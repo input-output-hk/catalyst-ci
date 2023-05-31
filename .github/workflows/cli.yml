@@ -65,5 +65,5 @@ jobs:
           earthly  \
             --ci \
             --buildkit-host "tcp://${{ secrets.EARTHLY_SATELLITE_ADDRESS }}:8372" \
-            --push ./ci+docker \
+            --push ./cli+docker \
             --registry=ghcr.io/${{ github.repository }}
