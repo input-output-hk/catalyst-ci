@@ -2,11 +2,11 @@ name: Build CLI image
 
 on:
   push:
-    branches:
-        - main
-    paths:
-        - ".github/workflows/cli.yml"
-        - "cli/**"
+    # branches:
+    #     - main
+    # paths:
+    #     - ".github/workflows/cli.yml"
+    #     - "cli/**"
 
 permissions:
   id-token: write
