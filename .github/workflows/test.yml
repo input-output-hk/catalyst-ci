@@ -23,3 +23,6 @@ jobs:
           earthly_version: 0.7.6
       - uses: actions/checkout@v3
       - uses: input-output-hk/catalyst-ci/actions/discover@actions
+        with:
+          parse_images: "true"
+          targets: docker
