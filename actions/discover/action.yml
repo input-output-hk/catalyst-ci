@@ -1,6 +1,10 @@
 name: CI Discovery
 description: Discovers Earthfiles in the given paths and compiles data about them
 inputs:
+  parse_images:
+    description: Whether the image names from the given targets should be returnd (requires at least one target)
+    required: false
+    default: "false"
   paths:
     description: A space separated list of paths to search
     required: false
@@ -13,14 +17,19 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Discovers
+    - name: Discover
       shell: bash
       id: discover
       run: |
-        TARGET_FLAGS=()
+        FLAGS=("-j")
+
+        if [[ "${{ inputs.parse_images }}" -eq "true" ]]; then
+          FLAGS+="-i"
+        fi
+
         for target in ${{ inputs.targets }}; do
-          TARGET_FLAGS+=("-t" "$target")
+          FLAGS+=("-t" "$target")
         done
 
-        JSON_OUTPUT=$(ci scan -j -i "${TARGET_FLAGS[@]}" ${{ inputs.paths }})
+        JSON_OUTPUT=$(ci scan "${FLAGS[@]}" ${{ inputs.paths }})
         echo "$JSON_OUTPUT"
