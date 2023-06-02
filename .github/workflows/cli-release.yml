@@ -22,4 +22,4 @@ jobs:
       - name: Release CLI
         uses: softprops/action-gh-release@v1
         with:
-          files: ./cli/bin/ci
+          files: ci-linux-amd64
