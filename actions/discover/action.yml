@@ -17,9 +17,9 @@ runs:
       shell: bash
       id: discover
       run: |
-        TARGET_FLAGS=""
-        for target in ${{ inputs.targets }}; do
-          TARGET_FLAGS+="-t $target "
+        TARGET_FLAGS=()
+        for target in ${inputs.targets}; do
+          TARGET_FLAGS+=("-t" "$target")
         done
 
         JSON_OUTPUT=$(ci scan -j -i "${TARGET_FLAGS}" ${{ inputs.paths }})
