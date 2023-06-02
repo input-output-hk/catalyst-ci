@@ -31,7 +31,7 @@ runs:
             --tag=latest
 
           for image in ${{ inputs.images }}; do
-            for tag in ${{ input.tags }}; do
+            for tag in ${{ inputs.tags }}; do
               echo "Tagging ${image}:latest as ${{ inputs.registry }}/${image}:${TAG}"
               docker tag "${image}:latest" "${{ inputs.registry }}/${image}:${TAG}"
 
