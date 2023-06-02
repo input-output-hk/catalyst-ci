@@ -22,7 +22,7 @@ runs:
         sudo curl \
           -L https://github.com/input-output-hk/catalyst-ci/releases/download/v${{ inputs.cli_version }}/ci-linux-amd64 \
           -o /usr/bin/ci
-        chmod +x /usr/bin/ci
+        sudo chmod +x /usr/bin/ci
     - name: Check
       shell: bash
       run: ci --help
