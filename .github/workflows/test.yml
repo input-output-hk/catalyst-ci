@@ -1,0 +1,12 @@
+name: Build CLI image
+
+on:
+  push:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: input-output-hk/catalyst-ci/actions/setup@actions
+        with:
+          earthly_version: 0.7.6
