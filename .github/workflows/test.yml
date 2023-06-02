@@ -3,10 +3,17 @@ name: Build CLI image
 on:
   push:
 
+env:
+  AWS_REGION: eu-central-1
+  AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
+
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
       - uses: input-output-hk/catalyst-ci/actions/setup@actions
         with:
+          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+          aws_region: ${{ env.AWS_REGION }}
           earthly_version: 0.7.6
+          satellite_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
