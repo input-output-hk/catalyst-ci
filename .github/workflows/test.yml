@@ -22,7 +22,12 @@ jobs:
           aws_region: ${{ env.AWS_REGION }}
           earthly_version: 0.7.6
       - uses: actions/checkout@v3
-      - uses: input-output-hk/catalyst-ci/actions/discover@actions
+      - name: Discover
+        uses: input-output-hk/catalyst-ci/actions/discover@actions
+        id: discover
         with:
           parse_images: "true"
           targets: docker
+      - name: Test
+        run: |
+          echo "${{ steps.discover.outputs.json}}"

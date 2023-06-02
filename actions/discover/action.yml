@@ -13,6 +13,10 @@ inputs:
     description: A space seperated list of targets to filter against
     required: false
     default: ""
+outputs:
+  json:
+    description: "JSON object containing information about discovered Earthfiles"
+    value: ${{ steps.discover.outputs.json }}
 
 runs:
   using: composite
@@ -32,4 +36,10 @@ runs:
         done
 
         JSON_OUTPUT=$(ci scan "${FLAGS[@]}" ${{ inputs.paths }})
-        echo "$JSON_OUTPUT"
+        if [[ "${{ inputs.parse_images }}" == "true" ]]; then
+          OUTPUT=$(echo "$JSON_OUTPUT" | jq -cr '[.[] | .images |= join(" ")]')
+        else
+          OUTPUT="${JSON_OUTPUT}"
+        fi
+
+        echo "json=$OUTPUT" >>$GITHUB_OUTPUT
