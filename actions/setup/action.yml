@@ -1,6 +1,10 @@
 name: CI Setup
 description: Performs required steps to setup CI
 inputs:
+  aws_ecr_registry:
+    description: The ECR registry to authenticate with for pushing images
+    required: false
+    default: ""
   aws_role_arn:
     description: The ARN of the CI role (used for fetching secrets)
     required: true
@@ -15,6 +19,10 @@ inputs:
     description: The version of Earthly to install
     required: false
     default: latest
+  ghcr_login:
+    description: If true, logs into the GHCR registry using runner Credentials
+    required: false
+    default: "false"
 runs:
   using: composite
   steps:
@@ -34,6 +42,18 @@ runs:
       with:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
-    - name: Setup Earthly environment
+    - name: Login to ECR
+      if: ${{ inputs.aws_ecr_registry != "" }}
+      uses: docker/login-action@v2
+      with:
+        registry: ${{ inputs.aws_ecr_registry }}
+    - name: Login to GHCR
+      if: ${{ inputs.ghcr_login == "true" }}
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    - name: Setup Earthly Satellite
       shell: bash
       run: mkdir -p /tmp/certs && ci setup /tmp/certs
