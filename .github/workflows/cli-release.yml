@@ -2,11 +2,8 @@ name: Release CLI Binary
 
 on:
   push:
-    branches:
-      - master
-    paths:
-      - ".github/workflows/cli-release.yml"
-      - "cli/**"
+    tags:
+      - "v*.*.*"
 
 permissions:
     contents: write
@@ -14,7 +11,6 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu
-    if: startsWith(github.ref, 'refs/tags/')
     steps:
       - uses: actions/checkout@v2
       - name: Install Earthly
@@ -25,6 +21,5 @@ jobs:
         run: earthly ./cli+build && mv ./cli/bin/ci ci-linux-amd64
       - name: Release CLI
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: ./cli/bin/ci
