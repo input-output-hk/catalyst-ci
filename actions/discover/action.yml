@@ -24,7 +24,7 @@ runs:
         FLAGS=("-j")
 
         if [[ "${{ inputs.parse_images }}" -eq "true" ]]; then
-          FLAGS+="-i"
+          FLAGS+=("-i")
         fi
 
         for target in ${{ inputs.targets }}; do
