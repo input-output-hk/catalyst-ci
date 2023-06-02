@@ -57,6 +57,6 @@ jobs:
           earthfile: ${{ matrix.target.path }}
           earthly_satellite: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           images: ${{ matrix.target.images }}
-          registry: ${{ github.repository }}
+          registry: ghcr.io/${{ github.repository }}
           tags: test
           target: docker
