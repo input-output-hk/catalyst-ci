@@ -22,5 +22,5 @@ runs:
           TARGET_FLAGS+=("-t" "$target")
         done
 
-        JSON_OUTPUT=$(ci scan -j -i "${TARGET_FLAGS}" ${{ inputs.paths }})
+        JSON_OUTPUT=$(ci scan -j -i "${TARGET_FLAGS[@]}" ${{ inputs.paths }})
         echo "$JSON_OUTPUT"
