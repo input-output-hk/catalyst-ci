@@ -32,10 +32,10 @@ runs:
 
           for image in ${{ inputs.images }}; do
             for tag in ${{ inputs.tags }}; do
-              echo "Tagging ${image}:latest as ${{ inputs.registry }}/${image}:${TAG}"
-              docker tag "${image}:latest" "${{ inputs.registry }}/${image}:${TAG}"
+              echo "Tagging ${image}:latest as ${{ inputs.registry }}/${image}:${tag}"
+              docker tag "${image}:latest" "${{ inputs.registry }}/${image}:${tag}"
 
-              echo "Pushing ${{ inputs.registry }}/${image}:${TAG}"
-              docker push "${{ inputs.registry }}/${image}:${TAG}"
+              echo "Pushing ${{ inputs.registry }}/${image}:${tag}"
+              docker push "${{ inputs.registry }}/${image}:${tag}"
             done
           done
