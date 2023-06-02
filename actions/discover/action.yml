@@ -23,7 +23,7 @@ runs:
       run: |
         FLAGS=("-j")
 
-        if [[ "${{ inputs.parse_images }}" -eq "true" ]]; then
+        if [[ "${{ inputs.parse_images }}" == "true" ]]; then
           FLAGS+=("-i")
         fi
 
