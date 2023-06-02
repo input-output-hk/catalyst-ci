@@ -15,9 +15,6 @@ inputs:
     description: The version of Earthly to install
     required: false
     default: latest
-  satellite_address:
-    description: Address to the remote Earthly satellite
-    required: true
 runs:
   using: composite
   steps:
@@ -40,8 +37,3 @@ runs:
     - name: Setup Earthly environment
       shell: bash
       run: mkdir -p /tmp/certs && ci setup /tmp/certs
-    - uses: actions/checkout@v3
-    - name: Test
-      shell: bash
-      run: |
-        earthly --buildkit-host "tcp://${{ inputs.satellite_address }}:8372" ./cli+build

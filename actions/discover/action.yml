@@ -1,0 +1,26 @@
+name: CI Discovery
+description: Discovers Earthfiles in the given paths and compiles data about them
+inputs:
+  paths:
+    description: A space separated list of paths to search
+    required: false
+    default: "."
+  targets:
+    description: A space seperated list of targets to filter against
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Discovers
+      shell: bash
+      id: discover
+      run: |
+        TARGET_FLAGS=""
+        for target in ${{ inputs.targets }}; do
+          TARGET_FLAGS+="-t $target "
+        done
+
+        JSON_OUTPUT=$(ci scan -j -i "${TARGET_FLAGS}" ${{ inputs.paths }})
+        echo "$JSON_OUTPUT"

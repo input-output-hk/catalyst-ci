@@ -21,4 +21,7 @@ jobs:
           aws_role_arn: ${{ env.AWS_ROLE_ARN }}
           aws_region: ${{ env.AWS_REGION }}
           earthly_version: 0.7.6
-          satellite_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      - uses: actions/checkout@v3
+      - uses: input-output-hk/catalyst-ci/actions/discover@actions
+        with:
+          targets: docker
