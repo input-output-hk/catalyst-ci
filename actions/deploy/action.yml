@@ -15,5 +15,5 @@ runs:
       shell: bash
       id: discover
       run: |
-        PAYLOAD=$(echo "${{ inputs.discover_output }}" | jq -cr 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
+        PAYLOAD=$(echo '${{ inputs.discover_output }}' | jq -cr 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
         echo "Payload: ${PAYLOAD}"
