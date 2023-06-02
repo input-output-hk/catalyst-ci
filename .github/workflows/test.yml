@@ -19,7 +19,8 @@ jobs:
     outputs:
       json: ${{ steps.discover.outputs.json}}
     steps:
-      - uses: input-output-hk/catalyst-ci/actions/setup@actions
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@actions
         with:
           aws_role_arn: ${{ env.AWS_ROLE_ARN }}
           aws_region: ${{ env.AWS_REGION }}
@@ -31,7 +32,7 @@ jobs:
         with:
           parse_images: "true"
           targets: docker
-  test:
+  publish:
     runs-on: ubuntu-latest
     needs: [discover]
     strategy:
@@ -60,3 +61,12 @@ jobs:
           registry: ghcr.io/${{ github.repository }}
           tags: test
           target: docker
+  deploy:
+    runs-on: ubuntu-latest
+    needs: [discover, publish]
+    steps:
+      - name: Send deployment payload
+        uses: input-output-hk/catalyst-ci/actions/deploy@actions
+        with:
+          discover_output: ${{ needs.discover.outputs.json }}
+          tag: test
