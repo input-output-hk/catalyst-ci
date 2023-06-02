@@ -14,8 +14,10 @@ env:
   ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
 
 jobs:
-  test:
+  discover:
     runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.discover.outputs.json}}
     steps:
       - uses: input-output-hk/catalyst-ci/actions/setup@actions
         with:
@@ -29,6 +31,31 @@ jobs:
         with:
           parse_images: "true"
           targets: docker
-      - name: Test
-        run: |
-          echo "${{ steps.discover.outputs.json}}"
+  test:
+    runs-on: ubuntu-latest
+    needs: [discover]
+    strategy:
+      matrix:
+        target: ${{ fromJson(needs.discover.outputs.json) }}
+    steps:
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@actions
+        with:
+          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+          aws_region: ${{ env.AWS_REGION }}
+          earthly_version: 0.7.6
+      - name: Login to GHCR
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish
+        uses: input-output-hk/catalyst-ci/actions/publish@actions
+        with:
+          earthfile: ${{ matrix.target.path }}
+          earthly_satellite: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          images: ${{ matrix.target.images }}
+          registry: ${{ github.repository }}
+          tags: test
+          target: docker
