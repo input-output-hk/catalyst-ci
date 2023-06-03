@@ -1,0 +1,39 @@
+name: CI Setup
+description: Performs required steps to setup CI
+inputs:
+  aws_role_arn:
+    description: The ARN of the CI role (used for fetching secrets)
+    required: true
+  aws_region:
+    description: The AWS region to use
+    required: true
+  cli_version:
+    description: The version of the CI CLI to install
+    required: false
+    default: 0.0.1
+  earthly_version:
+    description: The version of Earthly to install
+    required: false
+    default: latest
+runs:
+  using: composite
+  steps:
+    - name: Install Earthly
+      uses: earthly/actions-setup@v1
+      with:
+        version: ${{ inputs.earthly_version }}
+    - name: Install CLI
+      shell: bash
+      run: |
+        sudo curl \
+          -L https://github.com/input-output-hk/catalyst-ci/releases/download/v${{ inputs.cli_version }}/ci-linux-amd64 \
+          -o /usr/bin/ci
+        sudo chmod +x /usr/bin/ci
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        role-to-assume: ${{ inputs.aws_role_arn }}
+        aws-region: ${{ inputs.aws_region }}
+    - name: Setup Earthly Satellite
+      shell: bash
+      run: mkdir -p /tmp/certs && ci setup /tmp/certs

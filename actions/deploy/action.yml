@@ -1,0 +1,19 @@
+name: CI Deploy
+description: Deploys the published images to the remote cluster
+inputs:
+  discover_output:
+    description: The output from the discover step
+    required: true
+  tag:
+    description: The image tag to deploy
+    required: true
+
+runs:
+  using: composite
+  steps:
+    - name: Discover
+      shell: bash
+      id: discover
+      run: |
+        PAYLOAD=$(echo '${{ inputs.discover_output }}' | jq -cr 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
+        echo "Payload: ${PAYLOAD}"
