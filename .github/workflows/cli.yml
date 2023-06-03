@@ -2,11 +2,11 @@ name: Build CLI image
 
 on:
   push:
-    # branches:
-    #     - master
-    # paths:
-    #     - ".github/workflows/cli.yml"
-    #     - "cli/**"
+    branches:
+        - master
+    paths:
+        - ".github/workflows/cli.yml"
+        - "cli/**"
 
 permissions:
   id-token: write
@@ -29,13 +29,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@actions
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_role_arn: ${{ env.AWS_ROLE_ARN }}
           aws_region: ${{ env.AWS_REGION }}
           earthly_version: ${{ env.EARTHLY_VERSION }}
       - name: Discover Earthfiles
-        uses: input-output-hk/catalyst-ci/actions/discover@actions
+        uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
         with:
           parse_images: "true"
@@ -49,19 +49,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@actions
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_role_arn: ${{ env.AWS_ROLE_ARN }}
           aws_region: ${{ env.AWS_REGION }}
           earthly_version: ${{ env.EARTHLY_VERSION }}
       - name: Login to GHCR
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish
-        uses: input-output-hk/catalyst-ci/actions/publish@actions
+        uses: input-output-hk/catalyst-ci/actions/publish@master
         with:
           earthfile: ${{ matrix.earthfile.path }}
           earthly_satellite: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
