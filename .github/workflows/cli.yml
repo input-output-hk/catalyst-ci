@@ -2,11 +2,11 @@ name: Build CLI image
 
 on:
   push:
-    branches:
-        - master
-    paths:
-        - ".github/workflows/cli.yml"
-        - "cli/**"
+    # branches:
+    #     - master
+    # paths:
+    #     - ".github/workflows/cli.yml"
+    #     - "cli/**"
 
 permissions:
   id-token: write
@@ -16,54 +16,56 @@ permissions:
 env:
   AWS_REGION: eu-central-1
   AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
+  EARTHLY_TARGET: docker
+  EARTHLY_VERSION: 0.7.6
+  GHCR_REGISTRY: ghcr.io/${{ github.repository }}
+  TAGS: latest
 
 jobs:
-  build:
+  discover:
     runs-on: ubuntu-latest
-    env:
-      FORCE_COLOR: 1
+    outputs:
+      json: ${{ steps.discover.outputs.json}}
     steps:
-      - name: Install Earthly
-        uses: earthly/actions/setup-earthly@v1
-        with:
-          version: v0.7.6
       - uses: actions/checkout@v3
-      - name: Put back the git branch into git (Earthly uses it for tagging)
-        run: |
-          branch=""
-          if [ -n "$GITHUB_HEAD_REF" ]; then
-            branch="$GITHUB_HEAD_REF"
-          else
-            branch="${GITHUB_REF##*/}"
-          fi
-          git checkout -b "$branch" || true
-      - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1.7.0
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@actions
         with:
-          role-to-assume: ${{ env.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v2
+          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+          aws_region: ${{ env.AWS_REGION }}
+          earthly_version: ${{ env.EARTHLY_VERSION }}
+      - name: Discover Earthfiles
+        uses: input-output-hk/catalyst-ci/actions/discover@actions
+        id: discover
+        with:
+          parse_images: "true"
+          targets: ${{ env.EARTHLY_TARGET }}
+  publish:
+    runs-on: ubuntu-latest
+    needs: [discover]
+    strategy:
+      matrix:
+        earthfile: ${{ fromJson(needs.discover.outputs.json) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@actions
+        with:
+          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+          aws_region: ${{ env.AWS_REGION }}
+          earthly_version: ${{ env.EARTHLY_VERSION }}
+      - name: Login to GHCR
+        uses: docker/login-action@v1
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Configure Earthly remote runner
-        run: |
-            mkdir -p /tmp/certs
-
-            JSON=$(aws secretsmanager get-secret-value --secret-id global/ci/ci-tls --query SecretString --output text)
-            echo "${JSON}" | jq -r .private_key | sed 's/\\n/\n/g' > /tmp/certs/key.pem
-            echo "${JSON}" | jq -r .certificate | sed 's/\\n/\n/g' > /tmp/certs/cert.pem
-            echo "${JSON}" | jq -r .ca_certificate | sed 's/\\n/\n/g' > /tmp/certs/ca.pem
-
-            earthly config global.tlskey /tmp/certs/key.pem
-            earthly config global.tlscert /tmp/certs/cert.pem
-            earthly config global.tlsca /tmp/certs/ca.pem
-      - name: Run build
-        run: |
-          earthly  \
-            --ci \
-            --buildkit-host "tcp://${{ secrets.EARTHLY_SATELLITE_ADDRESS }}:8372" \
-            --push ./cli+docker \
-            --registry=ghcr.io/${{ github.repository }}
+      - name: Build and publish
+        uses: input-output-hk/catalyst-ci/actions/publish@actions
+        with:
+          earthfile: ${{ matrix.earthfile.path }}
+          earthly_satellite: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          images: ${{ matrix.earthfile.images }}
+          registry: ${{ env.GHCR_REGISTRY }}
+          tags: ${{ env.TAGS }}
+          target: ${{ env.EARTHLY_TARGET }}
