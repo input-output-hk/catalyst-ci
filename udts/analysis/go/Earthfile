@@ -12,6 +12,9 @@ FMT:
 
 LINT:
     COMMAND
+
+    CACHE /cache
+    ENV GOLANGCI_LINT_CACHE=/cache
     RUN golangci-lint run
 
 SETUP:
