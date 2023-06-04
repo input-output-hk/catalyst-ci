@@ -1,5 +1,5 @@
 name: CI Setup
-description: Performs required steps to setup CI
+description: Performs required steps to setup CI.
 inputs:
   aws_role_arn:
     description: The ARN of the CI role (used for fetching secrets)

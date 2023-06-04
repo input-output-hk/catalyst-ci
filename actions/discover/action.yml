@@ -1,5 +1,5 @@
 name: CI Discovery
-description: Discovers Earthfiles in the given paths and compiles data about them
+description: Discovers Earthfiles in the given paths and compiles data about them.
 inputs:
   parse_images:
     description: Whether the image names from the given targets should be returnd (requires at least one target)

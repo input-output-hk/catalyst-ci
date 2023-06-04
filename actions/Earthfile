@@ -1,0 +1,10 @@
+VERSION 0.7
+
+DOCS:
+    COMMAND
+    RUN npm install -g action-docs
+
+    COPY action.yml .
+    RUN action-docs > README.md
+
+    SAVE ARTIFACT README.md AS LOCAL README.md

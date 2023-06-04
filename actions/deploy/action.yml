@@ -1,5 +1,5 @@
 name: CI Deploy
-description: Deploys the published images to the remote cluster
+description: Deploys the published images to the remote cluster.
 inputs:
   discover_output:
     description: The output from the discover step

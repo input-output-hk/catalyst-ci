@@ -1,0 +1,5 @@
+VERSION 0.7
+
+docs:
+    FROM node:16-alpine3.17
+    DO ../+DOCS

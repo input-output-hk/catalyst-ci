@@ -1,5 +1,5 @@
 name: CI Publish
-description: Publishes the given Docker containers
+description: Publishes the given Docker containers.
 inputs:
   earthfile:
     description: Path to the Earthfile (excluding /Earthfile suffix) to build
