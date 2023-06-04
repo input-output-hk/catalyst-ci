@@ -24,8 +24,22 @@ var _ = Describe("FileScanner", func() {
 
 	Describe("Scan", func() {
 		BeforeEach(func() {
-			afero.WriteFile(fs, "/test/Earthfile", []byte("target:"), 0644)
-			afero.WriteFile(fs, "/test/pkg/Earthfile", []byte("target:"), 0644)
+			err := afero.WriteFile(
+				fs,
+				"/test/Earthfile",
+				[]byte("target:"),
+				0644,
+			)
+			Expect(err).NotTo(HaveOccurred())
+
+			err = afero.WriteFile(
+				fs,
+				"/test/pkg/Earthfile",
+				[]byte("target:"),
+				0644,
+			)
+			Expect(err).NotTo(HaveOccurred())
+
 			parser = &mockParser{
 				earthfile: pkg.Earthfile{},
 				err:       nil,
@@ -63,7 +77,13 @@ var _ = Describe("FileScanner", func() {
 
 	Describe("ScanForTarget", func() {
 		BeforeEach(func() {
-			afero.WriteFile(fs, "/test/Earthfile", []byte("docker"), 0644)
+			err := afero.WriteFile(
+				fs,
+				"/test/Earthfile",
+				[]byte("docker"),
+				0644,
+			)
+			Expect(err).NotTo(HaveOccurred())
 			parser = &mockParser{
 				earthfile: pkg.Earthfile{
 					Targets: []spec.Target{
@@ -85,7 +105,13 @@ var _ = Describe("FileScanner", func() {
 
 		Context("when the Earthfile does not contain docker target", func() {
 			BeforeEach(func() {
-				afero.WriteFile(fs, "/test/Earthfile", []byte("other"), 0644)
+				err := afero.WriteFile(
+					fs,
+					"/test/Earthfile",
+					[]byte("other"),
+					0644,
+				)
+				Expect(err).NotTo(HaveOccurred())
 				parser = &mockParser{
 					earthfile: pkg.Earthfile{
 						Targets: []spec.Target{

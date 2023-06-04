@@ -48,28 +48,32 @@ func (f *FileScanner) scan(
 ) ([]pkg.Earthfile, error) {
 	var earthfiles []pkg.Earthfile
 	for _, path := range f.paths {
-		if err := afero.Walk(f.fs, path, func(path string, info os.FileInfo, err error) error {
+		if walkErr := afero.Walk(f.fs, path, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+
 			// Filter to Earthfiles
 			if filepath.Base(path) != "Earthfile" {
 				return nil
 			}
 
-			earthfile, err := f.parser.Parse(path)
-			if err != nil {
-				return err
+			earthfile, parseErr := f.parser.Parse(path)
+			if parseErr != nil {
+				return parseErr
 			}
 
-			include, err := filter(earthfile)
-			if err != nil {
-				return err
+			include, filterErr := filter(earthfile)
+			if filterErr != nil {
+				return filterErr
 			}
 			if include {
 				earthfiles = append(earthfiles, earthfile)
 			}
 
 			return nil
-		}); err != nil {
-			return nil, err
+		}); walkErr != nil {
+			return nil, walkErr
 		}
 	}
 

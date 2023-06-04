@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -190,15 +189,15 @@ func (c *setupCmd) Run() error {
 	certPath := filepath.Join(c.Path, "cert.pem")
 	keyPath := filepath.Join(c.Path, "key.pem")
 
-	if err := ioutil.WriteFile(caPath, []byte(strings.Replace(certs.CACertificate, "\\n", "\n", -1)), 0644); err != nil {
+	if err := os.WriteFile(caPath, []byte(strings.Replace(certs.CACertificate, "\\n", "\n", -1)), 0644); err != nil {
 		return err
 	}
 
-	if err := ioutil.WriteFile(certPath, []byte(strings.Replace(certs.Certificate, "\\n", "\n", -1)), 0644); err != nil {
+	if err := os.WriteFile(certPath, []byte(strings.Replace(certs.Certificate, "\\n", "\n", -1)), 0644); err != nil {
 		return err
 	}
 
-	if err := ioutil.WriteFile(keyPath, []byte(strings.Replace(certs.PrivateKey, "\\n", "\n", -1)), 0644); err != nil {
+	if err := os.WriteFile(keyPath, []byte(strings.Replace(certs.PrivateKey, "\\n", "\n", -1)), 0644); err != nil {
 		return err
 	}
 
@@ -220,7 +219,7 @@ func (c *setupCmd) Run() error {
 	}
 
 	configPath := filepath.Join(usr.HomeDir, ".earthly", "config.yml")
-	if err := ioutil.WriteFile(configPath, configStr, 0644); err != nil {
+	if err := os.WriteFile(configPath, configStr, 0644); err != nil {
 		return err
 	}
 
