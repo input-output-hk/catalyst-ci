@@ -3,11 +3,16 @@ FROM golang:1.20-alpine3.18
 
 deps:
     WORKDIR /work
-    COPY go.mod go.sum ./
-    RUN go mod download
 
     # Install external deps
     RUN apk add --no-cache gcc musl-dev
+
+    # Install any static analysis tools
+    DO ../udts/analysis/go+SETUP
+
+    # Install package dependencies
+    COPY go.mod go.sum ./
+    RUN go mod download
 
     # Make sure the ginkgo binary is available for the test stage
     RUN go install github.com/onsi/ginkgo/v2
@@ -18,10 +23,8 @@ deps:
 check:
     FROM +deps
 
-    COPY --dir cmd pkg pkg .
-
-    RUN go fmt ./...
-    RUN go vet ./...
+    COPY --dir cmd pkg .
+    DO ../udts/analysis/go+ALL
 
 test:
     FROM +check

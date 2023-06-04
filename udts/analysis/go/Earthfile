@@ -1,0 +1,26 @@
+VERSION 0.7
+
+ALL:
+    COMMAND
+    DO +FMT
+    DO +LINT
+    DO +VET
+
+FMT:
+    COMMAND
+    RUN if [ "$(gofmt -l . | wc -l)" -gt 0 ]; then exit 1; fi
+
+LINT:
+    COMMAND
+    RUN golangci-lint run
+
+SETUP:
+    COMMAND
+    ARG GOLANGCI_LINT_URL=https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh
+    ARG GOLANGCI_LINT_VERSION=v1.53.1
+
+    RUN wget -O- -nv "${GOLANGCI_LINT_URL}" | sh -s -- -b $(go env GOPATH)/bin "${GOLANGCI_LINT_VERSION}"
+
+VET:
+    COMMAND
+    RUN go version && go vet ./...
