@@ -50,7 +50,7 @@ runs:
           ${{ inputs.earthfile }}+${{ inputs.target }}  \
           "${TARGET_FLAGS[@]}"
 
-        if [[ -n "${{ inputs.publish }}" == "true" ]]; then
+        if [[ "${{ inputs.publish }}" == "true" ]]; then
           for image in ${{ inputs.images }}; do
             for tag in ${{ inputs.tags }}; do
               echo "Tagging ${image}:latest as ${{ inputs.registry }}/${image}:${tag}"

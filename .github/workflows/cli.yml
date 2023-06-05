@@ -64,7 +64,7 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/build@build
         with:
           earthfile: ${{ matrix.earthfile.path }}
-          #earthly_satellite: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          earthly_satellite: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           #images: ${{ matrix.earthfile.images }}
           publish: "false"
           #registry: ${{ env.GHCR_REGISTRY }}
