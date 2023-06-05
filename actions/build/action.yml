@@ -34,8 +34,8 @@ runs:
     - name: Build
       shell: bash
       run: |
-        EARTHLY_FLAGS=("")
-        TARGET_FLAGS=("")
+        EARTHLY_FLAGS=()
+        TARGET_FLAGS=()
 
         if [[ "${{ inputs.earthly_satellite}}" == "true" ]]; then
           EARTHLY_FLAGS+=("--buildkit-host" "tcp://${{ inputs.earthly_satellite }}:8372")
