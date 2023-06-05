@@ -37,7 +37,7 @@ runs:
         EARTHLY_FLAGS=()
         TARGET_FLAGS=()
 
-        if [[ "${{ inputs.earthly_satellite}}" == "true" ]]; then
+        if [[ -n "${{ inputs.earthly_satellite}}" ]]; then
           EARTHLY_FLAGS+=("--buildkit-host" "tcp://${{ inputs.earthly_satellite }}:8372")
         fi
 
