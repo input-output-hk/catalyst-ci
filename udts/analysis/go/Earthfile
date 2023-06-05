@@ -15,7 +15,15 @@ LINT:
 
     CACHE /cache
     ENV GOLANGCI_LINT_CACHE=/cache
-    RUN golangci-lint run
+    RUN golangci-lint run \
+        -E errchkjson \
+        -E ginkgolinter \
+        -E godot \
+        -E goimports \
+        -E gosec \
+        -E nilnil \
+        -E revive \
+        -E testpackage
 
 SETUP:
     COMMAND

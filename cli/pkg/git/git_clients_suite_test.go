@@ -1,4 +1,4 @@
-package git_clients_test
+package git_test
 
 import (
 	"testing"
@@ -12,7 +12,7 @@ type mockExecutor struct {
 	err           error
 }
 
-func (m *mockExecutor) Run(args ...string) (string, error) {
+func (m *mockExecutor) Run(_ ...string) (string, error) {
 	return m.commandOutput, m.err
 }
 

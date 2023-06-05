@@ -1,4 +1,4 @@
-package git_clients
+package git
 
 import (
 	"strings"

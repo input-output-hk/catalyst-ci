@@ -16,9 +16,9 @@ type mockAstParser struct {
 }
 
 func (m mockAstParser) Parse(
-	ctx context.Context,
-	path string,
-	useCopy bool,
+	_ context.Context,
+	_ string,
+	_ bool,
 ) (spec.Earthfile, error) {
 	return m.ef, m.err
 }
@@ -34,7 +34,7 @@ var _ = Describe("EarthlyParser", func() {
 
 			earthfile, err := parser.Parse(expectedPath)
 
-			Expect(err).To(BeNil())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(earthfile.Path).To(Equal(expectedPath))
 			Expect(earthfile.Targets).To(HaveLen(1))
 			Expect(earthfile.Targets[0].Name).To(Equal("target"))
@@ -46,7 +46,7 @@ var _ = Describe("EarthlyParser", func() {
 
 			_, err := parser.Parse("/path/to/Earthfile")
 
-			Expect(err).NotTo(BeNil())
+			Expect(err).To(HaveOccurred())
 			Expect(err.Error()).To(Equal("parse error"))
 		})
 	})

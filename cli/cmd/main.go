@@ -15,7 +15,7 @@ import (
 	"github.com/input-output-hk/catalyst-ci/cli/pkg"
 	"github.com/input-output-hk/catalyst-ci/cli/pkg/executors"
 	"github.com/input-output-hk/catalyst-ci/cli/pkg/fetchers"
-	"github.com/input-output-hk/catalyst-ci/cli/pkg/git_clients"
+	"github.com/input-output-hk/catalyst-ci/cli/pkg/git"
 	"github.com/input-output-hk/catalyst-ci/cli/pkg/parsers"
 	"github.com/input-output-hk/catalyst-ci/cli/pkg/scanners"
 	"github.com/input-output-hk/catalyst-ci/cli/pkg/util"
@@ -38,7 +38,7 @@ var cli struct {
 }
 
 type imagesCmd struct {
-	JsonOutput bool   `short:"j" long:"json" help:"Output in JSON format"`
+	JSONOutput bool   `short:"j" long:"json" help:"Output in JSON format"`
 	Path       string `                      help:"path to Earthfile"               arg:"" type:"path"`
 	Target     string `short:"t"             help:"The target to search for images"                    required:"true"`
 }
@@ -55,24 +55,24 @@ func (c *imagesCmd) Run() error {
 		return err
 	}
 
-	if c.JsonOutput {
+	if c.JSONOutput {
 		jsonImages, err := json.Marshal(images)
 		if err != nil {
 			return err
 		}
 		fmt.Println(string(jsonImages))
 		return nil
-	} else {
-		for _, image := range images {
-			fmt.Println(image)
-		}
+	}
+
+	for _, image := range images {
+		fmt.Println(image)
 	}
 
 	return nil
 }
 
 type scanCmd struct {
-	JsonOutput bool     `short:"j" long:"json"   help:"Output in JSON format"`
+	JSONOutput bool     `short:"j" long:"json"   help:"Output in JSON format"`
 	Images     bool     `short:"i" long:"images" help:"Also output images for the target of each Earthfile (requires -t option)"`
 	Paths      []string `                        help:"paths to scan for Earthfiles"                                             arg:"" type:"path"`
 	Target     string   `short:"t"               help:"filter by Earthfiles that include this target"                                               default:""`
@@ -112,7 +112,7 @@ func (c *scanCmd) Run() error {
 			output[filepath.Dir(file.Path)] = images
 		}
 
-		if c.JsonOutput {
+		if c.JSONOutput {
 			var outFinal []interface{}
 			for path, images := range output {
 				out := struct {
@@ -138,7 +138,7 @@ func (c *scanCmd) Run() error {
 		return nil
 	}
 
-	if c.JsonOutput {
+	if c.JSONOutput {
 		var paths []string
 		for _, file := range files {
 			paths = append(paths, filepath.Dir(file.Path))
@@ -189,15 +189,15 @@ func (c *setupCmd) Run() error {
 	certPath := filepath.Join(c.Path, "cert.pem")
 	keyPath := filepath.Join(c.Path, "key.pem")
 
-	if err := os.WriteFile(caPath, []byte(strings.Replace(certs.CACertificate, "\\n", "\n", -1)), 0644); err != nil {
+	if err := os.WriteFile(caPath, []byte(strings.Replace(certs.CACertificate, "\\n", "\n", -1)), 0600); err != nil {
 		return err
 	}
 
-	if err := os.WriteFile(certPath, []byte(strings.Replace(certs.Certificate, "\\n", "\n", -1)), 0644); err != nil {
+	if err := os.WriteFile(certPath, []byte(strings.Replace(certs.Certificate, "\\n", "\n", -1)), 0600); err != nil {
 		return err
 	}
 
-	if err := os.WriteFile(keyPath, []byte(strings.Replace(certs.PrivateKey, "\\n", "\n", -1)), 0644); err != nil {
+	if err := os.WriteFile(keyPath, []byte(strings.Replace(certs.PrivateKey, "\\n", "\n", -1)), 0600); err != nil {
 		return err
 	}
 
@@ -219,11 +219,9 @@ func (c *setupCmd) Run() error {
 	}
 
 	configPath := filepath.Join(usr.HomeDir, ".earthly", "config.yml")
-	if err := os.WriteFile(configPath, configStr, 0644); err != nil {
-		return err
-	}
+	err = os.WriteFile(configPath, configStr, 0600)
 
-	return nil
+	return err
 }
 
 type tagsCmd struct {
@@ -232,7 +230,7 @@ type tagsCmd struct {
 
 func (c *tagsCmd) Run() error {
 	executor := executors.NewLocalExecutor("git")
-	client := git_clients.NewExternalGitClient(executor)
+	client := git.NewExternalGitClient(executor)
 
 	// Collect the highest version from the git tags
 	tags, err := client.Tags()

@@ -17,7 +17,7 @@ var _ = Describe("LocalExecutor", func() {
 			expectedOutput := "Hello, world!\n"
 
 			output, err := executor.Run("-n", expectedOutput)
-			Expect(err).To(BeNil())
+			Expect(err).ToNot(HaveOccurred())
 			Expect(output).To(Equal(expectedOutput))
 		})
 
@@ -25,7 +25,7 @@ var _ = Describe("LocalExecutor", func() {
 			executor := executors.NewLocalExecutor("does_not_exist")
 
 			_, err := executor.Run()
-			Expect(err).NotTo(BeNil())
+			Expect(err).To(HaveOccurred())
 			Expect(errors.Is(err, exec.ErrNotFound)).To(BeTrue())
 		})
 	})

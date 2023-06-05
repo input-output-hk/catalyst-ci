@@ -14,7 +14,7 @@ import (
 // AWSSatelliteCertificatesFetcher fetches the certificates required to connect
 // to a remote Earthly satellite from AWS Secrets Manager.
 type AWSSatelliteCertificatesFetcher struct {
-	Api  secretsmanageriface.SecretsManagerAPI
+	API  secretsmanageriface.SecretsManagerAPI
 	Path string
 }
 
@@ -23,7 +23,7 @@ func (a AWSSatelliteCertificatesFetcher) FetchCertificates() (pkg.SatelliteCerti
 		SecretId: aws.String(a.Path),
 	}
 
-	result, err := a.Api.GetSecretValue(input)
+	result, err := a.API.GetSecretValue(input)
 	if err != nil {
 		return pkg.SatelliteCertificates{}, err
 	}
@@ -43,9 +43,12 @@ func (a AWSSatelliteCertificatesFetcher) FetchCertificates() (pkg.SatelliteCerti
 		}
 
 		return certs, nil
-	} else {
-		return pkg.SatelliteCertificates{}, fmt.Errorf("Invalid secret name: %s", a.Path)
 	}
+
+	return pkg.SatelliteCertificates{}, fmt.Errorf(
+		"Invalid secret name: %s",
+		a.Path,
+	)
 }
 
 func NewAWSSatelliteCertificatesFetcher(
@@ -53,7 +56,7 @@ func NewAWSSatelliteCertificatesFetcher(
 	session *session.Session,
 ) *AWSSatelliteCertificatesFetcher {
 	return &AWSSatelliteCertificatesFetcher{
-		Api:  secretsmanager.New(session),
+		API:  secretsmanager.New(session),
 		Path: path,
 	}
 }

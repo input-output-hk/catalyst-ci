@@ -20,7 +20,7 @@ type mockSecretsManagerAPI struct {
 }
 
 func (m *mockSecretsManagerAPI) GetSecretValue(
-	input *secretsmanager.GetSecretValueInput,
+	_ *secretsmanager.GetSecretValueInput,
 ) (*secretsmanager.GetSecretValueOutput, error) {
 	return &m.Response, m.Error
 }
@@ -34,7 +34,7 @@ var _ = Describe("Aws", func() {
 			}
 
 			certFetcher := fetchers.AWSSatelliteCertificatesFetcher{
-				Api:  mockSvc,
+				API:  mockSvc,
 				Path: "fake-path",
 			}
 			_, err := certFetcher.FetchCertificates()
@@ -62,7 +62,7 @@ var _ = Describe("Aws", func() {
 			}
 
 			certFetcher := fetchers.AWSSatelliteCertificatesFetcher{
-				Api:  mockSvc,
+				API:  mockSvc,
 				Path: "fake-path",
 			}
 
@@ -85,7 +85,7 @@ var _ = Describe("Aws", func() {
 			}
 
 			certFetcher := fetchers.AWSSatelliteCertificatesFetcher{
-				Api:  mockSvc,
+				API:  mockSvc,
 				Path: "fake-path",
 			}
 
