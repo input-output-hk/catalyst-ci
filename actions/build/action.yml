@@ -41,7 +41,7 @@ runs:
           EARTHLY_FLAGS+=("--buildkit-host" "tcp://${{ inputs.earthly_satellite }}:8372")
         fi
 
-        if [[ -n "${{ inputs.publish }}" ]]; then
+        if [[ "${{ inputs.publish }}" == "true" ]]; then
           TARGET_FLAGS+=("--tag", "latest")
         fi
 
