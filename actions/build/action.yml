@@ -4,6 +4,10 @@ inputs:
   earthfile:
     description: Path to the Earthfile (excluding /Earthfile suffix) to build
     required: true
+  earthly_flags:
+    description: Additional flags to pass to Earthly
+    required: false
+    default: ""
   earthly_satellite:
     description: The address of the remote Earthly satellite to use
     required: false
@@ -27,6 +31,10 @@ inputs:
   target:
     description: The target to build for the given Earthfile
     required: true
+  target_flags:
+    description: Additional flags to pass to the Earthly target
+    required: false
+    default: ""
 
 runs:
   using: composite
@@ -47,8 +55,10 @@ runs:
 
         earthly \
           "${EARTHLY_FLAGS[@]}" \
+          ${{ inputs.earthly_flags }} \
           ${{ inputs.earthfile }}+${{ inputs.target }}  \
-          "${TARGET_FLAGS[@]}"
+          "${TARGET_FLAGS[@]}" \
+          ${{ inputs.target_flags }}
 
         if [[ "${{ inputs.publish }}" == "true" ]]; then
           for image in ${{ inputs.images }}; do
