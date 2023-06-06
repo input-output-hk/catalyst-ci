@@ -65,8 +65,8 @@ jobs:
         with:
           earthfile: ${{ matrix.earthfile.path }}
           earthly_satellite: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          #images: ${{ matrix.earthfile.images }}
+          images: ${{ matrix.earthfile.images }}
           publish: "false"
-          #registry: ${{ env.GHCR_REGISTRY }}
-          #tags: ${{ env.TAGS }}
+          registry: ${{ env.GHCR_REGISTRY }}
+          tags: ${{ env.TAGS }}
           target: ${{ env.EARTHLY_TARGET }}
