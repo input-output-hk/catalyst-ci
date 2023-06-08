@@ -33,8 +33,8 @@ runs:
     - name: Configure cluster access
       shell: bash
       run: |
-        CLUSTER_STATE=$(ci state -b {{ inputs.state_bucket }} -e {{ inputs.environment }} kubernetes/cluster)
-        CLUSTER_NAME=$(echo "$CLUSTER_STATE" | jq -r .cluster_name.value)
-        CLUSTER_REGION=$(echo "$CLUSTER_STATE" | jq -r .cluster_arn.value | cut -d ":" -f 4)
+        CLUSTER_STATE=$(ci state -b ${{ inputs.state_bucket }} -e ${{ inputs.environment }} kubernetes/cluster)
+        CLUSTER_NAME=$(echo "${CLUSTER_STATE}" | jq -r .cluster_name.value)
+        CLUSTER_REGION=$(echo "${CLUSTER_STATE}" | jq -r .cluster_arn.value | cut -d ":" -f 4)
 
         aws eks --region "${CLUSTER_REGION}" update-kubeconfig --name "${CLUSTER_NAME}"
