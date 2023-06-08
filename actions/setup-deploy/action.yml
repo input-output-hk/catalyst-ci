@@ -17,7 +17,7 @@ runs:
       shell: bash
       run: |
         sudo curl -fSL -o /usr/local/bin/tk "https://github.com/grafana/tanka/releases/download/v0.25.0/tk-linux-amd64"
-        sudo chmod +x /usr/local/bin/tk"
+        sudo chmod +x /usr/local/bin/tk
     - name: Configure SSH deployment key
       shell: bash
       run: |
