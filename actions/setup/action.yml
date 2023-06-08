@@ -11,6 +11,14 @@ inputs:
     description: The version of the CI CLI to install
     required: false
     default: 1.1.0
+  deploy_key_setup:
+    description: If "true", the git SSH deployment key will be configured
+    required: false
+    default: "false"
+  deploy_key_secret_name:
+    description: The name of the AWS secret containing the SSH deployment key
+    required: false
+    default: ""
   earthly_version:
     description: The version of Earthly to install
     required: false
@@ -34,6 +42,20 @@ runs:
       with:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
+    - name: Configure SSH deployment key
+      shell: bash
+      run: |
+        if [[ "${{ inputs.deploy_key_setup }}" == "true" ]]; then
+          DEPLOY_SECRET=$(aws secretsmanager get-secret-value --secret-id '${{ inputs.deploy_key_secret_name }}' | jq -r .SecretString)
+          PRIVATE_KEY=$(echo "${DEPLOY_SECRET}" | jq -r .private_key)
+          PUBLIC_KEY=$(echo "${DEPLOY_SECRET}" | jq -r .public_key)
+
+          mkdir -p ~/.ssh
+          echo "${PRIVATE_KEY}" >~/.ssh/id_ed25519
+          echo "${PUBLIC_KEY}" >~/.ssh/id_ed25519.pub
+          chmod 600 ~/.ssh/id_ed25519
+          chmod 0700 ~/.ssh
+        fi
     - name: Setup Earthly Satellite
       shell: bash
       run: mkdir -p /tmp/certs && ci setup /tmp/certs
