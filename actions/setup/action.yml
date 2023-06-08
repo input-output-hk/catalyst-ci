@@ -10,7 +10,7 @@ inputs:
   cli_version:
     description: The version of the CI CLI to install
     required: false
-    default: 0.0.1
+    default: 1.1.0
   earthly_version:
     description: The version of Earthly to install
     required: false
