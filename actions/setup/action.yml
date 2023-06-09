@@ -15,6 +15,10 @@ inputs:
     description: The version of Earthly to install
     required: false
     default: latest
+outputs:
+  token:
+    description: The Github token to use for interacting with repositories
+    value: ${{ steps.token.outputs.token }}
 runs:
   using: composite
   steps:
@@ -34,6 +38,12 @@ runs:
       with:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
+    - name: Fetch Github token
+      shell: bash
+      id: token
+      run: |
+        TOKEN=$(aws secretsmanager get-secret-value --secret-id 'global/ci/deploy' | jq -r .SecretString | jq -r .token)
+        echo "token=$TOKEN" >>$GITHUB_OUTPUT
     - name: Setup Earthly Satellite
       shell: bash
       run: mkdir -p /tmp/certs && ci setup /tmp/certs
