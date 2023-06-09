@@ -43,4 +43,4 @@ runs:
         git config --global user.name "catalyst-cibot"
         git add "$HASHES"
         git commit -m "chore: updates $REPO_NAME deployments"
-        git push origin deployment
+        git push origin "$(git rev-parse --abbrev-ref HEAD)"
