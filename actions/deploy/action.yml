@@ -31,18 +31,16 @@ runs:
       id: discover
       run: |
         CHANGES=$(echo '${{ inputs.discover_output }}' | jq -cr 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
-        CURRENT=src/kube/environments/${{ inputs.environment }}/hashes.json
+        echo "${CHANGES}" > /tmp/changes.json
 
-        echo "${CHANGES}" > changes.json
+        HASHES=src/kube/environments/${{ inputs.environment }}/hashes.json
+        FINAL=$(jq -s '.[0] * .[1]' "$HASHES" /tmp/changes.json)
+        echo "$FINAL" > "$HASHES"
 
-        ls -la
+        echo "Final:"
+        cat "$HASHES"
 
-        echo "Current ($CURRENT):"
-        cat "$CURRENT"
-
-        echo "Changes (changes.json):"
-        cat changes.json
-
-        FINAL=$(jq -s '.[0] * .[1]' "$CURRENT" changes.json)
-
-        echo "Final: $FINAL"
+        git config --global user.email "ci@projectcatalyst.io"
+        git config --global user.name "catalyst-cibot"
+        git add "$HASHES"
+        git commit -m "chore: updates deployments"
