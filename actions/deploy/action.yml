@@ -33,6 +33,14 @@ runs:
         UPDATED=$(echo '${{ inputs.discover_output }}' | jq -cr 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
         echo "${UPDATED}" > updated.json
 
+        ls -la
+
+        echo "Current:"
+        cat src/kube/environments/${{ inputs.environment }}/hashes.json
+
+        echo "Updated:"
+        cat updated.json
+
         HASHES=src/kube/environments/${{ inputs.environment }}/hashes.json
         jq -s '.[0] * .[1]' "$HASHES" updated.json > "$HASHES"
 
