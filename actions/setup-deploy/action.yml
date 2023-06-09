@@ -1,12 +1,21 @@
 name: CI Deployment Setup
 description: Performs required steps to setup CI for deploying to Kubernetes environments.
 inputs:
+  configure_cluster:
+    description: If "true", will configure kubectl to access the given environment's cluster
+    required: false
+    default: "false"
+  deploy_key_secret_id:
+    description: The ID of the AWS secret to use for fetching the SSH deployment key
+    required: true
   environment:
-    description: The target environment to configure deployment for
-    required: true
+    description: The target environment to configure cluster access for
+    required: false
+    default: ""
   state_bucket:
-    description: The name of the S3 bucket holding remote Terraform state.
-    required: true
+    description: The name of the S3 bucket holding remote Terraform state
+    required: false
+    default: ""
 runs:
   using: composite
   steps:
@@ -15,11 +24,25 @@ runs:
       run: |
         sudo curl -fSL -o /usr/local/bin/tk "https://github.com/grafana/tanka/releases/download/v0.25.0/tk-linux-amd64"
         sudo chmod +x /usr/local/bin/tk
+    - name: Configure SSH deployment key
+      shell: bash
+      run: |
+        DEPLOY_SECRET=$(aws secretsmanager get-secret-value --secret-id '${{ inputs.deploy_key_secret_id }}' | jq -r .SecretString)
+        PRIVATE_KEY=$(echo "${DEPLOY_SECRET}" | jq -r .private_key)
+        PUBLIC_KEY=$(echo "${DEPLOY_SECRET}" | jq -r .public_key)
+
+        mkdir -p ~/.ssh
+        echo "${PRIVATE_KEY}" >~/.ssh/id_ed25519
+        echo "${PUBLIC_KEY}" >~/.ssh/id_ed25519.pub
+        chmod 600 ~/.ssh/id_ed25519
+        chmod 0700 ~/.ssh
     - name: Configure cluster access
       shell: bash
       run: |
-        CLUSTER_STATE=$(ci state -b ${{ inputs.state_bucket }} -e ${{ inputs.environment }} kubernetes/cluster)
-        CLUSTER_NAME=$(echo "${CLUSTER_STATE}" | jq -r .cluster_name.value)
-        CLUSTER_REGION=$(echo "${CLUSTER_STATE}" | jq -r .cluster_arn.value | cut -d ":" -f 4)
+        if [[ "${{ inputs.configure_cluster }}" == "true" ]]; then
+          CLUSTER_STATE=$(ci state -b ${{ inputs.state_bucket }} -e ${{ inputs.environment }} kubernetes/cluster)
+          CLUSTER_NAME=$(echo "${CLUSTER_STATE}" | jq -r .cluster_name.value)
+          CLUSTER_REGION=$(echo "${CLUSTER_STATE}" | jq -r .cluster_arn.value | cut -d ":" -f 4)
 
-        aws eks --region "${CLUSTER_REGION}" update-kubeconfig --name "${CLUSTER_NAME}"
+          aws eks --region "${CLUSTER_REGION}" update-kubeconfig --name "${CLUSTER_NAME}"
+        fi
