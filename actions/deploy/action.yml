@@ -39,8 +39,9 @@ runs:
 
         git --no-pager diff
 
+        REPO_NAME=$(echo '${{ github.repository }}' | cut -d '/' -f 2)
         git config --global user.email "ci@projectcatalyst.io"
         git config --global user.name "catalyst-cibot"
         git add "$HASHES"
-        git commit -m "chore: updates deployments"
+        git commit -m "chore: updates $REPO_NAME deployments"
         git push origin deployment
