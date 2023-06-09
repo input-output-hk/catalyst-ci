@@ -1,9 +1,6 @@
 name: CI Deploy
 description: Deploys the published images to the remote cluster.
 inputs:
-  deployment_key:
-    description: The path to the SSH deployment key
-    required: true
   deployment_repo:
     description: The URL of the repository containing deployment code
     required: true
@@ -16,6 +13,9 @@ inputs:
   tag:
     description: The image tag to deploy
     required: true
+  token:
+    description: Github token for accessing deployment repo
+    required: true
 
 runs:
   using: composite
@@ -25,7 +25,7 @@ runs:
       with:
         repository: ${{ inputs.deployment_repo }}
         ref: deployment # TODO: Remove me
-        ssh-key: ${{ inputs.deployment_key }}
+        token: ${{ inputs.token }}
     - name: Update deployment hashes
       shell: bash
       id: discover
