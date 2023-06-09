@@ -30,19 +30,19 @@ runs:
       shell: bash
       id: discover
       run: |
-        UPDATED=$(echo '${{ inputs.discover_output }}' | jq -cr 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
-        echo "${UPDATED}" > updated.json
+        CHANGES=$(echo '${{ inputs.discover_output }}' | jq -cr 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
+        CURRENT=src/kube/environments/${{ inputs.environment }}/hashes.json
+
+        echo "${CHANGES}" > changes.json
 
         ls -la
 
-        echo "Current:"
-        cat src/kube/environments/${{ inputs.environment }}/hashes.json
+        echo "Current ($CURRENT):"
+        cat "$CURRENT"
 
-        echo "Updated:"
-        cat updated.json
+        echo "Changes (changes.json):"
+        cat changes.json
 
-        HASHES=src/kube/environments/${{ inputs.environment }}/hashes.json
-        jq -s '.[0] * .[1]' "$HASHES" updated.json > "$HASHES"
+        FINAL=$(jq -s '.[0] * .[1]' "$CURRENT" changes.json)
 
-        echo "Updated hashes:"
-        cat "$HASHES"
+        echo "Final: $FINAL"
