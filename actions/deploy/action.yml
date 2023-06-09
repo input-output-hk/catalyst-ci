@@ -24,7 +24,6 @@ runs:
       uses: actions/checkout@v3
       with:
         repository: ${{ inputs.deployment_repo }}
-        ref: deployment # TODO: Remove me
         token: ${{ inputs.token }}
     - name: Update deployment hashes
       shell: bash
