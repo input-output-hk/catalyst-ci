@@ -43,5 +43,5 @@ runs:
         git config --global user.email "ci@projectcatalyst.io"
         git config --global user.name "catalyst-cibot"
         git add "$HASHES"
-        git diff
+        git --no-pager diff
         git commit -m "chore: updates deployments"
