@@ -2,11 +2,11 @@ name: Build CLI image
 
 on:
   push:
-    # branches:
-    #     - master
-    # paths:
-    #     - ".github/workflows/cli.yml"
-    #     - "cli/**"
+    branches:
+        - master
+    paths:
+        - ".github/workflows/cli.yml"
+        - "cli/**"
 
 permissions:
   id-token: write
@@ -61,7 +61,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build and publish
-        uses: input-output-hk/catalyst-ci/actions/build@retries
+        uses: input-output-hk/catalyst-ci/actions/build@master
         with:
           earthfile: ${{ matrix.earthfile.path }}
           earthly_satellite: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
