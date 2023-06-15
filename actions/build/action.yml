@@ -44,6 +44,7 @@ runs:
       with:
         max_attempts: 3
         on_retry_command: docker image prune --all --force
+        timeout_minutes: 180
         command: |
           EARTHLY_FLAGS=()
           TARGET_FLAGS=()
