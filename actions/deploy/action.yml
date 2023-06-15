@@ -4,9 +4,6 @@ inputs:
   deployment_repo:
     description: The URL of the repository containing deployment code
     required: true
-  discover_output:
-    description: The output from the discover step
-    required: true
   environment:
     description: The target environment to deploy to
     required: true
@@ -41,13 +38,9 @@ runs:
 
         git --no-pager diff
 
-        echo "CHANGES: ${CHANGES}"
-        echo "HASHES": ${HASHES}"
-        echo "FINAL: ${FINAL}"
-
-        # REPO_NAME=$(echo '${{ github.repository }}' | cut -d '/' -f 2)
-        # git config --global user.email "ci@projectcatalyst.io"
-        # git config --global user.name "catalyst-cibot"
-        # git add "$HASHES"
-        # git commit -m "chore: updates $REPO_NAME deployments"
-        # git push origin "$(git rev-parse --abbrev-ref HEAD)"
+        REPO_NAME=$(echo '${{ github.repository }}' | cut -d '/' -f 2)
+        git config --global user.email "ci@projectcatalyst.io"
+        git config --global user.name "catalyst-cibot"
+        git add "$HASHES"
+        git commit -m "chore: updates $REPO_NAME deployments"
+        git push origin "$(git rev-parse --abbrev-ref HEAD)"
