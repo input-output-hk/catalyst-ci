@@ -4,11 +4,11 @@ inputs:
   deployment_repo:
     description: The URL of the repository containing deployment code
     required: true
-  discover_output:
-    description: The output from the discover step
-    required: true
   environment:
     description: The target environment to deploy to
+    required: true
+  images:
+    description: A space separted list of image names to deploy
     required: true
   tag:
     description: The image tag to deploy
@@ -29,7 +29,7 @@ runs:
       shell: bash
       id: discover
       run: |
-        CHANGES=$(echo '${{ inputs.discover_output }}' | jq --indent 4 -r 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
+        CHANGES=$(jq -n "$(for img in ${{ inputs.images }}; do printf '."%s"="%s" | ' $img "${{ inputs.tag }}"; done) .")
         echo "${CHANGES}" > /tmp/changes.json
 
         HASHES=src/kube/environments/${{ inputs.environment }}/hashes.json
