@@ -46,7 +46,7 @@ runs:
 
         IMAGES=""
         if [[ "${{ inputs.parse_images }}" == "true" ]]; then
-          IMAGES=$(echo "$JSON_OUTPUT" | jq -r '.[] | .images[]' file.json | tr '\n' ' ')
+          IMAGES=$(echo "$JSON_OUTPUT" | jq -r '.[] | .images[]' | tr '\n' ' ')
         fi
 
         echo "json=$OUTPUT" >>$GITHUB_OUTPUT
