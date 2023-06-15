@@ -15,9 +15,11 @@ inputs:
     default: ""
 outputs:
   json:
-    description: "JSON object containing information about discovered Earthfiles"
+    description: JSON object containing information about discovered Earthfiles
     value: ${{ steps.discover.outputs.json }}
-
+  images:
+    description: A string separated list of image names (only present if `parse_images` is "true")
+    value: ${{ steps.discover.outputs.images }}
 runs:
   using: composite
   steps:
@@ -42,4 +44,10 @@ runs:
           OUTPUT="${JSON_OUTPUT}"
         fi
 
+        IMAGES=""
+        if [[ "${{ inputs.parse_images }}" == "true" ]]; then
+          IMAGES=$(echo "$JSON_OUTPUT" | jq -r '.[] | .images[]' file.json | tr '\n' ' ')
+        fi
+
         echo "json=$OUTPUT" >>$GITHUB_OUTPUT
+        echo "images=$IMAGES" >>$GITHUB_OUTPUT

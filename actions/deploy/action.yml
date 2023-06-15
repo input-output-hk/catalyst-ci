@@ -10,6 +10,9 @@ inputs:
   environment:
     description: The target environment to deploy to
     required: true
+  images:
+    description: A space separted list of image names to deploy
+    required: true
   tag:
     description: The image tag to deploy
     required: true
@@ -29,7 +32,7 @@ runs:
       shell: bash
       id: discover
       run: |
-        CHANGES=$(echo '${{ inputs.discover_output }}' | jq --indent 4 -r 'map({(.images | split(" ")[] ): "${{ inputs.tag }}"}) | add')
+        CHANGES=$(jq -n "$(for img in ${{ inputs.images }}; do printf '."%s"="%s" | ' $img "${{ inputs.tag }}"; done) .")
         echo "${CHANGES}" > /tmp/changes.json
 
         HASHES=src/kube/environments/${{ inputs.environment }}/hashes.json
