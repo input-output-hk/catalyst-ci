@@ -40,34 +40,37 @@ runs:
   using: composite
   steps:
     - name: Build
-      shell: bash
-      run: |
-        EARTHLY_FLAGS=()
-        TARGET_FLAGS=()
+      uses: nick-fields/retry@v2
+      with:
+        max_attempts: 3
+        on_retry_command: docker image prune --all --force
+        command: |
+          EARTHLY_FLAGS=()
+          TARGET_FLAGS=()
 
-        if [[ -n "${{ inputs.earthly_satellite}}" ]]; then
-          EARTHLY_FLAGS+=("--buildkit-host" "tcp://${{ inputs.earthly_satellite }}:8372")
-        fi
+          if [[ -n "${{ inputs.earthly_satellite}}" ]]; then
+            EARTHLY_FLAGS+=("--buildkit-host" "tcp://${{ inputs.earthly_satellite }}:8372")
+          fi
 
-        if [[ "${{ inputs.publish }}" == "true" ]]; then
-          TARGET_FLAGS+=("--tag", "latest")
-        fi
+          if [[ "${{ inputs.publish }}" == "true" ]]; then
+            TARGET_FLAGS+=("--tag", "latest")
+          fi
 
-        earthly \
-          "${EARTHLY_FLAGS[@]}" \
-          ${{ inputs.earthly_flags }} \
-          ${{ inputs.earthfile }}+${{ inputs.target }}  \
-          "${TARGET_FLAGS[@]}" \
-          ${{ inputs.target_flags }}
+          earthly \
+            "${EARTHLY_FLAGS[@]}" \
+            ${{ inputs.earthly_flags }} \
+            ${{ inputs.earthfile }}+${{ inputs.target }}  \
+            "${TARGET_FLAGS[@]}" \
+            ${{ inputs.target_flags }}
 
-        if [[ "${{ inputs.publish }}" == "true" ]]; then
-          for image in ${{ inputs.images }}; do
-            for tag in ${{ inputs.tags }}; do
-              echo "Tagging ${image}:latest as ${{ inputs.registry }}/${image}:${tag}"
-              docker tag "${image}:latest" "${{ inputs.registry }}/${image}:${tag}"
+          if [[ "${{ inputs.publish }}" == "true" ]]; then
+            for image in ${{ inputs.images }}; do
+              for tag in ${{ inputs.tags }}; do
+                echo "Tagging ${image}:latest as ${{ inputs.registry }}/${image}:${tag}"
+                docker tag "${image}:latest" "${{ inputs.registry }}/${image}:${tag}"
 
-              echo "Pushing ${{ inputs.registry }}/${image}:${tag}"
-              docker push "${{ inputs.registry }}/${image}:${tag}"
+                echo "Pushing ${{ inputs.registry }}/${image}:${tag}"
+                docker push "${{ inputs.registry }}/${image}:${tag}"
+              done
             done
-          done
-        fi
+          fi
