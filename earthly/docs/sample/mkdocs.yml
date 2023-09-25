@@ -1,0 +1,4 @@
+site_name: Sample Documentation
+docs_dir: src
+theme:
+  name: material

@@ -1,0 +1,34 @@
+{
+    "$schema": "https://raw.githubusercontent.com/streetsidesoftware/cspell/main/cspell.schema.json",
+    "version": "0.2",
+    "enabled": true,
+    "language": "en,en-US",
+    "useGitignore": true,
+    "dictionaryDefinitions": [
+        {
+            "name": "project-words",
+            "path": ".config/dictionaries/project.dic",
+            "description": "Words used in this project.",
+            "addWords": true
+        }
+    ],
+    "dictionaries": [
+        "project-words",
+        "companies",
+        "cryptocurrencies",
+        "cryptography",
+        "networkingTerms",
+        "rust",
+        "softwareTerms",
+        "python",
+        "bash",
+        "typescript",
+        "html",
+        "css",
+        "golang"
+    ],
+    "ignorePaths": [
+        ".config/dictionaries",
+        ".github"
+    ]
+}
