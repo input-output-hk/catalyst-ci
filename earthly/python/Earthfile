@@ -1,0 +1,34 @@
+# Common Python UDC's and Builders.
+VERSION 0.7
+FROM python:3.11-bullseye
+
+# Common Poetry setup
+# Parameters:
+#   opts      : Options passed to the `poetry install` command.
+#   extra_file: An extra file to copy into the poetry path.
+POETRY_SETUP:
+    COMMAND
+    ARG opts
+    ARG extra_file
+
+    # Poetry Installation directory.
+    # Gives poetry and our poetry project a reliable location.
+    WORKDIR /poetry
+    ENV POETRY_HOME=/poetry
+    ENV PATH=$POETRY_HOME/bin:$PATH
+
+    # Stop python code running in the container saving pointless .pyc files.
+    ENV PYTHONDONTWRITEBYTECODE=1
+
+    # Install Poetry to manage python.
+    RUN curl -sSL https://install.python-poetry.org | python3 -
+    # Prevent warning when running on machines with more than 6 cores.
+    #   "Connection pool is full, discarding connection: pypi.org. Connection pool size: 10"
+    RUN poetry config installer.max-workers 10
+
+    # Copy our dependencies.
+    COPY pyproject.toml poetry.lock $extra_file .
+
+    # Install it all with poetry
+    RUN poetry install $opts
+

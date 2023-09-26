@@ -1,0 +1,19 @@
+version: "3"
+
+# This starts Kroki, for the Live Site to run against.
+include:
+  - docker-compose.kroki.yml
+
+services:
+  # Live document editing
+  live-docs:
+    image: mkdocs-material:latest
+    depends_on:
+      - kroki
+    volumes:
+      - ${LIVE_PATH:-./docs}:/docs
+    ports:
+      - ${LIVE_PORT:-10080}:10081
+    restart: no
+    networks:
+        - mkdocs

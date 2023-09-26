@@ -23,6 +23,9 @@ mkdocs-glightbox = "^0.3.4"
 # https://github.com/AVATEAM-IT-SYSTEMHAUS/mkdocs-kroki-plugin/tree/main
 mkdocs-kroki-plugin = "^0.6.1"
 
+# https://github.com/jdoiro3/mkdocs-multirepo-plugin
+mkdocs-multirepo-plugin = "^v0.6.3"
+
 ### DO NOT ENABLE THESE BAD PLUGINS.
 ### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
 # https://github.com/zoni/mkdocs-diagrams

@@ -5,42 +5,20 @@ mkdocs-material:
     # Derived from official mkdocs-material docker container.
     # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile
 
-    # What version is this
-    ARG tag=latest
-    ARG registry
-
-    # Installation tmp directory
-    WORKDIR /poetry
-
-    # Environment Variables
-    ENV POETRY_HOME=/poetry
-    ENV PATH=$POETRY_HOME/bin:$PATH
-    ENV PYTHONDONTWRITEBYTECODE=1
+    # Install poetry and our python dependencies.
+    DO ../python+POETRY_SETUP --extra_file=start.sh
 
     # Install extra debian packages we will need to support plugins.
     RUN apt-get update && \
         apt-get install -y --no-install-recommends \
         graphviz
 
-    # Install Poetry to manage python.
-    RUN curl -sSL https://install.python-poetry.org | python3 -
-    RUN poetry config installer.max-workers 10
-
-    # Copy our dependencies.
-    COPY pyproject.toml .
-    COPY poetry.lock .
-    COPY start.sh .
-
-    # Install it all with poetry
-    RUN poetry install --only main --no-root
-
-    # Trust directory, required for git >= 2.35.2
+    # Trust directory, required for git >= 2.35.2. (mkdocs Git plugin requirement).
     RUN git config --global --add safe.directory /docs &&\
         git config --global --add safe.directory /site
 
     # Carry the Kroki Docker Compose with this image.
-    WORKDIR /kroki
-    COPY docker-compose.kroki.yml ./docker-compose.yml
+    COPY --dir services /
 
     # Set working directory
     WORKDIR /docs
@@ -52,85 +30,51 @@ mkdocs-material:
     ENTRYPOINT ["/poetry/start.sh"]
     CMD ["serve", "--dev-addr=0.0.0.0:8000"]
 
-    # Finish building the container, and publish to the registry
-    IF [ "$registry" = "" ]
-        ARG registry_final=$registry
-    ELSE
-        ARG registry_final=${registry}/
-    END
+    # So we can extract these files in other steps.
+    SAVE ARTIFACT /services
 
-    SAVE ARTIFACT /kroki/docker-compose.yml /kroki/docker-compose.yml
+    SAVE IMAGE mkdocs-material
 
-    SAVE IMAGE --push ${registry_final}mkdocs-material:${tag}
-
+# Build the docuementation statically
 MKDOCS_BUILD:
     COMMAND
-    ARG src
-    ARG dest
+    ARG src=$(echo ${PWD}/src)
+    ARG dest=$(echo ${PWD}/site)
 
     # Ensure the mkdocs tools are built and up-to-date.
     BUILD +mkdocs-material
 
     FROM earthly/dind:alpine
     WORKDIR /build
-    COPY +mkdocs-material/kroki/docker-compose.yml .
+    COPY +mkdocs-material/services/docker-compose.kroki.yml .
 
     # Copy the src
     COPY --dir $src /docs
 
     # Docs need Kroki to build diagrams, so make sure its running.
-    WITH DOCKER --compose docker-compose.yml --load mkdocs=+mkdocs-material
-        RUN docker run --rm -v /docs:/docs --network=default_mkdocs mkdocs build
+    WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
+        RUN docker run \
+            --rm \
+            -v /docs:/docs \
+            --network=default_mkdocs \
+            mkdocs build
     END
 
     SAVE ARTIFACT /docs/site AS LOCAL $dest
 
-MKDOCS_SERVE:
+# Setup local documentation development.
+DEVELOP:
     COMMAND
-    ARG src
-    ARG port
+
+    ARG dest=$(echo ${PWD}/local)
 
     # Ensure the mkdocs tools are built and up-to-date.
     BUILD +mkdocs-material
 
-    FROM earthly/dind:alpine
-    WORKDIR /build
-    COPY +mkdocs-material/kroki/docker-compose.yml .
+    # Get local development artefacts
+    COPY +mkdocs-material/services /local
 
-    # Copy the src
-    COPY --dir $src /docs
-
-    # Docs need Kroki to build diagrams, so make sure its running.
-    WITH DOCKER --compose docker-compose.yml --load mkdocs=+mkdocs-material
-        RUN --privileged docker run --rm -p $port:8000 -v /docs:/docs --network=default_mkdocs mkdocs
-    END
-
-MDLINT:
-    # Linting is done with MarkdownLint CLI2
-    # See: https://github.com/DavidAnson/markdownlint-cli2
-    COMMAND
-
-    ARG fix
-    ARG src
-
-    RUN --no-cache echo SRC: $src
-
-    # cspell: words davidanson
-    WITH DOCKER --pull davidanson/markdownlint-cli2-rules:next
-        #RUN --no-cache docker run --rm -v $src:/workdir --entrypoint sh davidanson/markdownlint-cli2-rules:next -c "ls -al; ls -al docs"
-        RUN --no-cache docker run --rm -v $src:/workdir davidanson/markdownlint-cli2-rules:next "**/*.md" --config .markdownlint-cli2.jsonc $fix
-    END
-
-CSPELL:
-    # Spell checking all code is done with cspell
-    # See: cspell.org
-    COMMAND
-
-    ARG src
-
-    WITH DOCKER --pull ghcr.io/streetsidesoftware/cspell:latest
-        RUN --no-cache docker run --rm -v $src:/workdir ghcr.io/streetsidesoftware/cspell:latest lint .
-    END
+    SAVE ARTIFACT /local AS LOCAL $dest
 
 
 build-test:
@@ -138,38 +82,11 @@ build-test:
     # Run with `earthly -P +build-test`
     LOCALLY
 
-    DO +MKDOCS_BUILD --src=./sample --dest=./output/site
+    # Save development artefacts into the <repo root>/local directory.
+    DO +MKDOCS_BUILD --src=./sample --dest=./site
 
-serve-test:
-    # Need a better answer.  Can't export the port so we can't see the served docs.
-    LOCALLY
+# Target which setsup the documentation to be served locally.
+mkdocs-develop-test:
+    FROM alpine:latest
 
-    DO +MKDOCS_SERVE --src=./sample --port=10080
-
-mdlint-test:
-    # Test Markdown lint checks.
-    # Run with `earthly -P +mdlint-test
-    LOCALLY
-
-    ARG src=$(echo ${PWD}/../../)
-
-    DO +MDLINT --src=${src}
-
-cspell-test:
-    # Test spellcheck lint checks.
-    # Run with `earthly -P +cspell-test
-    LOCALLY
-
-    DO +CSPELL --src=$(echo ${PWD}/../../)
-
-
-#src:
-#    FROM +poetry
-#
-#    COPY --dir src mkdocs.yml .
-
-#build:
-#    FROM +src
-#
-#    RUN poetry run mkdocs build
-#    SAVE ARTIFACT site
+    DO +DEVELOP --dest=./local

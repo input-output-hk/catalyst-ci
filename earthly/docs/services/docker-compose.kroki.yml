@@ -26,30 +26,35 @@ services:
     #  - "8000:8000"
     networks:
         - mkdocs
+
   blockdiag:
     image: yuzutech/kroki-blockdiag
     expose:
       - "8001"
     networks:
         - mkdocs
+
   mermaid:
     image: yuzutech/kroki-mermaid
     expose:
       - "8002"
     networks:
         - mkdocs
+
   bpmn:
     image: yuzutech/kroki-bpmn
     expose:
       - "8003"
     networks:
         - mkdocs
+
   excalidraw:
     image: yuzutech/kroki-excalidraw
     expose:
       - "8004"
     networks:
         - mkdocs
+
   wireviz:
     image: yuzutech/kroki-wireviz
     ports:

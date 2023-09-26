@@ -13,4 +13,5 @@ treefmt.toml
 /.vscode
 
 # Built docs
-/earthly/docs/sample/site
+/earthly/docs/site
+/earthly/docs/local

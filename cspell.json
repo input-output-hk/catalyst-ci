@@ -29,6 +29,7 @@
     ],
     "ignorePaths": [
         ".config/dictionaries",
-        ".github"
+        ".github",
+        "earthly/docs/poetry.lock"
     ]
 }

@@ -1,8 +1,11 @@
 dind
+Earthfile
 glightbox
 graphviz
 Kroki
 mdlint
 mkdocs
+multirepo
 PYTHONDONTWRITEBYTECODE
+UDCs
 WORKDIR
