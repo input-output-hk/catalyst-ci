@@ -11,9 +11,9 @@ services:
     depends_on:
       - kroki
     volumes:
-      - ${LIVE_PATH:-./docs}:/docs
+      - ${LIVE_PATH:-../docs}:/docs
     ports:
-      - ${LIVE_PORT:-10080}:10081
+      - ${LIVE_PORT:-10080}:8000
     restart: no
     networks:
         - mkdocs
