@@ -20,7 +20,13 @@ markdown-lint:
     # Check Markdown in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci:v1.2.0/earthly/mdlint+MDLINT --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.0+MDLINT --src=$(echo ${PWD})
+
+markdown-lint-fix:
+    # Check Markdown in this repo.
+    LOCALLY
+
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.0+MDLINT --src=$(echo ${PWD}) --fix=--fix
 ```
 
 In this use case, the UDC is run Locally, so that the markdown in the repo can be directly checked.
