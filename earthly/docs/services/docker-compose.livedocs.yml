@@ -17,7 +17,3 @@ services:
     restart: no
     networks:
         - mkdocs
-
-networks:
-  mkdocs:
-    name: mkdocs
