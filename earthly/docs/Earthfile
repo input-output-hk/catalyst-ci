@@ -38,8 +38,7 @@ mkdocs-material:
 # Build the docuementation statically
 MKDOCS_BUILD:
     COMMAND
-    ARG src=$(echo ${PWD}/src)
-    ARG dest=$(echo ${PWD}/site)
+    ARG src
 
     # Ensure the mkdocs tools are built and up-to-date.
     BUILD +mkdocs-material
@@ -60,8 +59,6 @@ MKDOCS_BUILD:
             mkdocs build
     END
 
-    SAVE ARTIFACT /docs/site AS LOCAL $dest
-
 # Setup local documentation development.
 DEVELOP:
     COMMAND
@@ -80,10 +77,13 @@ DEVELOP:
 build-test:
     # Test of building docs.
     # Run with `earthly -P +build-test`
-    LOCALLY
+    ARG dest=./site
 
-    # Save development artefacts into the <repo root>/local directory.
-    DO +MKDOCS_BUILD --src=./sample --dest=./site
+    # Build the site (UDC creates the container itself.)
+    DO +MKDOCS_BUILD --src=./sample
+
+    SAVE ARTIFACT /docs/site AS LOCAL $dest
+
 
 # Target which setsup the documentation to be served locally.
 mkdocs-develop-test:
