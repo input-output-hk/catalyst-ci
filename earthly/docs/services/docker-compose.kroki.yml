@@ -64,3 +64,4 @@ services:
 
 networks:
   mkdocs:
+    name: mkdocs
