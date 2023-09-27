@@ -1,5 +1,5 @@
-name: CI Discovery
-description: Discovers Earthfiles in the given paths and compiles data about them.
+name: "Discover"
+description: "Discover Earthfiles in the repository"
 inputs:
   parse_images:
     description: Whether the image names from the given targets should be returnd (requires at least one target)
@@ -13,41 +13,6 @@ inputs:
     description: A space seperated list of targets to filter against
     required: false
     default: ""
-outputs:
-  json:
-    description: JSON object containing information about discovered Earthfiles
-    value: ${{ steps.discover.outputs.json }}
-  images:
-    description: A string separated list of image names (only present if `parse_images` is "true")
-    value: ${{ steps.discover.outputs.images }}
 runs:
-  using: composite
-  steps:
-    - name: Discover
-      shell: bash
-      id: discover
-      run: |
-        FLAGS=("-j")
-
-        if [[ "${{ inputs.parse_images }}" == "true" ]]; then
-          FLAGS+=("-i")
-        fi
-
-        for target in ${{ inputs.targets }}; do
-          FLAGS+=("-t" "$target")
-        done
-
-        JSON_OUTPUT=$(ci scan "${FLAGS[@]}" ${{ inputs.paths }})
-        if [[ "${{ inputs.parse_images }}" == "true" ]]; then
-          OUTPUT=$(echo "$JSON_OUTPUT" | jq -cr '[.[] | .images |= join(" ")]')
-        else
-          OUTPUT="${JSON_OUTPUT}"
-        fi
-
-        IMAGES=""
-        if [[ "${{ inputs.parse_images }}" == "true" ]]; then
-          IMAGES=$(echo "$JSON_OUTPUT" | jq -r '.[] | .images[]' | tr '\n' ' ')
-        fi
-
-        echo "json=$OUTPUT" >>$GITHUB_OUTPUT
-        echo "images=$IMAGES" >>$GITHUB_OUTPUT
+  using: "node20"
+  main: "dist/index.js"

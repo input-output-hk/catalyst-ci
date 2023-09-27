@@ -1,0 +1,25 @@
+name: "Run"
+description: "Runs an Earthly target"
+inputs:
+  artifact:
+    description: The name of the artifact to export
+    required: false
+  earthfile:
+    description: The path to the Earthfile containing the target to run
+    required: true
+  flags:
+    description: Additional flags to pass to the Earthly CLI
+    required: false
+  runner_address:
+    description: The address of the remote runner to use
+    required: false
+  runner_port:
+    description: The port to use for connecting to the remote runner
+    required: false
+    default: "8372"
+  target:
+    description: The name of the target to run
+    required: true
+runs:
+  using: "node20"
+  main: "dist/index.js"
