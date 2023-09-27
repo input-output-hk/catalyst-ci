@@ -55,7 +55,7 @@ MKDOCS_BUILD:
         RUN docker run \
             --rm \
             -v /docs:/docs \
-            --network=default_mkdocs \
+            --network=mkdocs \
             mkdocs build
     END
 
