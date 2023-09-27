@@ -25,7 +25,7 @@ spellcheck-lint:
     # Check spelling in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci:v1.2.0/earthly/cspell+CSPELL --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:t1.2.0+CSPELL --src=$(echo ${PWD})
 ```
 
 In this use case, the UDC is run Locally, so that the src in the repo can be directly checked.
