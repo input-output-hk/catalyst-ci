@@ -16,7 +16,7 @@ In an `Earthfile` in your source repository add:
 ```Earthfile
 example_python_target:
     FROM python:3.11-bullseye
-    DO DO github.com/input-output-hk/catalyst-ci:v1.2.0/earthly/python+POETRY_SETUP
+    DO github.com/input-output-hk/catalyst-ci:v1.2.0/earthly/python+POETRY_SETUP
 ```
 
 You may also pass optional arguments:
