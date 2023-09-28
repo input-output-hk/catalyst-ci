@@ -44,6 +44,5 @@ runs:
       run: |
         TOKEN=$(aws secretsmanager get-secret-value --secret-id 'global/ci/deploy' | jq -r .SecretString | jq -r .token)
         echo "token=$TOKEN" >>$GITHUB_OUTPUT
-    - name: Setup Earthly Satellite
-      shell: bash
-      run: mkdir -p /tmp/certs && ci setup /tmp/certs
+    - name: Setup Remote Runner
+      uses: ../configure-runner
