@@ -27,9 +27,10 @@ export async function run(): Promise<void> {
       await fs.access(certWritePath)
     } catch (error) {
       try {
-        fs.mkdir(certWritePath, { recursive: true })
+        await fs.mkdir(certWritePath, { recursive: true })
       } catch (_) {
         core.setFailed(`Failed creating directory ${certWritePath}`)
+        return
       }
     }
 
@@ -69,5 +70,3 @@ export async function run(): Promise<void> {
     }
   }
 }
-
-run()
