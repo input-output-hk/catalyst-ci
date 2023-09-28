@@ -28,6 +28,9 @@
       golint
       gopls
       go-tools
+
+      # Node
+      nodejs_20
     ];
   };
 in
