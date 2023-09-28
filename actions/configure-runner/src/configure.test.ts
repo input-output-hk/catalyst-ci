@@ -17,6 +17,10 @@ jest.mock('fs/promises', () => ({
   writeFile: jest.fn()
 }))
 
+jest.mock('os', () => ({
+  homedir: jest.fn()
+}))
+
 const mockedSecretsManagerClient = {
   send: jest.fn()
 }
@@ -37,6 +41,9 @@ describe('Configure Action', () => {
   const mkdirMock = fs.mkdir as jest.Mock
   const writeFileMock = fs.writeFile as jest.Mock
 
+  // os mocks
+  const homedirMock = os.homedir as jest.Mock
+
   beforeAll(() => {
     getInputMock.mockImplementation((name: string) => {
       switch (name) {
@@ -53,6 +60,8 @@ describe('Configure Action', () => {
   describe('when configuring the runner', () => {
     beforeEach(() => {
       accessMock.mockResolvedValue(undefined)
+      writeFileMock.mockResolvedValue(undefined)
+      homedirMock.mockReturnValue('/home/runner')
       mockedSecretsManagerClient.send.mockResolvedValue({
         SecretString: JSON.stringify({
           ca_certificate: 'ca', // eslint-disable-line camelcase
@@ -145,6 +154,30 @@ describe('Configure Action', () => {
           writeFileMock.mockRejectedValue(new Error('Failed writing files'))
           await run()
           expect(core.setFailed).toHaveBeenCalledWith('Failed writing files')
+        })
+      })
+    })
+
+    describe('when writing the earthly config', () => {
+      it('should write it to the correct location', async () => {
+        await run()
+        expect(writeFileMock).toHaveBeenCalledWith(
+          `/home/runner/.earthly/config.yml`,
+          yaml.dump({
+            global: {
+              tlskey: `${certWritePath}/key.pem`,
+              tlsca: `${certWritePath}/ca.pem`,
+              tlscert: `${certWritePath}/cert.pem`
+            }
+          })
+        )
+      })
+
+      describe('when the config cannot be written', () => {
+        it('should fail the action', async () => {
+          writeFileMock.mockRejectedValue(new Error('Failed writing config'))
+          await run()
+          expect(core.setFailed).toHaveBeenCalledWith('Failed writing config')
         })
       })
     })

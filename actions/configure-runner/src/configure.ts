@@ -54,9 +54,9 @@ export async function run(): Promise<void> {
     // Write the earthly config
     const config = {
       global: {
-        tlskey: `${certPath}/key.pem`,
-        tlsca: `${certPath}/ca.pem`,
-        tlscert: `${certPath}/cert.pem`
+        tlskey: keyPath,
+        tlsca: caPath,
+        tlscert: certPath
       }
     }
 
