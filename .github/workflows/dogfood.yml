@@ -17,7 +17,7 @@ jobs:
   dogfood:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/setup.yml
+      - uses: input-output-hk/catalyst-ci/actions/setup@actions-2.0
         with:
           aws_role_arn: ${{ env.AWS_ROLE_ARN }}
           aws_region: ${{ env.AWS_REGION }}
