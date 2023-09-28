@@ -28717,10 +28717,11 @@ async function run() {
         }
         catch (error) {
             try {
-                promises_namespaceObject.mkdir(certWritePath, { recursive: true });
+                await promises_namespaceObject.mkdir(certWritePath, { recursive: true });
             }
             catch (_) {
                 core.setFailed(`Failed creating directory ${certWritePath}`);
+                return;
             }
         }
         // Get the secret from AWS Secrets Manager
@@ -28734,9 +28735,9 @@ async function run() {
         // Write the earthly config
         const config = {
             global: {
-                tlskey: `${certPath}/key.pem`,
-                tlsca: `${certPath}/ca.pem`,
-                tlscert: `${certPath}/cert.pem`
+                tlskey: keyPath,
+                tlsca: caPath,
+                tlscert: certPath
             }
         };
         const yamlConfig = dump(config);
@@ -28751,7 +28752,6 @@ async function run() {
         }
     }
 }
-run();
 
 ;// CONCATENATED MODULE: ./src/index.ts
 
