@@ -49,4 +49,4 @@ runs:
         TOKEN=$(aws secretsmanager get-secret-value --secret-id 'global/ci/deploy' | jq -r .SecretString | jq -r .token)
         echo "token=$TOKEN" >>$GITHUB_OUTPUT
     - name: Setup Remote Runner
-      uses: ./../configure-runner
+      uses: ../configure-runner
