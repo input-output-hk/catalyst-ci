@@ -22,8 +22,6 @@ outputs:
 runs:
   using: composite
   steps:
-    - name: Checkout
-      uses: actions/checkout@v4
     - name: Install Earthly
       uses: earthly/actions-setup@v1
       with:
