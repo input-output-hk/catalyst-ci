@@ -1,16 +1,10 @@
-# direnv/direnv + divnix/std
-.std
+# direnv/devenv
+.devenv
+.direnv
 .envrc.local
-.direnv/
 
 # Node
 node_modules
-
-# nixago: ignore-linked-files
-.prettierrc
-lefthook.yml
-.conform.yaml
-treefmt.toml
 
 # Developer only files
 /.vscode
