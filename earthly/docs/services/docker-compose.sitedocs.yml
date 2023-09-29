@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  # Validating the built site.
+  site-docs:
+    image: nginx:latest
+    ports:
+      - ${SITE_PORT:-10081}:80
+    restart: no
+    volumes:
+      - ${SITE_PATH:-../docs/site}:/usr/share/nginx/html
+

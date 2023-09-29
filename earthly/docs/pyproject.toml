@@ -1,0 +1,39 @@
+[tool.poetry]
+name = "Documentation Tooling"
+version = "0.1.0"
+description = "Common Project Catalyst Documentation Tooling."
+authors = ["Joshua Gilman", "Steven Johnson"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+mkdocs-material = { version = "^9.4.1", extras = ["recommended","git","imaging"] }
+
+### MkDocs Plugins we add.
+
+# https://github.com/byrnereese/mkdocs-minify-plugin
+mkdocs-minify-plugin = "^0.7.1"
+
+# https://github.com/mkdocs/mkdocs-redirects
+mkdocs-redirects = "^v1.2.1"
+
+# https://github.com/Blueswen/mkdocs-glightbox
+mkdocs-glightbox = "^0.3.4"
+
+# https://github.com/AVATEAM-IT-SYSTEMHAUS/mkdocs-kroki-plugin/tree/main
+mkdocs-kroki-plugin = "^0.6.1"
+
+# https://github.com/jdoiro3/mkdocs-multirepo-plugin
+mkdocs-multirepo-plugin = "^v0.6.3"
+
+### DO NOT ENABLE THESE BAD PLUGINS.
+### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
+# https://github.com/zoni/mkdocs-diagrams
+#mkdocs-diagrams # Doesn't work properly look for replacement.
+
+# https://github.com/pawamoy/mkdocs-spellcheck
+#mkdocs-spellcheck[all] == 1.0.2 # We use cspell, don't use this.
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

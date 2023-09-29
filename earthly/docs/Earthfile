@@ -1,0 +1,92 @@
+VERSION 0.7
+FROM python:3.11-bullseye
+
+mkdocs-material:
+    # Derived from official mkdocs-material docker container.
+    # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile
+
+    # Install poetry and our python dependencies.
+    DO ../python+POETRY_SETUP --extra_file=start.sh
+
+    # Install extra debian packages we will need to support plugins.
+    RUN apt-get update && \
+        apt-get install -y --no-install-recommends \
+        graphviz
+
+    # Trust directory, required for git >= 2.35.2. (mkdocs Git plugin requirement).
+    RUN git config --global --add safe.directory /docs &&\
+        git config --global --add safe.directory /site
+
+    # Carry the Kroki Docker Compose with this image.
+    COPY --dir services /
+
+    # Set working directory
+    WORKDIR /docs
+
+    # Expose MkDocs development server port
+    EXPOSE 8000
+
+    # Start development server by default
+    ENTRYPOINT ["/poetry/start.sh"]
+    CMD ["serve", "--dev-addr=0.0.0.0:8000"]
+
+    # So we can extract these files in other steps.
+    SAVE ARTIFACT /services
+
+    SAVE IMAGE mkdocs-material
+
+# Build the docuementation statically
+MKDOCS_BUILD:
+    COMMAND
+    ARG src
+
+    # Ensure the mkdocs tools are built and up-to-date.
+    BUILD +mkdocs-material
+
+    FROM earthly/dind:alpine
+    WORKDIR /build
+    COPY +mkdocs-material/services/docker-compose.kroki.yml .
+
+    # Copy the src
+    COPY --dir $src /docs
+
+    # Docs need Kroki to build diagrams, so make sure its running.
+    WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
+        RUN docker run \
+            --rm \
+            -v /docs:/docs \
+            --network=mkdocs \
+            mkdocs build
+    END
+
+# Setup local documentation development.
+DEVELOP:
+    COMMAND
+
+    ARG dest=$(echo ${PWD}/local)
+
+    # Ensure the mkdocs tools are built and up-to-date.
+    BUILD +mkdocs-material
+
+    # Get local development artefacts
+    COPY +mkdocs-material/services /local
+
+    SAVE ARTIFACT /local AS LOCAL $dest
+
+
+build-test:
+    # Test of building docs.
+    # Run with `earthly -P +build-test`
+    ARG dest=./site
+
+    # Build the site (UDC creates the container itself.)
+    DO +MKDOCS_BUILD --src=./sample
+
+    SAVE ARTIFACT /docs/site AS LOCAL $dest
+
+
+# Target which setsup the documentation to be served locally.
+mkdocs-develop-test:
+    FROM alpine:latest
+
+    DO +DEVELOP --dest=./local

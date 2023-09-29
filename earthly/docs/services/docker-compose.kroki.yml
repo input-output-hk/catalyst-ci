@@ -1,0 +1,67 @@
+version: "3"
+
+# ##############################################################################
+# SERVICE DEFINITIONS
+
+services:
+
+  # Kroki Service for building both static and live docs against.
+  kroki:
+    image: yuzutech/kroki
+    depends_on:
+      - blockdiag
+      - mermaid
+      - bpmn
+      - excalidraw
+      - wireviz
+    environment:
+      - KROKI_BLOCKDIAG_HOST=blockdiag
+      - KROKI_MERMAID_HOST=mermaid
+      - KROKI_BPMN_HOST=bpmn
+      - KROKI_EXCALIDRAW_HOST=excalidraw
+      - KROKI_WIREVIZ_HOST=wireviz
+    expose:
+      - "8000"
+    #ports:
+    #  - "8000:8000"
+    networks:
+        - mkdocs
+
+  blockdiag:
+    image: yuzutech/kroki-blockdiag
+    expose:
+      - "8001"
+    networks:
+        - mkdocs
+
+  mermaid:
+    image: yuzutech/kroki-mermaid
+    expose:
+      - "8002"
+    networks:
+        - mkdocs
+
+  bpmn:
+    image: yuzutech/kroki-bpmn
+    expose:
+      - "8003"
+    networks:
+        - mkdocs
+
+  excalidraw:
+    image: yuzutech/kroki-excalidraw
+    expose:
+      - "8004"
+    networks:
+        - mkdocs
+
+  wireviz:
+    image: yuzutech/kroki-wireviz
+    ports:
+      - "8006"
+    networks:
+        - mkdocs
+
+networks:
+  mkdocs:
+    name: mkdocs

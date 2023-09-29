@@ -11,3 +11,10 @@ node_modules
 lefthook.yml
 .conform.yaml
 treefmt.toml
+
+# Developer only files
+/.vscode
+
+# Built docs
+/earthly/docs/site
+/earthly/docs/local
