@@ -28,3 +28,4 @@ jobs:
           earthfile: ./cli
           target: build
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          flags: --platform=linux/arm64
