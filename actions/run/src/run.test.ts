@@ -28,7 +28,8 @@ describe('Run Action', () => {
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
-        command: ['earthfile+target'],
+        targetFlags: '--flag1 test -f2 test2',
+        command: ['earthfile+target', '--flag1', 'test', '-f2', 'test2'],
         images: '',
         artifacts: ''
       },
@@ -40,6 +41,7 @@ describe('Run Action', () => {
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
+        targetFlags: '',
         command: ['--artifact', 'earthfile+target/artifact', 'artifact'],
         images: '',
         artifacts: 'artifact'
@@ -52,10 +54,11 @@ describe('Run Action', () => {
         runnerAddress: 'localhost',
         runnerPort: '8372',
         target: 'target',
+        targetFlags: '',
         command: [
-          'earthfile+target',
           '--buildkit-host',
-          'tcp://localhost:8372'
+          'tcp://localhost:8372',
+          'earthfile+target'
         ],
         images: '',
         artifacts: ''
@@ -69,7 +72,8 @@ describe('Run Action', () => {
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
-        command: ['earthfile+target', '--flag1', 'test', '-f2', 'test2'],
+        targetFlags: '',
+        command: ['--flag1', 'test', '-f2', 'test2', 'earthfile+target'],
         images: 'image1:tag1 image2:tag2',
         artifacts: ''
       }
@@ -83,6 +87,7 @@ describe('Run Action', () => {
         runnerAddress,
         runnerPort,
         target,
+        targetFlags,
         command,
         images,
         artifacts
@@ -104,6 +109,8 @@ describe('Run Action', () => {
               return runnerPort
             case 'target':
               return target
+            case 'target_flags':
+              return targetFlags
             default:
               throw new Error('Unknown input')
           }

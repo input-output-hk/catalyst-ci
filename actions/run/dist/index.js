@@ -2880,14 +2880,24 @@ async function run() {
     const runnerAddress = core.getInput('runner_address');
     const runnerPort = core.getInput('runner_port');
     const target = core.getInput('target');
+    const targetFlags = core.getInput('target_flags');
     const command = 'earthly';
-    let args = artifact
-        ? ['--artifact', `${earthfile}+${target}/${artifact}`, `${artifact}`]
-        : [`${earthfile}+${target}`];
-    args = flags ? args.concat(flags.split(' ')) : args;
-    args = runnerAddress
-        ? args.concat(['--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`])
-        : args;
+    const args = [];
+    if (artifact) {
+        args.push('--artifact', `${earthfile}+${target}/${artifact}`, `${artifact}`);
+    }
+    if (runnerAddress) {
+        args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`);
+    }
+    if (flags) {
+        args.push(...flags.split(' '));
+    }
+    if (!artifact) {
+        args.push(`${earthfile}+${target}`);
+    }
+    if (targetFlags) {
+        args.push(...targetFlags.split(' '));
+    }
     core.info(`Running command: ${command} ${args.join(' ')}`);
     const output = await spawnCommand(command, args);
     // TODO: The newest version of Earthly attaches annotations to the images
