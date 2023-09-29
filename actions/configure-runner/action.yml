@@ -1,0 +1,14 @@
+name: "Configure Remote Runner"
+description: "Configures Earthly to use a remote runner"
+inputs:
+  path:
+    description: "The path to store runner certificates"
+    required: false
+    default: "/tmp/certs"
+  secret:
+    description: "The AWS secret to read the runner certificates from"
+    required: false
+    default: "global/ci/ci-tls"
+runs:
+  using: "node20"
+  main: "dist/index.js"

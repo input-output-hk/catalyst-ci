@@ -1,0 +1,32 @@
+name: Dogfood
+
+on:
+  push:
+
+permissions:
+  id-token: write
+  contents: read
+  packages: write
+
+env:
+  AWS_REGION: eu-central-1
+  AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
+  EARTHLY_VERSION: 0.7.15
+
+jobs:
+  dogfood:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: input-output-hk/catalyst-ci/actions/setup@actions-2.0
+        with:
+          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+          aws_region: ${{ env.AWS_REGION }}
+          earthly_version: ${{ env.EARTHLY_VERSION }}
+      - uses: input-output-hk/catalyst-ci/actions/run@actions-2.0
+        with:
+          earthfile: ./cli
+          target: build
+          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      - name: Test
+        run: ./cli/bin/ci --help

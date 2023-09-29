@@ -1,0 +1,32 @@
+VERSION 0.7
+
+deps:
+    FROM node:20-bookworm
+    WORKDIR /work
+
+    COPY package.json package-lock.json .
+    RUN npm ci
+
+check:
+    FROM +deps
+
+    COPY --dir src .
+    COPY .eslintrc.yml tsconfig.json .
+
+    RUN npm run format:check
+    RUN npm run lint
+    RUN npm test
+
+package:
+    FROM +check
+
+    RUN npm run package
+
+    SAVE ARTIFACT dist dist AS LOCAL dist
+
+check-dist:
+    FROM +check
+
+    COPY --dir dist dist_old
+    RUN npm run package
+    RUN diff -r dist_old dist
