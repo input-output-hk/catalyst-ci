@@ -29,4 +29,4 @@ jobs:
           target: build
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
       - name: Test
-        run: ./cli/bin/cli --help
+        run: ./cli/bin/ci --help
