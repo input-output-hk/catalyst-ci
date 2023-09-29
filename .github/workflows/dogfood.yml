@@ -17,6 +17,7 @@ jobs:
   dogfood:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - uses: input-output-hk/catalyst-ci/actions/setup@actions-2.0
         with:
           aws_role_arn: ${{ env.AWS_ROLE_ARN }}
