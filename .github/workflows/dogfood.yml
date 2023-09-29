@@ -22,3 +22,8 @@ jobs:
           aws_role_arn: ${{ env.AWS_ROLE_ARN }}
           aws_region: ${{ env.AWS_REGION }}
           earthly_version: ${{ env.EARTHLY_VERSION }}
+      - uses: input-output-hk/catalyst-ci/actions/run@actions-2.0
+        with:
+          earthfile: ./cli
+          target: build
+          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
