@@ -27,6 +27,7 @@ export async function run(): Promise<void> {
       await fs.access(certWritePath)
     } catch (error) {
       try {
+        core.info(`Creating directory ${certWritePath}`)
         await fs.mkdir(certWritePath, { recursive: true })
       } catch (_) {
         core.setFailed(`Failed creating directory ${certWritePath}`)
@@ -35,6 +36,7 @@ export async function run(): Promise<void> {
     }
 
     // Get the secret from AWS Secrets Manager
+    core.info(`Getting secret ${secretName}`)
     const client = new SecretsManagerClient()
     const response = await client.send(
       new GetSecretValueCommand({ SecretId: secretName })
@@ -44,6 +46,7 @@ export async function run(): Promise<void> {
     ) as CertificateSecret
 
     // Write the certificate files
+    core.info(`Writing certificate files to ${certWritePath}`)
     await fs.writeFile(
       caPath,
       certSecret.ca_certificate.replaceAll('\\n', '\n')
@@ -52,6 +55,7 @@ export async function run(): Promise<void> {
     await fs.writeFile(keyPath, certSecret.private_key.replaceAll('\\n', '\n'))
 
     // Write the earthly config
+    core.info(`Writing earthly config to ${os.homedir()}/.earthly/config.yml`)
     const config = {
       global: {
         tlskey: keyPath,
