@@ -1,6 +1,14 @@
 VERSION 0.7
 FROM golang:1.20-alpine3.18
 
+fmt:
+    LOCALLY
+    DO ../earthly/go+FMT --src=$(echo ${PWD})
+
+lint:
+    LOCALLY
+    DO ../earthly/go+LINT --src=$(echo ${PWD})
+
 deps:
     WORKDIR /work
 
@@ -21,16 +29,10 @@ deps:
     SAVE ARTIFACT go.mod AS LOCAL go.mod
     SAVE ARTIFACT go.sum AS LOCAL go.sum
 
-check:
+test:
     FROM +deps
 
     COPY --dir cmd pkg .
-    # TODO: Create new UDCs for Go
-    # DO ../udts/analysis/go+ALL
-
-test:
-    FROM +check
-
     RUN ginkgo ./...
 
 build:

@@ -1,0 +1,41 @@
+VERSION 0.7
+
+FMT:
+    COMMAND
+
+    ARG --required src
+    ARG image=cytopia/gofmt:latest
+
+    # TOOD: We can't detect when we're in CI mode, because this is expected to
+    # be run with LOCALLY. We need to figure out a way to determine when we
+    # should use the `-w` (write to disk) or `--ci` (fail on diff) flags.
+    WITH DOCKER --pull ${image}
+        RUN docker run \
+            --rm \
+            -v $src:/data \
+            ${image} --ci .
+    END
+
+LINT:
+    COMMAND
+
+    ARG --required src
+    ARG image=golangci/golangci-lint:latest
+
+    WITH DOCKER --pull ${image}
+        RUN docker run \
+            --rm \
+            -v $src:/work \
+            -v go-cache:/cache \
+            -e GOLANGCI_LINT_CACHE=/cache \
+            -w /work \
+            ${image} golangci-lint run \
+                -E errchkjson \
+                -E ginkgolinter \
+                -E godot \
+                -E goimports \
+                -E gosec \
+                -E nilnil \
+                -E revive \
+                -E testpackage
+    END
