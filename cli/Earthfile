@@ -36,7 +36,7 @@ test:
     RUN ginkgo ./...
 
 build:
-    FROM +check
+    FROM +test
 
     ENV CGO_ENABLED=0
     RUN go build -ldflags="-extldflags=-static" -o bin/ci cmd/main.go
