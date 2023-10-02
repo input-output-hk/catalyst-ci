@@ -1,6 +1,6 @@
 VERSION 0.7
 
-MDLINT:
+MDLINT_LOCALLY:
     # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
     # IT IS NOT FOR CONTAINER BUILDS.
     # See: https://github.com/earthly/earthly/issues/580
@@ -48,4 +48,4 @@ mdlint-test:
 
     ARG src=$(echo ${PWD}/../../)
 
-    DO +MDLINT --src=${src}
+    DO +MDLINT_LOCALLY --src=${src}
