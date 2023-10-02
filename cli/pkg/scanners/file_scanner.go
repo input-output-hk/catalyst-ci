@@ -1,5 +1,7 @@
 package scanners
 
+// cspell: words afero
+
 import (
 	"os"
 	"path/filepath"

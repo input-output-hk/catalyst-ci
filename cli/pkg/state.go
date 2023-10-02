@@ -30,6 +30,8 @@ func (s State) ParseOutput(key string, v interface{}) error {
 	return json.Unmarshal(output.Value, v)
 }
 
+// cspell: words unmarshalled
+
 /*
  * Output is a representation of an output from a terraform state file. The
  * value is kept as a json.RawMessage so that it can be unmarshalled into the

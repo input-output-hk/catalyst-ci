@@ -1,6 +1,8 @@
 VERSION 0.7
 FROM golang:1.20-alpine3.18
 
+# cspell: words udts onsi ldflags extldflags
+
 deps:
     WORKDIR /work
 

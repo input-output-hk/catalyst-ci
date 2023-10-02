@@ -3,6 +3,8 @@ version: "3"
 # ##############################################################################
 # SERVICE DEFINITIONS
 
+# cspell: words yuzutech blockdiag excalidraw wireviz 
+
 services:
 
   # Kroki Service for building both static and live docs against.

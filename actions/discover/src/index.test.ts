@@ -2,6 +2,8 @@ import * as core from '@actions/core'
 import { exec } from 'child_process'
 import { run } from './discover'
 
+// cspell: words omashu
+
 jest.mock('@actions/core', () => ({
   getBooleanInput: jest.fn(),
   getInput: jest.fn(),

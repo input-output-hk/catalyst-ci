@@ -1,3 +1,5 @@
+# cspell: words cibot
+
 name: CI Deploy
 description: Deploys the published images to the remote cluster.
 inputs:
@@ -8,7 +10,7 @@ inputs:
     description: The target environment to deploy to
     required: true
   images:
-    description: A space separted list of image names to deploy
+    description: A space separated list of image names to deploy
     required: true
   tag:
     description: The image tag to deploy

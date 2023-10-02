@@ -30,6 +30,10 @@
     "ignorePaths": [
         ".config/dictionaries",
         ".github",
-        "earthly/docs/poetry.lock"
+        "earthly/docs/poetry.lock",
+        "actions/*/dist",
+        "cli/go.sum",
+        "cli/go.mod",
+        "cli/bin/ci"
     ]
 }

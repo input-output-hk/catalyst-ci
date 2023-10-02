@@ -1,3 +1,4 @@
+# cspell: words substituters cachix rrbutani
 {
   description = "Catalyst CI";
 
