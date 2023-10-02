@@ -8,7 +8,8 @@ deps:
     RUN apk add --no-cache gcc musl-dev
 
     # Install any static analysis tools
-    DO ../udts/analysis/go+SETUP
+    # TODO: Create new UDCs for Go
+    #DO ../udts/analysis/go+SETUP
 
     # Install package dependencies
     COPY go.mod go.sum ./
@@ -24,7 +25,8 @@ check:
     FROM +deps
 
     COPY --dir cmd pkg .
-    DO ../udts/analysis/go+ALL
+    # TODO: Create new UDCs for Go
+    # DO ../udts/analysis/go+ALL
 
 test:
     FROM +check

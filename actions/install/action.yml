@@ -1,0 +1,10 @@
+name: "Install"
+description: "Installs the Catalyst-CI CLI"
+inputs:
+  version:
+    description: "The version of the Catalyst-CI CLI to install"
+    required: false
+    default: "0.1.0"
+runs:
+  using: "node20"
+  main: "dist/index.js"

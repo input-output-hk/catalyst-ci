@@ -63,7 +63,7 @@ This can be necessary for the following reasons:
   * This is especially true when using names of Companies, Products or Technology.
 * There are identifiers used in the code which are used which fail spell checks.
 
-Words must ONLY be added to project words if they are correctly spelt.
+Words must ONLY be added to project words if they are correctly spelled.
 
 Project words that are added MUST be included in any PR where they became necessary.
 PR Review MUST check that the added words are both reasonable and valid.
@@ -71,7 +71,7 @@ PR Review MUST check that the added words are both reasonable and valid.
 Before a word is added to the project dictionary, it should be considered if it is a word likely to occur many times.
 
 Some spelling errors may only occur once, or a handful of times.
-Or, they may be an artefact of the code itself.
+Or, they may be an artifact of the code itself.
 In these cases it is MUCH better to disable the spelling error inline rather than add a word to the project dictionary.
 See [In Document Settings](http://cspell.org/configuration/document-settings/#in-document-settings) for details.
 
