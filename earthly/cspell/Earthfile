@@ -1,7 +1,11 @@
 # cspell UDCs and Containers.
 VERSION 0.7
 
-CSPELL:
+CSPELL_LOCALLY:
+    # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
+    # IT IS NOT FOR CONTAINER BUILDS.
+    # See: https://github.com/earthly/earthly/issues/580
+
     # Spell checking all docs and code is done with cspell
     # See: cspell.org
     COMMAND
@@ -12,27 +16,18 @@ CSPELL:
     # Unlikely to need to change this.
     ARG cfg_file=cspell.json
 
-    RUN --no-cache if [[ ! -f $src/$cfg_file ]]; then \
-        (>&2 echo "$src/$cfg_file does not exist. Can not check spelling."); \
-        exit 1; \
-    fi
+    RUN echo Spell Checking Recursively from: $src
 
-    RUN --no-cache echo Spell Checking Recursively from: $src
-
-    WITH DOCKER --pull ghcr.io/streetsidesoftware/cspell:latest
-        RUN --no-cache \
-            docker run \
-            --rm \
-            -v $src:/workdir \
-            ghcr.io/streetsidesoftware/cspell:latest \
-            lint .
-    END
+    RUN docker run \
+        --rm \
+        -v $src:/workdir \
+        ghcr.io/streetsidesoftware/cspell:latest \
+        lint .
 
 # A Test and example invocation of the above UDC.
 cspell-test:
-    # Test spellcheck lint checks.
-    # Run with `earthly -P +cspell-test
+    # As notes above, this check must only be run locally.
     LOCALLY
-
-    DO +CSPELL --src=$(echo ${PWD}/../../)
+    # Run with `earthly -P +cspell-test
+    DO +CSPELL_LOCALLY --src=$(echo ${PWD}/../../)
 
