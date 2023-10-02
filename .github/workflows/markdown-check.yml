@@ -1,0 +1,18 @@
+name: Markdown Check
+
+on: pull_request
+
+jobs:
+  check-markdown:
+    name: Check if Markdown files are properly formatted.
+    runs-on: ubuntu-latest
+    env:
+      FORCE_COLOR: 1
+    steps:
+      - uses: earthly/actions-setup@v1
+        with:
+          version: v0.7.8
+      - uses: actions/checkout@v4
+
+      - name: Check all markdown files are properly formatted
+        run: earthly -P +markdown-check

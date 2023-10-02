@@ -1,5 +1,7 @@
 package parsers_test
 
+// cspell: words onsi gomega
+
 import (
 	"testing"
 

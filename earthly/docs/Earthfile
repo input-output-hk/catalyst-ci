@@ -35,7 +35,7 @@ mkdocs-material:
 
     SAVE IMAGE mkdocs-material
 
-# Build the docuementation statically
+# Build the documentation statically
 MKDOCS_BUILD:
     COMMAND
     ARG src
@@ -68,7 +68,7 @@ DEVELOP:
     # Ensure the mkdocs tools are built and up-to-date.
     BUILD +mkdocs-material
 
-    # Get local development artefacts
+    # Get local development artifacts
     COPY +mkdocs-material/services /local
 
     SAVE ARTIFACT /local AS LOCAL $dest
@@ -85,8 +85,9 @@ build-test:
     SAVE ARTIFACT /docs/site AS LOCAL $dest
 
 
-# Target which setsup the documentation to be served locally.
+# Target which sets up the documentation to be served locally.
 mkdocs-develop-test:
     FROM alpine:latest
 
     DO +DEVELOP --dest=./local
+ 

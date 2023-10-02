@@ -6,7 +6,7 @@ This repo defines common python targets and UDCs for use with python.
 
 ### POETRY_SETUP
 
-This UDC setus up a python based container that uses poetry for dependency management.
+This UDC sets up a python based container that uses poetry for dependency management.
 Once the UDC has run, the Earthly target that invoked it will
 
 #### Invocation

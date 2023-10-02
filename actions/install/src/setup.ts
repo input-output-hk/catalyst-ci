@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 
+// cspell: words omashu
+
 const baseURL =
   'https://github.com/meigma/omashu/releases/download/v%VER%/omashu-%VER%-linux_amd64.tar.gz'
 
@@ -14,7 +16,7 @@ export async function run(): Promise<void> {
     }
 
     const finalURL = baseURL.replace(/%VER%/g, version)
-    core.info(`Downlaoading version ${version} from ${finalURL}`)
+    core.info(`Downloading version ${version} from ${finalURL}`)
     if (process.platform === 'linux') {
       const downloadPath = await tc.downloadTool(finalURL)
       const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')

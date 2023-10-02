@@ -1,5 +1,7 @@
 package util_test
 
+// cspell: words onsi gomega
+
 import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"

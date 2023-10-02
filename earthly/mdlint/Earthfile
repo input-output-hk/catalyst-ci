@@ -1,4 +1,5 @@
-VERSION 0.7
+VERSION 0.7 
+# cspell: words markdownlint
 
 MDLINT_LOCALLY:
     # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
@@ -43,7 +44,7 @@ mdlint-test:
     # Test Markdown lint checks.
     # Run with `earthly -P +mdlint-test
 
-    # Must be run LOCALLY as dexcribed above.
+    # Must be run LOCALLY as described above.
     LOCALLY
 
     ARG src=$(echo ${PWD}/../../)

@@ -1,4 +1,4 @@
-# Common Python UDC's and Builders.
+# Common Python UDCs and Builders.
 VERSION 0.7
 FROM python:3.11-bullseye
 

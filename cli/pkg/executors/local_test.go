@@ -1,5 +1,7 @@
 package executors_test
 
+// cspell: words onsi gomega
+
 import (
 	"errors"
 	"os/exec"

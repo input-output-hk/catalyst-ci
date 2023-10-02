@@ -13,7 +13,7 @@ inputs:
     required: false
     default: ""
   images:
-    description: A space seperated list of images the target will produce
+    description: A space separated list of images the target will produce
     required: false
     default: ""
   publish:
@@ -25,7 +25,7 @@ inputs:
     required: false
     default: ""
   tags:
-    description: A space seperated list of tags to tag the resulting images with
+    description: A space separated list of tags to tag the resulting images with
     required: false
     default: ""
   target:

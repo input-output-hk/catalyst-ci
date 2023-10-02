@@ -1,5 +1,7 @@
 package providers
 
+// cspell: words iface
+
 import (
 	"encoding/json"
 	"io"
