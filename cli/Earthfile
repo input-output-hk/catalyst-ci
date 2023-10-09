@@ -15,10 +15,6 @@ deps:
     # Install external deps
     RUN apk add --no-cache gcc musl-dev
 
-    # Install any static analysis tools
-    # TODO: Create new UDCs for Go
-    #DO ../udts/analysis/go+SETUP
-
     # Install package dependencies
     COPY go.mod go.sum ./
     RUN go mod download
