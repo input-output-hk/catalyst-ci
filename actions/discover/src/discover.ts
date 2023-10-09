@@ -14,9 +14,7 @@ export async function run(): Promise<void> {
     if (targets.trim() !== '') {
       flags.push(...targets.split(' ').map(t => `-t ${t}`))
     }
-    const command = ['ci', 'scan', ...flags, paths]
-      .filter(Boolean)
-      .join(' ')
+    const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)
     core.setOutput('json', await execCommand(command))
