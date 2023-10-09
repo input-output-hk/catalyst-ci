@@ -2,8 +2,6 @@ import * as core from '@actions/core'
 import { exec } from 'child_process'
 import { quote } from 'shell-quote'
 
-// cspell: words omashu
-
 export async function run(): Promise<void> {
   try {
     const parse = core.getBooleanInput('parse_images')
@@ -14,9 +12,7 @@ export async function run(): Promise<void> {
     if (targets.trim() !== '') {
       flags.push(...targets.split(' ').map(t => `-t ${t}`))
     }
-    const command = ['omashu', 'scan', ...flags, paths]
-      .filter(Boolean)
-      .join(' ')
+    const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)
     core.setOutput('json', await execCommand(command))

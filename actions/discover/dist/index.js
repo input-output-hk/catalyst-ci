@@ -3155,7 +3155,7 @@ async function run() {
         if (targets.trim() !== '') {
             flags.push(...targets.split(' ').map(t => `-t ${t}`));
         }
-        const command = ['omashu', 'scan', ...flags, paths]
+        const command = ['ci', 'scan', ...flags, paths]
             .filter(Boolean)
             .join(' ');
         core.info(`Running command: ${command}`);
