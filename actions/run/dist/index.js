@@ -2875,6 +2875,7 @@ const external_child_process_namespaceObject = require("child_process");
 
 async function run() {
     const artifact = core.getInput('artifact');
+    const artifactOutput = core.getInput('artifact_output');
     const earthfile = core.getInput('earthfile');
     const flags = core.getInput('flags');
     const runnerAddress = core.getInput('runner_address');
@@ -2883,8 +2884,8 @@ async function run() {
     const targetFlags = core.getInput('target_flags');
     const command = 'earthly';
     const args = [];
-    if (artifact) {
-        args.push('--artifact', `${earthfile}+${target}/${artifact}`, `${artifact}`);
+    if (artifact || artifactOutput) {
+        args.push('--artifact', `${earthfile}+${target}/${artifact}`, `${artifactOutput}`);
     }
     if (runnerAddress) {
         args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`);

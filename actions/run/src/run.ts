@@ -14,7 +14,7 @@ export async function run(): Promise<void> {
   const command = 'earthly'
   const args: string[] = []
 
-  if (artifact) {
+  if (artifact || artifactOutput) {
     args.push(
       '--artifact',
       `${earthfile}+${target}/${artifact}`,
