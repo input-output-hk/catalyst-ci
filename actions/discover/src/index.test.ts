@@ -27,25 +27,25 @@ describe('Discover Action', () => {
     jest.clearAllMocks()
   })
 
-  describe('when testing running the omashu command', () => {
+  describe('when testing running the ci command', () => {
     const testCases = [
       {
         parseImages: true,
         paths: 'path1 path2',
         targets: 'target1 target2',
-        expectedCommand: "omashu scan -ji -t target1 -t target2 'path1 path2'"
+        expectedCommand: "ci scan -ji -t target1 -t target2 'path1 path2'"
       },
       {
         parseImages: false,
         paths: 'path1',
         targets: 'target1',
-        expectedCommand: 'omashu scan -j -t target1 path1'
+        expectedCommand: 'ci scan -j -t target1 path1'
       },
       {
         parseImages: false,
         paths: '.',
         targets: '',
-        expectedCommand: 'omashu scan -j .'
+        expectedCommand: 'ci scan -j .'
       }
     ]
 

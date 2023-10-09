@@ -14,7 +14,7 @@ export async function run(): Promise<void> {
     if (targets.trim() !== '') {
       flags.push(...targets.split(' ').map(t => `-t ${t}`))
     }
-    const command = ['omashu', 'scan', ...flags, paths]
+    const command = ['ci', 'scan', ...flags, paths]
       .filter(Boolean)
       .join(' ')
 
