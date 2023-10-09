@@ -11,6 +11,7 @@ permissions:
 env:
   AWS_REGION: eu-central-1
   AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
+  EARTHLY_TARGET: build
   EARTHLY_VERSION: 0.7.15
 
 jobs:
@@ -28,7 +29,7 @@ jobs:
       - uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
         with:
-          targets: docker
+          targets: ${{ env.EARTHLY_TARGET }}
 
   build:
     runs-on: ubuntu-latest
@@ -49,5 +50,5 @@ jobs:
       - uses: input-output-hk/catalyst-ci/actions/run@master
         with:
           earthfile: ${{ matrix.earthfile }}
-          target: docker
+          target: ${{ env.EARTHLY_TARGET }}
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
