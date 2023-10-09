@@ -14,14 +14,6 @@ export async function run(): Promise<void> {
   const command = 'earthly'
   const args: string[] = []
 
-  if (artifact || artifactOutput) {
-    args.push(
-      '--artifact',
-      `${earthfile}+${target}/${artifact}`,
-      `${artifactOutput}`
-    )
-  }
-
   if (runnerAddress) {
     args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`)
   }
@@ -30,7 +22,13 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
-  if (!artifact) {
+  if (artifact || artifactOutput) {
+    args.push(
+      '--artifact',
+      `${earthfile}+${target}/${artifact}`,
+      `${artifactOutput}`
+    )
+  } else {
     args.push(`${earthfile}+${target}`)
   }
 

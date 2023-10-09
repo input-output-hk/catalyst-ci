@@ -2884,16 +2884,16 @@ async function run() {
     const targetFlags = core.getInput('target_flags');
     const command = 'earthly';
     const args = [];
-    if (artifact || artifactOutput) {
-        args.push('--artifact', `${earthfile}+${target}/${artifact}`, `${artifactOutput}`);
-    }
     if (runnerAddress) {
         args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`);
     }
     if (flags) {
         args.push(...flags.split(' '));
     }
-    if (!artifact) {
+    if (artifact || artifactOutput) {
+        args.push('--artifact', `${earthfile}+${target}/${artifact}`, `${artifactOutput}`);
+    }
+    else {
         args.push(`${earthfile}+${target}`);
     }
     if (targetFlags) {
