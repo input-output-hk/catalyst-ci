@@ -1,6 +1,11 @@
-VERSION 0.7
+VERSION 0.7 
+# cspell: words markdownlint
 
-MDLINT:
+MDLINT_LOCALLY:
+    # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
+    # IT IS NOT FOR CONTAINER BUILDS.
+    # See: https://github.com/earthly/earthly/issues/580
+
     # Linting is done with MarkdownLint CLI2
     # See: https://github.com/DavidAnson/markdownlint-cli2
     # We use a special container which includes all rule extensions to markdownlint
@@ -20,42 +25,28 @@ MDLINT:
     # Unlikely this ever needs to be changed.
     ARG cfg_file=.markdownlint-cli2.jsonc
 
-    # Ensure the `fix` argument only contains valid values.
-    RUN if [[ "${fix}" != "--fix" && "${fix}" != "" ]]; then \
-        echo "Invalid value for fix argument: ${fix}. It should be either --fix or not set." >&2; \
-        exit 1; \
-    fi
-
-    # Ensure the path to be checked has a mdlint config file.
-    RUN --no-cache if [[ ! -f $src/$cfg_file ]]; then \
-        (>&2 echo "$src/$cfg_file does not exist. Can not run mdLint."); \
-        exit 1; \
-    fi
-
     # Status line for what we are about to do.
-    RUN --no-cache echo Linting Markdown Recursively from: $src
+    RUN echo Linting Markdown Recursively from: $src
 
     # Run the linter with the given arguments, and recursively check all markdown files.
     # The directory to be checked `MUST` have a `.markdownlint-sli2.jsonc` file.
     # cspell: words davidanson
-    WITH DOCKER --pull davidanson/markdownlint-cli2-rules:next
-        # Lint checks should not be cached.
-        RUN --no-cache \
-            docker run \
-            --rm \
-            -v $src:/workdir \
-            davidanson/markdownlint-cli2-rules:next \
-            "**/*.md" \
-            --config $cfg_file \
-            $fix
-    END
+    RUN docker run \
+        --rm \
+        -v $src:/workdir \
+        davidanson/markdownlint-cli2-rules:next \
+        "**/*.md" \
+        --config $cfg_file \
+        $fix
 
 # A Test and example invocation of the above UDC.
 mdlint-test:
     # Test Markdown lint checks.
     # Run with `earthly -P +mdlint-test
+
+    # Must be run LOCALLY as described above.
     LOCALLY
 
     ARG src=$(echo ${PWD}/../../)
 
-    DO +MDLINT --src=${src}
+    DO +MDLINT_LOCALLY --src=${src}

@@ -2,6 +2,8 @@ import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import { run } from './setup'
 
+// cspell: words omashu
+
 jest.mock('@actions/core', () => {
   return {
     getInput: jest.fn(),

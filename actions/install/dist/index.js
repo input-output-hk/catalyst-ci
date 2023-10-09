@@ -6776,7 +6776,7 @@ async function run() {
             return;
         }
         const finalURL = baseURL.replace(/%VER%/g, version);
-        core.info(`Downlaoading version ${version} from ${finalURL}`);
+        core.info(`Downloading version ${version} from ${finalURL}`);
         if (process.platform === 'linux') {
             const downloadPath = await tool_cache.downloadTool(finalURL);
             const extractPath = await tool_cache.extractTar(downloadPath, '/usr/local/bin');

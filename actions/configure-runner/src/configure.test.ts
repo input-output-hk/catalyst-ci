@@ -5,6 +5,8 @@ import * as yaml from 'js-yaml'
 import { GetSecretValueCommand } from '@aws-sdk/client-secrets-manager'
 import { run } from './configure'
 
+// cspell: words camelcase tlskey tlsca tlscert
+
 jest.mock('@actions/core', () => ({
   getInput: jest.fn(),
   info: jest.fn(),

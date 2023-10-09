@@ -1,5 +1,7 @@
 package main
 
+// cspell: words alecthomas afero sess tfstate
+
 import (
 	"encoding/json"
 	"fmt"

@@ -7,6 +7,8 @@ import {
   SecretsManagerClient
 } from '@aws-sdk/client-secrets-manager'
 
+// cspell: words camelcase tlskey tlsca tlscert
+
 interface CertificateSecret {
   ca_certificate: string
   certificate: string

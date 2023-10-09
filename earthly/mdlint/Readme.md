@@ -2,6 +2,15 @@
 
 This Earthly Target and UDC enables uniform linting of Markdown files to maintain consistency and quality.
 
+## DO NOT RUN AS PART OF A CONTAINER BUILD TARGET
+
+This UDC is **NOT** intended to be used inside container builds.
+Its sole purpose is to enforce uniform style rules for all markdown files in a repository.
+It makes no assumptions about which files may or may not end up inside a container or are part of a build.
+This is *INTENTIONAL*.
+
+IF this UDC is used inside a container build, it is **NOT** a bug if it does not do the correct thing.
+
 ## How it works
 
 Linting is performed with the [`mdlint-cli2`](https://github.com/DavidAnson/markdownlint-cli2) program.
@@ -20,13 +29,13 @@ markdown-lint:
     # Check Markdown in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.0+MDLINT --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.0+MDLINT_LOCALLY --src=$(echo ${PWD})
 
 markdown-lint-fix:
     # Check Markdown in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.0+MDLINT --src=$(echo ${PWD}) --fix=--fix
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.0+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 ```
 
 In this use case, the UDC is run Locally, so that the markdown in the repo can be directly checked.

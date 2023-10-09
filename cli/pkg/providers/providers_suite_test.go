@@ -1,5 +1,7 @@
 package providers_test
 
+// cspell: words onsi gomega
+
 import (
 	"testing"
 
