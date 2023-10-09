@@ -1,17 +1,19 @@
 VERSION 0.7
 FROM golang:1.20-alpine3.18
 
-# cspell: words udts onsi ldflags extldflags
+# cspell: words udts onsi ldflags extldflags cytpoia gofmt golangci GOLANGCI GOCACHE errchkjson ginkgolinter goimports gosec nilnil testpackage
+
+fmt:
+    DO ../earthly/go+FMT --src="go.mod go.sum cmd pkg"
+
+lint:
+    DO ../earthly/go+LINT --src="go.mod go.sum cmd pkg"
 
 deps:
     WORKDIR /work
 
     # Install external deps
     RUN apk add --no-cache gcc musl-dev
-
-    # Install any static analysis tools
-    # TODO: Create new UDCs for Go
-    #DO ../udts/analysis/go+SETUP
 
     # Install package dependencies
     COPY go.mod go.sum ./
@@ -26,17 +28,17 @@ deps:
 check:
     FROM +deps
 
-    COPY --dir cmd pkg .
-    # TODO: Create new UDCs for Go
-    # DO ../udts/analysis/go+ALL
+    BUILD +fmt
+    BUILD +lint
 
 test:
     FROM +check
 
+    COPY --dir cmd pkg .
     RUN ginkgo ./...
 
 build:
-    FROM +check
+    FROM +test
 
     ENV CGO_ENABLED=0
     RUN go build -ldflags="-extldflags=-static" -o bin/ci cmd/main.go

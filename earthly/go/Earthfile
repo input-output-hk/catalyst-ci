@@ -1,0 +1,44 @@
+VERSION 0.7
+
+FMT:
+    COMMAND
+
+    # latest linux/amd64
+    FROM cytopia/gofmt@sha256:ae76abdbc96780819ce175f7ba4bf1fec98e9f708eb680d0b949d1737a959983
+    WORKDIR /work
+
+    ARG --required src
+
+    FOR f IN ${src}
+        COPY ${f} /work/${f}
+    END
+
+    RUN gofmt -l . | grep . && exit 1 || exit 0
+
+LINT:
+    COMMAND
+
+    # v1.54-alpine
+    FROM golangci/golangci-lint@sha256:a8423cab177c2863b863ee6d9f00c58f101cadd6120e195b2bb59fdfa189c1ae
+    WORKDIR /work
+
+    ARG --required src
+
+    FOR f IN ${src}
+        COPY ${f} /work/${f}
+    END
+
+    CACHE --sharing shared /cache
+    ENV GOLANGCI_LINT_CACHE=/cache/golangci-lint
+    ENV GOCACHE=/cache/go-build
+
+    RUN golangci-lint run \
+        --timeout 5m \
+        -E errchkjson \
+        -E ginkgolinter \
+        -E godot \
+        -E goimports \
+        -E gosec \
+        -E nilnil \
+        -E revive \
+        -E testpackage
