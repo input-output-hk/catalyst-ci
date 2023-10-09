@@ -26,7 +26,12 @@ LINT:
         COPY ${f} /work/${f}
     END
 
+    CACHE --sharing shared /cache
+    ENV GOLANGCI_LINT_CACHE=/cache/golangci-lint
+    ENV GOCACHE=/cache/go-build
+
     RUN golangci-lint run \
+        --timeout 5m \
         -E errchkjson \
         -E ginkgolinter \
         -E godot \
