@@ -60,4 +60,4 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.earthfile }}-${{ matrix.platform }}-${{ env.EARTHLY_TARGET }}
-          path: out
+          path: ${{ matrix.earthfile }}/out
