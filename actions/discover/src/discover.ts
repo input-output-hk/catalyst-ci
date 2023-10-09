@@ -2,8 +2,6 @@ import * as core from '@actions/core'
 import { exec } from 'child_process'
 import { quote } from 'shell-quote'
 
-// cspell: words omashu
-
 export async function run(): Promise<void> {
   try {
     const parse = core.getBooleanInput('parse_images')
