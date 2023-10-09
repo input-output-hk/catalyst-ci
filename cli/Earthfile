@@ -1,7 +1,7 @@
 VERSION 0.7
 FROM golang:1.20-alpine3.18
 
-# cspell: words udts onsi ldflags extldflags
+# cspell: words udts onsi ldflags extldflags cytpoia gofmt golangci GOLANGCI GOCACHE errchkjson ginkgolinter goimports gosec nilnil testpackage
 
 fmt:
     DO ../earthly/go+FMT --src="go.mod go.sum cmd pkg"
