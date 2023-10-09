@@ -4,6 +4,9 @@ inputs:
   artifact:
     description: The name of the artifact to export
     required: false
+  artifact_output:
+    description: The path to output the artifact to
+    required: false
   earthfile:
     description: The path to the Earthfile containing the target to run
     required: true

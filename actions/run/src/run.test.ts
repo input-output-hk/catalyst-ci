@@ -22,6 +22,7 @@ describe('Run Action', () => {
     it.each([
       {
         artifact: '',
+        artifactOutput: '',
         earthfile: 'earthfile',
         flags: '',
         output: '',
@@ -35,19 +36,21 @@ describe('Run Action', () => {
       },
       {
         artifact: 'artifact',
+        artifactOutput: 'out',
         earthfile: 'earthfile',
         flags: '',
-        output: 'Artifact +target/artifact output as artifact\n',
+        output: 'Artifact +target/artifact output as out\n',
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
         targetFlags: '',
-        command: ['--artifact', 'earthfile+target/artifact', 'artifact'],
+        command: ['--artifact', 'earthfile+target/artifact', 'out'],
         images: '',
-        artifacts: 'artifact'
+        artifacts: 'out'
       },
       {
         artifact: '',
+        artifactOutput: '',
         earthfile: 'earthfile',
         flags: '',
         output: '',
@@ -65,6 +68,7 @@ describe('Run Action', () => {
       },
       {
         artifact: '',
+        artifactOutput: '',
         earthfile: 'earthfile',
         flags: '--flag1 test -f2 test2',
         output:
@@ -81,6 +85,7 @@ describe('Run Action', () => {
       `should execute the correct command`,
       async ({
         artifact,
+        artifactOutput,
         earthfile,
         flags,
         output,
@@ -97,6 +102,8 @@ describe('Run Action', () => {
           switch (name) {
             case 'artifact':
               return artifact
+            case 'artifact_output':
+              return artifactOutput
             case 'earthfile':
               return earthfile
             case 'flags':

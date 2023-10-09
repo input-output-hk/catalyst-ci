@@ -3,6 +3,7 @@ import { spawn } from 'child_process'
 
 export async function run(): Promise<void> {
   const artifact = core.getInput('artifact')
+  const artifactOutput = core.getInput('artifact_output')
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
   const runnerAddress = core.getInput('runner_address')
@@ -14,7 +15,11 @@ export async function run(): Promise<void> {
   const args: string[] = []
 
   if (artifact) {
-    args.push('--artifact', `${earthfile}+${target}/${artifact}`, `${artifact}`)
+    args.push(
+      '--artifact',
+      `${earthfile}+${target}/${artifact}`,
+      `${artifactOutput}`
+    )
   }
 
   if (runnerAddress) {
