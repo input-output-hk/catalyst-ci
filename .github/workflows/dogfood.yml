@@ -37,6 +37,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        platform:
+          - linux/amd64
         earthfile: ${{ fromJson(needs.discover.outputs.json) }}
     steps:
       - uses: actions/checkout@v3
@@ -51,4 +53,5 @@ jobs:
         with:
           earthfile: ${{ matrix.earthfile }}
           target: ${{ env.EARTHLY_TARGET }}
+          flags: --platform ${{ matrix.platform }}
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
