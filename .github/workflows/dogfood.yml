@@ -14,19 +14,40 @@ env:
   EARTHLY_VERSION: 0.7.15
 
 jobs:
-  dogfood:
+  discover:
     runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.discover.outputs.json}}
     steps:
       - uses: actions/checkout@v3
-      - uses: input-output-hk/catalyst-ci/actions/setup@actions-2.0
+      - uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_role_arn: ${{ env.AWS_ROLE_ARN }}
           aws_region: ${{ env.AWS_REGION }}
           earthly_version: ${{ env.EARTHLY_VERSION }}
-      - uses: input-output-hk/catalyst-ci/actions/run@actions-2.0
+      - uses: input-output-hk/catalyst-ci/actions/discover@master
+        id: discover
         with:
-          earthfile: ./cli
-          target: build
+          targets: docker
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [discover]
+    strategy:
+      fail-fast: false
+      matrix:
+        earthfile: ${{ fromJson(needs.discover.outputs.json) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check var
+        run: echo ${{ matrix.earthfile }}
+      - uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+          aws_region: ${{ env.AWS_REGION }}
+          earthly_version: ${{ env.EARTHLY_VERSION }}
+      - uses: input-output-hk/catalyst-ci/actions/run@master
+        with:
+          earthfile: ${{ matrix.earthfile }}
+          target: docker
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-      - name: Test
-        run: ./cli/bin/ci --help
