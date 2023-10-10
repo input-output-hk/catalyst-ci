@@ -57,12 +57,12 @@ jobs:
           if [ "$output" == "null" ]; then
             echo "json=["EMPTY"]" >> $GITHUB_OUTPUT
           else
-            echo "json=$output" >> $GITHUB_OUTPUT
+            echo "json=${{ steps.discover.outputs.json }}" >> $GITHUB_OUTPUT
           fi
       - name: Test
         run: |
-          echo ${{ steps.discover.outputs.json }}
-          echo ${{ steps.check.outputs.json }}
+          echo "${{ steps.discover.outputs.json }}"
+          echo "${{ steps.check.outputs.json }}"
 
   build:
     runs-on: ubuntu-latest
