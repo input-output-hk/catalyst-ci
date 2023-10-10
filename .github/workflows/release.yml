@@ -38,7 +38,7 @@ jobs:
   discover:
     runs-on: ubuntu-latest
     outputs:
-      json: ${{ steps.discover.outputs.json }}
+      json: ${{ steps.check.outputs.json }}
     steps:
       - uses: actions/checkout@v3
       - uses: input-output-hk/catalyst-ci/actions/setup@dogfood
@@ -50,8 +50,18 @@ jobs:
         id: discover
         with:
           targets: ${{ inputs.target }}
+      - name: Check for empty output
+        id: check
+        run: |
+          if [ "${{ steps.discover.outputs.json }}" -eq "null" ]; then
+            echo "json='[]'" >> $GITHUB_OUTPUT
+          else
+            echo "json='${{ steps.discover.outputs.json }}'" >> $GITHUB_OUTPUT
+          fi
       - name: Test
-        run: echo "${{ steps.discover.outputs.json }}"
+        run: |
+          echo ${{ steps.discover.outputs.json }}
+          echo ${{ steps.check.outputs.json }}
 
   build:
     runs-on: ubuntu-latest
