@@ -38,7 +38,7 @@ jobs:
   discover:
     runs-on: ubuntu-latest
     outputs:
-      json: ${{ steps.check.outputs.json }}
+      json: ${{ steps.discover.outputs.json }}
     steps:
       - uses: actions/checkout@v3
       - uses: input-output-hk/catalyst-ci/actions/setup@dogfood
