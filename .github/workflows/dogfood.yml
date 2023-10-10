@@ -67,3 +67,14 @@ jobs:
         with:
           name: ${{ steps.artifact.outputs.name }}
           path: ${{ matrix.earthfile }}/out
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      - name: Check contents
+        run: ls -la artifacts
