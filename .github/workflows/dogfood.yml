@@ -57,7 +57,10 @@ jobs:
           artifact_output: out
           flags: --platform ${{ matrix.platform }}
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      - name: Extract Earthfile name
+        id: earthfile
+        run: echo  "name=$(basename ${{ matrix.earthfile }})" >> $GITHUB_OUTPUT
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ matrix.earthfile }}-${{ matrix.platform }}-${{ env.EARTHLY_TARGET }}
+          name: ${{ steps.earthfile.outputs.name }}-${{ matrix.platform }}-${{ env.EARTHLY_TARGET }}
           path: ${{ matrix.earthfile }}/out
