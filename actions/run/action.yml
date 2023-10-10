@@ -15,6 +15,9 @@ inputs:
   flags:
     description: Additional flags to pass to the Earthly CLI
     required: false
+  platform:
+    description: The platform to execute the earthfile target with (defaults to native)
+    required: false
   runner_address:
     description: The address of the remote runner to use
     required: false

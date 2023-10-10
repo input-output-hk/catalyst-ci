@@ -7,6 +7,7 @@ export async function run(): Promise<void> {
   const artifactPath = core.getInput('artifact_path')
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
+  const platform = core.getInput('platform')
   const runnerAddress = core.getInput('runner_address')
   const runnerPort = core.getInput('runner_port')
   const target = core.getInput('target')
@@ -17,6 +18,10 @@ export async function run(): Promise<void> {
 
   if (runnerAddress) {
     args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`)
+  }
+
+  if (platform) {
+    args.push('--platform', platform)
   }
 
   if (flags) {

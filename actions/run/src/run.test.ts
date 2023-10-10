@@ -26,6 +26,7 @@ describe('Run Action', () => {
         artifactPath: '',
         earthfile: './earthfile',
         flags: '',
+        platform: '',
         output: '',
         runnerAddress: '',
         runnerPort: '',
@@ -40,6 +41,7 @@ describe('Run Action', () => {
         artifactPath: 'out',
         earthfile: './earthfile',
         flags: '--test',
+        platform: '',
         output: 'Artifact +target/artifact output as out\n',
         runnerAddress: '',
         runnerPort: '',
@@ -54,6 +56,7 @@ describe('Run Action', () => {
         artifactPath: '',
         earthfile: './earthfile',
         flags: '',
+        platform: '',
         output: '',
         runnerAddress: 'localhost',
         runnerPort: '8372',
@@ -72,12 +75,21 @@ describe('Run Action', () => {
         artifactPath: '',
         earthfile: './earthfile',
         flags: '--flag1 test -f2 test2',
+        platform: 'linux/amd64',
         output: 'Image +docker output as image1:tag1\n',
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
         targetFlags: '',
-        command: ['--flag1', 'test', '-f2', 'test2', './earthfile+target'],
+        command: [
+          '--platform',
+          'linux/amd64',
+          '--flag1',
+          'test',
+          '-f2',
+          'test2',
+          './earthfile+target'
+        ],
         imageOutput: 'image1:tag1',
         artifactOutput: ''
       }
@@ -88,6 +100,7 @@ describe('Run Action', () => {
         artifactPath,
         earthfile,
         flags,
+        platform,
         output,
         runnerAddress,
         runnerPort,
@@ -107,6 +120,8 @@ describe('Run Action', () => {
               return earthfile
             case 'flags':
               return flags
+            case 'platform':
+              return platform
             case 'output':
               return output
             case 'runner_address':
