@@ -57,16 +57,22 @@ jobs:
           platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: "true"
-      - name: Extract artifact information
+      - name: Generate artifact name
         id: artifact
         run: |
           earthfile=$(basename ${{ matrix.earthfile }})
           platform=$(echo '${{ matrix.platform }}' | sed 's/\//-/g')
           echo "name=$earthfile-$platform" >> $GITHUB_OUTPUT
-      - uses: actions/upload-artifact@v3
+      - name: Compress artifact
+        run: |
+          earthfile=$(basename ${{ matrix.earthfile }})
+          platform=$(echo '${{ matrix.platform }}' | sed 's/\//-/g')
+          tar -czf ${{ steps.artifact.outputs.name }}.tar.gz ${{ steps.build.outputs.artifact }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.artifact.outputs.name }}
-          path: ${{ steps.build.outputs.artifact }}
+          path: ${{ steps.artifact.outputs.name }}.tar.gz
 
   release:
     runs-on: ubuntu-latest
