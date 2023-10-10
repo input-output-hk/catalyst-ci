@@ -8,18 +8,12 @@ permissions:
   contents: read
   packages: write
 
-env:
-  AWS_REGION: eu-central-1
-  AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
-  EARTHLY_TARGET: build
-  EARTHLY_VERSION: 0.7.15
-
 jobs:
   release:
     uses: ./.github/workflows/release.yml
     with:
-      aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-      aws_region: ${{ env.AWS_REGION }}
-      earthly_version: ${{ env.EARTHLY_VERSION }}
+      aws_role_arn: arn:aws:iam::332405224602:role/ci
+      aws_region: eu-central-1
+      earthly_version: 0.7.15
     secrets:
       earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
