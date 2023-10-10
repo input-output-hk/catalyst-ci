@@ -50,6 +50,8 @@ jobs:
         id: discover
         with:
           targets: ${{ inputs.target }}
+      - name: Test
+        run: echo "${{ steps.discover.outputs.json }}"
 
   build:
     runs-on: ubuntu-latest
