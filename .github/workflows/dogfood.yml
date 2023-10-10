@@ -62,7 +62,7 @@ jobs:
         run: |
           earthfile=$(basename ${{ matrix.earthfile }})
           platform=$(echo '${{ matrix.platform }}' | sed 's/\//-/g')
-          echo "name=$earthfile-${{ env.EARTHLY_TARGET }}-$platform" >> $GITHUB_OUTPUT
+          echo "name=$earthfile-$platform" >> $GITHUB_OUTPUT
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ steps.artifact.outputs.name }}
