@@ -41,12 +41,14 @@ jobs:
       json: ${{ steps.check.outputs.json }}
     steps:
       - uses: actions/checkout@v3
-      - uses: input-output-hk/catalyst-ci/actions/setup@dogfood
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@dogfood
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
           earthly_version: ${{ inputs.earthly_version }}
-      - uses: input-output-hk/catalyst-ci/actions/discover@dogfood
+      - name: Discover Earthly files
+        uses: input-output-hk/catalyst-ci/actions/discover@dogfood
         id: discover
         with:
           targets: ${{ inputs.target }}
@@ -59,12 +61,6 @@ jobs:
           else
             echo "json=$output" >> $GITHUB_OUTPUT
           fi
-
-          cat "$GITHUB_OUTPUT"
-      - name: Test
-        run: |
-          echo "${{ steps.discover.outputs.json }}"
-          echo "${{ steps.check.outputs.json }}"
 
   build:
     runs-on: ubuntu-latest
