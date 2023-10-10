@@ -65,7 +65,8 @@ jobs:
           echo "name=$earthfile-$platform" >> $GITHUB_OUTPUT
       - name: Compress artifact
         run: |
-          cd ${{ steps.build.outputs.artifact }} && tar -czvf ${{ steps.artifact.outputs.name }}.tar.gz .
+          cwd=$(pwd)
+          cd ${{ steps.build.outputs.artifact }} && tar -czvf "$cwd/${{ steps.artifact.outputs.name }}.tar.gz" .
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
