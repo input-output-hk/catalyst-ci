@@ -15,78 +15,11 @@ env:
   EARTHLY_VERSION: 0.7.15
 
 jobs:
-  discover:
-    runs-on: ubuntu-latest
-    outputs:
-      json: ${{ steps.discover.outputs.json}}
-    steps:
-      - uses: actions/checkout@v3
-      - uses: input-output-hk/catalyst-ci/actions/setup@dogfood
-        with:
-          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-          aws_region: ${{ env.AWS_REGION }}
-          earthly_version: ${{ env.EARTHLY_VERSION }}
-      - uses: input-output-hk/catalyst-ci/actions/discover@dogfood
-        id: discover
-        with:
-          targets: ${{ env.EARTHLY_TARGET }}
-
-  build:
-    runs-on: ubuntu-latest
-    needs: [discover]
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - linux/amd64
-        earthfile: ${{ fromJson(needs.discover.outputs.json) }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Check var
-        run: echo ${{ matrix.earthfile }}
-      - uses: input-output-hk/catalyst-ci/actions/setup@dogfood
-        with:
-          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-          aws_region: ${{ env.AWS_REGION }}
-          earthly_version: ${{ env.EARTHLY_VERSION }}
-      - uses: input-output-hk/catalyst-ci/actions/run@dogfood
-        id: build
-        with:
-          earthfile: ${{ matrix.earthfile }}
-          target: ${{ env.EARTHLY_TARGET }}
-          platform: ${{ matrix.platform }}
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: "true"
-      - name: Generate artifact name
-        id: artifact
-        run: |
-          earthfile=$(basename ${{ matrix.earthfile }})
-          platform=$(echo '${{ matrix.platform }}' | sed 's/\//-/g')
-          echo "name=$earthfile-$platform" >> $GITHUB_OUTPUT
-      - name: Compress artifact
-        run: |
-          cwd=$(pwd)
-          cd ${{ steps.build.outputs.artifact }} && tar -czvf "$cwd/${{ steps.artifact.outputs.name }}.tar.gz" .
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: ${{ steps.artifact.outputs.name }}
-          path: ${{ steps.artifact.outputs.name }}.tar.gz
-
   release:
-    runs-on: ubuntu-latest
-    needs: [build]
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: artifacts
-      - name: Collect artifacts
-        id: collect
-        run: echo "artifacts=$(find artifacts -type f -name '*.tar.gz')" >> $GITHUB_OUTPUT
-      - name: Check
-        run: echo ${{ steps.collect.outputs.artifacts }}
-      - name: Create release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: ${{ steps.collect.outputs.artifacts }}
+    uses: ./.github/workflows/release.yml
+    with:
+      aws_role_arn: ${{ env.AWS_ROLE_ARN }}
+      aws_region: ${{ env.AWS_REGION }}
+      earthly_version: ${{ env.EARTHLY_VERSION }}
+    secrets:
+      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
