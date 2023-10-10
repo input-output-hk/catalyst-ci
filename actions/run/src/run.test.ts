@@ -32,7 +32,7 @@ describe('Run Action', () => {
         target: 'target',
         targetFlags: '--flag1 test -f2 test2',
         command: ['./earthfile+target', '--flag1', 'test', '-f2', 'test2'],
-        images: '',
+        imageOutput: '',
         artifactOutput: ''
       },
       {
@@ -46,7 +46,7 @@ describe('Run Action', () => {
         target: 'target',
         targetFlags: '',
         command: ['--test', '--artifact', './earthfile+target/', 'out'],
-        images: '',
+        imageOutput: '',
         artifactOutput: 'earthfile/out'
       },
       {
@@ -64,7 +64,7 @@ describe('Run Action', () => {
           'tcp://localhost:8372',
           './earthfile+target'
         ],
-        images: '',
+        imageOutput: '',
         artifactOutput: ''
       },
       {
@@ -72,14 +72,13 @@ describe('Run Action', () => {
         artifactPath: '',
         earthfile: './earthfile',
         flags: '--flag1 test -f2 test2',
-        output:
-          'Image +docker output as image1:tag1\nImage +docker output as image2:tag2\n',
+        output: 'Image +docker output as image1:tag1\n',
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
         targetFlags: '',
         command: ['--flag1', 'test', '-f2', 'test2', './earthfile+target'],
-        images: 'image1:tag1 image2:tag2',
+        imageOutput: 'image1:tag1',
         artifactOutput: ''
       }
     ])(
@@ -95,7 +94,7 @@ describe('Run Action', () => {
         target,
         targetFlags,
         command,
-        images,
+        imageOutput,
         artifactOutput
       }) => {
         const getInputMock = core.getInput as jest.Mock
@@ -141,7 +140,11 @@ describe('Run Action', () => {
         expect(spawn).toHaveBeenCalledWith('earthly', command)
         expect(stdoutSpy).toHaveBeenCalledWith('stdout')
         expect(stderrSpy).toHaveBeenCalledWith(output)
-        expect(core.setOutput).toHaveBeenCalledWith('images', images)
+
+        if (imageOutput) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(core.setOutput).toHaveBeenCalledWith('image', imageOutput)
+        }
 
         if (artifact === 'true') {
           // eslint-disable-next-line jest/no-conditional-expect

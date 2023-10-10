@@ -36,25 +36,37 @@ export async function run(): Promise<void> {
   core.info(`Running command: ${command} ${args.join(' ')}`)
   const output = await spawnCommand(command, args)
 
-  // TODO: The newest version of Earthly attaches annotations to the images
-  let matches
-  const imageRegex = /^Image .*? output as (.*?)$/gm
-  const images = []
-  while ((matches = imageRegex.exec(output)) !== null) {
-    images.push(matches[1])
+  const imageOutput = parseImage(output)
+  if (imageOutput) {
+    core.info(`Found image: ${imageOutput}`)
+    core.setOutput('image', imageOutput)
   }
 
-  const artifactRegex = /^Artifact .*? output as (.*?)$/gm
-  const match = artifactRegex.exec(output)
-  if (match) {
-    const artifactOutput = path.join(earthfile, match[1])
-
+  const artifactOutput = path.join(earthfile, parseArtifact(output))
+  if (artifactOutput !== earthfile) {
     core.info(`Found artifact: ${artifactOutput}`)
     core.setOutput('artifact', artifactOutput)
   }
+}
 
-  core.info(`Found images: ${images.join(' ')}`)
-  core.setOutput('images', images.join(' '))
+function parseArtifact(output: string): string {
+  const regex = /^Artifact .*? output as (.*?)$/gm
+  const match = regex.exec(output)
+  if (match) {
+    return match[1]
+  }
+
+  return ''
+}
+
+function parseImage(output: string): string {
+  const regex = /^Image .*? output as (.*?)$/gm
+  const match = regex.exec(output)
+  if (match) {
+    return match[1]
+  }
+
+  return ''
 }
 
 async function spawnCommand(command: string, args: string[]): Promise<string> {
