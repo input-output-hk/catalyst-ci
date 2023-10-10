@@ -54,9 +54,9 @@ jobs:
         with:
           earthfile: ${{ matrix.earthfile }}
           target: ${{ env.EARTHLY_TARGET }}
-          artifact: "true"
-          flags: --platform ${{ matrix.platform }}
+          platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+          artifact: "true"
       - name: Extract artifact information
         id: artifact
         run: |
