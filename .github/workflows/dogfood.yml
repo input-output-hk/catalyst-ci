@@ -12,7 +12,7 @@ jobs:
   release:
     uses: ./.github/workflows/release.yml
     with:
-      #target: foobar
+      target: foobar
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
       earthly_version: 0.7.15
