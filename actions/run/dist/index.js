@@ -2870,12 +2870,15 @@ __nccwpck_require__.r(__webpack_exports__);
 var core = __nccwpck_require__(186);
 ;// CONCATENATED MODULE: external "child_process"
 const external_child_process_namespaceObject = require("child_process");
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(17);
 ;// CONCATENATED MODULE: ./src/run.ts
 
 
+
 async function run() {
-    const artifact = core.getInput('artifact');
-    const artifactOutput = core.getInput('artifact_output');
+    const artifact = core.getBooleanInput('artifact');
+    const artifactPath = core.getInput('artifact_path');
     const earthfile = core.getInput('earthfile');
     const flags = core.getInput('flags');
     const runnerAddress = core.getInput('runner_address');
@@ -2890,8 +2893,8 @@ async function run() {
     if (flags) {
         args.push(...flags.split(' '));
     }
-    if (artifact || artifactOutput) {
-        args.push('--artifact', `${earthfile}+${target}/${artifact}`, `${artifactOutput}`);
+    if (artifact) {
+        args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`);
     }
     else {
         args.push(`${earthfile}+${target}`);
@@ -2909,14 +2912,14 @@ async function run() {
         images.push(matches[1]);
     }
     const artifactRegex = /^Artifact .*? output as (.*?)$/gm;
-    const artifacts = [];
-    while ((matches = artifactRegex.exec(output)) !== null) {
-        artifacts.push(matches[1]);
+    const match = artifactRegex.exec(output);
+    if (match) {
+        const artifactOutput = external_path_.join(earthfile, match[1]);
+        core.info(`Found artifact: ${artifactOutput}`);
+        core.setOutput('artifact', artifactOutput);
     }
     core.info(`Found images: ${images.join(' ')}`);
-    core.info(`Found artifacts: ${artifacts.join(' ')}`);
     core.setOutput('images', images.join(' '));
-    core.setOutput('artifacts', artifacts.join(' '));
 }
 async function spawnCommand(command, args) {
     return new Promise((resolve, reject) => {

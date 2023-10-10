@@ -1,9 +1,10 @@
 import * as core from '@actions/core'
 import { spawn } from 'child_process'
+import * as path from 'path'
 
 export async function run(): Promise<void> {
-  const artifact = core.getInput('artifact')
-  const artifactOutput = core.getInput('artifact_output')
+  const artifact = core.getBooleanInput('artifact')
+  const artifactPath = core.getInput('artifact_path')
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
   const runnerAddress = core.getInput('runner_address')
@@ -22,12 +23,8 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
-  if (artifact || artifactOutput) {
-    args.push(
-      '--artifact',
-      `${earthfile}+${target}/${artifact}`,
-      `${artifactOutput}`
-    )
+  if (artifact) {
+    args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`)
   } else {
     args.push(`${earthfile}+${target}`)
   }
@@ -48,16 +45,16 @@ export async function run(): Promise<void> {
   }
 
   const artifactRegex = /^Artifact .*? output as (.*?)$/gm
-  const artifacts = []
-  while ((matches = artifactRegex.exec(output)) !== null) {
-    artifacts.push(matches[1])
+  const match = artifactRegex.exec(output)
+  if (match) {
+    const artifactOutput = path.join(earthfile, match[1])
+
+    core.info(`Found artifact: ${artifactOutput}`)
+    core.setOutput('artifact', artifactOutput)
   }
 
   core.info(`Found images: ${images.join(' ')}`)
-  core.info(`Found artifacts: ${artifacts.join(' ')}`)
-
   core.setOutput('images', images.join(' '))
-  core.setOutput('artifacts', artifacts.join(' '))
 }
 
 async function spawnCommand(command: string, args: string[]): Promise<string> {
