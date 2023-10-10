@@ -38,14 +38,14 @@ jobs:
   discover:
     runs-on: ubuntu-latest
     outputs:
-      json: ${{ steps.discover.outputs.json}}
+      json: ${{ steps.discover.outputs.json }}
     steps:
       - uses: actions/checkout@v3
       - uses: input-output-hk/catalyst-ci/actions/setup@dogfood
         with:
-          aws_role_arn: ${{ inputs.aws_role_arn}}
-          aws_region: ${{ inputs.aws_region}}
-          earthly_version: ${{ inputs.earthly_version}}
+          aws_role_arn: ${{ inputs.aws_role_arn }}
+          aws_region: ${{ inputs.aws_region }}
+          earthly_version: ${{ inputs.earthly_version }}
       - uses: input-output-hk/catalyst-ci/actions/discover@dogfood
         id: discover
         with:
@@ -66,9 +66,9 @@ jobs:
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@dogfood
         with:
-          aws_role_arn: ${{ inputs.aws_role_arn}}
-          aws_region: ${{ inputs.aws_region}}
-          earthly_version: ${{ inputs.earthly_version}}
+          aws_role_arn: ${{ inputs.aws_role_arn }}
+          aws_region: ${{ inputs.aws_region }}
+          earthly_version: ${{ inputs.earthly_version }}
       - name: Build artifact
         uses: input-output-hk/catalyst-ci/actions/run@dogfood
         id: build
@@ -76,7 +76,7 @@ jobs:
           earthfile: ${{ matrix.earthfile }}
           target: ${{ inputs.target }}
           platform: ${{ matrix.platform }}
-          runner_address: ${{ inputs.earthly_runner_address }}
+          runner_address: ${{ secrets.earthly_runner_address }}
           artifact: "true"
       - name: Generate artifact name
         id: artifact
