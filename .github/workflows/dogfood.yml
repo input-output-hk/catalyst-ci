@@ -81,5 +81,12 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: artifacts
-      - name: Check contents
-        run: tree
+      - name: Collect artifacts
+        id: collect
+        run: echo "artifacts=$(find artifacts -type f -name '*.tar.gz')" >> $GITHUB_OUTPUT
+      - name: Check
+        run: echo ${{ steps.collect.outputs.artifacts }}
+      - name: Create release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.collect.outputs.artifacts }}
