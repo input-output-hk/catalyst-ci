@@ -43,6 +43,9 @@ build:
     ENV CGO_ENABLED=0
     RUN go build -ldflags="-extldflags=-static" -o bin/ci cmd/main.go
 
+release:
+    FROM +build
+
     SAVE ARTIFACT bin/ci ci
 
 docker:
