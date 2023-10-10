@@ -53,17 +53,18 @@ jobs:
       - name: Check for empty output
         id: check
         run: |
-          output=$(echo "${{ steps.discover.outputs.json }}" | tr -d '\n')
+          output=$(echo "${{ steps.discover.outputs.json }}" | jq -c)
           if [ "$output" == "null" ]; then
             echo "json=["EMPTY"]" >> $GITHUB_OUTPUT
           else
             echo "json=${{ steps.discover.outputs.json }}" >> $GITHUB_OUTPUT
           fi
+
+          echo "$GITHUB_OUTPUT"
       - name: Test
         run: |
           echo "${{ steps.discover.outputs.json }}"
           echo "${{ steps.check.outputs.json }}"
-          echo "$GITHUB_OUTPUT"
 
   build:
     runs-on: ubuntu-latest
