@@ -82,4 +82,4 @@ jobs:
         with:
           path: artifacts
       - name: Check contents
-        run: ls -la artifacts
+        run: tree
