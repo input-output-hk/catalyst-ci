@@ -55,7 +55,7 @@ jobs:
         run: |
           output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           if [ "$output" == "null" ]; then
-            echo "json=["EMPTY"]" >> $GITHUB_OUTPUT
+            echo "json=[]" >> $GITHUB_OUTPUT
           else
             echo "json=$output" >> $GITHUB_OUTPUT
           fi
@@ -69,7 +69,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     needs: [discover]
-    if: needs.discover.outputs.json != '["EMPTY"]'
+    if: needs.discover.outputs.json != '[]'
     strategy:
       fail-fast: false
       matrix:
