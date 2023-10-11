@@ -13733,8 +13733,9 @@ async function run() {
             core.setFailed('Invalid version');
             return;
         }
-        core.info(`Github token: ${process.env.GITHUB_TOKEN}`);
-        const octokit = github.getOctokit(process.env.GITHUB_TOKEN);
+        const token = core.getInput('repo-token');
+        core.info(`Github token: ${token}`);
+        const octokit = github.getOctokit(token);
         const { data: releases } = await octokit.rest.repos.listReleases({
             owner: repoOwner,
             repo: repoName
@@ -13772,7 +13773,6 @@ async function run() {
 function isSemVer(version) {
     return /^\d+\.\d+\.\d+$/.test(version);
 }
-run();
 
 ;// CONCATENATED MODULE: ./src/index.ts
 

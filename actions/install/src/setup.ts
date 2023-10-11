@@ -20,8 +20,9 @@ export async function run(): Promise<void> {
       return
     }
 
-    core.info(`Github token: ${process.env.GITHUB_TOKEN}`)
-    const octokit = github.getOctokit(process.env.GITHUB_TOKEN as string)
+    const token = core.getInput('repo-token')
+    core.info(`Github token: ${token}`)
+    const octokit = github.getOctokit(token)
     const { data: releases } = await octokit.rest.repos.listReleases({
       owner: repoOwner,
       repo: repoName
@@ -60,5 +61,3 @@ export async function run(): Promise<void> {
 function isSemVer(version: string): boolean {
   return /^\d+\.\d+\.\d+$/.test(version)
 }
-
-run()
