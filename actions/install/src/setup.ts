@@ -1,6 +1,8 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
+import * as fs from 'fs'
+import { exec } from '@actions/exec'
 
 const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
@@ -43,11 +45,8 @@ export async function run(): Promise<void> {
     core.info(`Downloading version ${version} from ${finalURL}`)
     if (process.platform === 'linux') {
       const downloadPath = await tc.downloadTool(finalURL)
-      const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin', [
-        'xz',
-        '--no-overwrite-dir'
-      ])
-      core.info(`Installed cli to ${extractPath}`)
+      await exec('tar', ['xvf', downloadPath, '-C', '/usr/local/bin'])
+      core.info(`Installed cli to /usr/local/bin`)
     } else {
       core.setFailed('Unsupported platform')
     }
