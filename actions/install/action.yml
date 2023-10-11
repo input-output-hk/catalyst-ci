@@ -5,6 +5,8 @@ inputs:
     description: "The version of the Catalyst-CI CLI to install"
     required: false
     default: "0.1.0"
+env:
+  GITHUB_TOKEN: "As provided by Github Actions"
 runs:
   using: "node20"
   main: "dist/index.js"
