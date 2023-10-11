@@ -3,6 +3,7 @@ import { spawn, SpawnOptionsWithoutStdio } from 'child_process'
 import { run } from './run'
 
 jest.mock('@actions/core', () => ({
+  getBooleanInput: jest.fn(),
   getInput: jest.fn(),
   info: jest.fn(),
   setOutput: jest.fn()
@@ -22,34 +23,40 @@ describe('Run Action', () => {
     it.each([
       {
         artifact: '',
-        earthfile: 'earthfile',
+        artifactPath: '',
+        earthfile: './earthfile',
         flags: '',
+        platform: '',
         output: '',
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
         targetFlags: '--flag1 test -f2 test2',
-        command: ['earthfile+target', '--flag1', 'test', '-f2', 'test2'],
-        images: '',
-        artifacts: ''
+        command: ['./earthfile+target', '--flag1', 'test', '-f2', 'test2'],
+        imageOutput: '',
+        artifactOutput: ''
       },
       {
-        artifact: 'artifact',
-        earthfile: 'earthfile',
-        flags: '',
-        output: 'Artifact +target/artifact output as artifact\n',
+        artifact: 'true',
+        artifactPath: 'out',
+        earthfile: './earthfile',
+        flags: '--test',
+        platform: '',
+        output: 'Artifact +target/artifact output as out\n',
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
         targetFlags: '',
-        command: ['--artifact', 'earthfile+target/artifact', 'artifact'],
-        images: '',
-        artifacts: 'artifact'
+        command: ['--test', '--artifact', './earthfile+target/', 'out'],
+        imageOutput: '',
+        artifactOutput: 'earthfile/out'
       },
       {
         artifact: '',
-        earthfile: 'earthfile',
+        artifactPath: '',
+        earthfile: './earthfile',
         flags: '',
+        platform: '',
         output: '',
         runnerAddress: 'localhost',
         runnerPort: '8372',
@@ -58,49 +65,63 @@ describe('Run Action', () => {
         command: [
           '--buildkit-host',
           'tcp://localhost:8372',
-          'earthfile+target'
+          './earthfile+target'
         ],
-        images: '',
-        artifacts: ''
+        imageOutput: '',
+        artifactOutput: ''
       },
       {
         artifact: '',
-        earthfile: 'earthfile',
+        artifactPath: '',
+        earthfile: './earthfile',
         flags: '--flag1 test -f2 test2',
-        output:
-          'Image +docker output as image1:tag1\nImage +docker output as image2:tag2\n',
+        platform: 'linux/amd64',
+        output: 'Image +docker output as image1:tag1\n',
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
         targetFlags: '',
-        command: ['--flag1', 'test', '-f2', 'test2', 'earthfile+target'],
-        images: 'image1:tag1 image2:tag2',
-        artifacts: ''
+        command: [
+          '--platform',
+          'linux/amd64',
+          '--flag1',
+          'test',
+          '-f2',
+          'test2',
+          './earthfile+target'
+        ],
+        imageOutput: 'image1:tag1',
+        artifactOutput: ''
       }
     ])(
       `should execute the correct command`,
       async ({
         artifact,
+        artifactPath,
         earthfile,
         flags,
+        platform,
         output,
         runnerAddress,
         runnerPort,
         target,
         targetFlags,
         command,
-        images,
-        artifacts
+        imageOutput,
+        artifactOutput
       }) => {
         const getInputMock = core.getInput as jest.Mock
+        const getBooleanInputMock = core.getBooleanInput as jest.Mock
         getInputMock.mockImplementation((name: string) => {
           switch (name) {
-            case 'artifact':
-              return artifact
+            case 'artifact_path':
+              return artifactPath
             case 'earthfile':
               return earthfile
             case 'flags':
               return flags
+            case 'platform':
+              return platform
             case 'output':
               return output
             case 'runner_address':
@@ -116,6 +137,15 @@ describe('Run Action', () => {
           }
         })
 
+        getBooleanInputMock.mockImplementation((name: string) => {
+          switch (name) {
+            case 'artifact':
+              return artifact === 'true'
+            default:
+              throw new Error('Unknown input')
+          }
+        })
+
         const spawnMock = spawn as jest.Mock
         spawnMock.mockImplementation(createSpawnMock('stdout', output, 0))
 
@@ -125,8 +155,19 @@ describe('Run Action', () => {
         expect(spawn).toHaveBeenCalledWith('earthly', command)
         expect(stdoutSpy).toHaveBeenCalledWith('stdout')
         expect(stderrSpy).toHaveBeenCalledWith(output)
-        expect(core.setOutput).toHaveBeenCalledWith('images', images)
-        expect(core.setOutput).toHaveBeenCalledWith('artifacts', artifacts)
+
+        if (imageOutput) {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(core.setOutput).toHaveBeenCalledWith('image', imageOutput)
+        }
+
+        if (artifact === 'true') {
+          // eslint-disable-next-line jest/no-conditional-expect
+          expect(core.setOutput).toHaveBeenCalledWith(
+            'artifact',
+            artifactOutput
+          )
+        }
       }
     )
   })

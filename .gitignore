@@ -3,6 +3,9 @@
 .direnv
 .envrc.local
 
+# Earthly
+bin/
+
 # Node
 node_modules
 

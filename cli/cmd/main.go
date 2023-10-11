@@ -140,10 +140,11 @@ func (c *scanCmd) Run() error {
 	}
 
 	if c.JSONOutput {
-		var paths []string
+		paths := make([]string, 0)
 		for _, file := range files {
 			paths = append(paths, filepath.Dir(file.Path))
 		}
+
 		jsonFiles, err := json.Marshal(paths)
 		if err != nil {
 			return err

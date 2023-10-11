@@ -2,13 +2,21 @@ name: "Run"
 description: "Runs an Earthly target"
 inputs:
   artifact:
-    description: The name of the artifact to export
+    description: If true, forces artifacts to be saved locally
     required: false
+    default: "false"
+  artifact_path:
+    description: The path (relative to earthfile) where artifacts will be placed
+    required: false
+    default: out
   earthfile:
     description: The path to the Earthfile containing the target to run
     required: true
   flags:
     description: Additional flags to pass to the Earthly CLI
+    required: false
+  platform:
+    description: The platform to execute the earthfile target with (defaults to native)
     required: false
   runner_address:
     description: The address of the remote runner to use

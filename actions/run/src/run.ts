@@ -1,10 +1,13 @@
 import * as core from '@actions/core'
 import { spawn } from 'child_process'
+import * as path from 'path'
 
 export async function run(): Promise<void> {
-  const artifact = core.getInput('artifact')
+  const artifact = core.getBooleanInput('artifact')
+  const artifactPath = core.getInput('artifact_path')
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
+  const platform = core.getInput('platform')
   const runnerAddress = core.getInput('runner_address')
   const runnerPort = core.getInput('runner_port')
   const target = core.getInput('target')
@@ -13,19 +16,21 @@ export async function run(): Promise<void> {
   const command = 'earthly'
   const args: string[] = []
 
-  if (artifact) {
-    args.push('--artifact', `${earthfile}+${target}/${artifact}`, `${artifact}`)
-  }
-
   if (runnerAddress) {
     args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`)
+  }
+
+  if (platform) {
+    args.push('--platform', platform)
   }
 
   if (flags) {
     args.push(...flags.split(' '))
   }
 
-  if (!artifact) {
+  if (artifact) {
+    args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`)
+  } else {
     args.push(`${earthfile}+${target}`)
   }
 
@@ -36,25 +41,37 @@ export async function run(): Promise<void> {
   core.info(`Running command: ${command} ${args.join(' ')}`)
   const output = await spawnCommand(command, args)
 
-  // TODO: The newest version of Earthly attaches annotations to the images
-  let matches
-  const imageRegex = /^Image .*? output as (.*?)$/gm
-  const images = []
-  while ((matches = imageRegex.exec(output)) !== null) {
-    images.push(matches[1])
+  const imageOutput = parseImage(output)
+  if (imageOutput) {
+    core.info(`Found image: ${imageOutput}`)
+    core.setOutput('image', imageOutput)
   }
 
-  const artifactRegex = /^Artifact .*? output as (.*?)$/gm
-  const artifacts = []
-  while ((matches = artifactRegex.exec(output)) !== null) {
-    artifacts.push(matches[1])
+  const artifactOutput = path.join(earthfile, parseArtifact(output))
+  if (artifactOutput !== earthfile) {
+    core.info(`Found artifact: ${artifactOutput}`)
+    core.setOutput('artifact', artifactOutput)
+  }
+}
+
+function parseArtifact(output: string): string {
+  const regex = /^Artifact .*? output as (.*?)$/gm
+  const match = regex.exec(output)
+  if (match) {
+    return match[1]
   }
 
-  core.info(`Found images: ${images.join(' ')}`)
-  core.info(`Found artifacts: ${artifacts.join(' ')}`)
+  return ''
+}
 
-  core.setOutput('images', images.join(' '))
-  core.setOutput('artifacts', artifacts.join(' '))
+function parseImage(output: string): string {
+  const regex = /^Image .*? output as (.*?)$/gm
+  const match = regex.exec(output)
+  if (match) {
+    return match[1]
+  }
+
+  return ''
 }
 
 async function spawnCommand(command: string, args: string[]): Promise<string> {
