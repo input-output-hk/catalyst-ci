@@ -13,6 +13,7 @@ export async function run(): Promise<void> {
   }
 
   try {
+    const token = core.getInput('token')
     const version = core.getInput('version')
 
     if (!isSemVer(version)) {
@@ -20,8 +21,6 @@ export async function run(): Promise<void> {
       return
     }
 
-    const token = core.getInput('repo-token')
-    core.info(`Github token: ${token}`)
     const octokit = github.getOctokit(token)
     const { data: releases } = await octokit.rest.repos.listReleases({
       owner: repoOwner,

@@ -13728,13 +13728,12 @@ async function run() {
         return;
     }
     try {
+        const token = core.getInput('token');
         const version = core.getInput('version');
         if (!isSemVer(version)) {
             core.setFailed('Invalid version');
             return;
         }
-        const token = core.getInput('repo-token');
-        core.info(`Github token: ${token}`);
         const octokit = github.getOctokit(token);
         const { data: releases } = await octokit.rest.repos.listReleases({
             owner: repoOwner,

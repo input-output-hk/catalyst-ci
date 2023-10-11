@@ -1,6 +1,10 @@
 name: "Install"
 description: "Installs the Catalyst-CI CLI"
 inputs:
+  token:
+    description: Github token used to query API for available CLI releases
+    required: false
+    default: ${{ github.token }}
   version:
     description: "The version of the Catalyst-CI CLI to install"
     required: false
