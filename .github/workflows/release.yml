@@ -49,13 +49,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@dogfood
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
           earthly_version: ${{ inputs.earthly_version }}
       - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@dogfood
+        uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
         with:
           targets: ${{ inputs.target }}
@@ -82,13 +82,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@dogfood
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
           earthly_version: ${{ inputs.earthly_version }}
       - name: Build artifact
-        uses: input-output-hk/catalyst-ci/actions/run@dogfood
+        uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
         with:
           earthfile: ${{ matrix.earthfile }}
