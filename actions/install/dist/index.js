@@ -13756,7 +13756,13 @@ async function run() {
         core.info(`Downloading version ${version} from ${finalURL}`);
         if (process.platform === 'linux') {
             const downloadPath = await tool_cache.downloadTool(finalURL);
-            await (0,exec.exec)('tar', ['xvf', downloadPath, '-C', '/usr/local/bin']);
+            await (0,exec.exec)('tar', [
+                '--no-overwrite-dir',
+                'xvf',
+                downloadPath,
+                '-C',
+                '/usr/local/bin'
+            ]);
             core.info(`Installed cli to /usr/local/bin`);
         }
         else {

@@ -45,7 +45,13 @@ export async function run(): Promise<void> {
     core.info(`Downloading version ${version} from ${finalURL}`)
     if (process.platform === 'linux') {
       const downloadPath = await tc.downloadTool(finalURL)
-      await exec('tar', ['xvf', downloadPath, '-C', '/usr/local/bin'])
+      await exec('tar', [
+        '--no-overwrite-dir',
+        'xvf',
+        downloadPath,
+        '-C',
+        '/usr/local/bin'
+      ])
       core.info(`Installed cli to /usr/local/bin`)
     } else {
       core.setFailed('Unsupported platform')
