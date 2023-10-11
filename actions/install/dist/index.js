@@ -13753,7 +13753,7 @@ async function run() {
         core.info(`Downloading version ${version} from ${finalURL}`);
         if (process.platform === 'linux') {
             const downloadPath = await tool_cache.downloadTool(finalURL);
-            const extractPath = await tool_cache.extractTar(downloadPath, '/usr/local/bin/ci');
+            const extractPath = await tool_cache.extractTar(downloadPath, '/usr/local/bin');
             core.info(`Installed cli to ${extractPath}`);
         }
         else {
