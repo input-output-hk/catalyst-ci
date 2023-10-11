@@ -1,12 +1,17 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
+import * as github from '@actions/github'
 
-// cspell: words omashu
-
-const baseURL =
-  'https://github.com/meigma/omashu/releases/download/v%VER%/omashu-%VER%-linux_amd64.tar.gz'
+const assetName = 'cli-linux-amd64.tar.gz'
+const repoOwner = 'input-output-hk'
+const repoName = 'catalyst-ci'
 
 export async function run(): Promise<void> {
+  if (process.platform !== 'linux') {
+    core.setFailed('This action only supports Linux runners')
+    return
+  }
+
   try {
     const version = core.getInput('version')
 
@@ -15,13 +20,30 @@ export async function run(): Promise<void> {
       return
     }
 
-    const finalURL = baseURL.replace(/%VER%/g, version)
+    const octokit = github.getOctokit(process.env.GITHUB_TOKEN as string)
+    const { data: releases } = await octokit.rest.repos.listReleases({
+      owner: repoOwner,
+      repo: repoName
+    })
+    const targetRelease = releases.find(r => r.tag_name === `v${version}`)
+
+    if (!targetRelease) {
+      core.setFailed(`Version v${version} not found`)
+      return
+    }
+
+    const asset = targetRelease.assets.find(a => a.name === assetName)
+    if (!asset) {
+      core.setFailed(`Asset for version v${version} not found`)
+      return
+    }
+
+    const finalURL = asset.browser_download_url
     core.info(`Downloading version ${version} from ${finalURL}`)
     if (process.platform === 'linux') {
       const downloadPath = await tc.downloadTool(finalURL)
       const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
-
-      core.info(`Installed omashu to ${extractPath}`)
+      core.info(`Installed cli to ${extractPath}`)
     } else {
       core.setFailed('Unsupported platform')
     }
