@@ -106,8 +106,7 @@ jobs:
       - name: Compress artifact
         if: startsWith(github.ref, 'refs/tags/') || inputs.force_artifact
         run: |
-          cwd=$(pwd)
-          cd ${{ steps.build.outputs.artifact }} && tar -czvf "$cwd/${{ steps.artifact.outputs.name }}.tar.gz" .
+          find "${{ steps.build.outputs.artifact }}" -printf "%P\n" | tar -czvf "${{ steps.artifact.outputs.name }}.tar.gz" -C "${{ steps.build.outputs.artifact }}" -T -
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         if: startsWith(github.ref, 'refs/tags/') || inputs.force_artifact
