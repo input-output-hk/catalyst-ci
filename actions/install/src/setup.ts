@@ -20,6 +20,7 @@ export async function run(): Promise<void> {
       return
     }
 
+    core.info(`Github token: ${process.env.GITHUB_TOKEN}`)
     const octokit = github.getOctokit(process.env.GITHUB_TOKEN as string)
     const { data: releases } = await octokit.rest.repos.listReleases({
       owner: repoOwner,
