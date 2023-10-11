@@ -13757,11 +13757,11 @@ async function run() {
         if (process.platform === 'linux') {
             const downloadPath = await tool_cache.downloadTool(finalURL);
             await (0,exec.exec)('tar', [
-                '--no-overwrite-dir',
                 'xvf',
                 downloadPath,
                 '-C',
-                '/usr/local/bin'
+                '/usr/local/bin',
+                '--no-overwrite-dir'
             ]);
             core.info(`Installed cli to /usr/local/bin`);
         }

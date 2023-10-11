@@ -46,11 +46,11 @@ export async function run(): Promise<void> {
     if (process.platform === 'linux') {
       const downloadPath = await tc.downloadTool(finalURL)
       await exec('tar', [
-        '--no-overwrite-dir',
         'xvf',
         downloadPath,
         '-C',
-        '/usr/local/bin'
+        '/usr/local/bin',
+        '--no-overwrite-dir'
       ])
       core.info(`Installed cli to /usr/local/bin`)
     } else {
