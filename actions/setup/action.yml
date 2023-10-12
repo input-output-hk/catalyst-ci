@@ -50,7 +50,7 @@ runs:
       with:
         version: ${{ inputs.earthly_version }}
     - name: Install CI CLI
-      uses: input-output-hk/catalyst-ci/actions/install@setup-action
+      uses: input-output-hk/catalyst-ci/actions/install@master
       if: ${{ inputs.cli_skip_install != 'true' }}
       with:
         version: ${{ inputs.cli_version }}
@@ -61,7 +61,7 @@ runs:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
     - name: Setup Remote Runner
-      uses: input-output-hk/catalyst-ci/actions/configure-runner@setup-action
+      uses: input-output-hk/catalyst-ci/actions/configure-runner@master
       if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
       with:
         secret: ${{ inputs.earthly_runner_secret }}
