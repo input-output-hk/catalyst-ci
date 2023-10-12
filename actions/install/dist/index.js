@@ -13715,10 +13715,7 @@ var core = __nccwpck_require__(2186);
 var tool_cache = __nccwpck_require__(7784);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
-// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
-var exec = __nccwpck_require__(1514);
 ;// CONCATENATED MODULE: ./src/setup.ts
-
 
 
 
@@ -13756,14 +13753,8 @@ async function run() {
         core.info(`Downloading version ${version} from ${finalURL}`);
         if (process.platform === 'linux') {
             const downloadPath = await tool_cache.downloadTool(finalURL);
-            await (0,exec.exec)('tar', [
-                'xvf',
-                downloadPath,
-                '-C',
-                '/usr/local/bin',
-                '--no-overwrite-dir'
-            ]);
-            core.info(`Installed cli to /usr/local/bin`);
+            const extractPath = await tool_cache.extractTar(downloadPath, '/usr/local/bin');
+            core.info(`Installed cli to ${extractPath}`);
         }
         else {
             core.setFailed('Unsupported platform');
