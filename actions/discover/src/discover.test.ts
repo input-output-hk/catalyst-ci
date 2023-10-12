@@ -2,8 +2,6 @@ import * as core from '@actions/core'
 import { exec } from 'child_process'
 import { run } from './discover'
 
-// cspell: words omashu
-
 jest.mock('@actions/core', () => ({
   getBooleanInput: jest.fn(),
   getInput: jest.fn(),
@@ -49,12 +47,13 @@ describe('Discover Action', () => {
       }
     ]
 
-    it.each(testCases)(
-      'should execute the correct command for parseImages=%s, paths=%s, targets=%s',
-      async ({ parseImages, paths, targets, expectedCommand }) => {
-        const getBooleanInputMock = core.getBooleanInput as jest.Mock
-        const getInputMock = core.getInput as jest.Mock
+    // actions mocks
+    const getBooleanInputMock = core.getBooleanInput as jest.Mock
+    const getInputMock = core.getInput as jest.Mock
 
+    it.each(testCases)(
+      'should execute the correct command',
+      async ({ parseImages, paths, targets, expectedCommand }) => {
         getBooleanInputMock.mockReturnValue(parseImages)
         getInputMock.mockImplementation((name: string) => {
           switch (name) {
@@ -70,10 +69,7 @@ describe('Discover Action', () => {
         await run()
 
         expect(exec).toHaveBeenCalledWith(expectedCommand, expect.anything())
-        expect(core.setOutput as jest.Mock).toHaveBeenCalledWith(
-          'json',
-          'mocked output'
-        )
+        expect(core.setOutput).toHaveBeenCalledWith('json', 'mocked output')
       }
     )
   })
