@@ -13,13 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: input-output-hk/catalyst-ci/actions/install@setup-action
+      - uses: input-output-hk/catalyst-ci/actions/setup@setup-action
         with:
-          version: 1.3.1
+          aws_role_arn: arn:aws:iam::332405224602:role/ci
+          aws_region: eu-central-1
+          earthly_version: 0.7.15
       - name: Test
         run: |
-          ls /usr/local/bin/ci
-          /usr/local/bin/ci --help
+          ci --help
   # release:
   #   uses: ./.github/workflows/release.yml
   #   with:
