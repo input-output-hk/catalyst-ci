@@ -13715,22 +13715,22 @@ var core = __nccwpck_require__(2186);
 var tool_cache = __nccwpck_require__(7784);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
-;// CONCATENATED MODULE: ./src/setup.ts
+;// CONCATENATED MODULE: ./src/install.ts
 
 
 
 const assetName = 'cli-linux-amd64.tar.gz';
 const repoOwner = 'input-output-hk';
 const repoName = 'catalyst-ci';
-async function run() {
-    if (process.platform !== 'linux') {
+async function run(platform = process.platform) {
+    if (platform !== 'linux') {
         core.setFailed('This action only supports Linux runners');
         return;
     }
     try {
         const token = core.getInput('token');
         const version = core.getInput('version');
-        if (!isSemVer(version)) {
+        if (version !== 'latest' && !isSemVer(version)) {
             core.setFailed('Invalid version');
             return;
         }
@@ -13739,9 +13739,15 @@ async function run() {
             owner: repoOwner,
             repo: repoName
         });
-        const targetRelease = releases.find(r => r.tag_name === `v${version}`);
+        let targetRelease;
+        if (version === 'latest') {
+            targetRelease = releases[0];
+        }
+        else {
+            targetRelease = releases.find(r => r.tag_name === `v${version}`);
+        }
         if (!targetRelease) {
-            core.setFailed(`Version v${version} not found`);
+            core.setFailed(`Version ${version} not found`);
             return;
         }
         const asset = targetRelease.assets.find(a => a.name === assetName);
@@ -13751,14 +13757,9 @@ async function run() {
         }
         const finalURL = asset.browser_download_url;
         core.info(`Downloading version ${version} from ${finalURL}`);
-        if (process.platform === 'linux') {
-            const downloadPath = await tool_cache.downloadTool(finalURL);
-            const extractPath = await tool_cache.extractTar(downloadPath, '/usr/local/bin');
-            core.info(`Installed cli to ${extractPath}`);
-        }
-        else {
-            core.setFailed('Unsupported platform');
-        }
+        const downloadPath = await tool_cache.downloadTool(finalURL);
+        const extractPath = await tool_cache.extractTar(downloadPath, '/usr/local/bin');
+        core.info(`Installed cli to ${extractPath}`);
     }
     catch (error) {
         if (error instanceof Error) {
