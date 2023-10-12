@@ -2,17 +2,39 @@ name: CI Setup
 description: Performs required steps to setup CI.
 inputs:
   aws_role_arn:
-    description: The ARN of the CI role (used for fetching secrets)
-    required: true
-  aws_region:
-    description: The AWS region to use
-    required: true
-  cli_version:
-    description: The version of the CI CLI to install
+    description: |
+      The ARN of the AWS role to configure credentials for. If this input is
+      omitted, AWS credentials will not be configured in the environment.
     required: false
-    default: 1.1.0
+    default: ""
+  aws_region:
+    description: |
+      The default AWS region to use in all requests. If this input is omitted,
+      AWS credentials will not be configured in the environment.
+    required: false
+    default: ""
+  cli_skip_install:
+    description: If "true", will skip installing the CI CLI
+    required: false
+    default: "false"
+  cli_version:
+    description: The version of the CI CLI to install (defaults to latest)
+    required: false
+    default: latest
+  earthly_runner_secret:
+    description: |
+      The ID of the AWS secret holding Earthly remote runner credentials. This
+      secret must contain the runner address and the necessary TLS certificates
+      required to authenticate with it. If omitted, a remote Earthly runner will
+      not be configured.
+    required: false
+    default: ""
+  earthly_skip_install:
+    description: If "true", will skip installing Earthly
+    required: false
+    default: "false"
   earthly_version:
-    description: The version of Earthly to install
+    description: The version of Earthly to install (defaults to latest)
     required: false
     default: latest
 outputs:
@@ -24,25 +46,22 @@ runs:
   steps:
     - name: Install Earthly
       uses: earthly/actions-setup@v1
+      if: ${{ inputs.earthly_skip_install != 'true' }}
       with:
         version: ${{ inputs.earthly_version }}
-    - name: Install CLI
-      shell: bash
-      run: |
-        sudo curl \
-          -L https://github.com/input-output-hk/catalyst-ci/releases/download/v${{ inputs.cli_version }}/ci-linux-amd64 \
-          -o /usr/bin/ci
-        sudo chmod +x /usr/bin/ci
+    - name: Install CI CLI
+      uses: input-output-hk/catalyst-ci/actions/install@master
+      if: ${{ inputs.cli_skip_install != 'true' }}
+      with:
+        version: ${{ inputs.cli_version }}
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v2
+      uses: aws-actions/configure-aws-credentials@v4
+      if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
       with:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
-    - name: Fetch Github token
-      shell: bash
-      id: token
-      run: |
-        TOKEN=$(aws secretsmanager get-secret-value --secret-id 'global/ci/deploy' | jq -r .SecretString | jq -r .token)
-        echo "token=$TOKEN" >>$GITHUB_OUTPUT
     - name: Setup Remote Runner
-      uses: input-output-hk/catalyst-ci/actions/configure-runner@actions-2.0
+      uses: input-output-hk/catalyst-ci/actions/configure-runner@master
+      if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
+      with:
+        secret: ${{ inputs.earthly_runner_secret }}

@@ -40,6 +40,14 @@ on:
           The address of the Earthly runner that will be used to build the
           Earthly files.
         required: false
+      earthly_runner_secret:
+        description: |
+          The ID of the AWS secret holding Earthly remote runner credentials.
+          This secret must contain the runner address and the necessary TLS
+          certificates required to authenticate with it. If omitted, a remote
+          Earthly runner will not be configured.
+        required: false
+
 
 jobs:
   discover:
@@ -51,9 +59,7 @@ jobs:
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
-          aws_role_arn: ${{ inputs.aws_role_arn }}
-          aws_region: ${{ inputs.aws_region }}
-          earthly_version: ${{ inputs.earthly_version }}
+          earthly_skip_install: "true"
       - name: Discover Earthly files
         uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
@@ -87,6 +93,7 @@ jobs:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
           earthly_version: ${{ inputs.earthly_version }}
+          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Build artifact
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
