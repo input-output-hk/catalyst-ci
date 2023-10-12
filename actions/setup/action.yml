@@ -17,21 +17,18 @@ inputs:
     description: The version of the CI CLI to install (defaults to latest)
     required: false
     default: latest
-  disable_remote_runner:
-    description: If 'true', will skip configuring a remote Earthly runner
+  earthly_runner_secret:
+    description: |
+      The ID of the AWS secret holding Earthly remote runner credentials. This
+      secret must contain the runner address and the necessary TLS certificates
+      required to authenticate with it. If omitted, a remote Earthly runner will
+      not be configured.
     required: false
-    default: "false"
+    default: ""
   earthly_version:
     description: The version of Earthly to install (defaults to latest)
     required: false
     default: latest
-  remote_runner_secret:
-    description: |
-      The ID of the AWS secret holding Earthly remote runner credentials. This
-      secret must contain the runner address and the necessary TLS certificates
-      required to authenticate with it.
-    required: false
-    default: "global/ci/ci-tls"
 outputs:
   token:
     description: The Github token to use for interacting with repositories
@@ -55,6 +52,6 @@ runs:
         aws-region: ${{ inputs.aws_region }}
     - name: Setup Remote Runner
       uses: input-output-hk/catalyst-ci/actions/configure-runner@setup-action
-      if: ${{ inputs.disable_remote_runner != 'true' }}
+      if: ${{ inputs.earthly_runner_secret != '' }}
       with:
-        secret: ${{ inputs.remote_runner_secret }}
+        secret: ${{ inputs.earthly_runner_secret }}

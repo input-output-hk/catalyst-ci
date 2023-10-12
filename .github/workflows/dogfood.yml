@@ -15,6 +15,6 @@ jobs:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
       earthly_version: 0.7.15
-      force_artifact: true
     secrets:
       earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
