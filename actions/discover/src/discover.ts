@@ -36,5 +36,3 @@ async function execCommand(command: string): Promise<string> {
     })
   })
 }
-
-run()
