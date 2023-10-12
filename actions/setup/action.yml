@@ -2,21 +2,36 @@ name: CI Setup
 description: Performs required steps to setup CI.
 inputs:
   aws_role_arn:
-    description: The ARN of the AWS role to configure credentials for
+    description: |
+      The ARN of the AWS role to configure credentials for. If this input is
+      omitted, AWS credentials will not be configured in the environment.
     required: false
     default: ""
   aws_region:
-    description: The default AWS region to use in all requests
+    description: |
+      The default AWS region to use in all requests. If this input is omitted,
+      AWS credentials will not be configured in the environment.
     required: false
     default: ""
   cli_version:
     description: The version of the CI CLI to install (defaults to latest)
     required: false
     default: latest
+  disable_remote_runner:
+    description: If 'true', will skip configuring a remote Earthly runner
+    required: false
+    default: "false"
   earthly_version:
     description: The version of Earthly to install (defaults to latest)
     required: false
     default: latest
+  remote_runner_secret:
+    description: |
+      The ID of the AWS secret holding Earthly remote runner credentials. This
+      secret must contain the runner address and the necessary TLS certificates
+      required to authenticate with it.
+    required: false
+    default: "global/ci/ci-tls"
 outputs:
   token:
     description: The Github token to use for interacting with repositories
@@ -34,9 +49,12 @@ runs:
         version: ${{ inputs.cli_version }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
-      if: inputs.aws_region != '' && inputs.aws_role_arn != ''
+      if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
       with:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
     - name: Setup Remote Runner
       uses: input-output-hk/catalyst-ci/actions/configure-runner@setup-action
+      if: ${{ inputs.disable_remote_runner != 'true' }}
+      with:
+        secret: ${{ inputs.remote_runner_secret }}
