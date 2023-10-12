@@ -6,8 +6,10 @@ const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
 const repoName = 'catalyst-ci'
 
-export async function run(): Promise<void> {
-  if (process.platform !== 'linux') {
+export async function run(
+  platform: NodeJS.Process['platform'] = process.platform
+): Promise<void> {
+  if (platform !== 'linux') {
     core.setFailed('This action only supports Linux runners')
     return
   }
@@ -17,6 +19,7 @@ export async function run(): Promise<void> {
     const version = core.getInput('version')
 
     if (!isSemVer(version)) {
+      console.log(`Invalid version ${version}`)
       core.setFailed('Invalid version')
       return
     }
@@ -29,7 +32,7 @@ export async function run(): Promise<void> {
     const targetRelease = releases.find(r => r.tag_name === `v${version}`)
 
     if (!targetRelease) {
-      core.setFailed(`Version v${version} not found`)
+      core.setFailed(`Version ${version} not found`)
       return
     }
 

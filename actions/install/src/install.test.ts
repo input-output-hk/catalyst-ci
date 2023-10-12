@@ -1,13 +1,11 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
+import * as github from '@actions/github'
 import { run } from './install'
-
-// cspell: words omashu
 
 jest.mock('@actions/core', () => {
   return {
     getInput: jest.fn(),
-    info: jest.fn(),
     setFailed: jest.fn()
   }
 })
@@ -15,46 +13,165 @@ jest.mock('@actions/tool-cache', () => ({
   downloadTool: jest.fn(),
   extractTar: jest.fn()
 }))
+jest.mock('@actions/github', () => ({
+  getOctokit: jest.fn()
+}))
 
 describe('Setup Action', () => {
-  it('should download and extract the tool', async () => {
-    const mockDownloadTool = tc.downloadTool as jest.MockedFunction<
-      typeof tc.downloadTool
-    >
-    const mockExtractTar = tc.extractTar as jest.MockedFunction<
-      typeof tc.extractTar
-    >
-    const mockGetInput = core.getInput as jest.MockedFunction<
-      typeof core.getInput
-    >
-    mockGetInput.mockReturnValueOnce('1.0.0')
-    mockDownloadTool.mockResolvedValueOnce(
-      '/tmp/omashu-1.0.0-linux_amd64.tar.gz'
-    )
+  const token = 'token'
+  const version = '1.0.0'
 
-    await run()
+  // actions core mocks
+  const getInputMock = core.getInput as jest.Mock
+  const setFailedMock = core.setFailed as jest.Mock
 
-    const expectedUrl =
-      'https://github.com/meigma/omashu/releases/download/v1.0.0/omashu-1.0.0-linux_amd64.tar.gz'
-    expect(mockDownloadTool).toHaveBeenCalledWith(expectedUrl)
-    expect(mockExtractTar).toHaveBeenCalledWith(
-      '/tmp/omashu-1.0.0-linux_amd64.tar.gz',
-      '/usr/local/bin'
-    )
-  })
+  // actions tool-cache mocks
+  const downloadToolMock = tc.downloadTool as jest.Mock
+  const extractTarMock = tc.extractTar as jest.Mock
 
-  it('should handle errors gracefully', async () => {
-    const mockDownloadTool = tc.downloadTool as jest.MockedFunction<
-      typeof tc.downloadTool
-    >
-    const mockGetInput = core.getInput as jest.MockedFunction<
-      typeof core.getInput
-    >
-    mockGetInput.mockReturnValueOnce('1.0.0')
-    mockDownloadTool.mockRejectedValueOnce(new Error('Download error'))
+  // actions github mocks
+  const getOctokitMock = github.getOctokit as jest.Mock
 
-    await run()
+  describe('when installing the CLI binary', () => {
+    describe('when the platform is not linux', () => {
+      it('should fail', async () => {
+        await run('darwin')
 
-    expect(core.setFailed).toHaveBeenCalledWith('Download error')
+        expect(setFailedMock).toHaveBeenCalledWith(
+          'This action only supports Linux runners'
+        )
+      })
+    })
+
+    describe('when the platform is linux', () => {
+      describe('when the version is invalid', () => {
+        beforeAll(() => {
+          getInputMock.mockImplementation((name: string) => {
+            switch (name) {
+              case 'token':
+                return token
+              case 'version':
+                return 'invalid'
+              default:
+                throw new Error(`Unknown input ${name}`)
+            }
+          })
+        })
+
+        it('should fail', async () => {
+          await run()
+          expect(setFailedMock).toHaveBeenCalledWith('Invalid version')
+        })
+      })
+
+      describe('when the version is valid', () => {
+        beforeAll(() => {
+          getInputMock.mockImplementation((name: string) => {
+            switch (name) {
+              case 'token':
+                return token
+              case 'version':
+                return version
+              default:
+                throw new Error(`Unknown input ${name}`)
+            }
+          })
+        })
+
+        describe('when the version does not exist', () => {
+          beforeAll(() => {
+            getOctokitMock.mockReturnValue({
+              rest: {
+                repos: {
+                  listReleases: jest.fn().mockResolvedValue({
+                    data: []
+                  })
+                }
+              }
+            })
+          })
+
+          it('should fail', async () => {
+            await run()
+            expect(setFailedMock).toHaveBeenCalledWith(
+              `Version ${version} not found`
+            )
+          })
+        })
+
+        describe('when the version exists', () => {
+          describe('when the assets is not found', () => {
+            beforeAll(() => {
+              getOctokitMock.mockReturnValue({
+                rest: {
+                  repos: {
+                    listReleases: jest.fn().mockResolvedValue({
+                      data: [
+                        {
+                          // eslint-disable-next-line camelcase
+                          tag_name: `v${version}`,
+                          assets: []
+                        }
+                      ]
+                    })
+                  }
+                }
+              })
+            })
+
+            it('should fail', async () => {
+              await run()
+              expect(setFailedMock).toHaveBeenCalledWith(
+                `Asset for version v${version} not found`
+              )
+            })
+          })
+
+          describe('when the assets is found', () => {
+            beforeAll(() => {
+              getOctokitMock.mockReturnValue({
+                rest: {
+                  repos: {
+                    listReleases: jest.fn().mockResolvedValue({
+                      data: [
+                        {
+                          // eslint-disable-next-line camelcase
+                          tag_name: `v${version}`,
+                          assets: [
+                            {
+                              name: 'cli-linux-amd64.tar.gz',
+                              // eslint-disable-next-line camelcase
+                              browser_download_url: 'https://example.com'
+                            }
+                          ]
+                        }
+                      ]
+                    })
+                  }
+                }
+              })
+            })
+
+            it('should download the asset', async () => {
+              await run()
+
+              expect(downloadToolMock).toHaveBeenCalledWith(
+                'https://example.com'
+              )
+            })
+
+            it('should extract the asset', async () => {
+              downloadToolMock.mockResolvedValue('/tmp/file.tar.gz')
+              await run()
+
+              expect(extractTarMock).toHaveBeenCalledWith(
+                '/tmp/file.tar.gz',
+                '/usr/local/bin'
+              )
+            })
+          })
+        })
+      })
+    })
   })
 })
