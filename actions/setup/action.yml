@@ -25,6 +25,10 @@ inputs:
     description: The version of the CI CLI to install (defaults to latest)
     required: false
     default: latest
+  configure_registries:
+    description: If "true", the action will login to container registries
+    required: false
+    default: "false"
   earthly_runner_secret:
     description: |
       The ID of the AWS secret holding Earthly remote runner credentials. This
@@ -70,11 +74,12 @@ runs:
         aws-region: ${{ inputs.aws_region }}
     - name: Login to ECR
       uses: docker/login-action@v3
-      if: ${{ inputs.aws_role_arn != '' && inputs.aws_role_arn != '' && inputs.aws_ecr_registry != '' }}
+      if: ${{ inputs.aws_role_arn != '' && inputs.aws_role_arn != '' && inputs.aws_ecr_registry != '' && inputs.configure_registries == 'true' }}
       with:
         registry: ${{ inputs.aws_ecr_registry }}
     - name: Login to GitHub Container Registry
       uses: docker/login-action@v3
+      if: ${{ inputs.configure_registries == 'true' }}
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
