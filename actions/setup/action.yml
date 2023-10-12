@@ -38,11 +38,5 @@ runs:
       with:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
-    - name: Fetch Github token
-      shell: bash
-      id: token
-      run: |
-        TOKEN=$(aws secretsmanager get-secret-value --secret-id 'global/ci/deploy' | jq -r .SecretString | jq -r .token)
-        echo "token=$TOKEN" >>$GITHUB_OUTPUT
     - name: Setup Remote Runner
       uses: input-output-hk/catalyst-ci/actions/configure-runner@setup-action
