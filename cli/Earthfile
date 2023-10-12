@@ -43,32 +43,23 @@ build:
     ENV CGO_ENABLED=0
     RUN go build -ldflags="-extldflags=-static" -o bin/ci cmd/main.go
 
+    SAVE ARTIFACT bin/ci ci
+
+docker:
+    FROM debian:bookworm-slim
+    WORKDIR /workspace
+
+    COPY +build/ci /usr/local/bin/ci
+
+    ENTRYPOINT ["/usr/local/bin/ci"]
+
 release:
     FROM +build
 
     SAVE ARTIFACT bin/ci ci
 
-docker:
-    FROM earthly/earthly:v0.7.6
-
+publish:
+    FROM +docker
     ARG tag=latest
-    ARG registry
 
-    WORKDIR /workspace
-
-    # Add runtime dependencies
-    RUN apk add --no-cache aws-cli bash git jq
-
-    # Trust WORKDIR
-    RUN git config --global --add safe.directory /workspace
-
-    COPY +build/ci /usr/local/bin/ci
-
-    IF [ "$registry" = "" ]
-        ARG registry_final=$registry
-    ELSE
-        ARG registry_final=${registry}/
-    END
-
-    ENTRYPOINT ["/usr/local/bin/ci"]
-    SAVE IMAGE --push ${registry_final}cli:${tag}
+    SAVE IMAGE --push cli:${tag}
