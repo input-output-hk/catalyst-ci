@@ -59,7 +59,7 @@ jobs:
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@setup-action
         with:
-          earthly_version: ${{ inputs.earthly_version }}
+          earthly_skip_install: "true"
       - name: Discover Earthly files
         uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
