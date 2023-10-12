@@ -18,8 +18,7 @@ export async function run(
     const token = core.getInput('token')
     const version = core.getInput('version')
 
-    if (!isSemVer(version)) {
-      console.log(`Invalid version ${version}`)
+    if (version !== 'latest' && !isSemVer(version)) {
       core.setFailed('Invalid version')
       return
     }
@@ -29,7 +28,13 @@ export async function run(
       owner: repoOwner,
       repo: repoName
     })
-    const targetRelease = releases.find(r => r.tag_name === `v${version}`)
+
+    let targetRelease
+    if (version === 'latest') {
+      targetRelease = releases[0]
+    } else {
+      targetRelease = releases.find(r => r.tag_name === `v${version}`)
+    }
 
     if (!targetRelease) {
       core.setFailed(`Version ${version} not found`)

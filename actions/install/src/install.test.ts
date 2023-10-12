@@ -6,6 +6,7 @@ import { run } from './install'
 jest.mock('@actions/core', () => {
   return {
     getInput: jest.fn(),
+    info: jest.fn(),
     setFailed: jest.fn()
   }
 })
@@ -136,6 +137,17 @@ describe('Setup Action', () => {
                       data: [
                         {
                           // eslint-disable-next-line camelcase
+                          tag_name: `v2.0.0`,
+                          assets: [
+                            {
+                              name: 'cli-linux-amd64.tar.gz',
+                              // eslint-disable-next-line camelcase
+                              browser_download_url: 'https://example2.com'
+                            }
+                          ]
+                        },
+                        {
+                          // eslint-disable-next-line camelcase
                           tag_name: `v${version}`,
                           assets: [
                             {
@@ -168,6 +180,39 @@ describe('Setup Action', () => {
                 '/tmp/file.tar.gz',
                 '/usr/local/bin'
               )
+            })
+
+            describe('when the download fails', () => {
+              beforeAll(() => {
+                downloadToolMock.mockRejectedValue(new Error('Download error'))
+              })
+
+              it('should fail', async () => {
+                await run()
+                expect(setFailedMock).toHaveBeenCalledWith('Download error')
+              })
+            })
+
+            describe('when the version is latest', () => {
+              beforeAll(() => {
+                getInputMock.mockImplementation((name: string) => {
+                  switch (name) {
+                    case 'token':
+                      return token
+                    case 'version':
+                      return 'latest'
+                    default:
+                      throw new Error(`Unknown input ${name}`)
+                  }
+                })
+              })
+
+              it('should download the latest version', async () => {
+                await run()
+                expect(downloadToolMock).toHaveBeenCalledWith(
+                  'https://example2.com'
+                )
+              })
             })
           })
         })

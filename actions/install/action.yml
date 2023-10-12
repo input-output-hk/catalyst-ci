@@ -1,14 +1,14 @@
-name: "Install"
-description: "Installs the Catalyst-CI CLI"
+name: Install
+description: Installs the Catalyst-CI CLI
 inputs:
   token:
     description: Github token used to query API for available CLI releases
     required: false
     default: ${{ github.token }}
   version:
-    description: "The version of the Catalyst-CI CLI to install"
+    description: The version of the Catalyst-CI CLI to install (defaults to latest)
     required: false
-    default: "0.1.0"
+    default: latest
 runs:
-  using: "node20"
-  main: "dist/index.js"
+  using: node20
+  main: dist/index.js
