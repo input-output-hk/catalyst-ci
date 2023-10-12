@@ -2,13 +2,15 @@ name: CI Setup
 description: Performs required steps to setup CI.
 inputs:
   aws_role_arn:
-    description: The ARN of the CI role (used for fetching secrets)
-    required: true
+    description: The ARN of the AWS role to configure credentials for
+    required: false
+    default: ""
   aws_region:
-    description: The AWS region to use
-    required: true
+    description: The default AWS region to use in all requests
+    required: false
+    default: ""
   cli_version:
-    description: The version of the CI CLI to install (default to latest)
+    description: The version of the CI CLI to install (defaults to latest)
     required: false
     default: latest
   earthly_version:
@@ -32,6 +34,7 @@ runs:
         version: ${{ inputs.cli_version }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
+      if: inputs.aws_region != "" && inputs.aws_role_arn != ""
       with:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
