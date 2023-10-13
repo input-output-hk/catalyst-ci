@@ -9,8 +9,17 @@ permissions:
   packages: write
 
 jobs:
+  check:
+    uses: ./.github/workflows/check.yml
+    with:
+      aws_role_arn: arn:aws:iam::332405224602:role/ci
+      aws_region: eu-central-1
+    secrets:
+      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
   release:
     uses: ./.github/workflows/release.yml
+    needs: [check]
     with:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1

@@ -25,20 +25,18 @@ deps:
     SAVE ARTIFACT go.mod AS LOCAL go.mod
     SAVE ARTIFACT go.sum AS LOCAL go.sum
 
-check:
+src:
     FROM +deps
 
-    BUILD +fmt
-    BUILD +lint
+    COPY --dir cmd pkg .
 
 test:
-    FROM +check
+    FROM +src
 
-    COPY --dir cmd pkg .
     RUN ginkgo ./...
 
 build:
-    FROM +test
+    FROM +src
 
     ENV CGO_ENABLED=0
     RUN go build -ldflags="-extldflags=-static" -o bin/ci cmd/main.go
@@ -52,6 +50,13 @@ docker:
     COPY +build/ci /usr/local/bin/ci
 
     ENTRYPOINT ["/usr/local/bin/ci"]
+
+check:
+    FROM +deps
+
+    BUILD +fmt
+    BUILD +lint
+    BUILD +test
 
 release:
     FROM +build
