@@ -1,0 +1,133 @@
+on:
+  workflow_call:
+    inputs:
+      target:
+        description: |
+          The target used to mark publish builds. This target should be unique
+          across all Earthly files in the repository. The target should always
+          produce at least one image which is optionally published to the
+          configured registries.
+        required: false
+        type: string
+        default: publish
+      aws_ecr_registry:
+        description: |
+            The AWS ECR registry that will be used to publish images
+        required: true
+        type: string
+      aws_role_arn:
+        description: |
+          The ARN of the AWS role that will be assumed by the workflow. Only
+          required when configuring a remote Earthly runner or AWS ECR.
+        required: false
+        type: string
+      aws_region:
+        description: |
+          The AWS region that will be used by the workflow. Only required when
+          configuring a remote Earthly runner or AWS ECR.
+        required: false
+        type: string
+      earthly_version:
+        description: The version of Earthly to use.
+        required: false
+        type: string
+        default: latest
+      tags:
+        description: |
+          A line separated list of additional tags that will be applied to
+          published images.
+        required: false
+        type: string
+    secrets:
+      earthly_runner_address:
+        description: |
+          The address of the Earthly runner that will be used to build the
+          Earthly files.
+        required: false
+      earthly_runner_secret:
+        description: |
+          The ID of the AWS secret holding Earthly remote runner credentials.
+          This secret must contain the runner address and the necessary TLS
+          certificates required to authenticate with it. If omitted, a remote
+          Earthly runner will not be configured.
+        required: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.check.outputs.json }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+          earthly_skip_install: "true"
+      - name: Discover Earthly files
+        uses: input-output-hk/catalyst-ci/actions/discover@master
+        id: discover
+        with:
+          targets: ${{ inputs.target }}
+      - name: Check for empty output
+        id: check
+        run: |
+          output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
+          if [ "$output" == "null" ]; then
+            echo "json=[]" >> $GITHUB_OUTPUT
+          else
+            echo "json=$output" >> $GITHUB_OUTPUT
+          fi
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [discover]
+    if: needs.discover.outputs.json != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        platform:
+          - linux/amd64
+        earthfile: ${{ fromJson(needs.discover.outputs.json) }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+          aws_ecr_registry: ${{ inputs.aws_ecr_registry }}
+          aws_role_arn: ${{ inputs.aws_role_arn }}
+          aws_region: ${{ inputs.aws_region }}
+          configure_registries: "true"
+          earthly_version: ${{ inputs.earthly_version }}
+          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+      - name: Build image
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        id: build
+        with:
+          earthfile: ${{ matrix.earthfile }}
+          target: ${{ inputs.target }}
+          platform: ${{ matrix.platform }}
+          runner_address: ${{ secrets.earthly_runner_address }}
+      - name: Push image
+        uses: input-output-hk/catalyst-ci/actions/push@master
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        with:
+          image: ${{ steps.build.outputs.image }}
+          registries: |
+            ${{ inputs.aws_ecr_registry }}
+          tags: |
+            ${{ github.sha }}
+            ${{ inputs.tags }}
+      - name: Fetch tag
+        id: fetch_tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITUB_OUTPUT
+      - name: Push release image
+        uses: input-output-hk/catalyst-ci/actions/push@master
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          image: ${{ steps.build.outputs.image }}
+          registries: |
+            ${{ inputs.aws_ecr_registry }}
+            ghcr.io/${{ github.repository }}
+          tags: |
+            ${{ steps.fetch_tag.outputs.tag }}

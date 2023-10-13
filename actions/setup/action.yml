@@ -1,6 +1,10 @@
 name: CI Setup
 description: Performs required steps to setup CI.
 inputs:
+  aws_ecr_registry:
+    description: The address to the ECR registry that will be configured
+    required: false
+    default: ""
   aws_role_arn:
     description: |
       The ARN of the AWS role to configure credentials for. If this input is
@@ -21,6 +25,10 @@ inputs:
     description: The version of the CI CLI to install (defaults to latest)
     required: false
     default: latest
+  configure_registries:
+    description: If "true", the action will login to container registries
+    required: false
+    default: "false"
   earthly_runner_secret:
     description: |
       The ID of the AWS secret holding Earthly remote runner credentials. This
@@ -37,6 +45,10 @@ inputs:
     description: The version of Earthly to install (defaults to latest)
     required: false
     default: latest
+  github_token:
+    description: Github token used to login to GHCR (defaults to runner token)
+    required: false
+    default: ${{ github.token }}
 outputs:
   token:
     description: The Github token to use for interacting with repositories
@@ -60,6 +72,18 @@ runs:
       with:
         role-to-assume: ${{ inputs.aws_role_arn }}
         aws-region: ${{ inputs.aws_region }}
+    - name: Login to ECR
+      uses: docker/login-action@v3
+      if: ${{ inputs.aws_role_arn != '' && inputs.aws_role_arn != '' && inputs.aws_ecr_registry != '' && inputs.configure_registries == 'true' }}
+      with:
+        registry: ${{ inputs.aws_ecr_registry }}
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      if: ${{ inputs.configure_registries == 'true' }}
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.github_token }}
     - name: Setup Remote Runner
       uses: input-output-hk/catalyst-ci/actions/configure-runner@master
       if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
