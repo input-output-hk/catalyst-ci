@@ -1,5 +1,7 @@
 VERSION 0.7
 
+# cspell: words cytopia gofmt golangci GOLANGCI GOCACHE errchkjson ginkgolinter goimports gosec nilnil testpackage
+
 FMT:
     COMMAND
 

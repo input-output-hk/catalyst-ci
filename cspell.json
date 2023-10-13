@@ -25,7 +25,8 @@
         "typescript",
         "html",
         "css",
-        "golang"
+        "golang",
+        "camelcase"
     ],
     "ignorePaths": [
         ".config/dictionaries",
@@ -35,6 +36,10 @@
         "cli/go.sum",
         "cli/go.mod",
         "cli/bin/ci",
-        ".git"
+        ".git",
+        ".gitignore",
+        ".markdownlint.jsonc",
+        ".markdownlint-cli2.jsonc",
+        ".envrc"
     ]
 }
