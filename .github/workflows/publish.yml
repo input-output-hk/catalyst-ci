@@ -117,3 +117,17 @@ jobs:
           tags: |
             ${{ github.sha }}
             ${{ inputs.tags }}
+      - name: Fetch tag
+        id: fetch_tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITUB_OUTPUT
+      - name: Push release image
+        uses: input-output-hk/catalyst-ci/actions/push@publish-action
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          image: ${{ steps.build.outputs.image }}
+          registries: |
+            ${{ inputs.aws_ecr_registry }}
+            ghcr.io/${{ github.repository }}
+          tags: |
+            ${{ steps.fetch_tag.outputs.tag }}
