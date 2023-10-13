@@ -60,7 +60,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@publish-action
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           earthly_skip_install: "true"
       - name: Discover Earthly files
@@ -91,7 +91,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@publish-action
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_ecr_registry: ${{ inputs.aws_ecr_registry }}
           aws_role_arn: ${{ inputs.aws_role_arn }}
@@ -108,7 +108,7 @@ jobs:
           platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Push image
-        uses: input-output-hk/catalyst-ci/actions/push@publish-action
+        uses: input-output-hk/catalyst-ci/actions/push@master
         if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         with:
           image: ${{ steps.build.outputs.image }}
@@ -122,7 +122,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITUB_OUTPUT
       - name: Push release image
-        uses: input-output-hk/catalyst-ci/actions/push@publish-action
+        uses: input-output-hk/catalyst-ci/actions/push@master
         if: startsWith(github.ref, 'refs/tags/')
         with:
           image: ${{ steps.build.outputs.image }}
