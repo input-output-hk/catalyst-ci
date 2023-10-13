@@ -39,6 +39,7 @@
         ".gitignore",
         ".markdownlint.jsonc",
         ".markdownlint-cli2.jsonc",
-        ".envrc"
+        ".envrc",
+        "cspell.json"
     ]
 }
