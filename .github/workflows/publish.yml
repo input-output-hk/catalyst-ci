@@ -13,7 +13,7 @@ on:
       aws_ecr_registry:
         description: |
             The AWS ECR registry that will be used to publish images
-        required: false
+        required: true
         type: string
       aws_role_arn:
         description: |
@@ -32,6 +32,12 @@ on:
         required: false
         type: string
         default: latest
+      tags:
+        description: |
+          A space separated list of additional tags that will be applied to
+          published images.
+        required: false
+        type: string
     secrets:
       earthly_runner_address:
         description: |
@@ -101,3 +107,26 @@ jobs:
           target: ${{ inputs.target }}
           platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.earthly_runner_address }}
+      - name: Publish to ECR
+        #if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        run: |
+          function tag_and_push() {
+            local TAG=$1
+
+            echo "Tagging $IMAGE as $REGISTRY/$IMAGE_NAME:$TAG"
+            docker tag "$IMAGE" "$REGISTRY/$IMAGE_NAME:$TAG"
+
+            echo "Pushing $REGISTRY/$IMAGE_NAME:$TAG"
+            docker push "$REGISTRY/$IMAGE_NAME:$TAG"
+          }
+
+          IMAGE="${{ steps.build.outputs.image }}"
+          IMAGE_NAME=$(echo "$IMAGE" | cut -d':' -f1)
+          REGISTRY="${{ inputs.aws_ecr_registry }}"
+          PRIMARY_TAG="${{ github.sha }}"
+
+          tag_and_push "$PRIMARY_TAG"
+
+          for TAG in ${{ inputs.tags }}; do
+            tag_and_push "$TAG"
+          done
