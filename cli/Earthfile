@@ -62,4 +62,4 @@ publish:
     FROM +docker
     ARG tag=latest
 
-    SAVE IMAGE --push cli:${tag}
+    SAVE IMAGE --push ci-cli:${tag}
