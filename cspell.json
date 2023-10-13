@@ -34,6 +34,7 @@
         "actions/*/dist",
         "cli/go.sum",
         "cli/go.mod",
-        "cli/bin/ci"
+        "cli/bin/ci",
+        ".git"
     ]
 }
