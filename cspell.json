@@ -34,6 +34,12 @@
         "actions/*/dist",
         "cli/go.sum",
         "cli/go.mod",
-        "cli/bin/ci"
+        "cli/bin/ci",
+        ".git",
+        ".gitignore",
+        ".markdownlint.jsonc",
+        ".markdownlint-cli2.jsonc",
+        ".envrc",
+        "cspell.json"
     ]
 }
