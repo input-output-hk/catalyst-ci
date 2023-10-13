@@ -1,0 +1,15 @@
+name: "Push"
+description: "Tags and pushes an image to the given registries"
+inputs:
+  image:
+    description: The full name of the image to tag and push (image:tag)
+    required: true
+  registries:
+    description: A line separated list of registries to push to
+    required: true
+  tags:
+    description: A line separated list of tags to tag the image with
+    required: true
+runs:
+  using: "node20"
+  main: "dist/index.js"

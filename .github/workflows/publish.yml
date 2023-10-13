@@ -34,7 +34,7 @@ on:
         default: latest
       tags:
         description: |
-          A space separated list of additional tags that will be applied to
+          A line separated list of additional tags that will be applied to
           published images.
         required: false
         type: string
@@ -107,26 +107,13 @@ jobs:
           target: ${{ inputs.target }}
           platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.earthly_runner_address }}
-      - name: Publish to ECR
+      - name: Build image
+        uses: input-output-hk/catalyst-ci/actions/push@publish-action
         #if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-        run: |
-          function tag_and_push() {
-            local TAG=$1
-
-            echo "Tagging $IMAGE as $REGISTRY/$IMAGE_NAME:$TAG"
-            docker tag "$IMAGE" "$REGISTRY/$IMAGE_NAME:$TAG"
-
-            echo "Pushing $REGISTRY/$IMAGE_NAME:$TAG"
-            docker push "$REGISTRY/$IMAGE_NAME:$TAG"
-          }
-
-          IMAGE="${{ steps.build.outputs.image }}"
-          IMAGE_NAME=$(echo "$IMAGE" | cut -d':' -f1)
-          REGISTRY="${{ inputs.aws_ecr_registry }}"
-          PRIMARY_TAG="${{ github.sha }}"
-
-          tag_and_push "$PRIMARY_TAG"
-
-          for TAG in ${{ inputs.tags }}; do
-            tag_and_push "$TAG"
-          done
+        with:
+          image: ${{ steps.build.outputs.image }}
+          registries: |
+            ${{ inputs.aws_ecr_registry }}
+          tags: |
+            ${{ github.sha }}
+            ${{ inputs.tags }}
