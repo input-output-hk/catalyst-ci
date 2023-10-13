@@ -7,25 +7,25 @@ deps:
     COPY package.json package-lock.json .
     RUN npm ci
 
-check:
+src:
     FROM +deps
 
-    COPY --dir src .
+    COPY --dir src src
     COPY .eslintrc.yml tsconfig.json .
 
-    RUN npm run format:check
-    RUN npm run lint
-    RUN npm test
-
 package:
-    FROM +check
+    FROM +src
 
     RUN npm run package
 
     SAVE ARTIFACT dist dist AS LOCAL dist
 
-check-dist:
-    FROM +check
+check:
+    FROM +package
+
+    RUN npm run format:check
+    RUN npm run lint
+    RUN npm test
 
     COPY --dir dist dist_old
     RUN npm run package
