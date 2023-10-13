@@ -7,9 +7,11 @@ export async function run(): Promise<void> {
     const registries = core.getInput('registries').split('\n')
     const tags = core.getInput('tags').split('\n')
 
+    const imageName = image.split(':')[0]
+
     for (const registry of registries) {
       for (const tag of tags) {
-        const fullImage = `${registry}/${image}:${tag}`
+        const fullImage = `${registry}/${imageName}:${tag}`
 
         core.info(`Tagging ${image} as ${fullImage}`)
         await exec.exec('docker', ['tag', image, fullImage])

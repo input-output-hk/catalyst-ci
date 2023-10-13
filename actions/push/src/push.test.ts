@@ -22,7 +22,7 @@ describe('Discover Action', () => {
       getInputMock.mockImplementation((name: string) => {
         switch (name) {
           case 'image':
-            return 'image'
+            return 'image:latest'
           case 'registries':
             return 'registry1\nregistry2'
           case 'tags':
@@ -39,7 +39,7 @@ describe('Discover Action', () => {
       expect(execMock).toHaveBeenCalledTimes(8)
       expect(execMock).toHaveBeenNthCalledWith(1, 'docker', [
         'tag',
-        'image',
+        'image:latest',
         'registry1/image:tag1'
       ])
       expect(execMock).toHaveBeenNthCalledWith(2, 'docker', [
@@ -48,7 +48,7 @@ describe('Discover Action', () => {
       ])
       expect(execMock).toHaveBeenNthCalledWith(3, 'docker', [
         'tag',
-        'image',
+        'image:latest',
         'registry1/image:tag2'
       ])
       expect(execMock).toHaveBeenNthCalledWith(4, 'docker', [
@@ -57,7 +57,7 @@ describe('Discover Action', () => {
       ])
       expect(execMock).toHaveBeenNthCalledWith(5, 'docker', [
         'tag',
-        'image',
+        'image:latest',
         'registry2/image:tag1'
       ])
       expect(execMock).toHaveBeenNthCalledWith(6, 'docker', [
@@ -66,7 +66,7 @@ describe('Discover Action', () => {
       ])
       expect(execMock).toHaveBeenNthCalledWith(7, 'docker', [
         'tag',
-        'image',
+        'image:latest',
         'registry2/image:tag2'
       ])
       expect(execMock).toHaveBeenNthCalledWith(8, 'docker', [
