@@ -27,6 +27,12 @@ on:
           configuring a remote Earthly runner or AWS ECR.
         required: false
         type: string
+      ci_cli_version:
+        description: |
+          The version of the CI CLI to use.
+        required: false
+        type: string
+        default: latest
       earthly_version:
         description: The version of Earthly to use.
         required: false
@@ -62,6 +68,7 @@ jobs:
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
+          cli_version: ${{ inputs.ci_cli_version }}
           earthly_skip_install: "true"
       - name: Discover Earthly files
         uses: input-output-hk/catalyst-ci/actions/discover@master
@@ -96,6 +103,7 @@ jobs:
           aws_ecr_registry: ${{ inputs.aws_ecr_registry }}
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
+          cli_version: ${{ inputs.ci_cli_version }}
           configure_registries: "true"
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
