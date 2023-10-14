@@ -1,0 +1,28 @@
+on:
+  workflow_call:
+    inputs:
+      images:
+        description: A space separated list of images to deploy.
+        required: true
+        type: string
+      tag:
+        description: The tag to use for deploying images.
+        required: true
+        type: string
+    secrets:
+      github_token:
+        description: A Github token with access to the deployment repository.
+        required: true
+
+jobs:
+  deploy:
+      runs-on: ubuntu-latest
+      steps:
+        - name: Deploy
+          uses: input-output-hk/catalyst-ci/actions/deploy@master
+          with:
+            deployment_repo: input-output-hk/catalyst-world
+            images: ${{ inputs.images }}
+            environment: dev
+            tag: ${{ inputs.tag }}
+            token: ${{ secrets.github_token }}
