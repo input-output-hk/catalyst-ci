@@ -10,7 +10,7 @@ on:
         required: true
         type: string
     secrets:
-      github_token:
+      token:
         description: A Github token with access to the deployment repository.
         required: true
 
@@ -25,4 +25,4 @@ jobs:
             images: ${{ inputs.images }}
             environment: dev
             tag: ${{ inputs.tag }}
-            token: ${{ secrets.github_token }}
+            token: ${{ secrets.token }}
