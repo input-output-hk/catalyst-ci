@@ -120,7 +120,7 @@ jobs:
       - name: Fetch tag
         id: fetch_tag
         if: startsWith(github.ref, 'refs/tags/')
-        run: echo "tag=${GITHUB_REF#refs/tags/}" >> $GITUB_OUTPUT
+        run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: Push release image
         uses: input-output-hk/catalyst-ci/actions/push@master
         if: startsWith(github.ref, 'refs/tags/')
