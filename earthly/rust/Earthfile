@@ -1,0 +1,73 @@
+# Common Rust UDCs and Builders.
+VERSION 0.7
+
+# Base Rustup build container.
+rustup:
+    # Base it on Debian bookworm-slim
+    FROM debian:bookworm-slim
+
+    WORKDIR /root
+
+    # Install necessary packages 
+    # Expand this list as needed, rather than adding more tools in later containers.
+    RUN apt-get update && \
+        apt-get install --no-install-recommends -y \
+            ca-certificates \
+            curl \
+            file \
+            build-essential \
+            autoconf \
+            automake \
+            autotools-dev \
+            libtool \
+            xutils-dev \
+            mold \
+            python3 \
+            python3-pip \
+            musl-tools && \
+        rm -rf /var/lib/apt/lists/*
+
+    # Install OpenSSL here but ONLY if we can't avoid using it.
+
+    # Install rustup.
+    RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain none -y -v
+
+    # Set necessary env vars from this setup.
+    ENV PATH=/root/.cargo/bin:$PATH
+
+# Common Rust setup
+# Parameters:
+#  * toolchain : The `rust-toolchain` toml file.
+RUST_SETUP:
+    COMMAND
+    ARG toolchain
+
+    # Poetry Installation directory.
+    # Gives poetry and our poetry project a reliable location.
+    WORKDIR /build
+
+    # Copy our toolchain dependency.
+    COPY $toolchain ./rust-toolchain.toml
+    ENV default_rust_channel=$(grep -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)
+
+    # Install pinned Rustup from `rust-toolchain.toml`
+    # Plus nightly latest so we can use it for docs, lints, etc.
+    RUN rustup show && \
+        rustup default $default_rust_channel && \
+        rustup toolchain install nightly --component miri --component rust-src && \
+        cargo --version && \
+        cargo +nightly --version
+
+    # Install tools we use commonly with `cargo`.
+    RUN cargo install cargo-nextest --locked && \
+        cargo install cargo-chef --locked && \
+        cargo install kani-verifier --locked && \
+        cargo kani setup && \
+        cargo install refinery_cli --locked
+
+
+# Test rust build container
+rust-builder:
+    FROM +rustup
+
+    DO +RUST_SETUP --toolchain=example/rust-toolchain.toml
