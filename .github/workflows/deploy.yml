@@ -48,6 +48,4 @@ jobs:
             author_name: catalyst-cibot
             author_email: ci@projectcatalyst.io
             message: "chore: updates ${{ github.event.repository.name }} deployments"
-            push: false
-        - name: Run git log
-          run: git --no-pager log --oneline -n 5
+            push: true
