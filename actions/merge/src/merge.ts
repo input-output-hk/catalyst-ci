@@ -10,7 +10,7 @@ export async function run(): Promise<void> {
     const images = core.getInput('images')
 
     const newHashes = buildHashes(images.split('\n'), hash)
-    core.info(`Merging new hashes: ${JSON.stringify(newHashes)}`)
+    core.info(`Merging new hashes: ${JSON.stringify(newHashes, null, 2)}`)
 
     const hashFileContent = await fs.promises.readFile(hashFile, 'utf8')
     const hashFileHashes = JSON.parse(hashFileContent) as Hashes
@@ -22,9 +22,9 @@ export async function run(): Promise<void> {
         result[key] = mergedHashes[key]
         return result
       }, {} as Hashes)
-    core.info(`Merged hashes: ${JSON.stringify(sortedHashes)}`)
+    core.info(`Merged hashes: ${JSON.stringify(sortedHashes, null, 2)}`)
 
-    await fs.promises.writeFile(hashFile, JSON.stringify(sortedHashes))
+    await fs.promises.writeFile(hashFile, JSON.stringify(sortedHashes, null, 2))
     core.info(`Wrote merged hashes to ${hashFile}`)
   } catch (error) {
     if (error instanceof Error) {

@@ -2879,7 +2879,7 @@ async function run() {
         const hashFile = core.getInput('hash_file');
         const images = core.getInput('images');
         const newHashes = buildHashes(images.split('\n'), hash);
-        core.info(`Merging new hashes: ${JSON.stringify(newHashes)}`);
+        core.info(`Merging new hashes: ${JSON.stringify(newHashes, null, 2)}`);
         const hashFileContent = await external_fs_.promises.readFile(hashFile, 'utf8');
         const hashFileHashes = JSON.parse(hashFileContent);
         const mergedHashes = { ...hashFileHashes, ...newHashes };
@@ -2889,8 +2889,8 @@ async function run() {
             result[key] = mergedHashes[key];
             return result;
         }, {});
-        core.info(`Merged hashes: ${JSON.stringify(sortedHashes)}`);
-        await external_fs_.promises.writeFile(hashFile, JSON.stringify(sortedHashes));
+        core.info(`Merged hashes: ${JSON.stringify(sortedHashes, null, 2)}`);
+        await external_fs_.promises.writeFile(hashFile, JSON.stringify(sortedHashes, null, 2));
         core.info(`Wrote merged hashes to ${hashFile}`);
     }
     catch (error) {

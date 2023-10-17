@@ -64,12 +64,16 @@ describe('Merge Action', () => {
       expect(writeFileMock).toHaveBeenCalledTimes(1)
       expect(writeFileMock).toHaveBeenCalledWith(
         'hash_file',
-        JSON.stringify({
-          image1: 'hash',
-          image2: 'hash',
-          image3: 'hash',
-          image4: 'old_hash'
-        })
+        JSON.stringify(
+          {
+            image1: 'hash',
+            image2: 'hash',
+            image3: 'hash',
+            image4: 'old_hash'
+          },
+          null,
+          2
+        )
       )
     })
   })
