@@ -34,10 +34,6 @@ jobs:
           with:
             repository: ${{ inputs.deployment_repo }}
             token: ${{ secrets.token }}
-        - name: Configure git
-          run: |
-            git config --global user.email "ci@projectcatalyst.io"
-            git config --global user.name "catalyst-cibot"
         - name: Merge hashes
           uses: input-output-hk/catalyst-ci/actions/merge@deploy-action
           with:
@@ -46,3 +42,12 @@ jobs:
             tag: ${{ inputs.tag }}
         - name: Run diff
           run: git --no-pager diff
+        - name: Commit and push
+          uses: EndBug/add-and-commit@v9
+          with:
+            author_name: catalyst-cibot
+            author_email: ci@projectcatalyst.io
+            message: "chore: updates ${{ github.event.repository.name }} deployments"
+            push: false
+        - name: Run git log
+          run: git --no-pager log --oneline -n 5
