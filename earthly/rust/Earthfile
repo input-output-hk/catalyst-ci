@@ -1,6 +1,8 @@
 # Common Rust UDCs and Builders.
 VERSION 0.7
 
+# cspell: words rustup automake autotools xutils miri nextest kani
+
 # Base Rustup build container.
 rustup:
     # Base it on Debian bookworm-slim

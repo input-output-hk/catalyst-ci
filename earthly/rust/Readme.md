@@ -1,5 +1,7 @@
 # Rust Earthly Build Containers and UDCs
 
+<!-- cspell: words rustup -->
+
 This repo defines common rust targets and UDCs for use with rust.
 
 ## User Defined Commands
