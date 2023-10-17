@@ -5,7 +5,7 @@ on:
         description: The URL of the repository containing deployment code
         required: false
         type: string
-        default: "https://github.com/input-output-hk/catalyst-world"
+        default: input-output-hk/catalyst-world
       environment:
         description: The target environment to deploy to
         required: false
