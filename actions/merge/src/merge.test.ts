@@ -64,7 +64,7 @@ describe('Merge Action', () => {
       expect(writeFileMock).toHaveBeenCalledTimes(1)
       expect(writeFileMock).toHaveBeenCalledWith(
         'hash_file',
-        JSON.stringify(
+        `${JSON.stringify(
           {
             image1: 'hash',
             image2: 'hash',
@@ -73,7 +73,7 @@ describe('Merge Action', () => {
           },
           null,
           2
-        )
+        )}\n`
       )
     })
   })
