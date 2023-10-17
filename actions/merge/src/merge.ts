@@ -24,7 +24,10 @@ export async function run(): Promise<void> {
       }, {} as Hashes)
     core.info(`Merged hashes: ${JSON.stringify(sortedHashes, null, 2)}`)
 
-    await fs.promises.writeFile(hashFile, JSON.stringify(sortedHashes, null, 2))
+    await fs.promises.writeFile(
+      hashFile,
+      `${JSON.stringify(sortedHashes, null, 2)}\n`
+    )
     core.info(`Wrote merged hashes to ${hashFile}`)
   } catch (error) {
     if (error instanceof Error) {

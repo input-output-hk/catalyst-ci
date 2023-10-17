@@ -2890,7 +2890,7 @@ async function run() {
             return result;
         }, {});
         core.info(`Merged hashes: ${JSON.stringify(sortedHashes, null, 2)}`);
-        await external_fs_.promises.writeFile(hashFile, JSON.stringify(sortedHashes, null, 2));
+        await external_fs_.promises.writeFile(hashFile, `${JSON.stringify(sortedHashes, null, 2)}\n`);
         core.info(`Wrote merged hashes to ${hashFile}`);
     }
     catch (error) {
