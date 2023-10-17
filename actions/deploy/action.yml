@@ -5,9 +5,13 @@ description: Deploys the published images to the remote cluster.
 inputs:
   deployment_repo:
     description: The URL of the repository containing deployment code
-    required: true
+    required: false
+    default: "https://github.com/input-output-hk/catalyst-world"
   environment:
     description: The target environment to deploy to
+    required: true
+  hash_file:
+    description: The relative path to the hash file to update with deployment information
     required: true
   images:
     description: A space separated list of image names to deploy
@@ -23,7 +27,7 @@ runs:
   using: composite
   steps:
     - name: Checkout deployment repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         repository: ${{ inputs.deployment_repo }}
         token: ${{ inputs.token }}
