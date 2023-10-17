@@ -11,10 +11,6 @@ on:
         required: false
         type: string
         default: dev
-      hash_file:
-        description: The relative path to the hash file to update with deployment information
-        required: true
-        type: string
       images:
         description: A newline separated list of image names to deploy
         required: true
