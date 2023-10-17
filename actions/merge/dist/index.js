@@ -2875,7 +2875,7 @@ var external_fs_ = __nccwpck_require__(147);
 
 async function run() {
     try {
-        const hash = core.getInput('hash');
+        const hash = core.getInput('tag');
         const hashFile = core.getInput('hash_file');
         const images = core.getInput('images');
         const newHashes = buildHashes(images.split('\n'), hash);

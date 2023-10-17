@@ -28,7 +28,7 @@ describe('Merge Action', () => {
   beforeAll(() => {
     getInputMock.mockImplementation((name: string) => {
       switch (name) {
-        case 'hash':
+        case 'tag':
           return 'hash'
         case 'hash_file':
           return 'hash_file'

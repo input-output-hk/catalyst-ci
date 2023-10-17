@@ -5,7 +5,7 @@ type Hashes = { [key: string]: string }
 
 export async function run(): Promise<void> {
   try {
-    const hash = core.getInput('hash')
+    const hash = core.getInput('tag')
     const hashFile = core.getInput('hash_file')
     const images = core.getInput('images')
 
