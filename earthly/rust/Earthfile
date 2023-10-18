@@ -54,7 +54,7 @@ rustup:
 #  * toolchain : The `rust-toolchain` toml file.
 RUST_SETUP:
     COMMAND
-    ARG toolchain
+    ARG toolchain=./rust-toolchain.toml
 
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.
