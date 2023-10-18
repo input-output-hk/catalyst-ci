@@ -1,14 +1,25 @@
 on:
   workflow_call:
     inputs:
+      deployment_repo:
+        description: The URL of the repository containing deployment code
+        required: false
+        type: string
+        default: input-output-hk/catalyst-world
+      environment:
+        description: The target environment to deploy to
+        required: false
+        type: string
+        default: dev
       images:
-        description: A space separated list of images to deploy.
+        description: A newline separated list of image names to deploy
         required: true
         type: string
       tag:
-        description: The tag to use for deploying images.
-        required: true
+        description: The image tag to deploy
+        required: false
         type: string
+        default: ${{ github.sha }}
     secrets:
       token:
         description: A Github token with access to the deployment repository.
@@ -18,11 +29,23 @@ jobs:
   deploy:
       runs-on: ubuntu-latest
       steps:
-        - name: Deploy
-          uses: input-output-hk/catalyst-ci/actions/deploy@master
+        - name: Checkout deployment repository
+          uses: actions/checkout@v4
           with:
-            deployment_repo: input-output-hk/catalyst-world
-            images: ${{ inputs.images }}
-            environment: dev
-            tag: ${{ inputs.tag }}
+            repository: ${{ inputs.deployment_repo }}
             token: ${{ secrets.token }}
+        - name: Merge hashes
+          uses: input-output-hk/catalyst-ci/actions/merge@deploy-action
+          with:
+            hash_file: "src/kube/environments/${{ inputs.environment }}/hashes.json"
+            images: ${{ inputs.images }}
+            tag: ${{ inputs.tag }}
+        - name: Run diff
+          run: git --no-pager diff
+        - name: Commit and push
+          uses: EndBug/add-and-commit@v9
+          with:
+            author_name: catalyst-cibot
+            author_email: ci@projectcatalyst.io
+            message: "chore: updates ${{ github.event.repository.name }} deployments"
+            push: true

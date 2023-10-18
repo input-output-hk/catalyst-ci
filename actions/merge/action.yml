@@ -1,0 +1,16 @@
+name: Merge
+description: Merges new deployments into existing GitOps structure
+inputs:
+  hash_file:
+    description: The relative path to the hash file to update with deployment information
+    required: true
+  images:
+    description: A newline separated list of images to deploy
+    required: true
+  tag:
+    description: The image tag to deploy
+    required: false
+    default: ${{ github.sha }}
+runs:
+  using: node20
+  main: dist/index.js
