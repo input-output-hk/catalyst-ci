@@ -1,4 +1,6 @@
 # Use MOLD linker where possible.
+# cspell: words rustflags armv gnueabihf msvc
+
 [target.x86_64-unknown-linux-gnu]
 linker = "clang"
 rustflags = ["-C", "link-arg=-fuse-ld=/usr/bin/mold"]

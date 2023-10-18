@@ -1,7 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION 0.7
 
-# cspell: words rustup automake autotools xutils miri nextest kani
+# cspell: words rustup rustc automake autotools xutils miri nextest kani
 
 # Base Rustup build container.
 rustup:
@@ -86,7 +86,7 @@ check:
 
     DO +RUST_SETUP --toolchain=example/rust-toolchain.toml
 
-    # Check all the expected tooling is isntalled and works for both the stable and nighlty versions.
+    # Check all the expected tooling is installed and works for both the stable and nightly versions.
     RUN rustc --version && \
         rustc +nightly --version && \
         cargo --version && \
