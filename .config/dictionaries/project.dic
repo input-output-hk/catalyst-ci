@@ -13,6 +13,7 @@ gofmt
 golangci
 GOLANGCI
 GOCACHE
+GOMODCACHE
 goimports
 golines
 golint
@@ -23,10 +24,12 @@ Kroki
 kubeconfig
 mdlint
 mkdocs
+modcache
 multirepo
 nilnil
 nixos
 nixpkgs
+onsi
 pkgs
 PYTHONDONTWRITEBYTECODE
 testpackage
