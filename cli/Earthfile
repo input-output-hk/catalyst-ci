@@ -12,18 +12,8 @@ lint:
 deps:
     WORKDIR /work
 
-    # Install external deps
     RUN apk add --no-cache gcc musl-dev
-
-    # Install package dependencies
-    COPY go.mod go.sum ./
-    RUN go mod download
-
-    # Make sure the ginkgo binary is available for the test stage
-    RUN go install github.com/onsi/ginkgo/v2/ginkgo
-
-    SAVE ARTIFACT go.mod AS LOCAL go.mod
-    SAVE ARTIFACT go.sum AS LOCAL go.sum
+    DO ../earthly/go+DEPS
 
 src:
     FROM +deps
