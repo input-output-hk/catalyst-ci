@@ -2,13 +2,10 @@
 
 > Tags and pushes an image to the given registries
 
-This Github Action will attach a variable number of tags to a given image and
-then push all variants to a list of image registries. This is often useful when
-a single image needs to be tagged multiple times and pushed to multiple
-registries.
+This Github Action will attach a variable number of tags to a given image and then push all variants to a list of image registries.
+This is often useful when a single image needs to be tagged multiple times and pushed to multiple registries.
 
-To see a full demonstration of this action, see the
-[publish workflow](../../.github/workflows/publish.yml).
+To see a full demonstration of this action, see the [publish workflow](../../.github/workflows/publish.yml).
 
 ## Usage
 
@@ -37,6 +34,6 @@ To see a full demonstration of this action, see the
 
 All tests can be run using Earthly.
 
-```
+```bash
 earthly +check
 ```

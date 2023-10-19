@@ -2,13 +2,11 @@
 
 > Runs an Earthly target
 
-This Github Action will run a given target from a given Earthfile. It takes a
-number of inputs which can augment the way in which the Earthly CLI is being
-called. Notably, the action will automatically parse any produced artifacts or
-images from the target and return them as an action output.
+This Github Action will run a given target from a given Earthfile.
+It takes a number of inputs which can augment the way in which the Earthly CLI is being called.
+Notably, the action will automatically parse any produced artifacts or images from the target and return them as an action output.
 
-To see a full demonstration of this action, see the
-[release workflow](../../.github/workflows/release.yml).
+To see a full demonstration of this action, see the [release workflow](../../.github/workflows/release.yml).
 
 ## Usage
 
@@ -46,6 +44,6 @@ To see a full demonstration of this action, see the
 
 All tests can be run using Earthly.
 
-```
+```bash
 earthly +check
 ```

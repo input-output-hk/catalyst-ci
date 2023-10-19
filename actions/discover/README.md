@@ -2,13 +2,11 @@
 
 > Discover Earthfiles in a repository
 
-This Github Action will recursively scan a repository and return a list of the
-locations of all discovered Earthfiles. The scan can be further refined by
-specifying a target that must be included in scanned Earthfiles, allowing one
-to find a specific target across an entire repository.
+This Github Action will recursively scan a repository and return a list of the locations of all discovered Earthfiles.
+The scan can be further refined by specifying a target that must be included in scanned Earthfiles.
+This allows finding a specific target across an entire repository.
 
-To see a full demonstration of this action, see the
-[publish workflow](../../.github/workflows/publish.yml).
+To see a full demonstration of this action, see the [publish workflow](../../.github/workflows/publish.yml).
 
 ## Usage
 
@@ -45,9 +43,8 @@ build:
 
 ## Setup
 
-This action assumes the [CLI](../../cli) provided by this repositoriy has been
-downloaded and is accessible via `$PATH`. You can use the
-[install action](../install/) to automate this process.
+This action assumes the [CLI](../../cli) provided by this repositoriy has been downloaded and is accessible via `$PATH`.
+You can use the [install action](../install/) to automate this process.
 
 ## Inputs
 
@@ -61,6 +58,6 @@ downloaded and is accessible via `$PATH`. You can use the
 
 All tests can be run using Earthly.
 
-```
+```bash
 earthly +check
 ```

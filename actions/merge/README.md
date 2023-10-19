@@ -2,9 +2,9 @@
 
 > Merges new deployments into an existing GitOps structure
 
-This Github Action essentially merges a map of image names to their respective
-tags into an existing map, overwriting values where required. It's intended to
-automate a GitOps repository where images are deployed from a central file.
+This Github Action essentially merges a map of image names to their respective tags into an existing map, overwriting values where
+required.
+It's intended to automate a GitOps repository where images are deployed from a central file.
 
 ## Usage
 
@@ -33,12 +33,11 @@ in the `hash_file` input. **Note that this process is destructive**.
 
 ## Setup
 
-This action has limited usefulness for consumers who are not using the opionated
-approach of using GitOps to control service deployments. It assumes you have a
-single "hashes" file per environment that is the source of truth for what images
-are currently deployed. When new images are created, for example as part of a CI
-pipeline, this action can automatically update this "hashes" file with the newly
-generated tag.
+This action has limited usefulness for consumers who are not using the opionated approach of using GitOps to control service
+deployments.
+It assumes you have a single "hashes" file per environment that is the source of truth for what images are currently deployed.
+When new images are created, for example as part of a CI pipeline, this action can automatically update this "hashes" file with the
+newly generated tag.
 
 ## Inputs
 
@@ -52,6 +51,6 @@ generated tag.
 
 All tests can be run using Earthly.
 
-```
+```bash
 earthly +check
 ```

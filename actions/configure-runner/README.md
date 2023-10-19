@@ -2,12 +2,11 @@
 
 > Configures Earthly to use a remote runner
 
-This Github Action will automatically perform the necessary steps to configure
-the local GitHub runner to connect to a remote Earthly runner. It expects a
-secret to be stored in [AWS Secrets Manager][asm] (see setup section below). It
-will automatically pull down TLS certificates, place them into a temporary
-location on the local runner, and then configure Earthly to consume them
-correctly.
+This Github Action will automatically perform the necessary steps to configure the local GitHub runner to connect to a remote
+Earthly runner.
+It expects a secret to be stored in [AWS Secrets Manager][asm] (see setup section below).
+It will automatically pull down TLS certificates, place them into a temporary location on the local runner, and then configure
+Earthly to consume them correctly.
 
 **NOTE**: This action is included in the [CI setup action](../setup/).
 
@@ -25,12 +24,11 @@ correctly.
 
 ## Setup
 
-You must already have a [remote runner][rr] created and configured with a set of
-client certificates that have been signed by the same CA used for signing the
-certificates present in AWS SM. The secret in AWS should have the following
-format:
+You must already have a [remote runner][rr] created and configured with a set of client certificates that have been signed by the
+same CA used for signing the certificates present in AWS SM.
+The secret in AWS should have the following format:
 
-```
+```json
 {
   "private_key": "-----BEGIN EC PRIVATE KEY-----...",
   "certificate": "-----BEGIN CERTIFICATE-----....",
@@ -51,7 +49,7 @@ Where the full contents of the respective certificates/keys should be included.
 
 All tests can be run using Earthly.
 
-```
+```bash
 earthly +check
 ```
 

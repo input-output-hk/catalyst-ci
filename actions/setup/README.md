@@ -2,8 +2,8 @@
 
 > Performs required steps to setup CI
 
-This Github Action will perform common configuration steps required to set up
-a GitHub runner to interact with actions in this repository, including:
+This Github Action will perform common configuration steps required to set up a GitHub runner to interact with actions in this
+repository, including:
 
 1. Install Earthly
 2. Install the CLI provied by this repository
@@ -13,8 +13,7 @@ a GitHub runner to interact with actions in this repository, including:
 
 Most steps can be disabled to limit the amount the action does.
 
-To see a full demonstration of this action, see the
-[release workflow](../../.github/workflows/release.yml).
+To see a full demonstration of this action, see the [release workflow](../../.github/workflows/release.yml).
 
 ## Usage
 
@@ -50,6 +49,6 @@ To see a full demonstration of this action, see the
 
 All tests can be run using Earthly.
 
-```
+```bash
 earthly +check
 ```

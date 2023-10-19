@@ -2,10 +2,9 @@
 
 > Installs the Catalyst-CI CLI
 
-This Github Action will install the CLI provided by this repository to the local
-runner. After installation, the CLI should be accessible via running `ci` (it
-will automatically be available via `$PATH`). The CLI is required by a select
-few actions in order to perform certain operations.
+This Github Action will install the CLI provided by this repository to the local runner.
+After installation, the CLI should be accessible via running `ci` (it will automatically be available via `$PATH`).
+The CLI is required by a select few actions in order to perform certain operations.
 
 **NOTE**: This action is included in the [CI setup action](../setup/).
 
@@ -31,6 +30,6 @@ few actions in order to perform certain operations.
 
 All tests can be run using Earthly.
 
-```
+```bash
 earthly +check
 ```
