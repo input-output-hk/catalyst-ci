@@ -1,5 +1,5 @@
 name: Merge
-description: Merges new deployments into existing GitOps structure
+description: Merges new deployments into an existing GitOps structure
 inputs:
   hash_file:
     description: The relative path to the hash file to update with deployment information
