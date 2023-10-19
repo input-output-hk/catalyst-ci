@@ -55,7 +55,6 @@ rustup:
 RUST_SETUP:
     COMMAND
     ARG toolchain=./rust-toolchain.toml
-    ARG host=x86_64-unknown-linux-musl
 
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.
@@ -67,9 +66,8 @@ RUST_SETUP:
 
     # Install pinned Rustup from `rust-toolchain.toml`
     # Plus nightly latest so we can use it for docs, lints, etc.
-    RUN rustup show && \
-        rustup set default-host $host && \
-        rustup default $default_rust_channel && \
+    RUN rustup default $default_rust_channel && \
+        rustup show && \
         rustup toolchain install nightly --component miri --component rust-src && \
         cargo --version && \
         cargo +nightly --version
