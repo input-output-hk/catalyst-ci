@@ -43,7 +43,7 @@ build:
 
 ## Setup
 
-This action assumes the [CLI](../../cli) provided by this repositoriy has been downloaded and is accessible via `$PATH`.
+This action assumes the [CLI](../../cli) provided by this repository has been downloaded and is accessible via `$PATH`.
 You can use the [install action](../install/) to automate this process.
 
 ## Inputs

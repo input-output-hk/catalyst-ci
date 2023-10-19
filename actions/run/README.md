@@ -16,7 +16,7 @@ To see a full demonstration of this action, see the [release workflow](../../.gi
   with:
     earthfile: ./project
     target: build
-    runner_address: tcp://myrunner:8372
+    runner_address: tcp://runner:8372
 ```
 
 ## Inputs

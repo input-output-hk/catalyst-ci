@@ -6,7 +6,7 @@ This Github Action will perform common configuration steps required to set up a 
 repository, including:
 
 1. Install Earthly
-2. Install the CLI provied by this repository
+2. Install the CLI provided by this repository
 3. Configure AWS credentials
 4. Configure GHCR and ECR registries
 5. Configure the GitHub runner to connect to an Earthly remote runner

@@ -33,7 +33,7 @@ in the `hash_file` input. **Note that this process is destructive**.
 
 ## Setup
 
-This action has limited usefulness for consumers who are not using the opionated approach of using GitOps to control service
+This action has limited usefulness for consumers who are not using the opinionated approach of using GitOps to control service
 deployments.
 It assumes you have a single "hashes" file per environment that is the source of truth for what images are currently deployed.
 When new images are created, for example as part of a CI pipeline, this action can automatically update this "hashes" file with the
