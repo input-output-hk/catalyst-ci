@@ -22,7 +22,7 @@ inputs:
     required: false
     default: "false"
   cli_version:
-    description: The version of the CI CLI to install (defaults to latest)
+    description: The version of the CI CLI to install
     required: false
     default: latest
   configure_registries:
@@ -49,10 +49,6 @@ inputs:
     description: Github token used to login to GHCR (defaults to runner token)
     required: false
     default: ${{ github.token }}
-outputs:
-  token:
-    description: The Github token to use for interacting with repositories
-    value: ${{ steps.token.outputs.token }}
 runs:
   using: composite
   steps:
