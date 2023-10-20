@@ -77,8 +77,8 @@ RUST_SETUP:
         cargo install cargo-chef --locked && \
         cargo install kani-verifier --locked && \
         cargo kani setup && \
-        cargo install refinery_cli --locked
-
+        cargo install refinery_cli --locked && \
+        cargo install cargo-machete --locked
 
 # Test rust build container
 check:
