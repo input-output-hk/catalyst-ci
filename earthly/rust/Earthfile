@@ -1,0 +1,103 @@
+# Common Rust UDCs and Builders.
+VERSION 0.7
+
+# cspell: words rustup rustc automake autotools xutils miri nextest kani
+
+# Base Rustup build container.
+rustup:
+    # Base it on Debian bookworm-slim
+    FROM debian:bookworm-slim
+
+    WORKDIR /root
+
+    # Set necessary env vars from this setup.
+    ENV RUSTUP_HOME=/usr/local/rustup
+    ENV CARGO_HOME=/usr/local/cargo
+    ENV CARGO_HOME_BIN=$CARGO_HOME/bin
+    ENV PATH=$CARGO_HOME_BIN:$PATH    
+
+    # Ensure correct directory permissions on the install locations.
+    RUN mkdir -p $RUSTUP_HOME && \
+        mkdir -p $CARGO_HOME_BIN && \
+        chmod -R a+w $RUSTUP_HOME $CARGO_HOME
+
+    # Install necessary packages 
+    # Expand this list as needed, rather than adding more tools in later containers.
+    RUN apt-get update && \
+        apt-get install --no-install-recommends -y \
+            ca-certificates \
+            curl \
+            file \
+            build-essential \
+            autoconf \
+            automake \
+            autotools-dev \
+            libtool \
+            xutils-dev \
+            mold \
+            python3 \
+            python3-pip \
+            musl-tools \
+            clang && \
+        rm -rf /var/lib/apt/lists/*
+
+    # Install OpenSSL here but ONLY if we can't avoid using it.
+
+    # Install rustup.
+    RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain none -y -v
+
+    # Install the default cargo config.
+    COPY config.toml $CARGO_HOME/config.toml
+
+# Common Rust setup
+# Parameters:
+#  * toolchain : The `rust-toolchain` toml file.
+RUST_SETUP:
+    COMMAND
+    ARG toolchain=./rust-toolchain.toml
+
+    # Poetry Installation directory.
+    # Gives poetry and our poetry project a reliable location.
+    WORKDIR /build
+
+    # Copy our toolchain dependency.
+    COPY $toolchain ./rust-toolchain.toml
+    ENV default_rust_channel=$(grep -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)
+
+    # Install pinned Rustup from `rust-toolchain.toml`
+    # Plus nightly latest so we can use it for docs, lints, etc.
+    RUN rustup default $default_rust_channel && \
+        rustup show && \
+        rustup toolchain install nightly --component miri --component rust-src && \
+        cargo --version && \
+        cargo +nightly --version
+
+    # Install tools we use commonly with `cargo`.
+    RUN cargo install cargo-nextest --locked && \
+        cargo install cargo-chef --locked && \
+        cargo install kani-verifier --locked && \
+        cargo kani setup && \
+        cargo install refinery_cli --locked && \
+        cargo install cargo-machete --locked
+
+# Test rust build container
+check:
+    FROM +rustup
+
+    DO +RUST_SETUP --toolchain=example/rust-toolchain.toml
+
+    # Check all the expected tooling is installed and works for both the stable and nightly versions.
+    RUN rustc --version && \
+        rustc +nightly --version && \
+        cargo --version && \
+        cargo +nightly --version &&  \
+        cargo clippy --version && \
+        cargo +nightly clippy --version && \
+        cargo nextest --version && \
+        cargo chef --version && \
+        cargo kani --version && \
+        refinery --version && \
+        mold --version
+
+
+
