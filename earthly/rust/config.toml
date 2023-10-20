@@ -1,5 +1,5 @@
 # Use MOLD linker where possible.
-# cspell: words rustflags armv gnueabihf msvc
+# cspell: words rustflags armv gnueabihf msvc nextest
 
 # Should be the default to have fully static rust programs.
 [target.x86_64-unknown-linux-musl]
