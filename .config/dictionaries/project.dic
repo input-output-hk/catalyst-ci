@@ -42,6 +42,7 @@ PYTHONDONTWRITEBYTECODE
 rivo
 runewidth
 subproject
+subprojects
 superfences
 testpackage
 UDCs
