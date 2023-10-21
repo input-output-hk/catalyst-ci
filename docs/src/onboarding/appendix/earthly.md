@@ -84,7 +84,7 @@ The commands are in all uppercase letters and there's typically only one command
 #### Schema
 
 An `Earthfile` always starts by specifying a schema version which informs Earthly how it should go about parsing the file.
-This allows the syntax and format of an Earthfile to evolve while maintaing backwards compatibility.
+This allows the syntax and format of an Earthfile to evolve while maintaining backwards compatibility.
 In our case, we target version `0.7` which is the latest version at the time of this writing.
 
 #### Targets

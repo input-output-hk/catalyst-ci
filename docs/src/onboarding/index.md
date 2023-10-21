@@ -30,7 +30,7 @@ An additional target filter can be applied to the discovery process such that it
 Using this CLI, the discovery process can, for example, find the location of all `Earthfile`s with a `release` target.
 
 Using the above filtered discovery process, we can now standardize on a small number of reserved targets with which the CI system
-is gauranteed to interact with.
+is guaranteed to interact with.
 These targets are as follows:
 
 1. `check` - This target is expected to run all necessary checks to validate the health of the project.
@@ -42,12 +42,12 @@ These targets are as follows:
 3. `publish` - This target is expected to produce a single container image.
    The CI will automatically build and publish this image to configured registries during certain types of git events.
 
-The above summmaries are not exhaustive and only intended to introduce you to the overall concept.
+The above summaries are not exhaustive and only intended to introduce you to the overall concept.
 We will dig further into these three reserved targets at a later point.
 
 The primary point to take away is that the discovery process allows developers to contractually declare all of their deliverables
 from a single `Earthfile` that is tightly coupled to the subproject they are working within.
-While knowledge of how the CI system is helpful for troubleshooting purposes, it's purely extracuricular and not required.
+While knowledge of how the CI system is helpful for troubleshooting purposes, it's purely extracurricular and not required.
 Instead, a developer must only remember these three reserved targets in order to have their deliverables handled accordingly.
 
 In the remaining sections of this onboarding guide, we will cover the components the make up Catalyst CI, how they are molded
