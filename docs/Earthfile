@@ -1,0 +1,5 @@
+VERSION 0.7
+
+docs:
+    DO ../earthly/docs+MKDOCS_BUILD --src=.
+    SAVE ARTIFACT /docs/site AS LOCAL docs

@@ -1,0 +1,32 @@
+VERSION 0.7
+
+deps:
+    FROM golang:1.20-alpine3.18
+    WORKDIR /work
+
+    COPY go.mod go.sum .
+    RUN go mod download
+
+src:
+    FROM +deps
+
+    COPY --dir cmd .
+
+build:
+    FROM +src
+
+    ENV CGO_ENABLED=0
+    RUN go build -ldflags="-extldflags=-static" -o bin/hello cmd/main.go
+
+    SAVE ARTIFACT bin/hello hello
+
+docker:
+    FROM alpine:3.18
+    WORKDIR /app
+
+    ARG tag=latest
+
+    COPY +build/hello .
+
+    ENTRYPOINT ["/app/hello"]
+    SAVE IMAGE hello:${tag}

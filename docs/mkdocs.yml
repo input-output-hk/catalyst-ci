@@ -1,0 +1,13 @@
+site_name: Catalyst CI Documentation
+docs_dir: src
+theme:
+  name: material
+  features:
+    - navigation.indexes
+    - navigation.tracking
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
