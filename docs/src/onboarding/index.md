@@ -6,11 +6,12 @@ that we use.
 
 ## Overview
 
-!!!
-Note
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Note
     This section will talk about concepts related to [Earthly](https://earthly.dev).
     If you are not familiar with Earthly, please head over [to the appendix](./appendix/earthly.md) to learn more about it before
     continuing.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 To understand how the overall CI process works, it first helps to understand the problem.
 
@@ -50,5 +51,5 @@ from a single `Earthfile` that is tightly coupled to the subproject they are wor
 While knowledge of how the CI system is helpful for troubleshooting purposes, it's purely extracurricular and not required.
 Instead, a developer must only remember these three reserved targets in order to have their deliverables handled accordingly.
 
-In the remaining sections of this onboarding guide, we will cover the components the make up Catalyst CI, how they are molded
+In the remaining sections of this onboarding guide, we will cover the components that make up Catalyst CI, how they are molded
 together to create reusable workflows, and finally some examples to get started using these actions and workflows.

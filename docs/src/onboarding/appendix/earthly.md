@@ -5,12 +5,13 @@ Earthly serves a central role in the CI process and is the primary orchestrator 
 
 ## Getting Started with Earthly
 
-!!!
-Warning
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
     The process described in this section is purely for educational purposes.
     While the CI process does use Earthly, it does so in a very specific and opinionated way.
     Do *not* package your service using the methodology shown below.
     Instead, refer to the onboarding documentation for a description and examples of the proper method.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 This section will get you started with the basics of Earthly in as little time as possible.
 To maximize learning, this section is written with a hands-on approach, and you are highly encouraged to follow along.
@@ -19,9 +20,11 @@ To maximize learning, this section is written with a hands-on approach, and you 
 
 If you prefer to learn visually, a video tutorial has been provided which introduces Earthly using a similar hands-on process.
 
+<!-- markdownlint-disable max-one-sentence-per-line -->
 !!!
 note
     Before starting the video, check out the setup section below to get your local environment prepared to follow along.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 <!-- markdownlint-disable MD013 MD033 -->
 <div style="position: relative; padding-bottom: 58.63192182410424%; height: 0;">
@@ -43,10 +46,11 @@ See the [installation methods](https://earthly.dev/get-earthly) available on the
 
 #### Clone the example
 
-!!!
-Note
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Note
     Even though we're using Go, you don't need to be familiar with the language or its tooling.
     The process we will walk through is generic enough that applying it to other languages should be trivial.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 To demonstrate how to use Earthly, we'll be using a tiny Go program which simply prints "Hello, World!" to the screen.
 You can get a local copy by performing the following:

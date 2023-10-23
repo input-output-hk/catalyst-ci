@@ -5,6 +5,14 @@ theme:
   features:
     - navigation.indexes
     - navigation.tracking
+nav:
+  - Introduction: index.md
+  - Onboarding:
+      - onboarding/index.md
+      - Targets: onboarding/targets.md
+      - Workflows: onboarding/workflows.md
+      - Actions: onboarding/actions.md
+      - UDCs: onboarding/udc.md
 markdown_extensions:
   - admonition
   - pymdownx.details
