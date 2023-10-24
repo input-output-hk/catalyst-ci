@@ -11,8 +11,8 @@ UDCs are helpful for several reasons:
 2. They can encapsulate complex logic into a simple contractual interface
 3. They enforce standardization and prevent solving the same problem in multiple different ways
 
-The third reason is particularly useful for Catalyst as we have multiple repositories with dozens of Earthfiles often solving similar
-problems.
+The third reason is particularly useful for Catalyst as we have multiple repositories with dozens of Earthfiles often solving
+similar problems.
 
 ## Usage
 
