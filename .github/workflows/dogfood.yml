@@ -10,17 +10,40 @@ permissions:
 
 jobs:
   check:
-    uses: ./.github/workflows/check.yml
+    uses: ./.github/workflows/run.yml
     with:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
       ci_cli_version: 1.3.1
+      target: check
+    secrets:
+      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+  build:
+    uses: ./.github/workflows/run.yml
+    needs: [check]
+    with:
+      aws_role_arn: arn:aws:iam::332405224602:role/ci
+      aws_region: eu-central-1
+      ci_cli_version: 1.3.1
+      target: build
+    secrets:
+      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+  integrate:
+    uses: ./.github/workflows/run.yml
+    needs: [build, check]
+    with:
+      aws_role_arn: arn:aws:iam::332405224602:role/ci
+      aws_region: eu-central-1
+      ci_cli_version: 1.3.1
+      target: integrate
     secrets:
       earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
       earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
   release:
     uses: ./.github/workflows/release.yml
-    needs: [check]
+    needs: [build, check]
     with:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
@@ -30,7 +53,7 @@ jobs:
       earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
   publish:
     uses: ./.github/workflows/publish.yml
-    needs: [release]
+    needs: [build, check]
     with:
       aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
       aws_role_arn: arn:aws:iam::332405224602:role/ci
