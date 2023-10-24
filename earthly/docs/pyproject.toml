@@ -26,6 +26,12 @@ mkdocs-kroki-plugin = "^0.6.1"
 # https://github.com/jdoiro3/mkdocs-multirepo-plugin
 mkdocs-multirepo-plugin = "^v0.6.3"
 
+# https://mkdocs-macros-plugin.readthedocs.io/en/latest/
+mkdocs-macros-plugin = "^v1.0.4"
+
+# https://github.com/timmeinerzhagen/mkdocs-meta-manager
+mkdocs-meta-manager = "^0.2.1"
+
 ### DO NOT ENABLE THESE BAD PLUGINS.
 ### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
 # https://github.com/zoni/mkdocs-diagrams

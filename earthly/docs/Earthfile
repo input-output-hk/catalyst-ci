@@ -74,7 +74,7 @@ DEVELOP:
     SAVE ARTIFACT /local AS LOCAL $dest
 
 
-build-test:
+check:
     # Test of building docs.
     # Run with `earthly -P +build-test`
     ARG dest=./site
