@@ -52,20 +52,9 @@ rustup:
 # Common Rust setup
 # Parameters:
 #  * toolchain : The `rust-toolchain` toml file.
-#  * with_cargo_nextest: <true/false> Flag to install cargo-nextest tool
-#  * with_cargo_chef: <true/false> Flag to install cargo-chef tool
-#  * with_kani: <true/false> Flag to install kani-verifier and kani tools
-#  * with_refinery: <true/false> Flag to install refinery tool
-#  * with_cargo_machete: <true/false> Flag to install cargo-machete tool
 RUST_SETUP:
     COMMAND
     ARG toolchain=./rust-toolchain.toml
-
-    ARG with_cargo_nextest=false
-    ARG with_cargo_chef=false
-    ARG with_kani=false
-    ARG with_refinery=false
-    ARG with_cargo_machete=false
 
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.
@@ -84,40 +73,15 @@ RUST_SETUP:
         cargo +nightly --version
 
     # Install tools we use commonly with `cargo`.
-    IF [ "$with_cargo_nextest" = "true" ]
-        RUN cargo install cargo-nextest --locked
-    END
-    IF [ "$with_cargo_chef" = "true" ]
-        RUN cargo install cargo-chef --locked
-    END
-    IF [ "$with_kani" = "true" ]
-        RUN cargo install kani-verifier --locked && \
-        cargo kani setup
-    END
-    IF [ "$with_refinery" = "true" ]
-        RUN cargo install refinery_cli --locked
-    END
-    IF [ "$with_cargo_machete" = "true" ]
-        RUN cargo install cargo-machete --locked
-    END
+    RUN cargo install cargo-nextest --locked && \
+        cargo install refinery_cli --locked && \
+        cargo install cargo-machete --locked
 
 # Test rust build container
 check:
     FROM +rustup
 
-    ARG with_cargo_nextest=true
-    ARG with_cargo_chef=true
-    ARG with_kani=true
-    ARG with_refinery=true
-    ARG with_cargo_machete=true
-
-    DO +RUST_SETUP \
-        --toolchain=example/rust-toolchain.toml \
-        --with_cargo_nextest="$with_cargo_nextest" \
-        --with_cargo_chef="$with_cargo_chef" \
-        --with_kani="$with_kani" \
-        --with_refinery="$with_refinery" \
-        --with_cargo_machete="$with_cargo_machete"
+    DO +RUST_SETUP --toolchain=example/rust-toolchain.toml
 
     # Check all the expected tooling is installed and works for both the stable and nightly versions.
     RUN rustc --version && \
@@ -126,20 +90,7 @@ check:
         cargo +nightly --version &&  \
         cargo clippy --version && \
         cargo +nightly clippy --version && \
+        cargo nextest --version && \
+        cargo machete --version \
         refinery --version && \
         mold --version
-    IF [ "$with_cargo_nextest" = "true" ]
-        RUN cargo nextest --version
-    END
-    IF [ "$with_cargo_chef" = "true" ]
-        RUN cargo chef --version
-    END
-    IF [ "$with_kani" = "true" ]
-        RUN cargo kani --version
-    END
-    IF [ "$with_refinery" = "true" ]
-        RUN refinery --version
-    END
-    IF [ "$with_cargo_machete" = "true" ]
-        RUN cargo machete --version
-    END
