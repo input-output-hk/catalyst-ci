@@ -1,7 +1,7 @@
 # Targets
 
 As discussed in the overview, the Catalyst CI automatically searches for and executes distinct Earthly targets.
-By creating these targets in your `Earthfile`, you can hook into the Cataly CI process with minimal effort.
+By creating these targets in your `Earthfile`, you can hook into the Catalyst CI process with minimal effort.
 This section is dedicated to explaining what these targets are, how they work, and how to use them.
 
 ## Check
@@ -83,7 +83,7 @@ This allows end-users to validate that their release artifacts build as expected
 If instead the commit contains a git tag, then the resulting artifacts are compressed into a single tarball and uploaded as an
 artifact of the GitHub Action job.
 The compression happens regardless of whether a single or multiple artifacts were produced.
-After the `release` target has been run for _every_ subproject, the produced artifacts from all subprojects are then attached into a
+After the `release` target has been run for *every* subproject, the produced artifacts from all subprojects are then attached into a
 single GitHub release for the given git tag (i.e., `1.0.0`).
 
 ### Usage

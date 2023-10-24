@@ -10,6 +10,7 @@ Earthfiles
 errchkjson
 extldflags
 ginkgolinter
+gitops
 glightbox
 gofmt
 golangci
@@ -37,6 +38,7 @@ nixos
 nixpkgs
 onsi
 pkgs
+projectcatalyst
 pymdownx
 PYTHONDONTWRITEBYTECODE
 rivo

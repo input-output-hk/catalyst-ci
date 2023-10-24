@@ -1,24 +1,26 @@
 # GitHub Actions
 
+<!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Note
-    If you don't intend on using the custom GitHub Actions to build custom workflows, you're encouraged to skip this section and move on
-    to the next one.
+    If you don't intend on using the custom GitHub Actions to build custom workflows, you're encouraged to skip this section and
+    move on to the next one.
     However, understanding how the individual actions work, and the role they play, can greatly help when troubleshooting workflows.
 
 Catalyst CI is made up of several GitHub Actions that simplify the steps required to perform the CI process.
 All of these GitHub Actions are compiled into reusable workflows which perform a majority of the CI logic.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 ## Overview
 
 The following actions are provided by Catalyst CI:
 
-- [configure-runner](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/configure-runner)
-- [discover](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/discover)
-- [install](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/install)
-- [merge](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/merge)
-- [push](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/push)
-- [run](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/run)
-- [setup](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/setup)
+* [configure-runner](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/configure-runner)
+* [discover](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/discover)
+* [install](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/install)
+* [merge](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/merge)
+* [push](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/push)
+* [run](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/run)
+* [setup](https://github.com/input-output-hk/catalyst-ci/tree/master/actions/setup)
 
 This section will only highlight the actions which are commonly used in most workflows.
 Additionally, we will not cover these actions in depth.
@@ -32,11 +34,11 @@ The `setup` action is by far the most common action and shows up in a majority o
 It performs the necessary steps to setup the local GitHub runner to perform CI tasks.
 This includes:
 
-- Installing Earthly
-- Installing the custom CI CLI
-- Configuring access to AWS
-- Authenticating with container registries
-- Configuring the Earthly remote runner
+* Installing Earthly
+* Installing the custom CI CLI
+* Configuring access to AWS
+* Authenticating with container registries
+* Configuring the Earthly remote runner
 
 Most of these steps are configurable and can be individually disabled.
 When creating custom workflows, it's highly recommended to use this action to perform common set up tasks.

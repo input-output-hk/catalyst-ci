@@ -4,15 +4,15 @@ The Catalyst CI process works by combining several high-level reusable workflows
 our repositories.
 The purpose for this is to standardize the CI process across all repositories as well as provide control for easily updating the CI
 process without having to make changes across multiple repositories.
-This section gives a brief overview of these reusable workflows, which can aid in troubelshooting purposes.
+This section gives a brief overview of these reusable workflows, which can aid in troubleshooting purposes.
 
 ## Overview
 
 Most reusable workflows have a one-to-one relationship with the Earthly targets discussed in the previous section:
 
-- `check.yml` is responsible for handling the `check` target
-- `publish.yml` is responsible for handling the `publish` target
-- `release.yml` is responsible for hanlding the `release` target
+* `check.yml` is responsible for handling the `check` target
+* `publish.yml` is responsible for handling the `publish` target
+* `release.yml` is responsible for handling the `release` target
 
 Each workflow is self-contained and independent of the other workflows.
 However, in most cases, they are tied together with conditionals (i.e. `publish` only runs if `check` succeeds).
@@ -37,7 +37,7 @@ As noted above, Catalyst CI uses a remote Earthly runner in order to maximize ca
 As a result, all workflows that interact with Earthly will accept optional inputs describing the address of the runner as well as
 the name of an AWS secret containing the authentication details.
 The workflow will configure the local GitHub runner using the TLS credentials retrieved from AWS so that it can successfully connect
-and interact with the rexmote Earthly runner.
+and interact with the remote Earthly runner.
 
 ## Check
 
@@ -67,7 +67,7 @@ If the target returns a non-zero exit code it will bubble up and cause the job t
 
 The publish workflow is responsible for performing the logic related to the `publish` target.
 It uses the custom `run` GitHub Action to execute the target and parse the name/tag of the resulting image.
-It then uses the custom `push` GitHub Action to retag the image and push it to the appropriate image registries.
+It then uses the custom `push` GitHub Action to re-tag the image and push it to the appropriate image registries.
 
 ### Inputs
 
@@ -92,7 +92,7 @@ It then uses the custom `push` GitHub Action to retag the image and push it to t
 
 The release workflow is responsible for performing logic related to the `release` target.
 It uses the custom `run` GitHub Action to execute the target and store the produced artifacts to a local directory on the runner.
-These arifacts are then compressed and ultimately uploaded as artifacts for the job and/or a new GitHub release.
+These artifacts are then compressed and ultimately uploaded as artifacts for the job and/or a new GitHub release.
 
 ### Inputs
 
@@ -125,7 +125,7 @@ The changes are then committed, causing the `dev` environment to deploy the newl
 | --------------- | ------ | ---------------------------------------------------- | -------- | -------------------------------- |
 | deployment_repo | string | The URL of the repository containing deployment code | No       | `input-output-hk/catalyst-world` |
 | environment     | string | The target environment to deploy to                  | No       | `dev`                            |
-| images          | string | A newline separated list of image names to deplo     | Yes      | N/A                              |
+| images          | string | A newline separated list of image names to deploy    | Yes      | N/A                              |
 | tag             | string | The image tag to deploy                              | Yes      | N/A                              |
 
 ### Secrets
