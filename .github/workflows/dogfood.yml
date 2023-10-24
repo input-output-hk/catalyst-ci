@@ -43,7 +43,7 @@ jobs:
       earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
   release:
     uses: ./.github/workflows/release.yml
-    needs: [build, check]
+    needs: [build, check, integrate]
     with:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
@@ -53,7 +53,7 @@ jobs:
       earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
   publish:
     uses: ./.github/workflows/publish.yml
-    needs: [build, check]
+    needs: [build, check, integrate]
     with:
       aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
       aws_role_arn: arn:aws:iam::332405224602:role/ci
