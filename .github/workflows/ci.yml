@@ -1,15 +1,6 @@
 on:
   workflow_call:
     inputs:
-      target:
-        description: |
-          The target used to mark publish builds. This target should be unique
-          across all Earthly files in the repository. The target should always
-          produce at least one image which is optionally published to the
-          configured registries.
-        required: false
-        type: string
-        default: publish
       aws_ecr_registry:
         description: |
             The AWS ECR registry that will be used to publish images
@@ -123,8 +114,8 @@ jobs:
       earthly_version: ${{ inputs.earthly_version }}
       force_artifact: ${{ inputs.force_artifact }}
     secrets:
-      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   publish:
     uses: ./.github/workflows/publish.yml
     needs: [build, check, package, test]
@@ -136,5 +127,5 @@ jobs:
       earthly_version: ${{ inputs.earthly_version }}
       tags: ${{ inputs.tags }}
     secrets:
-      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}

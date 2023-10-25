@@ -72,7 +72,7 @@ jobs:
             echo "json=$output" >> $GITHUB_OUTPUT
           fi
 
-  build:
+  run:
     runs-on: ubuntu-latest
     needs: [discover]
     if: needs.discover.outputs.json != '[]'
