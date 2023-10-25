@@ -4,6 +4,13 @@ As discussed in the overview, the Catalyst CI automatically searches for and exe
 By creating these targets in your `Earthfile`, you can hook into the Catalyst CI process with minimal effort.
 This section is dedicated to explaining what these targets are, how they work, and how to use them.
 
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Tip
+    The targets discussed below are *not* required to be implemented in every single `Earthfile`.
+    Consider each target a building block that can be composed into a complete structure that CI runs.
+    The system is meant to be adaptable to different workflows.
+<!-- markdownlint-enable max-one-sentence-per-line -->
+
 ## Check
 
 ### Summary
@@ -14,24 +21,100 @@ No additional tasks are performed before or after running the target.
 
 ### How it Works
 
-Of all the targets, the `check` target is the simplest in that the CI executes it and only expects it to pass.
-The `check` target is the **first target run** in the CI pipeline.
-Additionally, the `check` target **must pass** before any other targets are run.
-This means that all subsequent CI steps, such as building and publishing artifacts, will not be run if the `check` target fails.
+The `check` target is the **first target run** in the CI pipeline and **must pass** before any other targets are run.
+The CI will call the `check` target and fail if it returns a non-zero exit code.
 
 ### Usage
 
 It's important to avoid adding any steps that may have flaky results to the `check` target.
 Reducing the runtime of the `check` phase by avoiding any lengthy processes is also advisable.
 This includes things like complex integrations tests or E2E tests that should have their own dedicated workflows.
+The goal of the `check` target is to "fail fast" and avoid running a lengthy CI pipeline if there are immediate problems with the
+code.
 
 Some typical tasks that would be appropriate for the `check` target are as follows:
 
 1. Validating code format
 2. Linting code
 3. Running static analysis tools (i.e. vulnerability scanners)
-4. Running unit tests
-5. Validating code generation (i.e. making sure code generation has been run)
+
+## Build
+
+### Summary
+
+The `build` target is responsible for building artifacts.
+It serves two purposes:
+
+1. To validate that a given build works prior to performing any other steps
+2. To cache the build so future steps can re-use it without a performance impact.
+
+No additional tasks are performed before or after running the target.
+The target must pass before subsequent targets are called.
+
+### How it Works
+
+The `build` target is the **second target run** in the CI pipeline and **must pass** before any other targets are run.
+The CI will call the `build` target and fail if it returns a non-zero exit code.
+
+### Usage
+
+The `build` artifact should only be used for running "build" processes.
+What defines a build process is unique to each project.
+For example, it could be anything from compiling a binary to transpiling a medium into its final form
+(i.e., Typescript -> Javascript).
+
+Downstream targets should always depend on the `build` target for maximizng cache hits.
+For example, the `test` and `release` targets should either inherit from the `build` target or copy artifacts from it.
+
+## Package
+
+### Summary
+
+The `package` target is responsible for taking multiple artifacts and packaging them together.
+In mono-repos especially, deliverables sometime consist of more than one artifact being produced by different subprojects.
+This target is intended to provide an additional step where this packaging can happen before the `test` phase where these packages
+are usually utilized in E2E or integration testing.
+
+### How it Works
+
+The `package` target is the **third target run** in the CI pipeline and **must pass** before any other targets are run.
+The CI will call the `package` target and fail if it returns a non-zero exit code.
+
+### Usage
+
+The `package` target is very similar to the `build` target in that it should be used for building artifacts.
+However, the `build` target is geared specifically at building an artifact from the context of a single project
+(i.e., a single binary).
+The `package` target is instead focused on composing the outputs of multiple build artifacts into a single package.
+What constitutes a package is intentionally left vague, as the definition can change from project to project.
+In smaller repos, this target should be skipped.
+
+## Test
+
+### Summary
+
+The `test` target is responsible for running tests to validate things are working as expected.
+The target is intended to be versatile, and can be used to run several different formats of testing.
+For example:
+
+1. Unit tests
+2. Smoke tests
+3. Integration tests
+
+### How it Works
+
+The `test` target is the **fourth target run** in the CI pipeline and **must pass** before any other targets are run.
+The CI will call the `test` target and fail if it returns a non-zero exit code.
+
+### Usage
+
+The `test` target is intended to be versatile.
+In many cases, separate `Earthfile`s that are outside of the scope of a single subproject are created to hold a `test` target which
+runs integration tests.
+At the same time, individual subprojects may utilize this target to run their own unit tests.
+
+The only requirement is that the target should *only* be used to run tests.
+This target is the final target that is run (and must pass) before artifacts are released and/or published.
 
 ## Publish
 

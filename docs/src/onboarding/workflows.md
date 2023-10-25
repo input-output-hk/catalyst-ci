@@ -10,7 +10,8 @@ This section gives a brief overview of these reusable workflows, which can aid i
 
 Most reusable workflows have a one-to-one relationship with the Earthly targets discussed in the previous section:
 
-* `check.yml` is responsible for handling the `check` target
+* `ci.yml` is responsible for running the entire CI pipeline
+* `run.yml` is responsible for executing targets with no additional steps (i.e., `check`, `build`, and `package` targets)
 * `publish.yml` is responsible for handling the `publish` target
 * `release.yml` is responsible for handling the `release` target
 
@@ -31,6 +32,11 @@ In most cases, this is necessary, because the Catalyst CI uses a remote Earthly 
 The credentials for the remote runner are held in AWS and need to be retrieved by the workflow.
 The only other case where AWS authentication is required is during the `publish` workflow where images are pushed to ECR.
 
+| Name         | Type   | Description                                                  | Required | Default |
+| ------------ | ------ | ------------------------------------------------------------ | -------- | ------- |
+| aws_role_arn | string | The ARN of the AWS role that will be assumed by the workflow | No       | `""`    |
+| aws_region   | string | The AWS region that will be used by the workflow             | No       | `""`    |
+
 ### Earthly Runner
 
 As noted above, Catalyst CI uses a remote Earthly runner in order to maximize cache hits.
@@ -39,29 +45,46 @@ the name of an AWS secret containing the authentication details.
 The workflow will configure the local GitHub runner using the TLS credentials retrieved from AWS so that it can successfully connect
 and interact with the remote Earthly runner.
 
-## Check
+| Name                   | Type   | Description                                                 | Required | Default  |
+| ---------------------- | ------ | ----------------------------------------------------------- | -------- | -------- |
+| earthly_runner_address | string | The address of the Earthly runner that will be used         | No       | `""`     |
+| earthly_runner_secret  | string | The ID of the AWS secret holding Earthly runner credentials | No       | `""`     |
+| earthly_version        | string | The version of Earthly to use.                              | No       | `latest` |
 
-The check workflow is responsible for performing the logic related to the `check` target.
-It uses the custom `run` GitHub Action in order to execute the provided target name.
-Since GitHub Actions jobs are, by default, required to return a non-zero exit code, no further logic is needed for the workflow.
-If the target returns a non-zero exit code it will bubble up and cause the job to fail.
+### CLI
+
+Most workflows utilize the custom CLI provided by the Catalyst CI repository.
+It's possible to specify a specific version of the CI to be installed (as opposed to the default of installing the latest).
+
+| Name           | Type   | Description                       | Required | Default  |
+| -------------- | ------ | --------------------------------- | -------- | -------- |
+| ci_cli_version | string | The version of the CI CLI to use. | No       | `latest` |
+
+## CI
+
+The CI workflow is responsible for executing the entire CI pipeline.
+This workflow is a composition of the other reusable workflows covered in this section.
+It's purpose is to reduce the friction for introducing the CI process into a repository by consolidating it to a single workflow.
 
 ### Inputs
 
-| Name            | Type   | Description                                                  | Required | Default  |
-| --------------- | ------ | ------------------------------------------------------------ | -------- | -------- |
-| target          | string | The target used to mark check builds                         | No       | `check`  |
-| aws_role_arn    | string | The ARN of the AWS role that will be assumed by the workflow | No       | `""`     |
-| aws_region      | string | The AWS region that will be used by the workflow             | No       | `""`     |
-| ci_cli_version  | string | The version of the CI CLI to use.                            | No       | `latest` |
-| earthly_version | string | The version of Earthly to use.                               | No       | `latest` |
+| Name             | Type   | Description                                                                        | Required | Default |
+| ---------------- | ------ | ---------------------------------------------------------------------------------- | -------- | ------- |
+| aws_ecr_registry | string | The AWS ECR registry that will be used to publish images                           | No       | `""`    |
+| force_artifact   | bool   | If true, the workflow will always produce an artifact                              | No       | `false` |
+| tags             | string | A line separated list of additional tags that will be applied to published images. | No       | `""`    |
 
-### Secrets
+## Run
 
-| Name                   | Type   | Description                                                 | Required | Default |
-| ---------------------- | ------ | ----------------------------------------------------------- | -------- | ------- |
-| earthly_runner_address | string | The address of the Earthly runner that will be used         | No       | `""`    |
-| earthly_runner_secret  | string | The ID of the AWS secret holding Earthly runner credentials | No       | `""`    |
+The run workflow is a general purpose workflow that discovers and executes a given Earthly target.
+Many of the CI steps follow this same pattern and this workflow serves the purpose of reducing boilerplate.
+For adding ad-hoc steps, specifically ones that just need to execute a target, this is the correct workflow to use.
+
+### Inputs
+
+| Name   | Type   | Description                    | Required | Default |
+| ------ | ------ | ------------------------------ | -------- | ------- |
+| target | string | The target to discover and run | Yes      | N/A     |
 
 ## Publish
 
@@ -75,18 +98,7 @@ It then uses the custom `push` GitHub Action to re-tag the image and push it to 
 | ---------------- | ------ | ---------------------------------------------------------------------------------- | -------- | --------- |
 | target           | string | The target used to mark check builds                                               | No       | `publish` |
 | aws_ecr_registry | string | The AWS ECR registry that will be used to publish images                           | No       | `""`      |
-| aws_role_arn     | string | The ARN of the AWS role that will be assumed by the workflow                       | No       | `""`      |
-| aws_region       | string | The AWS region that will be used by the workflow                                   | No       | `""`      |
-| ci_cli_version   | string | The version of the CI CLI to use.                                                  | No       | `latest`  |
-| earthly_version  | string | The version of Earthly to use.                                                     | No       | `latest`  |
 | tags             | string | A line separated list of additional tags that will be applied to published images. | No       | `""`      |
-
-### Secrets
-
-| Name                   | Type   | Description                                                 | Required | Default |
-| ---------------------- | ------ | ----------------------------------------------------------- | -------- | ------- |
-| earthly_runner_address | string | The address of the Earthly runner that will be used         | No       | `""`    |
-| earthly_runner_secret  | string | The ID of the AWS secret holding Earthly runner credentials | No       | `""`    |
 
 ## Release
 
@@ -96,21 +108,10 @@ These artifacts are then compressed and ultimately uploaded as artifacts for the
 
 ### Inputs
 
-| Name            | Type   | Description                                                  | Required | Default   |
-| --------------- | ------ | ------------------------------------------------------------ | -------- | --------- |
-| target          | string | The target used to mark check builds                         | No       | `release` |
-| aws_role_arn    | string | The ARN of the AWS role that will be assumed by the workflow | No       | `""`      |
-| aws_region      | string | The AWS region that will be used by the workflow             | No       | `""`      |
-| ci_cli_version  | string | The version of the CI CLI to use.                            | No       | `latest`  |
-| earthly_version | string | The version of Earthly to use.                               | No       | `latest`  |
-| force_artifact  | bool   | If true, the workflow will always produce an artifact        | No       | `false`   |
-
-### Secrets
-
-| Name                   | Type   | Description                                                 | Required | Default |
-| ---------------------- | ------ | ----------------------------------------------------------- | -------- | ------- |
-| earthly_runner_address | string | The address of the Earthly runner that will be used         | No       | `""`    |
-| earthly_runner_secret  | string | The ID of the AWS secret holding Earthly runner credentials | No       | `""`    |
+| Name           | Type   | Description                                           | Required | Default   |
+| -------------- | ------ | ----------------------------------------------------- | -------- | --------- |
+| target         | string | The target used to mark check builds                  | No       | `release` |
+| force_artifact | bool   | If true, the workflow will always produce an artifact | No       | `false`   |
 
 ## Deploy
 
