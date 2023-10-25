@@ -11,7 +11,7 @@ on:
           deployed to GitHub Pages.
         required: false
         type: string
-        default: release
+        default: docs
       aws_role_arn:
         description: |
           The ARN of the AWS role that will be assumed by the workflow. Only
