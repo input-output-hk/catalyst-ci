@@ -133,5 +133,11 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           path: artifacts
+      - name: Merge docs
+        run: |
+          mkdir -p merged
+          for dir in artifacts/*; do
+              rsync -av "$dir"/ "merged"/
+          done
       - name: Test
-        run: tree artifacts
+        run: tree merged
