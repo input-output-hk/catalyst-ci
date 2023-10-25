@@ -20,10 +20,11 @@ src:
 
     COPY --dir cmd pkg .
 
-test:
+check:
     FROM +src
 
-    RUN ginkgo ./...
+    BUILD +fmt
+    BUILD +lint
 
 build:
     FROM +src
@@ -33,20 +34,10 @@ build:
 
     SAVE ARTIFACT bin/ci ci
 
-docker:
-    FROM debian:bookworm-slim
-    WORKDIR /workspace
+test:
+    FROM +build
 
-    COPY +build/ci /usr/local/bin/ci
-
-    ENTRYPOINT ["/usr/local/bin/ci"]
-
-check:
-    FROM +deps
-
-    BUILD +fmt
-    BUILD +lint
-    BUILD +test
+    RUN ginkgo ./...
 
 release:
     FROM +build
@@ -54,7 +45,11 @@ release:
     SAVE ARTIFACT bin/ci ci
 
 publish:
-    FROM +docker
+    FROM debian:bookworm-slim
+    WORKDIR /workspace
     ARG tag=latest
 
+    COPY +build/ci /usr/local/bin/ci
+
+    ENTRYPOINT ["/usr/local/bin/ci"]
     SAVE IMAGE --push ci-cli:${tag}
