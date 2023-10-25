@@ -39,7 +39,7 @@ mkdocs-material:
 MKDOCS_BUILD:
     COMMAND
     ARG src="."
-    ARG extra_files=[]
+    ARG extra_files=""
 
     # Ensure the mkdocs tools are built and up-to-date.
     BUILD +mkdocs-material
@@ -49,8 +49,14 @@ MKDOCS_BUILD:
     COPY +mkdocs-material/services/docker-compose.kroki.yml .
 
     # Copy the src
+    RUN mkdir /extras 
     COPY --dir $src /docs
-    COPY --dir ${extra_files[@]} /extra
+    FOR --sep=", " file IN $extra_files
+        COPY --dir $file /extras
+    END
+    RUN ls -al /extras
+    RUN ls -al /extras/extra
+    #COPY --dir ${extra_files[@]} /extra
 
     # Docs need Kroki to build diagrams, so make sure its running.
     WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
@@ -82,7 +88,7 @@ check:
     ARG dest=./site
 
     # Build the site (UDC creates the container itself.)
-    DO +MKDOCS_BUILD --src=./sample
+    DO +MKDOCS_BUILD --src=./sample --extra_files="Readme.md, services, ../../+extra-docs/extra"
 
     SAVE ARTIFACT /docs/site AS LOCAL $dest
 

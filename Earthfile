@@ -21,3 +21,11 @@ spell-check:
     LOCALLY
 
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
+
+extra-docs:
+    FROM scratch
+
+    WORKDIR /
+    COPY --dir README.md LICENSE-APACHE.md /extra
+
+    SAVE ARTIFACT /extra extra
