@@ -3,12 +3,17 @@
 on:
   workflow_call:
     inputs:
+      earthfile:
+        description: |
+          The path to the folder containing the Earthfile that will be built.
+          This path should be relative to the repository root.
+        required: true
+        type: string
       target:
         description: |
-          The target used to mark GitHub Pages builds. This target should be
-          unique across all Earthly files in the repository. The target should
-          always produce one artifact which is the static site that will be
-          deployed to GitHub Pages.
+          The target that will be used to build docs. The target should always
+          produce one artifact which is the static site that will be deployed to
+          GitHub Pages.
         required: false
         type: string
         default: docs
@@ -35,18 +40,11 @@ on:
         required: false
         type: string
         default: latest
-      force_artifact:
-        description: |
-          When set to true, the workflow will always produce an artifact even
-          when the current commit is not being merged to the default branch.
-        required: false
-        type: boolean
-        default: false
     secrets:
       earthly_runner_address:
         description: |
           The address of the Earthly runner that will be used to build the
-          Earthly files.
+          Earthfile.
         required: false
       earthly_runner_secret:
         description: |
@@ -56,44 +54,9 @@ on:
           Earthly runner will not be configured.
         required: false
 
-
 jobs:
-  discover:
-    runs-on: ubuntu-latest
-    outputs:
-      json: ${{ steps.check.outputs.json }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
-        with:
-          cli_version: ${{ inputs.ci_cli_version }}
-          earthly_skip_install: "true"
-      - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@master
-        id: discover
-        with:
-          targets: ${{ inputs.target }}
-      - name: Check for empty output
-        id: check
-        run: |
-          output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
-          if [ "$output" == "null" ]; then
-            echo "json=[]" >> $GITHUB_OUTPUT
-          else
-            echo "json=$output" >> $GITHUB_OUTPUT
-          fi
-
   run:
     runs-on: ubuntu-latest
-    needs: [discover]
-    if: needs.discover.outputs.json != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        platform:
-          - linux/amd64
-        earthfile: ${{ fromJson(needs.discover.outputs.json) }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
@@ -108,36 +71,13 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
         with:
-          earthfile: ${{ matrix.earthfile }}
+          earthfile: ${{ inputs.earthfile }}
           target: ${{ inputs.target }}
-          platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.earthly_runner_address }}
           artifact: "true"
-      - name: Generate artifact name
-        #if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || inputs.force_artifact
-        id: artifact
-        run: echo "name=$(basename ${{ matrix.earthfile }})" >> $GITHUB_OUTPUT
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        #if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || inputs.force_artifact
+      - name: Publish docs
+        uses: JamesIves/github-pages-deploy-action@v4.3.3
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
         with:
-          name: ${{ steps.artifact.outputs.name }}
-          path: ${{ steps.build.outputs.artifact }}
-
-  publish:
-    runs-on: ubuntu-latest
-    needs: [run]
-    #if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
-    steps:
-      - name: Download artifacts
-        uses: actions/download-artifact@v3
-        with:
-          path: artifacts
-      - name: Merge docs
-        run: |
-          mkdir -p merged
-          for dir in artifacts/*; do
-              rsync -av "$dir"/ "merged"/
-          done
-      - name: Test
-        run: tree merged
+          branch: gh-pages
+          folder: ${{ steps.build.outputs.artifact }}
