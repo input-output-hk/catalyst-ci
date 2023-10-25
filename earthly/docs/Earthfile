@@ -36,7 +36,7 @@ mkdocs-material:
     SAVE IMAGE mkdocs-material
 
 # Build the documentation statically
-MKDOCS_BUILD:
+MKDOCS_SETUP:
     COMMAND
     ARG src="."
     ARG extra_files=""
@@ -55,37 +55,44 @@ MKDOCS_BUILD:
         COPY --dir $file /extras
     END
 
+    # 
+    #RUN mkdocs build
+
     # Docs need Kroki to build diagrams, so make sure its running.
-    WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
-        RUN docker run \
-            --rm \
-            -v /docs:/docs \
-            --network=mkdocs \
-            mkdocs build
-    END
+    #WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
+    #    RUN docker run \
+    #        --rm \
+    #        -v /docs:/docs \
+    #        --network=mkdocs \
+    #        mkdocs build
+    #END
 
 # Setup local documentation development.
-DEVELOP:
-    COMMAND
+#DEVELOP:
+#    COMMAND
 
-    ARG dest=$(echo ${PWD}/local)
+#    ARG dest=$(echo ${PWD}/local)
 
     # Ensure the mkdocs tools are built and up-to-date.
-    BUILD +mkdocs-material
+#    BUILD +mkdocs-material
 
     # Get local development artifacts
-    COPY +mkdocs-material/services /local
+#    COPY +mkdocs-material/services /local
 
-    SAVE ARTIFACT /local AS LOCAL $dest
+#    SAVE ARTIFACT /local AS LOCAL $dest
 
 
 check:
     # Test of building docs.
     # Run with `earthly -P +check`
+    FROM +mkdocs-material
+    
     ARG dest=./site
 
     # Build the site (UDC creates the container itself.)
-    DO +MKDOCS_BUILD --src=./sample --extra_files="Readme.md, services, ../../+extra-docs/extra"
+    DO +MKDOCS_SETUP --src=./sample --extra_files="Readme.md, services, ../../+extra-docs/extra"
+
+    RUN mkdocs build
 
     SAVE ARTIFACT /docs/site AS LOCAL $dest
 
