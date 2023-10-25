@@ -9,12 +9,8 @@ src:
 
     COPY --dir src mkdocs.yml .
 
-build:
+docs:
     FROM +src
 
     RUN poetry run mkdocs build --strict
-
-docs:
-    FROM +build
-
     SAVE ARTIFACT site/*
