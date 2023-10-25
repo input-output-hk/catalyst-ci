@@ -38,7 +38,8 @@ mkdocs-material:
 # Build the documentation statically
 MKDOCS_BUILD:
     COMMAND
-    ARG src
+    ARG src="."
+    ARG extra_files=[]
 
     # Ensure the mkdocs tools are built and up-to-date.
     BUILD +mkdocs-material
@@ -49,6 +50,7 @@ MKDOCS_BUILD:
 
     # Copy the src
     COPY --dir $src /docs
+    COPY --dir ${extra_files[@]} /extra
 
     # Docs need Kroki to build diagrams, so make sure its running.
     WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
@@ -76,7 +78,7 @@ DEVELOP:
 
 check:
     # Test of building docs.
-    # Run with `earthly -P +build-test`
+    # Run with `earthly -P +check`
     ARG dest=./site
 
     # Build the site (UDC creates the container itself.)
