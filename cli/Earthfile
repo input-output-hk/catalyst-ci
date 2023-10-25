@@ -3,12 +3,6 @@ FROM golang:1.20-alpine3.18
 
 # cspell: words onsi ldflags extldflags
 
-fmt:
-    DO ../earthly/go+FMT --src="go.mod go.sum cmd pkg"
-
-lint:
-    DO ../earthly/go+LINT --src="go.mod go.sum cmd pkg"
-
 deps:
     WORKDIR /work
 
@@ -20,11 +14,6 @@ src:
 
     COPY --dir cmd pkg .
 
-test:
-    FROM +src
-
-    RUN ginkgo ./...
-
 build:
     FROM +src
 
@@ -32,6 +21,11 @@ build:
     RUN go build -ldflags="-extldflags=-static" -o bin/ci cmd/main.go
 
     SAVE ARTIFACT bin/ci ci
+
+test:
+    FROM +src
+
+    RUN ginkgo ./...
 
 docker:
     FROM debian:bookworm-slim
@@ -41,12 +35,17 @@ docker:
 
     ENTRYPOINT ["/usr/local/bin/ci"]
 
+fmt:
+    DO ../earthly/go+FMT --src="go.mod go.sum cmd pkg"
+
+lint:
+    DO ../earthly/go+LINT --src="go.mod go.sum cmd pkg"
+
 check:
     FROM +deps
 
     BUILD +fmt
     BUILD +lint
-    BUILD +test
 
 release:
     FROM +build
