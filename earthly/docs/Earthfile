@@ -54,9 +54,6 @@ MKDOCS_BUILD:
     FOR --sep=", " file IN $extra_files
         COPY --dir $file /extras
     END
-    RUN ls -al /extras
-    RUN ls -al /extras/extra
-    #COPY --dir ${extra_files[@]} /extra
 
     # Docs need Kroki to build diagrams, so make sure its running.
     WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
