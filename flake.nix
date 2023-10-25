@@ -41,6 +41,9 @@
             gopls
             go-tools
 
+            # Misc
+            markdownlint-cli2
+
             # Node
             nodejs_20
             nodePackages.typescript

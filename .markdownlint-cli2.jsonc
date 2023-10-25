@@ -9,7 +9,8 @@
   ],
   "ignores": [
     "LICENSE-APACHE.md",
-    "LICENSE-MIT.md"
+    "LICENSE-MIT.md",
+    "**/node_modules/**"
   ],
   // Set standard config options in `/.markdownlint.jsonc`
   "config": {

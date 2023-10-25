@@ -1,5 +1,28 @@
 VERSION 0.7
 
+DEPS:
+    COMMAND
+
+    ARG ginkgo="true"
+
+    # Establish a cache
+    RUN mkdir -p /go/cache && mkdir /go/modcache
+    ENV GOCACHE=/go/cache
+    ENV GOMODCACHE=/go/modcache
+    CACHE --sharing shared /go
+
+    COPY go.mod go.sum ./
+    RUN go mod download
+
+    # Optionally, install ginkgo for testing
+    IF ${ginkgo} == "true"
+        RUN go install github.com/onsi/ginkgo/v2/ginkgo
+    END
+
+    # Save artifacts that may have been modified
+    SAVE ARTIFACT go.mod AS LOCAL go.mod
+    SAVE ARTIFACT go.sum AS LOCAL go.sum
+
 FMT:
     COMMAND
 
