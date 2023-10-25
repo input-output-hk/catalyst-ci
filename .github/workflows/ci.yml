@@ -1,0 +1,131 @@
+on:
+  workflow_call:
+    inputs:
+      aws_ecr_registry:
+        description: |
+            The AWS ECR registry that will be used to publish images
+        required: true
+        type: string
+      aws_role_arn:
+        description: |
+          The ARN of the AWS role that will be assumed by the workflow. Only
+          required when configuring a remote Earthly runner or AWS ECR.
+        required: false
+        type: string
+      aws_region:
+        description: |
+          The AWS region that will be used by the workflow. Only required when
+          configuring a remote Earthly runner or AWS ECR.
+        required: false
+        type: string
+      ci_cli_version:
+        description: |
+          The version of the CI CLI to use.
+        required: false
+        type: string
+        default: latest
+      earthly_version:
+        description: The version of Earthly to use.
+        required: false
+        type: string
+        default: latest
+      force_artifact:
+        description: |
+          When set to true, the workflow will always produce a release artifact
+          even when the current commit is not tagged.
+        required: false
+        type: boolean
+        default: false
+      tags:
+        description: |
+          A line separated list of additional tags that will be applied to
+          published images.
+        required: false
+        type: string
+    secrets:
+      earthly_runner_address:
+        description: |
+          The address of the Earthly runner that will be used to build the
+          Earthly files.
+        required: false
+      earthly_runner_secret:
+        description: |
+          The ID of the AWS secret holding Earthly remote runner credentials.
+          This secret must contain the runner address and the necessary TLS
+          certificates required to authenticate with it. If omitted, a remote
+          Earthly runner will not be configured.
+        required: false
+
+jobs:
+  check:
+    uses: ./.github/workflows/run.yml
+    with:
+      aws_role_arn: ${{ inputs.aws_role_arn }}
+      aws_region: ${{ inputs.aws_region }}
+      ci_cli_version: ${{ inputs.ci_cli_version }}
+      earthly_version: ${{ inputs.earthly_version }}
+      target: check
+    secrets:
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+  build:
+    uses: ./.github/workflows/run.yml
+    needs: [check]
+    with:
+      aws_role_arn: ${{ inputs.aws_role_arn }}
+      aws_region: ${{ inputs.aws_region }}
+      ci_cli_version: ${{ inputs.ci_cli_version }}
+      earthly_version: ${{ inputs.earthly_version }}
+      target: check
+    secrets:
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+  package:
+    uses: ./.github/workflows/run.yml
+    needs: [build, check]
+    with:
+      aws_role_arn: ${{ inputs.aws_role_arn }}
+      aws_region: ${{ inputs.aws_region }}
+      ci_cli_version: ${{ inputs.ci_cli_version }}
+      earthly_version: ${{ inputs.earthly_version }}
+      target: check
+    secrets:
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+  test:
+    uses: ./.github/workflows/run.yml
+    needs: [build, check, package]
+    with:
+      aws_role_arn: ${{ inputs.aws_role_arn }}
+      aws_region: ${{ inputs.aws_region }}
+      ci_cli_version: ${{ inputs.ci_cli_version }}
+      earthly_version: ${{ inputs.earthly_version }}
+      target: check
+    secrets:
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+  release:
+    uses: ./.github/workflows/release.yml
+    needs: [build, check, package, test]
+    with:
+      aws_role_arn: ${{ inputs.aws_role_arn }}
+      aws_region: ${{ inputs.aws_region }}
+      ci_cli_version: ${{ inputs.ci_cli_version }}
+      earthly_version: ${{ inputs.earthly_version }}
+      force_artifact: ${{ inputs.force_artifact }}
+    secrets:
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+  publish:
+    uses: ./.github/workflows/publish.yml
+    needs: [build, check, package, test]
+    with:
+      aws_ecr_registry: ${{ inputs.aws_ecr_registry }}
+      aws_role_arn: ${{ inputs.aws_role_arn }}
+      aws_region: ${{ inputs.aws_region }}
+      ci_cli_version: ${{ inputs.ci_cli_version }}
+      earthly_version: ${{ inputs.earthly_version }}
+      tags: ${{ inputs.tags }}
+    secrets:
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
