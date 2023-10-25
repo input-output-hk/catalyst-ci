@@ -63,7 +63,7 @@ What defines a build process is unique to each project.
 For example, it could be anything from compiling a binary to transpiling a medium into its final form
 (i.e., Typescript -> Javascript).
 
-Downstream targets should always depend on the `build` target for maximizng cache hits.
+Downstream targets should always depend on the `build` target for maximizing cache hits.
 For example, the `test` and `release` targets should either inherit from the `build` target or copy artifacts from it.
 
 ## Package
