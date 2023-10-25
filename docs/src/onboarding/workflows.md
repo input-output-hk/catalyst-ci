@@ -122,15 +122,24 @@ The changes are then committed, causing the `dev` environment to deploy the newl
 
 ### Inputs
 
-| Name            | Type   | Description                                          | Required | Default                          |
-| --------------- | ------ | ---------------------------------------------------- | -------- | -------------------------------- |
-| deployment_repo | string | The URL of the repository containing deployment code | No       | `input-output-hk/catalyst-world` |
-| environment     | string | The target environment to deploy to                  | No       | `dev`                            |
-| images          | string | A newline separated list of image names to deploy    | Yes      | N/A                              |
-| tag             | string | The image tag to deploy                              | Yes      | N/A                              |
+| Name            | Type   | Description                                              | Required | Default                          |
+| --------------- | ------ | -------------------------------------------------------- | -------- | -------------------------------- |
+| deployment_repo | string | The URL of the repository containing deployment code     | No       | `input-output-hk/catalyst-world` |
+| environment     | string | The target environment to deploy to                      | No       | `dev`                            |
+| images          | string | A newline separated list of image names to deploy        | Yes      | N/A                              |
+| tag             | string | The image tag to deploy                                  | Yes      | N/A                              |
+| token           | string | A Github token with access to the deployment repository. | Yes      | N/A                              |
 
-### Secrets
+## Pages
 
-| Name  | Type   | Description                                              | Required | Default |
-| ----- | ------ | -------------------------------------------------------- | -------- | ------- |
-| token | string | A Github token with access to the deployment repository. | Yes      | N/A     |
+The pages workflow is responsible for building documentation and deploying to GitHub Pages.
+It can be configured to point to an `Earthfile` and target that produces static documentation.
+The workflow will execute the target, and if the commit is a merge to the default branch, push the resulting files to the `gh_pages`
+branch.
+
+### Inputs
+
+| Name      | Type   | Description                                                        | Required | Default |
+| --------- | ------ | ------------------------------------------------------------------ | -------- | ------- |
+| earthfile | string | The path to the folder containing the Earthfile that will be built | Yes      | N/A     |
+| target    | string | The target that will be used to build docs                         | Yes      | N/A     |
