@@ -3,6 +3,12 @@ FROM golang:1.20-alpine3.18
 
 # cspell: words onsi ldflags extldflags
 
+fmt:
+    DO ../earthly/go+FMT --src="go.mod go.sum cmd pkg"
+
+lint:
+    DO ../earthly/go+LINT --src="go.mod go.sum cmd pkg"
+
 deps:
     WORKDIR /work
 
@@ -14,6 +20,12 @@ src:
 
     COPY --dir cmd pkg .
 
+check:
+    FROM +src
+
+    BUILD +fmt
+    BUILD +lint
+
 build:
     FROM +src
 
@@ -23,29 +35,9 @@ build:
     SAVE ARTIFACT bin/ci ci
 
 test:
-    FROM +src
+    FROM +build
 
     RUN ginkgo ./...
-
-docker:
-    FROM debian:bookworm-slim
-    WORKDIR /workspace
-
-    COPY +build/ci /usr/local/bin/ci
-
-    ENTRYPOINT ["/usr/local/bin/ci"]
-
-fmt:
-    DO ../earthly/go+FMT --src="go.mod go.sum cmd pkg"
-
-lint:
-    DO ../earthly/go+LINT --src="go.mod go.sum cmd pkg"
-
-check:
-    FROM +deps
-
-    BUILD +fmt
-    BUILD +lint
 
 release:
     FROM +build
@@ -53,7 +45,11 @@ release:
     SAVE ARTIFACT bin/ci ci
 
 publish:
-    FROM +docker
+    FROM debian:bookworm-slim
+    WORKDIR /workspace
     ARG tag=latest
 
+    COPY +build/ci /usr/local/bin/ci
+
+    ENTRYPOINT ["/usr/local/bin/ci"]
     SAVE IMAGE --push ci-cli:${tag}
