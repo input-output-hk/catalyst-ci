@@ -9,6 +9,7 @@ nav:
   - Introduction: index.md
   - Onboarding: onboarding/index.md
   - Reference:
+      - reference/index.md
       - Actions: reference/actions.md
       - Targets: reference/targets.md
       - Workflows: reference/workflows.md

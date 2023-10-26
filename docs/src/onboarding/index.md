@@ -9,7 +9,7 @@ that we use.
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Note
     This section will talk about concepts related to [Earthly](https://earthly.dev).
-    If you are not familiar with Earthly, please head over [to the appendix](./appendix/earthly.md) to learn more about it before
+    If you are not familiar with Earthly, please head over [to the appendix](../appendix/earthly.md) to learn more about it before
     continuing.
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
@@ -81,7 +81,7 @@ target.
 
 Each stage is self-contained and the only dependency occurs when validating that the previous stage was successful.
 For example, the `build` stage will not execute until the `check` stage has passed.
-Recall that stages consist of executing mulitple targets in parallel.
+Recall that stages consist of executing multiple targets in parallel.
 This means that all subprojects within a repository must pass the `check` stage before any building will begin.
 This fits into the overall goal of ensuring that the default branch is always in a healthy state and it also promotes cross-team
 collaboration.
@@ -139,7 +139,7 @@ is ready to be tested and shipped.
 ## Getting Started
 
 Before creating and/or modifying an `Earthfile`, it's imperative to review the style guide.
-Due to the relative flexbility of Earthly, it's possible to structure an `Earthfile` in dozens of valid ways.
+Due to the relative flexibility of Earthly, it's possible to structure an `Earthfile` in dozens of valid ways.
 To provide consistency across our projects, we have implemented a style guide which brings a level of standardization to
 `Earthfile`s.
 
