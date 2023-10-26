@@ -1,0 +1,29 @@
+site_name: Catalyst CI Documentation
+docs_dir: src
+theme:
+  name: material
+  features:
+    - navigation.indexes
+    - navigation.tracking
+nav:
+  - Introduction: index.md
+  - Onboarding: onboarding/index.md
+  - Style Guide: style.md
+  - Reference:
+      - reference/index.md
+      - Actions: reference/actions.md
+      - Targets: reference/targets.md
+      - Workflows: reference/workflows.md
+      - UDCs: reference/udc.md
+  - Appendix:
+      - Earthly: appendix/earthly.md
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true

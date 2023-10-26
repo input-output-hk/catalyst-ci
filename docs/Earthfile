@@ -1,0 +1,16 @@
+VERSION 0.7
+
+deps:
+    FROM python:3.11-bullseye
+    DO ../earthly/python+POETRY_SETUP
+
+src:
+    FROM +deps
+
+    COPY --dir src mkdocs.yml .
+
+docs:
+    FROM +src
+
+    RUN poetry run mkdocs build --strict
+    SAVE ARTIFACT site/*
