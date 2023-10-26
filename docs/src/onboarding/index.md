@@ -138,7 +138,7 @@ is ready to be tested and shipped.
 
 ## Getting Started
 
-Before creating and/or modifying an `Earthfile`, it's imperative to review the style guide.
+Before creating and/or modifying an `Earthfile`, it's imperative to review the [style guide](../style.md).
 Due to the relative flexibility of Earthly, it's possible to structure an `Earthfile` in dozens of valid ways.
 To provide consistency across our projects, we have implemented a style guide which brings a level of standardization to
 `Earthfile`s.
