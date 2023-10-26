@@ -61,5 +61,5 @@ from a single `Earthfile` that is tightly coupled to the subproject they are wor
 While knowledge of how the CI system is helpful for troubleshooting purposes, it's purely extracurricular and not required.
 Instead, a developer must only remember these reserved targets in order to have their deliverables handled accordingly.
 
-In the remaining sections of this onboarding guide, we will cover the components that make up Catalyst CI, how they are molded
-together to create reusable workflows, and finally some examples to get started using these actions and workflows.
+In the remaining sections of this onboarding guide, we will cover the components that make up Catalyst CI and how they are composed
+together to achieve the documented solution.

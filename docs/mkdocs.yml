@@ -13,6 +13,8 @@ nav:
       - Workflows: onboarding/workflows.md
       - Actions: onboarding/actions.md
       - UDCs: onboarding/udc.md
+      - Appendix:
+          - Earthly: onboarding/appendix/earthly.md
 markdown_extensions:
   - admonition
   - pymdownx.details
