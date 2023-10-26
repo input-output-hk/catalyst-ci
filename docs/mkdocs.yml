@@ -8,6 +8,7 @@ theme:
 nav:
   - Introduction: index.md
   - Onboarding: onboarding/index.md
+  - Style Guide: style.md
   - Reference:
       - reference/index.md
       - Actions: reference/actions.md
