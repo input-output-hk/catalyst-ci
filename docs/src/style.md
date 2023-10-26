@@ -102,7 +102,7 @@ When referencing an Earthfile from another repository, always append a git tag
 to it.
 For example:
 
-```
+```Earthfile
 DO github.com/input-output-hk/catalyst-ci/earthly/udc+NAME:tag
 ```
 
