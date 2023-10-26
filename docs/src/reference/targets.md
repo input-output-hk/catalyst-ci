@@ -1,6 +1,6 @@
 # Targets
 
-As discussed in the overview, the Catalyst CI automatically searches for and executes distinct Earthly targets.
+As discussed in onboarding, the Catalyst CI automatically searches for and executes distinct Earthly targets.
 By creating these targets in your `Earthfile`, you can hook into the Catalyst CI process with minimal effort.
 This section is dedicated to explaining what these targets are, how they work, and how to use them.
 

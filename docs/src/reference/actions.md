@@ -1,14 +1,7 @@
 # GitHub Actions
 
-<!-- markdownlint-disable max-one-sentence-per-line -->
-!!! Note
-    If you don't intend on using the custom GitHub Actions to build custom workflows, you're encouraged to skip this section and
-    move on to the next one.
-    However, understanding how the individual actions work, and the role they play, can greatly help when troubleshooting workflows.
-
 Catalyst CI is made up of several GitHub Actions that simplify the steps required to perform the CI process.
 All of these GitHub Actions are compiled into reusable workflows which perform a majority of the CI logic.
-<!-- markdownlint-enable max-one-sentence-per-line -->
 
 ## Overview
 
