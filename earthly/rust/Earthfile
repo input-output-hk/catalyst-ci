@@ -165,18 +165,25 @@ check-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
 build-hosted:
+    ARG TARGETPLATFORM
+
     # Build the service
     FROM +builder
  
     RUN /scripts/std_build.sh
 
-    # TODO use the correct target arch here.
-    RUN ldd target/x86_64-unknown-linux-musl/release/cat-gateway
-    RUN readelf -p .comment target/x86_64-unknown-linux-musl/release/cat-gateway
-    RUN strip -v target/x86_64-unknown-linux-musl/release/cat-gateway
+    RUN ls -al target/$TARGETARCH/release
 
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/doc doc
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/cat-gateway cat-gateway
+    RUN ldd target/$TARGETARCH/release/hello_world
+    RUN readelf -p .comment target/$TARGETARCH/release/hello_world
+    RUN ls -al target/$TARGETARCH/release/hello_world
+    RUN strip -v target/$TARGETARCH/release/hello_world
+    RUN ls -al target/$TARGETARCH/release/hello_world
+
+    RUN target/$TARGETARCH/release/hello_world
+
+    SAVE ARTIFACT target/$TARGETARCH/doc doc
+    SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world
 
 # Run build using the most efficient host tooling
 # CI Automated Entry point.

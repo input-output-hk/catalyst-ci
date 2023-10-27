@@ -1,23 +1,26 @@
 // src/main.rs
-use clap::{App, Arg};
+
+use clap::Parser;
+
+/// Simple program to greet a person
+#[derive(Parser, Debug)]
+#[command(author, version, about, long_about = None)]
+struct Args {
+    /// Name of the person to greet
+    #[arg(short, long)]
+    name: String,
+
+    /// Number of times to greet
+    #[arg(short, long, default_value_t = 1)]
+    count: u8,
+}
 
 fn main() {
-    let matches = App::new("Hello, World!")
-        .version("1.0")
-        .arg(
-            Arg::with_name("version")
-                .short('v')
-                .long("version")
-                .help("Print the program version"),
-        )
-        .get_matches();
+    let args = Args::parse();
 
-    if matches.is_present("version") {
-        println!("Hello, World! v1.0");
-        return;
+    for _ in 0..args.count {
+        println!("Hello {}!", args.name)
     }
-
-    println!("Hello, World!");
 }
 
 #[cfg(test)]

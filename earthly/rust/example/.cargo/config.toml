@@ -15,7 +15,7 @@
 linker = "clang"
 rustflags = [
     "-C", "link-arg=-fuse-ld=/usr/bin/mold",
-    "-C", "target-feature=+crt-static"
+    "-C", "target-feature=-crt-static"
 ]
 
 # Should be the default to have fully static rust programs in CI
@@ -23,7 +23,7 @@ rustflags = [
 linker = "clang"
 rustflags = [
     "-C", "link-arg=-fuse-ld=/usr/bin/mold",
-    "-C", "target-feature=+crt-static"
+    "-C", "target-feature=-crt-static"
 ]
 
 
