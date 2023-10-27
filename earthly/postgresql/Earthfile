@@ -1,0 +1,31 @@
+# Common PostgreSQL Earthly builders
+VERSION 0.7
+
+postgress-base:
+    FROM postgres:16.0-alpine3.18
+
+    WORKDIR /root
+
+    # Install necessary packages 
+    # Expand this list as needed, rather than adding more tools in later containers.
+    RUN apk add --no-cache \
+            ripgrep \
+            bash \
+            colordiff \
+            musl-dev \
+            curl \
+            gcc
+
+    # Install refinery
+
+    # Set necessary env vars from this setup.
+    ENV RUSTUP_HOME=/usr/local/rustup
+    ENV CARGO_HOME=/usr/local/cargo
+    ENV CARGO_HOME_BIN=$CARGO_HOME/bin
+    ENV PATH=$CARGO_HOME_BIN:$PATH  
+
+    RUN curl –proto ‘=https’ –tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -v
+    RUN rustc --version && \
+        cargo --version
+    RUN cargo install refinery_cli --version 0.8.7
+    RUN refinery --version
