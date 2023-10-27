@@ -4,55 +4,83 @@ VERSION 0.7
 # cspell: words rustup rustc automake autotools xutils miri nextest kani
 
 # Base Rustup build container.
-rustup:
-    # Base it on Debian bookworm-slim
-    FROM debian:bookworm-slim
+rust-base:
+    ARG TARGETPLATFORM
+    ARG TARGETOS
+    ARG TARGETARCH
+    ARG TARGETVARIANT
+    ARG USERPLATFORM
+    ARG USEROS
+    ARG USERARCH
+    ARG USERVARIANT
+
+
+    # This is our base Host toolset, and rustup.
+    # The ACTUAL version of rust that will be used, and available targets
+    # is controlled by a `rust-toolchain.toml` file when the RUST_SETUP UDC is run.
+    # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
+    FROM rust:1.73-alpine3.18
+
+    RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
+        echo "TARGETOS       = $TARGETOS"; \
+        echo "TARGETARCH     = $TARGETARCH"; \
+        echo "TARGETVARIANT  = $TARGETVARIANT"; \
+        echo "USERPLATFORM   = $USERPLATFORM"; \
+        echo "USEROS         = $USEROS"; \
+        echo "USERARCH       = $USERARCH"; \
+        echo "USERVARIANT    = $USERVARIANT"; 
+
 
     WORKDIR /root
 
-    # Set necessary env vars from this setup.
-    ENV RUSTUP_HOME=/usr/local/rustup
-    ENV CARGO_HOME=/usr/local/cargo
-    ENV CARGO_HOME_BIN=$CARGO_HOME/bin
-    ENV PATH=$CARGO_HOME_BIN:$PATH    
-
-    # Ensure correct directory permissions on the install locations.
-    RUN mkdir -p $RUSTUP_HOME && \
-        mkdir -p $CARGO_HOME_BIN && \
-        chmod -R a+w $RUSTUP_HOME $CARGO_HOME
-
     # Install necessary packages 
     # Expand this list as needed, rather than adding more tools in later containers.
-    RUN apt-get update && \
-        apt-get install --no-install-recommends -y \
-            ca-certificates \
-            curl \
-            file \
-            build-essential \
-            autoconf \
-            automake \
-            autotools-dev \
-            libtool \
-            xutils-dev \
+     RUN apk add --no-cache \
+            musl-dev \
             mold \
-            python3 \
-            python3-pip \
-            musl-tools \
-            clang && \
-        rm -rf /var/lib/apt/lists/*
+            clang \
+            ripgrep \
+            bash \
+            colordiff \
+            graphviz
 
-    # Install OpenSSL here but ONLY if we can't avoid using it.
-
-    # Install rustup.
-    RUN curl https://sh.rustup.rs -sSf | sh -s -- --default-toolchain none -y -v
+    # Install a nightly toolchain which matches.
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt
 
     # Install the default cargo config.
-    COPY config.toml $CARGO_HOME/config.toml
+    COPY .cargo/config.toml $CARGO_HOME/config.toml
+
+    # Install rust based tooling
+    # Install tools we use commonly with `cargo`.
+    # Note, we disable static compiles for tools, specifically, as its not required.
+    # These tools are not artefacts and we do not use them in production.
+    RUN export RUSTFLAGS="-C target-feature=-crt-static" && \
+        cargo install cargo-nextest --version=0.9.59 && \
+        cargo install cargo-machete --version=0.6.0 && \
+        cargo install refinery_cli --version=0.8.11
+
+
+    # Universal build scripts we will always need and are not target dependent.
+    COPY --dir scripts /scripts
+    RUN ls -al /scripts
+
+    # Standardized Rust configs.
+    # Build will refuse to proceed if the projects rust configs do not match these.
+    # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
+    COPY rustfmt.toml /stdcfgs/
+
+# Builds all the rust-base targets for each supported DOCKER architecture.
+# Currently only used for multi-platform cross build testing.
+# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for 
+# docker enabled on Mac.
+# Again, this is just a test target, and not for general use.
+rust-base-all-hosts:
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
 
 # Common Rust setup
 # Parameters:
 #  * toolchain : The `rust-toolchain` toml file.
-RUST_SETUP:
+SETUP:
     COMMAND
     ARG toolchain=./rust-toolchain.toml
 
@@ -62,35 +90,135 @@ RUST_SETUP:
 
     # Copy our toolchain dependency.
     COPY $toolchain ./rust-toolchain.toml
-    ENV default_rust_channel=$(grep -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)
+    ENV default_rust_channel=$(rg -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)
+
+    # Check that `default_rust_channel` and $RUST_VERSION from the rust-base container are exactly the same.
+    # This ensures CI Rust version and local rust version are properly aligned and prevents version skew.
+    RUN /scripts/verify_toolchain.sh $default_rust_channel $RUST_VERSION
 
     # Install pinned Rustup from `rust-toolchain.toml`
     # Plus nightly latest so we can use it for docs, lints, etc.
     RUN rustup default $default_rust_channel && \
         rustup show && \
-        rustup toolchain install nightly --component miri --component rust-src && \
         cargo --version && \
         cargo +nightly --version
 
-    # Install tools we use commonly with `cargo`.
-    RUN cargo install cargo-nextest --locked && \
-        cargo install refinery_cli --locked && \
-        cargo install cargo-machete --locked
 
-# Test rust build container
+CP_SRC:
+    # Copy the build src using this.
+    COMMAND
+    # This can be one directory like `"src/*"` or multiple src seperated by `","`:
+    # eg, "example/Cargo.toml, example/Cargo.lock, example/src"
+    ARG src=""
+
+    # ONLY copy whats needed to build.  Not everything.
+    # Note: rust-toolchain.toml was already copied when rust was setup.
+    # Minimizing whats copied reduces needless cache misses.
+    FOR --sep=", " file IN $src
+        COPY --dir $file .
+    END
+
+    RUN ls -al 
+
+
+# Steps we do during the `check` CI phase for all Rust programs
+CHECK:
+    COMMAND
+
+    # This is set up so that ALL checks are run and it will fail if any fail.
+    # This imporvies visibility into all issues that need to be corrected for `check`
+    # to pass without needing to iterate excessively.
+    RUN /scripts/std_checks.sh
+    
+    #diff .cargo/config.toml .stdconfig/.cargo/config.toml; \
+    #    cargo_config_chk_failed=$?; \
+    #    if [ "$cargo_config_chk_failed" -ne 0 ]; then \
+    #        echo ".cargo/config.toml has diverged from standard verstion."; \
+    #    fi; \
+    #    \
+    #    cargo +nightly fmtchk; \
+    #    fmt_chk_failed=$?; \
+    #    if [ "$fmt_chk_failed" -ne 0 ]; then \
+    #        echo "cargo fmt: failed"; \
+    #    fi; \
+    #    \
+    #    cargo machete; \
+    #    unused_crate_dependency_check_failed=$?; \
+    #    \
+    #    cargo modules generate --help; \
+    #    \
+    #    if [ "$unused_crate_dependency_check_failed" -ne 0 ]; then echo "cargo machete: failed"; fi; \
+    #    exit $(($fmt_chk_failed || $unused_crate_dependency_check_failed))
+
+# Set up our target toolchains, and copy our files.
+builder:
+    FROM +rust-base
+
+    DO +SETUP --toolchain=example/rust-toolchain.toml
+
+    DO +CP_SRC --src="example/cli example/core example/src example/tests example/utils example/Cargo.* rustfmt.toml .cargo"
+
+# Test rust build container - Use best architecture host tools.
+check-hosted:
+    FROM +builder
+
+    DO +CHECK
+
+# Run check using the most efficient host tooling
+# CI Automated Entry point.
 check:
-    FROM +rustup
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
 
-    DO +RUST_SETUP --toolchain=example/rust-toolchain.toml
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +check-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +check-hosted
+    END
 
-    # Check all the expected tooling is installed and works for both the stable and nightly versions.
-    RUN rustc --version && \
-        rustc +nightly --version && \
-        cargo --version && \
-        cargo +nightly --version &&  \
-        cargo clippy --version && \
-        cargo +nightly clippy --version && \
-        cargo nextest --version && \
-        cargo machete --version \
-        refinery --version && \
-        mold --version
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+check-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
+
+
+build:
+    # Build the service
+    FROM +rust-base 
+ 
+    DO +SETUP --toolchain=example/rust-toolchain.toml
+
+    DO +CP_SRC --src="example/cli example/core example/src example/tests example/utils example/Cargo.* rustfmt.toml .cargo"
+   
+    DO +COPY_SRC
+
+    RUN cargo build --release --workspace --locked; \
+        build_failed=$?; \
+        cargo lint; \
+        lint_failed=$?; \
+        cargo docs; \
+        docs_failed=$?; \
+        exit $(($build_failed || $lint_failed || $docs_failed))
+
+    # Run rust tests.
+    FROM +build
+
+    COPY --dir .config .
+
+    # Cargo nextest creates a test artifact. TODO: Work out how to publish it (even if test run fails).
+    RUN cargo testci; \
+        testci_failed=$?; \
+        cargo testdocs; \
+        testdocs_failed=$?; \
+        exit $(($testci_failed || $testdocs_failed))
+
+
+    RUN ldd target/x86_64-unknown-linux-musl/release/cat-gateway
+    RUN readelf -p .comment target/x86_64-unknown-linux-musl/release/cat-gateway
+    RUN strip -v target/x86_64-unknown-linux-musl/release/cat-gateway
+
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/doc doc
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/cat-gateway cat-gateway
