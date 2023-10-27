@@ -1,37 +1,31 @@
-#[cfg(not(debug_assertions))]
-use human_panic::setup_panic;
+// src/main.rs
+use clap::{App, Arg};
 
-#[cfg(debug_assertions)]
-extern crate better_panic;
+fn main() {
+    let matches = App::new("Hello, World!")
+        .version("1.0")
+        .arg(
+            Arg::with_name("version")
+                .short('v')
+                .long("version")
+                .help("Print the program version"),
+        )
+        .get_matches();
 
-use utils::{app_config::AppConfig, error::Result};
-
-/// The main entry point of the application.
-fn main() -> Result<()> {
-    // Human Panic. Only enabled when *not* debugging.
-    #[cfg(not(debug_assertions))]
-    {
-        setup_panic!();
+    if matches.is_present("version") {
+        println!("Hello, World! v1.0");
+        return;
     }
 
-    // Better Panic. Only enabled *when* debugging.
-    #[cfg(debug_assertions)]
-    {
-        better_panic::Settings::debug()
-            .most_recent_first(false)
-            .lineno_suffix(true)
-            .verbosity(better_panic::Verbosity::Full)
-            .install();
+    println!("Hello, World!");
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_hello_world() {
+        assert_eq!(main(), ());
     }
-
-    let _guard = utils::logger::setup_logging()?;
-
-    // Initialize Configuration
-    let config_contents = include_str!("resources/default_config.toml");
-    AppConfig::init(Some(config_contents))?;
-
-    // Match Commands
-    cli::cli_match()?;
-
-    Ok(())
 }

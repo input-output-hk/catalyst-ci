@@ -129,26 +129,6 @@ CHECK:
     # This imporvies visibility into all issues that need to be corrected for `check`
     # to pass without needing to iterate excessively.
     RUN /scripts/std_checks.sh
-    
-    #diff .cargo/config.toml .stdconfig/.cargo/config.toml; \
-    #    cargo_config_chk_failed=$?; \
-    #    if [ "$cargo_config_chk_failed" -ne 0 ]; then \
-    #        echo ".cargo/config.toml has diverged from standard verstion."; \
-    #    fi; \
-    #    \
-    #    cargo +nightly fmtchk; \
-    #    fmt_chk_failed=$?; \
-    #    if [ "$fmt_chk_failed" -ne 0 ]; then \
-    #        echo "cargo fmt: failed"; \
-    #    fi; \
-    #    \
-    #    cargo machete; \
-    #    unused_crate_dependency_check_failed=$?; \
-    #    \
-    #    cargo modules generate --help; \
-    #    \
-    #    if [ "$unused_crate_dependency_check_failed" -ne 0 ]; then echo "cargo machete: failed"; fi; \
-    #    exit $(($fmt_chk_failed || $unused_crate_dependency_check_failed))
 
 # Set up our target toolchains, and copy our files.
 builder:
@@ -156,7 +136,7 @@ builder:
 
     DO +SETUP --toolchain=example/rust-toolchain.toml
 
-    DO +CP_SRC --src="example/cli example/core example/src example/tests example/utils example/Cargo.* rustfmt.toml .cargo"
+    DO +CP_SRC --src="example/src example/tests example/benches example/Cargo.* example/rustfmt.toml example/.cargo"
 
 # Test rust build container - Use best architecture host tools.
 check-hosted:
@@ -184,41 +164,37 @@ check:
 check-all-hosts:    
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
-
-build:
+build-hosted:
     # Build the service
-    FROM +rust-base 
+    FROM +builder
  
-    DO +SETUP --toolchain=example/rust-toolchain.toml
+    RUN /scripts/std_build.sh
 
-    DO +CP_SRC --src="example/cli example/core example/src example/tests example/utils example/Cargo.* rustfmt.toml .cargo"
-   
-    DO +COPY_SRC
-
-    RUN cargo build --release --workspace --locked; \
-        build_failed=$?; \
-        cargo lint; \
-        lint_failed=$?; \
-        cargo docs; \
-        docs_failed=$?; \
-        exit $(($build_failed || $lint_failed || $docs_failed))
-
-    # Run rust tests.
-    FROM +build
-
-    COPY --dir .config .
-
-    # Cargo nextest creates a test artifact. TODO: Work out how to publish it (even if test run fails).
-    RUN cargo testci; \
-        testci_failed=$?; \
-        cargo testdocs; \
-        testdocs_failed=$?; \
-        exit $(($testci_failed || $testdocs_failed))
-
-
+    # TODO use the correct target arch here.
     RUN ldd target/x86_64-unknown-linux-musl/release/cat-gateway
     RUN readelf -p .comment target/x86_64-unknown-linux-musl/release/cat-gateway
     RUN strip -v target/x86_64-unknown-linux-musl/release/cat-gateway
 
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/doc doc
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/cat-gateway cat-gateway
+
+# Run build using the most efficient host tooling
+# CI Automated Entry point.
+build:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +build-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +build-hosted
+    END
+
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+build-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted

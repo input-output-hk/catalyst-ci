@@ -9,25 +9,6 @@
 
 source "$(dirname "$0")/colors.sh"
 
-status() {
-    local rc="$1"
-    local message="$2"
-    shift 2
-
-    # Check if the command returned a bad status
-    if "$@"; then
-        # Append green OK to the message
-        echo -e "${CYAN}${message} : ${GREEN}[OK]${NC}"
-    else
-        # Append red ERROR to the message
-        echo -e "${CYAN}${message} : ${RED}[ERROR]${NC}"
-        rc=1
-    fi
-
-    # Return the current status
-    return "$rc"
-}
-
 # Checks if two files that should exist DO, and are equal.
 # used to enforce consistency between local config files and the expected config locked in CI.
 check_vendored_files() {
