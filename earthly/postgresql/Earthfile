@@ -30,4 +30,33 @@ postgress-base:
     RUN cargo install refinery_cli --version 0.8.7
     RUN refinery --version
 
+    COPY ./entry.sh .
+
     SAVE ARTIFACT $CARGO_HOME_BIN/refinery refinery
+    SAVE ARTIFACT ./entry.sh entry.sh
+
+DOCKER:
+    COMMAND
+    ARG tag="latest"
+    ARG registry
+
+    ARG refinery=./refinery.toml
+    ARG setup=./setup-db.sql
+    ARG migrations_dir=./migrations
+
+    WORKDIR /build
+
+    # Copy our toolchain dependency.
+    COPY +postgress-base/refinery .
+    COPY +postgress-base/entry.sh .
+
+    COPY $refinery ./refinery.toml
+    COPY --dir $migrations_dir .
+    COPY $setup ./setup/
+
+    RUN chmod ugo+x ./entry.sh
+
+    ENTRYPOINT ["./entry.sh"]
+
+    # Push the container...
+    SAVE IMAGE --push ${registry}migrations:$tag
