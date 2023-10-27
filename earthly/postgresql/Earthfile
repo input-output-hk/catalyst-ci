@@ -29,3 +29,5 @@ postgress-base:
         cargo --version
     RUN cargo install refinery_cli --version 0.8.7
     RUN refinery --version
+
+    SAVE ARTIFACT $CARGO_HOME_BIN/refinery refinery
