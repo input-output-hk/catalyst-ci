@@ -1,3 +1,5 @@
+# WARNING: If you modify this file, please update the guide that it is dependent
+# on in docs/guides/languages/go.md.
 VERSION 0.7
 
 # The structure of this Earthfile is derived from the style guide:
