@@ -34,3 +34,12 @@ build:
     DO +CHECK
     DO +BUILD --image_name=example-db
 ```
+
+An example `docker-compose` file you can find in `example/docker-compose.yml`.
+Here it is important to note that this image have 4 possible options how to run:
+
+* If `DB_HOST` env var established to `localhost`, container will run PostgreSQL server by itself,
+otherwise will relies on remote PostgreSQL server connection.
+* `INIT_AND_DROP_DB` env var defines to run initial initialization of the db with the clean state or not. (could be omitted)
+* `WITH_MIGRATIONS` env var defines to run migrations defined inside `./migrations` dir or not.(could be omitted)
+* `WITH_SEED_DATA` env var defines to setup db with some seed data defined inside `./data` dir or not.(could be omitted)
