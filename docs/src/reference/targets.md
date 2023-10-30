@@ -122,7 +122,7 @@ This target is the final target that is run (and must pass) before artifacts are
 
 The `publish` target is responsible for building and publishing a container image to image registries.
 This target should be used when a subproject needs to produce and publish a container image.
-The CI will execute this target after the `check` target, assuming it passes.
+The CI will execute this target after the `test` target, assuming it passes.
 
 ### How it Works
 
@@ -151,10 +151,10 @@ The CI will automatically handle auxiliary tasks like image scanning and/or sign
 ## Release
 
 The `release` target is responsible for building and releasing artifacts to GitHub.
-This target should be used when a subproject produces artifacts (i.e. a binary) that is appropriate to include in a GitHub release.
+This target should be used when a subproject produces artifacts (i.e. a binary) that are appropriate to include in a GitHub release.
 For example, a subproject may produce a binary that is intended to be used directly (i.e. a CLI) or it may produce a set of files
 that end-users need access to during a release cycle.
-The CI will execute this target after the `check` target, assuming it passes.
+The CI will execute this target after the `test` target, assuming it passes.
 
 ### How it Works
 
@@ -164,7 +164,7 @@ If the commit that triggered the CI does not contain a git tag, then the CI will
 This allows end-users to validate that their release artifacts build as expected without relying on a release cycle.
 
 If instead the commit contains a git tag, then the resulting artifacts are compressed into a single tarball and uploaded as an
-artifact of the GitHub Action job.
+artifact of the individual GitHub Action job.
 The compression happens regardless of whether a single or multiple artifacts were produced.
 After the `release` target has been run for *every* subproject, the produced artifacts from all subprojects are then attached into a
 single GitHub release for the given git tag (i.e., `1.0.0`).

@@ -1,4 +1,4 @@
-# run
+# setup
 
 > Performs required steps to setup CI
 
