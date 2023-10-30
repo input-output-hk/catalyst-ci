@@ -30,6 +30,10 @@ postgress-base:
     RUN cargo install refinery_cli --version 0.8.7
     RUN refinery --version
 
+    COPY ./entry.sh .
+    RUN chmod ugo+x ./entry.sh
+    COPY setup-db.sql .
+
 CP_SRC:
     # Copy the build src using this.
     COMMAND
@@ -46,6 +50,27 @@ CP_SRC:
 
     RUN ls -al
 
+BUILDER:
+    COMMAND
+
+    COPY ./entry.sh .
+    RUN chmod ugo+x ./entry.sh
+    COPY setup-db.sql .
+
+BUILD:
+    COMMAND
+
+    ARG tag="latest"
+    ARG registry
+    ARG --required image_name
+
+    USER postgres:postgres
+
+    ENTRYPOINT ["./entry.sh"]
+
+    # Push the container...
+    SAVE IMAGE --push ${registry}${image_name}:$tag
+
 CHECK:
     COMMAND
 
@@ -55,22 +80,10 @@ builder:
     WORKDIR /build
 
     DO +CP_SRC --src="example/migrations example/refinery.toml example/data"
-
-    COPY ./entry.sh .
-    RUN chmod ugo+x ./entry.sh
-    COPY setup-db.sql .
+    DO +BUILDER
 
 build:
     FROM +builder
 
     DO +CHECK
-    
-    ARG tag="latest"
-    ARG registry
-
-    USER postgres:postgres
-
-    ENTRYPOINT ["./entry.sh"]
-
-    # Push the container...
-    SAVE IMAGE --push ${registry}example-db:$tag
+    DO +BUILD --image_name=example_db
