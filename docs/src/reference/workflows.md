@@ -22,9 +22,9 @@ These individual actions will be discussed in the next section.
 Since most of the workflow logic was discussed in the previous section, this section will refrain from duplicating that effort and
 instead focus on how to use the workflows (including covering their inputs).
 
-## Common Inputs
+### Common Inputs
 
-### AWS
+#### AWS
 
 Most of the workflows accept an optional AWS role and region.
 The workflow will attempt to automatically authenticate and assume the role prior to performing any other steps.
@@ -37,7 +37,7 @@ The only other case where AWS authentication is required is during the `publish`
 | aws_role_arn | string | The ARN of the AWS role that will be assumed by the workflow | No       | `""`    |
 | aws_region   | string | The AWS region that will be used by the workflow             | No       | `""`    |
 
-### Earthly Runner
+#### Earthly Runner
 
 As noted above, Catalyst CI uses a remote Earthly runner in order to maximize cache hits.
 As a result, all workflows that interact with Earthly will accept optional inputs describing the address of the runner as well as
@@ -51,7 +51,7 @@ and interact with the remote Earthly runner.
 | earthly_runner_secret  | string | The ID of the AWS secret holding Earthly runner credentials | No       | `""`     |
 | earthly_version        | string | The version of Earthly to use.                              | No       | `latest` |
 
-### CLI
+#### CLI
 
 Most workflows utilize the custom CLI provided by the Catalyst CI repository.
 It's possible to specify a specific version of the CI to be installed (as opposed to the default of installing the latest).
@@ -116,16 +116,16 @@ These artifacts are then compressed and ultimately uploaded as artifacts for the
 ## Deploy
 
 The deploy workflow is responsible for deploying services to the Catalyst `dev` cluster when new container images are produced.
-It checks out the code from the Catalyst gitops repository and uses the custom `merge` GitHub Action to merge the new image tags
-into the deployment files.
-The changes are then committed, causing the `dev` environment to deploy the newly produced images.
+It checks out the code from a private Project Catalyst repository and uses the custom `merge` GitHub Action to merge the new image
+tags into the repository files.
+The changes are then committed, which triggers the `dev` environment to deploy the newly produced images.
 
 ### Inputs
 
 | Name            | Type   | Description                                              | Required | Default                          |
 | --------------- | ------ | -------------------------------------------------------- | -------- | -------------------------------- |
-| deployment_repo | string | The URL of the repository containing deployment code     | No       | `input-output-hk/catalyst-world` |
-| environment     | string | The target environment to deploy to                      | No       | `dev`                            |
+| deployment_repo | string | The URL of the repository to merge with                  | No       | `input-output-hk/catalyst-world` |
+| environment     | string | The target environment to deploy                         | No       | `dev`                            |
 | images          | string | A newline separated list of image names to deploy        | Yes      | N/A                              |
 | tag             | string | The image tag to deploy                                  | Yes      | N/A                              |
 | token           | string | A Github token with access to the deployment repository. | Yes      | N/A                              |

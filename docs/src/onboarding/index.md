@@ -29,7 +29,8 @@ This promotes self-service and establishes a clear boundary of ownership whereby
 maintaining a single file in their subproject.
 
 The CI process is well-documented and troubleshooting unexpected errors only requires knowledge of Earthly and GitHub Actions.
-All of the code is contained in a single open-source repository and contributions are welcome.
+All of the code is contained in a single [open-source repository](https://github.com/input-output-hk/catalyst-ci) and contributions
+are welcome.
 The remainder of the overview section will focus on discussing some of these concepts in more detail.
 
 ### Discovery

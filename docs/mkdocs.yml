@@ -11,9 +11,9 @@ nav:
   - Style Guide: style.md
   - Reference:
       - reference/index.md
+      - Workflows: reference/workflows.md
       - Actions: reference/actions.md
       - Targets: reference/targets.md
-      - Workflows: reference/workflows.md
       - UDCs: reference/udc.md
   - Appendix:
       - Earthly: appendix/earthly.md
