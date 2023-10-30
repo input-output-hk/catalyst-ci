@@ -1,0 +1,17 @@
+version: "3"
+
+services:
+  example:
+    image: example-db:latest
+    environment:
+      # Required environment variables for migrations
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_NAME=ExampleDb
+      - DB_DESCRIPTION="Example DB"
+      - DB_SUPERUSER=postgres
+      - DB_SUPERUSER_PASSWORD=postgres
+      - DB_USER=example-dev
+      - DB_USER_PASSWORD=CHANGE_ME
+    ports:
+      - 5432:5432

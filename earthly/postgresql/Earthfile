@@ -30,33 +30,47 @@ postgress-base:
     RUN cargo install refinery_cli --version 0.8.7
     RUN refinery --version
 
-    COPY ./entry.sh .
-
-    SAVE ARTIFACT $CARGO_HOME_BIN/refinery refinery
-    SAVE ARTIFACT ./entry.sh entry.sh
-
-DOCKER:
+CP_SRC:
+    # Copy the build src using this.
     COMMAND
-    ARG tag="latest"
-    ARG registry
+    # This can be one directory like `"src/*"` or multiple src seperated by `","`:
+    # eg, "example/Cargo.toml, example/Cargo.lock, example/src"
+    ARG src=""
 
-    ARG refinery=./refinery.toml
-    ARG setup=./setup-db.sql
-    ARG migrations_dir=./migrations
+    # ONLY copy whats needed to build.  Not everything.
+    # Note: rust-toolchain.toml was already copied when rust was setup.
+    # Minimizing whats copied reduces needless cache misses.
+    FOR --sep=", " file IN $src
+        COPY --dir $file .
+    END
+
+    RUN ls -al
+
+CHECK:
+    COMMAND
+
+builder:
+    FROM +postgress-base
 
     WORKDIR /build
 
-    # Copy our toolchain dependency.
-    COPY +postgress-base/refinery .
-    COPY +postgress-base/entry.sh .
+    DO +CP_SRC --src="example/migrations example/refinery.toml example/data"
 
-    COPY $refinery ./refinery.toml
-    COPY --dir $migrations_dir .
-    COPY $setup ./setup/
-
+    COPY ./entry.sh .
     RUN chmod ugo+x ./entry.sh
+    COPY setup-db.sql .
+
+build:
+    FROM +builder
+
+    DO +CHECK
+    
+    ARG tag="latest"
+    ARG registry
+
+    USER postgres:postgres
 
     ENTRYPOINT ["./entry.sh"]
 
     # Push the container...
-    SAVE IMAGE --push ${registry}migrations:$tag
+    SAVE IMAGE --push ${registry}example-db:$tag

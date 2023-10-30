@@ -3,10 +3,10 @@
 # cspell: words REINIT PGHOST PGPORT PGUSER PGPASSWORD PGDATABASE
 
 # ---------------------------------------------------------------
-# Entrypoint script for migrations container
+# Entrypoint script for database container
 # ---------------------------------------------------------------
 #
-# This script serves as the entrypoint for the migrations container. It sets up
+# This script serves as the entrypoint for the general database container. It sets up
 # the environment, performing optional database initialization if configured,
 # and then runs the migrations.
 #
@@ -84,14 +84,31 @@ export PGDATABASE="${DB_NAME}"
 # Sleep if DEBUG_SLEEP is set
 debug_sleep
 
-# Initialize database if necessary
-PSQL_FLAGS=""
-if [ -n "${DEBUG:-}" ]; then
-    PSQL_FLAGS="-e"
-fi
+# Set the timeout value in seconds (default: 0 = wait forever)
+TIMEOUT=${TIMEOUT:-0}
+echo "TIMEOUT is set to ${TIMEOUT}"
 
+# Start PostgreSQL in the background
+initdb -D /var/lib/postgresql/data || true
+pg_ctl -D /var/lib/postgresql/data start &
+
+# Check if PostgreSQL is running using psql
+echo "Waiting for PostgreSQL to start..."
+until pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; do
+    sleep 1
+    if [ $TIMEOUT -gt 0 ]; then
+        TIMEOUT=$((TIMEOUT - 1))
+        if [ $TIMEOUT -eq 0 ]; then
+            echo "Timeout: PostgreSQL server did not start within the specified time"
+            exit 1
+        fi
+    fi
+done
+echo "PostgreSQL is running"
+
+# Initialize database if necessary
 echo ">>> Initializing database..."
-psql "${PSQL_FLAGS}" -f ./setup/setup-db.sql \
+psql -h $DB_HOST -p $DB_PORT -d postgres -f ./setup-db.sql \
     -v dbName="${DB_NAME}" \
     -v dbDescription="${DB_DESCRIPTION}" \
     -v dbUser="${DB_USER}" \
@@ -100,6 +117,12 @@ psql "${PSQL_FLAGS}" -f ./setup/setup-db.sql \
 # Run migrations
 echo ">>> Running migrations..."
 export DATABASE_URL="postgres://${DB_USER}:${DB_USER_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
-./refinery migrate -e DATABASE_URL -c ./refinery.toml -p ./migrations
+refinery migrate -e DATABASE_URL -c ./refinery.toml -p ./migrations
+
+echo ">>> Applying data..."
+while IFS= read -r -d '' file; do
+    echo "Applying data from $file"
+    psql -f "$file"
+done < <(find ./data -name '*.sql' -print0 | sort -z)
 
 echo ">>> Finished entrypoint script"
