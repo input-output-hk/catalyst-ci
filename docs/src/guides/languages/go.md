@@ -94,9 +94,9 @@ check:
     DO ../../earthly/go+LINT --src="go.mod go.sum cmd"
 ```
 
-With our depedencies installed, we're now ready to start operating with the source code.
+With our dependencies installed, we're now ready to start operating with the source code.
 To do this, we establish a dedicated `src` target that is solely responsible for copying the local source code into the context.
-This is a common patern as it ensures we perform this only once and it makes future changes easier (as we only copy in a single
+This is a common pattern as it ensures we perform this only once and it makes future changes easier (as we only copy in a single
 place).
 Any future targets which need access to the source code will inherit from this target.
 
@@ -107,7 +107,7 @@ These two UDCs will validate the code formatting is correct and also perform a s
 
 Note that these checks are fast (compared to later steps) and perform quick feedback on code quality.
 Since this is the first target run in CI, we want to fail the CI as quickly as possible if we can easily find code quality issues.
-In future targets, we will run tests which can tend to take significantly more time to run than static anaylsis tools.
+In future targets, we will run tests which can tend to take significantly more time to run than static analysis tools.
 
 ### Build and test
 
@@ -135,9 +135,9 @@ Since we need the source code to do this, we'll inherit from the `src` target.
 The actual build process is fairly straight-forward, and the additional flags are simply there to ensure a fully static output is
 created.
 
-It's important we use `SAVE ARTIFACT` at the end of the build to make the compiled binary avaiable to other targets.
+It's important we use `SAVE ARTIFACT` at the end of the build to make the compiled binary available to other targets.
 Remember that targets can reference other targets, even ones in another `Earthfile`.
-So by `SAVE ARTIFACT` here, we're making this binary avaiable to any other `Earthfile` which may need to use it.
+So by `SAVE ARTIFACT` here, we're making this binary available to any other `Earthfile` which may need to use it.
 
 Finally, after building the binary, we will run our tests.
 In the case of this example, there are no actual tests to run, so the target will complete very quickly.
@@ -199,7 +199,7 @@ It also serves as a natural way to use our program without having to rely on a p
 
 In this target, it's important we start with a "fresh" image by using `FROM`.
 Unlike the previous targets, here the size of the image matters as the resulting image will be published to a registry.
-In our case, we just take a plain `alpine` image as we don't need any of the Go tooling we used previosuly (since the binary has
+In our case, we just take a plain `alpine` image as we don't need any of the Go tooling we used previously (since the binary has
 already been built for us).
 
 We add a `tag` argument out of convention.
