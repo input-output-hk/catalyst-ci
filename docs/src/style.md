@@ -124,7 +124,7 @@ This ensures that upstream changes do not incidentally break builds.
 
 ### Avoid `LOCALLY`
 
-The `LOCALLY` directive casues Earthly to execute all commands on the local machine instead of inside of a container.
+The `LOCALLY` directive causes Earthly to execute all commands on the local machine instead of inside of a container.
 This directive is useful for troubleshooting, but otherwise it fits a very small number of use cases.
 The official Earthly best practices document recommends against using this directive in most cases.
 It can be destructive, complete with different results each time, and by default is not run during CI.
