@@ -119,10 +119,16 @@ echo ">>> Running migrations..."
 export DATABASE_URL="postgres://${DB_USER}:${DB_USER_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
 refinery migrate -e DATABASE_URL -c ./refinery.toml -p ./migrations
 
-echo ">>> Applying data..."
+echo ">>> Applying seed data..."
 while IFS= read -r -d '' file; do
-    echo "Applying data from $file"
+    echo "Applying seed data from $file"
     psql -f "$file"
 done < <(find ./data -name '*.sql' -print0 | sort -z)
 
 echo ">>> Finished entrypoint script"
+
+# Infinite loop to run until PostgreSQL is ready
+until ! pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; do
+    sleep 60
+done
+

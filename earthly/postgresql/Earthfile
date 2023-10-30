@@ -86,4 +86,4 @@ build:
     FROM +builder
 
     DO +CHECK
-    DO +BUILD --image_name=example_db
+    DO +BUILD --image_name=example-db
