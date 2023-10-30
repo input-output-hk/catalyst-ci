@@ -1,7 +1,9 @@
 # Common PostgreSQL Earthly builders
 VERSION 0.7
 
-postgress-base:
+# cspell: words colordiff rustup rustc
+
+postgres-base:
     FROM postgres:16.0-alpine3.18
 
     WORKDIR /root
@@ -34,22 +36,8 @@ postgress-base:
     RUN chmod ugo+x ./entry.sh
     COPY setup-db.sql .
 
-CP_SRC:
-    # Copy the build src using this.
-    COMMAND
-    # This can be one directory like `"src/*"` or multiple src seperated by `","`:
-    # eg, "example/Cargo.toml, example/Cargo.lock, example/src"
-    ARG src=""
-
-    # ONLY copy whats needed to build.  Not everything.
-    # Note: rust-toolchain.toml was already copied when rust was setup.
-    # Minimizing whats copied reduces needless cache misses.
-    FOR --sep=", " file IN $src
-        COPY --dir $file .
-    END
-
-    RUN ls -al
-
+# Common PostgreSQL setup.
+# Prepare important files needed for building image
 BUILDER:
     COMMAND
 
@@ -57,6 +45,16 @@ BUILDER:
     RUN chmod ugo+x ./entry.sh
     COPY setup-db.sql .
 
+# Base checks for sql files
+# TODO
+CHECK:
+    COMMAND
+
+# Build PostgreSQL image
+# Arguments:
+#  * tag : The tag of the image, default value `latest`.
+#  * registry: The registry of the image.
+#  * image_name: The name of the image (required).
 BUILD:
     COMMAND
 
@@ -71,15 +69,12 @@ BUILD:
     # Push the container...
     SAVE IMAGE --push ${registry}${image_name}:$tag
 
-CHECK:
-    COMMAND
-
 builder:
-    FROM +postgress-base
+    FROM +postgres-base
 
     WORKDIR /build
 
-    DO +CP_SRC --src="example/migrations example/refinery.toml example/data"
+    COPY --dir example/migrations example/data example/refinery.toml
     DO +BUILDER
 
 build:

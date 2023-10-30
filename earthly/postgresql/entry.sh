@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words REINIT PGHOST PGPORT PGUSER PGPASSWORD PGDATABASE
+# cspell: words REINIT PGHOST PGPORT PGUSER PGPASSWORD PGDATABASE psql initdb isready dotglob
 
 # ---------------------------------------------------------------
 # Entrypoint script for database container
@@ -84,7 +84,7 @@ export PGDATABASE="${DB_NAME}"
 # Sleep if DEBUG_SLEEP is set
 debug_sleep
 
-# Run postgreSQL databse in this container if the host is localhost
+# Run postgreSQL database in this container if the host is localhost
 if [ "${DB_HOST}" == "localhost" ]; then
     # Set the timeout value in seconds (default: 0 = wait forever)
     TIMEOUT=${TIMEOUT:-0}

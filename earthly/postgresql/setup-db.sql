@@ -1,5 +1,7 @@
 -- Initialize the Project Catalyst Event Database.
 
+-- cspell: words psql
+
 -- This script requires a number of variables to be set.
 -- They will default if not set externally.
 -- These variables can be set on the "psql" command line.
