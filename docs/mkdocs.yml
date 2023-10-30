@@ -9,6 +9,10 @@ nav:
   - Introduction: index.md
   - Onboarding: onboarding/index.md
   - Style Guide: style.md
+  - Guides:
+      - guides/index.md
+      - Languages:
+          - Go: guides/languages/go.md
   - Reference:
       - reference/index.md
       - Workflows: reference/workflows.md
