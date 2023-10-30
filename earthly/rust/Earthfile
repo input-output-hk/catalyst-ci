@@ -44,30 +44,32 @@ rust-base:
             colordiff \
             graphviz
 
+    # Make sure we have the clippy linter.
+    RUN rustup component add clippy
+
     # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
 
     # Install the default cargo config.
-    COPY .cargo/config.toml $CARGO_HOME/config.toml
+    COPY stdcfgs/cargo_config.toml $CARGO_HOME/config.toml
 
     # Install rust based tooling
     # Install tools we use commonly with `cargo`.
     # Note, we disable static compiles for tools, specifically, as its not required.
     # These tools are not artefacts and we do not use them in production.
-    RUN export RUSTFLAGS="-C target-feature=-crt-static" && \
-        cargo install cargo-nextest --version=0.9.59 && \
-        cargo install cargo-machete --version=0.6.0 && \
-        cargo install refinery_cli --version=0.8.11
-
+    RUN cargo install cargo-nextest --version=0.9.59 && \
+        cargo install cargo-machete --version=0.6.0  && \
+        cargo install refinery_cli  --version=0.8.11 && \
+        cargo install cargo-deny    --version=0.14.3 && \
+        cargo install cargo-modules --version=0.10.2
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
-    RUN ls -al /scripts
 
     # Standardized Rust configs.
     # Build will refuse to proceed if the projects rust configs do not match these.
     # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
-    COPY rustfmt.toml /stdcfgs/
+    COPY --dir stdcfgs /stdcfgs
 
 # Builds all the rust-base targets for each supported DOCKER architecture.
 # Currently only used for multi-platform cross build testing.
@@ -130,19 +132,62 @@ CHECK:
     # to pass without needing to iterate excessively.
     RUN /scripts/std_checks.sh
 
+# Check if the build executable, isn't a busted mess.
+SMOKE_TEST:
+    COMMAND
+    ARG TARGETPLATFORM
+    ARG bin
+
+    RUN ldd target/$TARGETARCH/release/$bin
+    RUN readelf -p .comment target/$TARGETARCH/release/$bin
+    RUN strip -v target/$TARGETARCH/release/$bin
+
+    # ALL executables MUST have `--help` as an option.
+    RUN target/$TARGETARCH/release/$bin --help
+
+
 # Set up our target toolchains, and copy our files.
 builder:
     FROM +rust-base
 
     DO +SETUP --toolchain=example/rust-toolchain.toml
 
-    DO +CP_SRC --src="example/src example/tests example/benches example/Cargo.* example/rustfmt.toml example/.cargo"
+    DO +CP_SRC --src="example/*"
 
 # Test rust build container - Use best architecture host tools.
 check-hosted:
     FROM +builder
 
     DO +CHECK
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+check-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
+
+build-hosted:
+    ARG TARGETPLATFORM
+
+    # Build the service
+    FROM +builder
+ 
+    RUN /scripts/std_build.sh
+
+    DO +SMOKE_TEST --bin=hello_world
+
+    SAVE ARTIFACT target/$TARGETARCH/doc doc
+    SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+build-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+
+## -----------------------------------------------------------------------------
+##
+## Standard CI targets.
+##
+## These targets are discovered and executed automatically by CI.
 
 # Run check using the most efficient host tooling
 # CI Automated Entry point.
@@ -158,32 +203,6 @@ check:
     ELSE
         BUILD --platform=linux/amd64 +check-hosted
     END
-
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
-
-build-hosted:
-    ARG TARGETPLATFORM
-
-    # Build the service
-    FROM +builder
- 
-    RUN /scripts/std_build.sh
-
-    RUN ls -al target/$TARGETARCH/release
-
-    RUN ldd target/$TARGETARCH/release/hello_world
-    RUN readelf -p .comment target/$TARGETARCH/release/hello_world
-    RUN ls -al target/$TARGETARCH/release/hello_world
-    RUN strip -v target/$TARGETARCH/release/hello_world
-    RUN ls -al target/$TARGETARCH/release/hello_world
-
-    RUN target/$TARGETARCH/release/hello_world
-
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world
 
 # Run build using the most efficient host tooling
 # CI Automated Entry point.
@@ -201,7 +220,24 @@ build:
     END
 
 
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+# This step will build any packages we would intend to publish or integration test.
+package:
+    FROM scratch
+
+# Run integration tests on all packages built during the `package` step.
+integrate:
+    FROM scratch
+
+# Publish packlages if all integration tests have passed. (Failure to pass tests will prevent packages being published.)
+publish:
+    FROM scratch
+
+## -----------------------------------------------------------------------------
+
+# This step simulates the full CI run for local purposes only.
+local-ci-run:
+    BUILD +check
+    BUILD +build
+    BUILD +package
+    BUILD +integrate
+    BUILD +publish

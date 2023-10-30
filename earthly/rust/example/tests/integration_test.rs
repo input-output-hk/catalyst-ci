@@ -1,10 +1,11 @@
-// tests/integration_test.rs
-#[cfg(test)]
-mod integration_tests {
-    use super::*;
+//! Simple integration tests
 
-    #[test]
-    fn test_hello_world() {
-        assert_eq!(main(), ());
-    }
+#[test]
+/// Prove we can say hello to Dave on a 99 count.
+fn test_hello_dave_99() {
+    let msg = fmt_hello("Dave", 99);
+    assert_eq!(msg, "Hello # 99 Dave!");
 }
+
+/// Dummy main needed because we are integration testing a binary package.
+fn main() {}

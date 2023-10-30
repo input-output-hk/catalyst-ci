@@ -1,6 +1,8 @@
-// src/main.rs
+//! Simple program to greet a person.
+//! Used as a test of the Rust CI/CD pipeline.
 
 use clap::Parser;
+use hello_world_lib::fmt_hello;
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
@@ -15,20 +17,11 @@ struct Args {
     count: u8,
 }
 
+/// The main entrypoint of this program.
 fn main() {
     let args = Args::parse();
 
-    for _ in 0..args.count {
-        println!("Hello {}!", args.name)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_hello_world() {
-        assert_eq!(main(), ());
+    for cnt in 0..args.count {
+        println!("{}", fmt_hello(&args.name, cnt));
     }
 }

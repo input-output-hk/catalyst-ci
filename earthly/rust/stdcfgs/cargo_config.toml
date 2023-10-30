@@ -113,7 +113,7 @@ docs = "doc --workspace -r --all-features --no-deps --bins --document-private-it
 # nightly docs build broken... when they are'nt we can enable these docs... --unit-graph --timings=html,json -Z unstable-options"
 testfast = "nextest run --release --workspace --locked"
 testci = "nextest run --release --workspace --locked -P ci"
-testdocs = "test --doc --release --workspace --locked --doc"
+testdocs = "test --doc --release --workspace --locked"
 
 # Rust formatting, MUST be run with +nightly
 fmtchk = "fmt -- --check -v --color=always"

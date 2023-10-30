@@ -25,20 +25,25 @@ check_vendored_files() {
 # This imporvies visibility into all issues that need to be corrected for `check`
 # to pass without needing to iterate excessively.
 
-rc=0
-
-## Check if .cargo.config.toml has been modified.
-check_vendored_files $rc .cargo/config.toml "$CARGO_HOME"/config.toml; rc=$?
-check_vendored_files $rc rustfmt.toml /stdcfgs/rustfmt.toml; rc=$?
-
 # Check if the rust src is properly formatted.
-status $rc "Checking Rust Code Format" cargo +nightly fmtchk; rc=$?
+# Note, we run this first so we can print help how to fix.
+status 0 "Checking Rust Code Format" cargo +nightly fmtchk; rc=$?
 if [ $rc -ne 0 ]; then
     echo -e "    ${YELLOW}You can locally fix format errors by running: \`cargo +nightly fmtfix\`${NC}"
 fi
 
+## Check if .cargo.config.toml has been modified.
+check_vendored_files $rc .cargo/config.toml "$CARGO_HOME"/config.toml; rc=$?
+check_vendored_files $rc rustfmt.toml /stdcfgs/rustfmt.toml; rc=$?
+check_vendored_files $rc .config/nextest.toml /stdcfgs/nextest.toml; rc=$?
+check_vendored_files $rc clippy.toml /stdcfgs/clippy.toml; rc=$?
+check_vendored_files $rc deny.toml /stdcfgs/deny.toml; rc=$?
+
 # Check if we have unused dependencies declared in our Cargo.toml files.
 status $rc "Checking for Unused Dependencies" cargo machete; rc=$?
+
+# Check if we have any supply chain issues with dependencies.
+status $rc "Checking for Supply Chain Issues" cargo deny check; rc=$?
 
 # Return an error if any of this fails.
 exit $rc
