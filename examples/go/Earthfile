@@ -1,0 +1,74 @@
+VERSION 0.7
+
+# The structure of this Earthfile is derived from the style guide:
+# https://input-output-hk.github.io/catalyst-ci/style/#adhere-to-a-consistent-structure
+
+deps:
+    # This target is used to install external Go dependencies.
+    FROM golang:1.20-alpine3.18
+    WORKDIR /work
+
+    # Any build dependencies should also be captured in this target.
+    RUN apk add --no-cache gcc musl-dev
+
+    # This UDC automatically copies the go.mod and go.sum files and runs
+    # `go mod download` to install the dependencies.
+    DO ../../earthly/go+DEPS --ginkgo="false"
+
+src:
+    # This target copies the source code into the current build context
+    FROM +deps
+
+    COPY --dir cmd .
+
+check:
+    # This target checks the overall health of the source code.
+    FROM +src
+
+    # This UDC validates the code is formatted according to Go standards.
+    DO ../../earthly/go+FMT --src="go.mod go.sum cmd"
+
+    # This UDC runs golangci-lint to check for common errors.
+    DO ../../earthly/go+LINT --src="go.mod go.sum cmd"
+
+build:
+    # This target builds the application.
+    FROM +src
+
+    # The below just creates a fully static binary with no CGO dependencies.
+    ENV CGO_ENABLED=0
+    RUN go build -ldflags="-extldflags=-static" -o bin/hello cmd/main.go
+
+    # We save the artifact here so that future targets can use it.
+    SAVE ARTIFACT bin/hello hello
+
+test:
+    # This target runs unit tests.
+    FROM +build
+
+    RUN go test ./...
+
+# This target is normally named `release` but is renamed here in order to avoid
+# the CI from picking it up and trying to release our example.
+release-example:
+    # This target is called by the CI when performing a release. It should use
+    # `SAVE ARTIFACT` to save the release artifact which is then picked up by
+    # the CI.
+    FROM +build
+
+    SAVE ARTIFACT bin/hello hello
+
+# This target is normally named `publish` but is renamed here in order to avoid
+# the CI from picking it up and trying to publish our example.
+publish-example:
+    # This target is called by CI when publishing images. It should use the
+    # `SAVE IMAGE` command to save the image which is then picked up by the CI.
+    # Note that we start from a "fresh" base image.
+    FROM alpine:3.18
+    WORKDIR /app
+    ARG tag=latest  # Prefer to use `latest` by default, the CI will override this.
+
+    COPY +build/hello .  # Use the cached artifact from the build target.
+
+    ENTRYPOINT ["/app/hello"]
+    SAVE IMAGE hello:${tag}
