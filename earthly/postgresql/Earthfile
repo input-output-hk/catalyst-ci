@@ -46,11 +46,15 @@ BUILDER:
     COPY setup-db.sql .
 
 # Base checks for sql files
-# TODO
+# TODO: https://github.com/input-output-hk/catalyst-ci/issues/62
 CHECK:
     COMMAND
 
-# Build PostgreSQL image
+# Build PostgreSQL image.
+# REQUIREMENTS: 
+#  * prepare migrations files into the `./migrations` dir
+#  * prepare seed data files into the `./data` dir (optional)
+#  * prepare `refinery.toml` file
 # Arguments:
 #  * tag : The tag of the image, default value `latest`.
 #  * registry: The registry of the image.
