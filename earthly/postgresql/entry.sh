@@ -84,13 +84,16 @@ export PGDATABASE="${DB_NAME}"
 # Sleep if DEBUG_SLEEP is set
 debug_sleep
 
-# Set the timeout value in seconds (default: 0 = wait forever)
-TIMEOUT=${TIMEOUT:-0}
-echo "TIMEOUT is set to ${TIMEOUT}"
+# Run postgreSQL databse in this container if the host is localhost
+if [ "${DB_HOST}" == "localhost" ]; then
+    # Set the timeout value in seconds (default: 0 = wait forever)
+    TIMEOUT=${TIMEOUT:-0}
+    echo "TIMEOUT is set to ${TIMEOUT}"
 
-# Start PostgreSQL in the background
-initdb -D /var/lib/postgresql/data || true
-pg_ctl -D /var/lib/postgresql/data start &
+    # Start PostgreSQL in the background
+    initdb -D /var/lib/postgresql/data || true
+    pg_ctl -D /var/lib/postgresql/data start &
+fi
 
 # Check if PostgreSQL is running using psql
 echo "Waiting for PostgreSQL to start..."
@@ -106,29 +109,37 @@ until pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; do
 done
 echo "PostgreSQL is running"
 
-# Initialize database if necessary
-echo ">>> Initializing database..."
-psql -h $DB_HOST -p $DB_PORT -d postgres -f ./setup-db.sql \
-    -v dbName="${DB_NAME}" \
-    -v dbDescription="${DB_DESCRIPTION}" \
-    -v dbUser="${DB_USER}" \
-    -v dbUserPw="${DB_USER_PASSWORD}"
+# Initialize and drop database if necessary
+if [ "${INIT_AND_DROP_DB:-}" == "true" ]; then
+    echo ">>> Initializing database..."
+    psql -h $DB_HOST -p $DB_PORT -d postgres -f ./setup-db.sql \
+        -v dbName="${DB_NAME}" \
+        -v dbDescription="${DB_DESCRIPTION}" \
+        -v dbUser="${DB_USER}" \
+        -v dbUserPw="${DB_USER_PASSWORD}"
+fi
 
 # Run migrations
-echo ">>> Running migrations..."
-export DATABASE_URL="postgres://${DB_USER}:${DB_USER_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
-refinery migrate -e DATABASE_URL -c ./refinery.toml -p ./migrations
+if [ "${WITH_MIGRATIONS:-}" == "true" ]; then
+    echo ">>> Running migrations..."
+    export DATABASE_URL="postgres://${DB_USER}:${DB_USER_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+    refinery migrate -e DATABASE_URL -c ./refinery.toml -p ./migrations
+fi
 
-echo ">>> Applying seed data..."
-while IFS= read -r -d '' file; do
-    echo "Applying seed data from $file"
-    psql -f "$file"
-done < <(find ./data -name '*.sql' -print0 | sort -z)
+# Apply seed data
+if [ "${WITH_SEED_DATA:-}" == "true" ]; then
+    echo ">>> Applying seed data..."
+    while IFS= read -r -d '' file; do
+        echo "Applying seed data from $file"
+        psql -f "$file"
+    done < <(find ./data -name '*.sql' -print0 | sort -z)
+fi
 
 echo ">>> Finished entrypoint script"
 
-# Infinite loop to run until PostgreSQL is ready
-until ! pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; do
+# Infinite loop to run until local PostgreSQL is ready
+until [ "${DB_HOST}" == "localhost" ] && ! pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; 
+do
     sleep 60
 done
 
