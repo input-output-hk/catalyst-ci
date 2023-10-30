@@ -74,7 +74,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@dockerhub-login
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           cli_version: ${{ inputs.ci_cli_version }}
           configure_registries: "false"
@@ -107,7 +107,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@dockerhub-login
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_ecr_registry: ${{ inputs.aws_ecr_registry }}
           aws_role_arn: ${{ inputs.aws_role_arn }}
