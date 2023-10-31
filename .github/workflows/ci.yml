@@ -24,6 +24,15 @@ on:
         required: false
         type: string
         default: latest
+      deployment_images:
+        description: A newline separated list of image names to deploy
+        required: false
+        type: string
+      deployment_repo:
+        description: The URL of the repository containing deployment code
+        required: false
+        type: string
+        default: input-output-hk/catalyst-world
       earthly_version:
         description: The version of Earthly to use.
         required: false
@@ -43,6 +52,9 @@ on:
         required: false
         type: string
     secrets:
+      deployment_token:
+        description: A Github token with access to the deployment repository.
+        required: false
       dockerhub_username:
         description: The token to use for logging into the DockerHub registry.
         required: false
@@ -147,3 +159,12 @@ jobs:
       dockerhub_username: ${{ secrets.dockerhub_username }}
       earthly_runner_address: ${{ secrets.earthly_runner_address }}
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+  deploy:
+    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@master
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && inputs.deployment_images != ''
+    needs: [publish]
+    with:
+      deployment_repo: ${{ inputs.deployment_repo }}
+      images: ${{ inputs.deployment_images }}
+    secrets:
+      token: ${{ secrets.deployment_token }}
