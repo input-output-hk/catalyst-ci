@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
 
-# This script is run inside the `check` stage for rust projects to perfom all 
+# cspell: words localfile vendorfile colordiff Naur fmtchk fmtfix rustfmt stdcfgs
+# cspell: words nextest 
+
+# This script is run inside the `check` stage for rust projects to perform all 
 # high level non-compilation checks.
 # These are the Standard checks which ALL rust targets must pass before they
-# will be scheduled to be `buuild`. 
+# will be scheduled to be `build`. 
 # Individual targets can add extra `check` steps, but these checks must always
 # pass. 
 
@@ -22,7 +25,7 @@ check_vendored_files() {
 }
 
 # This is set up so that ALL checks are run and it will fail if any fail.
-# This imporvies visibility into all issues that need to be corrected for `check`
+# This improves visibility into all issues that need to be corrected for `check`
 # to pass without needing to iterate excessively.
 
 # Check if the rust src is properly formatted.

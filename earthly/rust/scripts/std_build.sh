@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
-# This script is run inside the `check` stage for rust projects to perfom all 
+# cspell: words testci testdocs
+
+# This script is run inside the `check` stage for rust projects to perform all 
 # high level non-compilation checks.
 # These are the Standard checks which ALL rust targets must pass before they
-# will be scheduled to be `buuild`. 
+# will be scheduled to be `build`. 
 # Individual targets can add extra `check` steps, but these checks must always
 # pass. 
 
@@ -11,7 +13,7 @@ source "$(dirname "$0")/colors.sh"
 
 
 # This is set up so that ALL build steps are run and it will fail if any fail.
-# This imporvies visibility into all issues that need to be corrected for `build`
+# This improves visibility into all issues that need to be corrected for `build`
 # to pass without needing to iterate excessively.
 
 rc=0
