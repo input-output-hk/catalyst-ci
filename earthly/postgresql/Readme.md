@@ -31,7 +31,6 @@ builder:
 build:
     FROM +builder
 
-    DO +CHECK
     DO +BUILD --image_name=example-db
 ```
 

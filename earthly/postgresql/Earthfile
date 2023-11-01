@@ -81,8 +81,12 @@ builder:
     COPY --dir example/migrations example/data example/refinery.toml
     DO +BUILDER
 
-build:
+check:
     FROM +builder
 
     DO +CHECK
+
+build:
+    FROM +builder
+
     DO +BUILD --image_name=example-db
