@@ -74,9 +74,6 @@ RUST_SETUP:
 
     # Install tools we use commonly with `cargo`.
     RUN cargo install cargo-nextest --locked && \
-        cargo install cargo-chef --locked && \
-        cargo install kani-verifier --locked && \
-        cargo kani setup && \
         cargo install refinery_cli --locked && \
         cargo install cargo-machete --locked
 
@@ -94,10 +91,6 @@ check:
         cargo clippy --version && \
         cargo +nightly clippy --version && \
         cargo nextest --version && \
-        cargo chef --version && \
-        cargo kani --version && \
+        cargo machete --version \
         refinery --version && \
         mold --version
-
-
-
