@@ -22,10 +22,11 @@ spell-check:
 
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
 
-extra-docs:
+repo-docs:
+    # Create artefacts of extra files we embed inside the documentation when its built.
     FROM scratch
 
     WORKDIR /
-    COPY --dir README.md LICENSE-APACHE.md /extra
+    COPY --dir *.md /extra
 
     SAVE ARTIFACT /extra extra
