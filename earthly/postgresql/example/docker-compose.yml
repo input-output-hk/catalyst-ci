@@ -12,7 +12,7 @@ services:
       - DB_SUPERUSER=postgres
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=example-dev
-      - DB_USER_PASSWORD=CHANGE_ME
+      - DB_USER_PASSWORD=example-pass
 
       - INIT_AND_DROP_DB=true
       - WITH_MIGRATIONS=true
