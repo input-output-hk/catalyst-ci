@@ -1,0 +1,81 @@
+# Common PostgreSQL Earthly builders
+VERSION 0.7
+
+# cspell: words colordiff rustup rustc
+
+postgres-base:
+    FROM postgres:16.0-alpine3.18
+
+    WORKDIR /root
+
+    # Install necessary packages 
+    # Expand this list as needed, rather than adding more tools in later containers.
+    RUN apk add --no-cache \
+            ripgrep \
+            bash \
+            colordiff \
+            musl-dev \
+            curl \
+            gcc
+
+    # Get refinery
+    COPY ../rust+rust-base/refinery /bin
+
+    COPY ./entry.sh .
+    RUN chmod ugo+x ./entry.sh
+    COPY setup-db.sql .
+
+# Common PostgreSQL setup.
+# Prepare important files needed for building image
+BUILDER:
+    COMMAND
+
+    COPY ./entry.sh .
+    RUN chmod ugo+x ./entry.sh
+    COPY setup-db.sql .
+
+# Base checks for sql files
+# TODO: https://github.com/input-output-hk/catalyst-ci/issues/62
+CHECK:
+    COMMAND
+
+# Build PostgreSQL image.
+# REQUIREMENTS: 
+#  * prepare migrations files into the `./migrations` dir
+#  * prepare seed data files into the `./data` dir (optional)
+#  * prepare `refinery.toml` file
+# Arguments:
+#  * tag : The tag of the image, default value `latest`.
+#  * registry: The registry of the image.
+#  * image_name: The name of the image (required).
+BUILD:
+    COMMAND
+
+    ARG tag="latest"
+    ARG registry
+    ARG --required image_name
+
+    USER postgres:postgres
+
+    ENTRYPOINT ["./entry.sh"]
+
+    # Push the container...
+    SAVE IMAGE --push ${registry}${image_name}:$tag
+
+builder:
+    FROM +postgres-base
+
+    WORKDIR /build
+
+    COPY --dir ./example/migrations ./example/data ./example/refinery.toml .
+    DO +BUILDER
+
+check:
+    FROM +builder
+
+    DO +CHECK
+
+build:
+    FROM +builder
+
+    DO +BUILD --image_name=example-db

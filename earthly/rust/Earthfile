@@ -66,6 +66,8 @@ rust-base:
         cargo install cargo-deny    --version=0.14.3 && \
         cargo install cargo-modules --version=0.10.2
 
+    SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
+
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
 
