@@ -43,12 +43,14 @@
 
             # Misc
             markdownlint-cli2
+            mkdocs
 
             # Node
             nodejs_20
             nodePackages.typescript
 
             # Python
+            poetry
             python312
           ];
           enterShell = ''

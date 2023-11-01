@@ -1,15 +1,22 @@
+# WARNING: If you modify this workflow, please update the documentation
+
 on:
   workflow_call:
     inputs:
+      earthfile:
+        description: |
+          The path to the folder containing the Earthfile that will be built.
+          This path should be relative to the repository root.
+        required: true
+        type: string
       target:
         description: |
-          The target used to mark check builds. This target should be unique
-          across all Earthly files in the repository. The target should perform
-          all required checks to validate an artifact: linting, formatting, and
-          unit tests are common examples.
+          The target that will be used to build docs. The target should always
+          produce one artifact which is the static site that will be deployed to
+          GitHub Pages.
         required: false
         type: string
-        default: check
+        default: docs
       aws_role_arn:
         description: |
           The ARN of the AWS role that will be assumed by the workflow. Only
@@ -37,7 +44,7 @@ on:
       earthly_runner_address:
         description: |
           The address of the Earthly runner that will be used to build the
-          Earthly files.
+          Earthfile.
         required: false
       earthly_runner_secret:
         description: |
@@ -48,40 +55,8 @@ on:
         required: false
 
 jobs:
-  discover:
+  run:
     runs-on: ubuntu-latest
-    outputs:
-      json: ${{ steps.check.outputs.json }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
-        with:
-          cli_version: ${{ inputs.ci_cli_version }}
-          earthly_skip_install: "true"
-      - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@master
-        id: discover
-        with:
-          targets: ${{ inputs.target }}
-      - name: Check for empty output
-        id: check
-        run: |
-          output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
-          if [ "$output" == "null" ]; then
-            echo "json=[]" >> $GITHUB_OUTPUT
-          else
-            echo "json=$output" >> $GITHUB_OUTPUT
-          fi
-
-  build:
-    runs-on: ubuntu-latest
-    needs: [discover]
-    if: needs.discover.outputs.json != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        earthfile: ${{ fromJson(needs.discover.outputs.json) }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
@@ -92,10 +67,17 @@ jobs:
           cli_version: ${{ inputs.ci_cli_version }}
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
-      - name: Check
+      - name: Build docs
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
         with:
-          earthfile: ${{ matrix.earthfile }}
+          earthfile: ${{ inputs.earthfile }}
           target: ${{ inputs.target }}
           runner_address: ${{ secrets.earthly_runner_address }}
+          artifact: "true"
+      - name: Publish docs
+        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        with:
+          branch: gh-pages
+          folder: ${{ steps.build.outputs.artifact }}

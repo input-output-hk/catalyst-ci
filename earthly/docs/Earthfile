@@ -33,8 +33,6 @@ mkdocs-material:
     # So we can extract these files in other steps.
     SAVE ARTIFACT /services
 
-    SAVE IMAGE mkdocs-material
-
 # Build the documentation statically
 MKDOCS_SETUP:
     COMMAND
@@ -102,4 +100,3 @@ mkdocs-develop-test:
     FROM alpine:latest
 
     DO +DEVELOP --dest=./local
- 

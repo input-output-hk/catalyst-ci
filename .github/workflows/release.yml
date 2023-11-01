@@ -1,3 +1,5 @@
+# WARNING: If you modify this workflow, please update the documentation
+
 on:
   workflow_call:
     inputs:
@@ -41,6 +43,12 @@ on:
         type: boolean
         default: false
     secrets:
+      dockerhub_username:
+        description: The token to use for logging into the DockerHub registry.
+        required: false
+      dockerhub_token:
+        description: The token to use for logging into the DockerHub registry.
+        required: false
       earthly_runner_address:
         description: |
           The address of the Earthly runner that will be used to build the
@@ -66,6 +74,7 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           cli_version: ${{ inputs.ci_cli_version }}
+          configure_registries: "false"
           earthly_skip_install: "true"
       - name: Discover Earthly files
         uses: input-output-hk/catalyst-ci/actions/discover@master
@@ -82,7 +91,7 @@ jobs:
             echo "json=$output" >> $GITHUB_OUTPUT
           fi
 
-  build:
+  run:
     runs-on: ubuntu-latest
     needs: [discover]
     if: needs.discover.outputs.json != '[]'
@@ -100,6 +109,8 @@ jobs:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
           cli_version: ${{ inputs.ci_cli_version }}
+          dockerhub_token: ${{ secrets.dockerhub_token }}
+          dockerhub_username: ${{ secrets.dockerhub_username }}
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Build artifact
@@ -131,7 +142,7 @@ jobs:
 
   release:
     runs-on: ubuntu-latest
-    needs: [build]
+    needs: [run]
     if: startsWith(github.ref, 'refs/tags/')
     steps:
       - name: Download artifacts
