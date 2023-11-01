@@ -96,7 +96,7 @@ jobs:
       aws_region: ${{ inputs.aws_region }}
       ci_cli_version: ${{ inputs.ci_cli_version }}
       earthly_version: ${{ inputs.earthly_version }}
-      target: check
+      target: build
     secrets:
       dockerhub_token: ${{ secrets.dockerhub_token }}
       dockerhub_username: ${{ secrets.dockerhub_username }}
@@ -110,7 +110,7 @@ jobs:
       aws_region: ${{ inputs.aws_region }}
       ci_cli_version: ${{ inputs.ci_cli_version }}
       earthly_version: ${{ inputs.earthly_version }}
-      target: check
+      target: package
     secrets:
       dockerhub_token: ${{ secrets.dockerhub_token }}
       dockerhub_username: ${{ secrets.dockerhub_username }}
@@ -124,7 +124,7 @@ jobs:
       aws_region: ${{ inputs.aws_region }}
       ci_cli_version: ${{ inputs.ci_cli_version }}
       earthly_version: ${{ inputs.earthly_version }}
-      target: check
+      target: test
     secrets:
       dockerhub_token: ${{ secrets.dockerhub_token }}
       dockerhub_username: ${{ secrets.dockerhub_username }}
