@@ -18,19 +18,8 @@ postgres-base:
             curl \
             gcc
 
-    # Install refinery
-
-    # Set necessary env vars from this setup.
-    ENV RUSTUP_HOME=/usr/local/rustup
-    ENV CARGO_HOME=/usr/local/cargo
-    ENV CARGO_HOME_BIN=$CARGO_HOME/bin
-    ENV PATH=$CARGO_HOME_BIN:$PATH  
-
-    RUN curl –proto ‘=https’ –tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y -v
-    RUN rustc --version && \
-        cargo --version
-    RUN cargo install refinery_cli --version 0.8.7
-    RUN refinery --version
+    # Get refinery
+    COPY ../rust+rust-base/refinery /bin
 
     COPY ./entry.sh .
     RUN chmod ugo+x ./entry.sh
