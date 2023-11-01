@@ -94,6 +94,39 @@ test-1:
         --service example \
         --allow-privileged
         RUN sleep 5;\
-            docker-compose logs example;\
+            psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
+    END
+
+# Container runs PostgreSQL server, drops and initialises db, doesn't apply migrations, doesn't apply seed data.
+test-2:
+    FROM +postgres-base
+
+    ENV INIT_AND_DROP_DB true
+    ENV WITH_MIGRATIONS false
+    ENV WITH_SEED_DATA false
+    COPY ./example/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load example-db:latest=+build \
+        --service example \
+        --allow-privileged
+        RUN sleep 5;\
+            ! psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
+    END
+
+# Container runs PostgreSQL server, drops and initialises db, applies migrations, doesn't apply seed data.
+test-3:
+    FROM +postgres-base
+
+    ENV INIT_AND_DROP_DB true
+    ENV WITH_MIGRATIONS true
+    ENV WITH_SEED_DATA false
+    COPY ./example/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load example-db:latest=+build \
+        --service example \
+        --allow-privileged
+        RUN sleep 5;\
             psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
     END
