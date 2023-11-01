@@ -79,3 +79,17 @@ build:
     FROM +builder
 
     DO +BUILD --image_name=example-db
+
+# Container runs PostgreSQL server, drops and initialises db, applies migrations, applies seed data.
+test-1:
+    FROM +postgres-base
+
+    COPY ./example/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load example-db:latest=+build \
+        --service example \
+        --allow-privileged
+        RUN sleep 5;\
+            psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
+    END

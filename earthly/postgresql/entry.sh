@@ -88,16 +88,19 @@ debug_sleep
 if [ "${DB_HOST}" == "localhost" ]; then
     # Set the timeout value in seconds (default: 0 = wait forever)
     TIMEOUT=${TIMEOUT:-0}
+    POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD:-trust}
     echo "TIMEOUT is set to ${TIMEOUT}"
+    echo "POSTGRES_HOST_AUTH_METHOD is set to ${POSTGRES_HOST_AUTH_METHOD}"
 
     # Start PostgreSQL in the background
     initdb -D /var/lib/postgresql/data || true
+    printf "\n host all all all %s \n" "$POSTGRES_HOST_AUTH_METHOD" >> /var/lib/postgresql/data/pg_hba.conf
     pg_ctl -D /var/lib/postgresql/data start &
 fi
 
 # Check if PostgreSQL is running using psql
 echo "Waiting for PostgreSQL to start..."
-until pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; do
+until pg_isready -h $DB_HOST -p $DB_PORT -U $DB_SUPERUSER -d postgres >/dev/null 2>&1; do
     sleep 1
     if [ $TIMEOUT -gt 0 ]; then
         TIMEOUT=$((TIMEOUT - 1))
@@ -112,7 +115,7 @@ echo "PostgreSQL is running"
 # Initialize and drop database if necessary
 if [ "${INIT_AND_DROP_DB:-}" == "true" ]; then
     echo ">>> Initializing database..."
-    psql -h $DB_HOST -p $DB_PORT -d postgres -f ./setup-db.sql \
+    psql -h $DB_HOST -p $DB_PORT -d postgres -U $DB_SUPERUSER -f ./setup-db.sql \
         -v dbName="${DB_NAME}" \
         -v dbDescription="${DB_DESCRIPTION}" \
         -v dbUser="${DB_USER}" \
@@ -131,14 +134,14 @@ if [ "${WITH_SEED_DATA:-}" == "true" ]; then
     echo ">>> Applying seed data..."
     while IFS= read -r -d '' file; do
         echo "Applying seed data from $file"
-        psql -f "$file"
+        psql -h $DB_HOST -p $DB_PORT -d $DB_NAME -U $DB_USER -W $DB_USER_PASSWORD -f "$file"
     done < <(find ./data -name '*.sql' -print0 | sort -z)
 fi
 
 echo ">>> Finished entrypoint script"
 
 # Infinite loop to run until local PostgreSQL is ready
-until [ "${DB_HOST}" == "localhost" ] && ! pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; 
+until [ "${DB_HOST}" == "localhost" ] && ! pg_isready -h $DB_HOST -p $DB_PORT -U $DB_SUPERUSER -d postgres >/dev/null 2>&1; 
 do
     sleep 60
 done
