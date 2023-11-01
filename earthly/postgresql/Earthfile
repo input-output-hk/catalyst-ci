@@ -130,3 +130,9 @@ test-3:
         RUN sleep 5;\
             psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
     END
+
+# Invoke all tests
+test:
+    BUILD +test-1
+    BUILD +test-2
+    BUILD +test-3
