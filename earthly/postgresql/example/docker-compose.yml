@@ -14,8 +14,8 @@ services:
       - DB_USER=example-dev
       - DB_USER_PASSWORD=example-pass
 
-      - INIT_AND_DROP_DB=true
-      - WITH_MIGRATIONS=true
-      - WITH_SEED_DATA=true
+      - INIT_AND_DROP_DB=${INIT_AND_DROP_DB:-true}
+      - WITH_MIGRATIONS=${WITH_MIGRATIONS:-true}
+      - WITH_SEED_DATA=${WITH_SEED_DATA:-true}
     ports:
       - 5432:5432

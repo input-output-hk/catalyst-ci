@@ -84,6 +84,9 @@ build:
 test-1:
     FROM +postgres-base
 
+    ENV INIT_AND_DROP_DB true
+    ENV WITH_MIGRATIONS true
+    ENV WITH_SEED_DATA true
     COPY ./example/docker-compose.yml .
     WITH DOCKER \
         --compose docker-compose.yml \
@@ -91,5 +94,6 @@ test-1:
         --service example \
         --allow-privileged
         RUN sleep 5;\
+            docker-compose logs example;\
             psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
     END
