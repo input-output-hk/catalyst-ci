@@ -29,7 +29,8 @@ This promotes self-service and establishes a clear boundary of ownership whereby
 maintaining a single file in their subproject.
 
 The CI process is well-documented and troubleshooting unexpected errors only requires knowledge of Earthly and GitHub Actions.
-All of the code is contained in a single open-source repository and contributions are welcome.
+All of the code is contained in a single [open-source repository](https://github.com/input-output-hk/catalyst-ci) and contributions
+are welcome.
 The remainder of the overview section will focus on discussing some of these concepts in more detail.
 
 ### Discovery
@@ -143,18 +144,23 @@ Due to the relative flexibility of Earthly, it's possible to structure an `Earth
 To provide consistency across our projects, we have implemented a style guide which brings a level of standardization to
 `Earthfile`s.
 
-The next step after reviewing the style guide is taking a look at the examples provided in the `catalyst-ci` repository.
-The examples are broken up by language and serve as a starter template for getting off the ground quickly.
-Reviewing the examples also helps with connecting the concepts discussed in this onboarding guide with actual code.
+The next step after reviewing the style guide is taking a look at available [guides](../guides/index.md) for performing specific
+tasks with Catalyst CI.
+The guides are broken up by language or topic and provide a starter template for getting off the ground quickly.
+Reviewing the guides also helps with connecting the concepts discussed in this onboarding guide with actual code.
+If the task you're working on is not covered in a guide, it's still recommended you read at least one of the other guides in order
+get a more in-depth understanding of building with Catalyst CI.
 
 Experimentation is also encouraged.
 The CI process runs on every single commit, even commits to PRs.
 You can utilize this fact to begin experimenting with an `Earthfile` and seeing how the CI reacts to different targets.
 The only limitation is that not all targets execute fully in a PR setting (i.e. no artifacts are published/released).
 
-Finally, if you get stuck, or have a need to understand the the CI process more, there is reference documentation available which
-covers not only individual targets, but also how the entire CI process operates under the hood.
-You may also use the discussions section of the `catalyst-ci` repository to ask questions specific to the CI process.
+Finally, if you get stuck, or have a need to understand the the CI process more, there is
+[reference documentation](../reference/index.md) available which covers not only individual targets, but also how the entire CI
+process operates under the hood.
+You may also use the [discussions](https://github.com/input-output-hk/catalyst-ci/discussions/landing) section of the `catalyst-ci`
+repository to ask questions specific to the CI process.
 
 You are now equipped and ready to start using the Catalyst CI!
 We are very open-source friendly and will review all feedback/PRs made against the repository.

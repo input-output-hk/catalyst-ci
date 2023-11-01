@@ -35,8 +35,18 @@ check:
     # analysis checks.
 
 build:
-    FROM +build
+    FROM +src
+    SAVE ARTIFACT ./artifact
     # This target is used by the CI and should be used to build the project.
+
+package:
+    FROM +build
+    COPY ./artifact pkg
+    COPY ../other_project+build/artifact pkg
+    # This target is uncommon in most Earthfiles, however, certain subprojects
+    # have dependencies on other subprojects which should be defined in this
+    # target. We define it here to serve as an example, however, we don't use it
+    # in future steps.
 
 test:
     FROM +build
@@ -49,6 +59,9 @@ release:
     # This target is used by the CI and should use `SAVE ARTIFACT` to save the
     # result of the build step in cases where the artifact should be included
     # with the GitHub release (i.e., things that are self-contained like CLIs).
+    # Note that in many cases, this will look identical to the `build` step.
+    # However, to the CI, these are two distinct steps. Also, in some cases, the
+    # release target may have additional steps to perform.
 
 publish:
     FROM <base image>
@@ -109,6 +122,14 @@ DO github.com/input-output-hk/catalyst-ci/earthly/udc+NAME:tag
 Where `tag` is the git tag.
 This ensures that upstream changes do not incidentally break builds.
 
+### Avoid `LOCALLY`
+
+The `LOCALLY` directive causes Earthly to execute all commands on the local machine instead of inside of a container.
+This directive is useful for troubleshooting, but otherwise it fits a very small number of use cases.
+The official Earthly best practices document recommends against using this directive in most cases.
+It can be destructive, complete with different results each time, and by default is not run during CI.
+For these reasons, usage of it should be avoided where possible.
+
 ### Avoid `--no-cache`
 
 The `RUN` command allows passing a `--no-cache` flag which will force Earthly
@@ -120,7 +141,18 @@ this flag and all caching proceeds to immediately stop.
 To prevent this, the `--no-cache` should be avoided at all times.
 The only acceptable time to use it is for debugging purposes.
 
-### Prefer UDCs
+### Keep `build` as the source of truth for build artifacts
+
+The `build` target should be used as the single source of truth for building a given subproject's artifacts.
+The target may call other targets to accomplish the build, however, the `build` target should contain the authoritative source.
+Practically, this means that a subproject should only have one way to build it (via the `build` target).
+
+In addition to the above, targets which rely on built artifacts should always reference `build`.
+This can be through inheriting from it or by directly copying artifacts.
+The main point is that a subproject should not have multiple builds scattered in various places.
+Each subproject has an authoritative `build` target that *all* targets use when fetching build artifacts.
+
+### Prefer User Defined Commands (UDCs)
 
 The primary purpose of a UDC is to reduce boilerplate and promote reusing common workflows.
 Many build patterns tend to be repetitive.

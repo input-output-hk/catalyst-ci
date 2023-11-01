@@ -9,11 +9,15 @@ nav:
   - Introduction: index.md
   - Onboarding: onboarding/index.md
   - Style Guide: style.md
+  - Guides:
+      - guides/index.md
+      - Languages:
+          - Go: guides/languages/go.md
   - Reference:
       - reference/index.md
+      - Workflows: reference/workflows.md
       - Actions: reference/actions.md
       - Targets: reference/targets.md
-      - Workflows: reference/workflows.md
       - UDCs: reference/udc.md
   - Appendix:
       - Earthly: appendix/earthly.md
