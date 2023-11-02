@@ -1,11 +1,28 @@
 version: "3"
 
+# cspell: words healthcheck isready
+
 services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
+    ports:
+      - 5433:5432
+
   example:
     image: example-db:latest
     environment:
       # Required environment variables for migrations
-      - DB_HOST=localhost
+      - DB_HOST=${DB_HOST:-localhost}
       - DB_PORT=5432
       - DB_NAME=ExampleDb
       - DB_DESCRIPTION="Example DB"
@@ -14,8 +31,8 @@ services:
       - DB_USER=example-dev
       - DB_USER_PASSWORD=example-pass
 
-      - INIT_AND_DROP_DB=true
-      - WITH_MIGRATIONS=true
-      - WITH_SEED_DATA=true
+      - INIT_AND_DROP_DB=${INIT_AND_DROP_DB:-true}
+      - WITH_MIGRATIONS=${WITH_MIGRATIONS:-true}
+      - WITH_SEED_DATA=${WITH_SEED_DATA:-true}
     ports:
       - 5432:5432

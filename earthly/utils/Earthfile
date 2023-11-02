@@ -1,0 +1,10 @@
+# Common PostgreSQL Earthly builders
+VERSION 0.7
+
+shell-assert:
+    FROM scratch
+
+    WORKDIR /assert-sh
+
+    COPY assert.sh .
+    SAVE ARTIFACT assert.sh assert.sh

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words REINIT PGHOST PGPORT PGUSER PGPASSWORD PGDATABASE psql initdb isready dotglob
+# cspell: words REINIT PGHOST PGPORT PGUSER PGPASSWORD psql initdb isready dotglob
 
 # ---------------------------------------------------------------
 # Entrypoint script for database container
@@ -74,30 +74,27 @@ export PGHOST="${DB_HOST}"
 export PGPORT="${DB_PORT}"
 export PGUSER="${DB_SUPERUSER}"
 export PGPASSWORD="${DB_SUPERUSER_PASSWORD}"
-export PGDATABASE="${DB_NAME}"
-
-: "${ADMIN_FIRST_NAME:='Admin'}"
-: "${ADMIN_LAST_NAME:='Default'}"
-: "${ADMIN_ABOUT:='Default Admin User'}"
-: "${ADMIN_EMAIL:='admin.default@projectcatalyst.io'}"
 
 # Sleep if DEBUG_SLEEP is set
 debug_sleep
 
 # Run postgreSQL database in this container if the host is localhost
 if [ "${DB_HOST}" == "localhost" ]; then
-    # Set the timeout value in seconds (default: 0 = wait forever)
-    TIMEOUT=${TIMEOUT:-0}
-    echo "TIMEOUT is set to ${TIMEOUT}"
+    POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD:-trust}
+    echo "POSTGRES_HOST_AUTH_METHOD is set to ${POSTGRES_HOST_AUTH_METHOD}"
 
     # Start PostgreSQL in the background
     initdb -D /var/lib/postgresql/data || true
+    printf "\n host all all all %s \n" "$POSTGRES_HOST_AUTH_METHOD" >> /var/lib/postgresql/data/pg_hba.conf
     pg_ctl -D /var/lib/postgresql/data start &
 fi
 
 # Check if PostgreSQL is running using psql
 echo "Waiting for PostgreSQL to start..."
-until pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; do
+# Set the timeout value in seconds (default: 0 = wait forever)
+TIMEOUT=${TIMEOUT:-0}
+echo "TIMEOUT is set to ${TIMEOUT}"
+until pg_isready -d postgres >/dev/null 2>&1; do
     sleep 1
     if [ $TIMEOUT -gt 0 ]; then
         TIMEOUT=$((TIMEOUT - 1))
@@ -112,7 +109,7 @@ echo "PostgreSQL is running"
 # Initialize and drop database if necessary
 if [ "${INIT_AND_DROP_DB:-}" == "true" ]; then
     echo ">>> Initializing database..."
-    psql -h $DB_HOST -p $DB_PORT -d postgres -f ./setup-db.sql \
+    psql -d postgres -f ./setup-db.sql \
         -v dbName="${DB_NAME}" \
         -v dbDescription="${DB_DESCRIPTION}" \
         -v dbUser="${DB_USER}" \
@@ -131,14 +128,14 @@ if [ "${WITH_SEED_DATA:-}" == "true" ]; then
     echo ">>> Applying seed data..."
     while IFS= read -r -d '' file; do
         echo "Applying seed data from $file"
-        psql -f "$file"
+        psql -d $DB_NAME -f "$file"
     done < <(find ./data -name '*.sql' -print0 | sort -z)
 fi
 
 echo ">>> Finished entrypoint script"
 
 # Infinite loop to run until local PostgreSQL is ready
-until [ "${DB_HOST}" == "localhost" ] && ! pg_isready -h $DB_HOST -p $DB_PORT -d postgres >/dev/null 2>&1; 
+until [ "${DB_HOST}" == "localhost" ] && ! pg_isready -d postgres >/dev/null 2>&1; 
 do
     sleep 60
 done
