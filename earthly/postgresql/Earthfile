@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
 VERSION 0.7
 
-# cspell: words colordiff rustup rustc
+# cspell: words colordiff rustup rustc psql
 
 postgres-base:
     FROM postgres:16.0-alpine3.18
@@ -80,7 +80,7 @@ build:
 
     DO +BUILD --image_name=example-db
 
-# Container runs PostgreSQL server, drops and initialises db, applies migrations, applies seed data.
+# Container runs PostgreSQL server, drops and initialise db, applies migrations, applies seed data.
 test-1:
     FROM +postgres-base
 
@@ -103,7 +103,7 @@ test-1:
             assert_eq "$expected" "$res"
     END
 
-# Container runs PostgreSQL server, drops and initialises db, doesn't apply migrations, doesn't apply seed data.
+# Container runs PostgreSQL server, drops and initialise db, doesn't apply migrations, doesn't apply seed data.
 test-2:
     FROM +postgres-base
 
@@ -120,7 +120,7 @@ test-2:
             ! psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
     END
 
-# Container runs PostgreSQL server, drops and initialises db, applies migrations, doesn't apply seed data.
+# Container runs PostgreSQL server, drops and initialise db, applies migrations, doesn't apply seed data.
 test-3:
     FROM +postgres-base
 
@@ -143,7 +143,7 @@ test-3:
             assert_eq "$expected" "$res"
     END
 
-# PostgreSQL server runs as a separate service, drops and initialises db, applies migrations, applies seed data.
+# PostgreSQL server runs as a separate service, drops and initialise db, applies migrations, applies seed data.
 test-4:
     FROM +postgres-base
 

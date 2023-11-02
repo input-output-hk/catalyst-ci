@@ -1,5 +1,7 @@
 version: "3"
 
+# cspell: words healthcheck isready
+
 services:
   postgres:
     image: postgres:16
