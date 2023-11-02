@@ -54,6 +54,17 @@ mkdocs-material:
     # Will live serve the docs in `/docs` on 0.0.0.0:8000
     ENTRYPOINT ["/scripts/serve.sh"]
 
+# Build the docs - We always do this in a `docs` target.  
+# The only target that needs customizing is the `src` target.
+BUILD:
+    COMMAND
+
+    FROM +src
+
+    RUN /scripts/build.sh
+
+    SAVE ARTIFACT /site/*
+
 
 # See `<repo>/docs` for the example docs project which uses this tooling.
 
@@ -61,3 +72,24 @@ mkdocs-material:
 
 # We do however build a docs package which is used for locally serving the docs
 # which assists in documentation writing.
+PACKAGE:
+    COMMAND
+    ARG image_name
+
+    # Use the official Nginx base image
+    FROM nginx:alpine3.18-slim
+
+    # make sure docs are built.
+    BUILD +docs
+
+    # Copy the static pages into the container
+    COPY +docs/ /usr/share/nginx/html
+
+    # Expose port 80 for HTTP traffic
+    EXPOSE 80
+
+    # Start Nginx when the container is run
+    CMD ["nginx", "-g", "daemon off;"]
+
+    SAVE IMAGE cat-voices-docs:latest    
+    
