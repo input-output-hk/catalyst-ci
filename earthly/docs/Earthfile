@@ -59,8 +59,6 @@ mkdocs-material:
 BUILD:
     COMMAND
 
-    FROM +src
-
     RUN /scripts/build.sh
 
     SAVE ARTIFACT /site/*
