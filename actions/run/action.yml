@@ -18,6 +18,10 @@ inputs:
   platform:
     description: The platform to execute the earthfile target with (defaults to native)
     required: false
+  privileged:
+    description: Whether the workflow should run earthly in privileged mode (earthly -P flag).
+    required: false
+    default: "false"
   runner_address:
     description: The address of the remote runner to use
     required: false
