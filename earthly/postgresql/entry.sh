@@ -69,18 +69,6 @@ REQUIRED_ENV=(
 )
 check_env_vars "${REQUIRED_ENV[@]}"
 
-# Export environment variables
-export PGHOST="${DB_HOST}"
-export PGPORT="${DB_PORT}"
-export PGUSER="${DB_SUPERUSER}"
-export PGPASSWORD="${DB_SUPERUSER_PASSWORD}"
-export PGDATABASE="${DB_NAME}"
-
-: "${ADMIN_FIRST_NAME:='Admin'}"
-: "${ADMIN_LAST_NAME:='Default'}"
-: "${ADMIN_ABOUT:='Default Admin User'}"
-: "${ADMIN_EMAIL:='admin.default@projectcatalyst.io'}"
-
 # Sleep if DEBUG_SLEEP is set
 debug_sleep
 
