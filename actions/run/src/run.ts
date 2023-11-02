@@ -24,6 +24,8 @@ export async function run(): Promise<void> {
     args.push('--platform', platform)
   }
 
+  args.push('-P')
+
   if (flags) {
     args.push(...flags.split(' '))
   }
