@@ -8,6 +8,7 @@ export async function run(): Promise<void> {
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
   const platform = core.getInput('platform')
+  const privileged = core.getBooleanInput('privileged')
   const runnerAddress = core.getInput('runner_address')
   const runnerPort = core.getInput('runner_port')
   const target = core.getInput('target')
@@ -15,6 +16,10 @@ export async function run(): Promise<void> {
 
   const command = 'earthly'
   const args: string[] = []
+
+  if (privileged) {
+    args.push('-P')
+  }
 
   if (runnerAddress) {
     args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`)

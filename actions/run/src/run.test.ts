@@ -27,6 +27,7 @@ describe('Run Action', () => {
         earthfile: './earthfile',
         flags: '',
         platform: '',
+        privileged: '',
         output: '',
         runnerAddress: '',
         runnerPort: '',
@@ -42,6 +43,7 @@ describe('Run Action', () => {
         earthfile: './earthfile',
         flags: '--test',
         platform: '',
+        privileged: '',
         output: 'Artifact +target/artifact output as out\n',
         runnerAddress: '',
         runnerPort: '',
@@ -57,6 +59,7 @@ describe('Run Action', () => {
         earthfile: './earthfile',
         flags: '',
         platform: '',
+        privileged: '',
         output: '',
         runnerAddress: 'localhost',
         runnerPort: '8372',
@@ -76,12 +79,14 @@ describe('Run Action', () => {
         earthfile: './earthfile',
         flags: '--flag1 test -f2 test2',
         platform: 'linux/amd64',
+        privileged: 'true',
         output: 'Image +docker output as image1:tag1\n',
         runnerAddress: '',
         runnerPort: '',
         target: 'target',
         targetFlags: '',
         command: [
+          '-P',
           '--platform',
           'linux/amd64',
           '--flag1',
@@ -101,6 +106,7 @@ describe('Run Action', () => {
         earthfile,
         flags,
         platform,
+        privileged,
         output,
         runnerAddress,
         runnerPort,
@@ -122,6 +128,8 @@ describe('Run Action', () => {
               return flags
             case 'platform':
               return platform
+            case 'privileged':
+              return privileged
             case 'output':
               return output
             case 'runner_address':
@@ -141,6 +149,8 @@ describe('Run Action', () => {
           switch (name) {
             case 'artifact':
               return artifact === 'true'
+            case 'privileged':
+              return privileged === 'true'
             default:
               throw new Error('Unknown input')
           }
