@@ -1,5 +1,6 @@
 VERSION 0.7
 
+# cspell: words runable
 
 # Copy all the source we need to build the docs
 src:
