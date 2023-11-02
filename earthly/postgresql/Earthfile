@@ -143,8 +143,35 @@ test-3:
             assert_eq "$expected" "$res"
     END
 
+# PostgreSQL server runs as a separate service, drops and initialises db, applies migrations, applies seed data.
+test-4:
+    FROM +postgres-base
+
+    COPY ../utils+shell-assert/assert.sh .
+
+    ENV DB_HOST postgres
+    ENV INIT_AND_DROP_DB true
+    ENV WITH_MIGRATIONS true
+    ENV WITH_SEED_DATA true
+    COPY ./example/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --pull postgres:16 \
+        --load example-db:latest=+build \
+        --service example \
+        --service postgres \
+        --allow-privileged
+        RUN sleep 5;\
+            res=$(psql postgresql://postgres:postgres@0.0.0.0:5433/ExampleDb -c "SELECT * FROM users");\
+            
+            source assert.sh;\
+            expected=$(printf "  name   | age \n---------+-----\n Alice   |  20\n Bob     |  30\n Charlie |  40\n(3 rows)");\
+            assert_eq "$expected" "$res"
+    END
+
 # Invoke all tests
 test:
     BUILD +test-1
     BUILD +test-2
     BUILD +test-3
+    BUILD +test-4

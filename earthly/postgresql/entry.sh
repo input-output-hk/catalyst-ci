@@ -128,7 +128,7 @@ if [ "${WITH_SEED_DATA:-}" == "true" ]; then
     echo ">>> Applying seed data..."
     while IFS= read -r -d '' file; do
         echo "Applying seed data from $file"
-        psql -d $DB_NAME -U $DB_USER -W $DB_USER_PASSWORD -f "$file"
+        psql -d $DB_NAME -f "$file"
     done < <(find ./data -name '*.sql' -print0 | sort -z)
 fi
 
