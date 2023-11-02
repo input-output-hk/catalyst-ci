@@ -72,14 +72,9 @@ BUILD:
 # which assists in documentation writing.
 PACKAGE:
     COMMAND
-    ARG image_name
-    ARG docs
 
     # Use the official Nginx base image
     FROM nginx:alpine3.18-slim
-
-    # Copy the static pages into the container
-    COPY $docs /usr/share/nginx/html
 
     # Expose port 80 for HTTP traffic
     EXPOSE 80
@@ -87,5 +82,11 @@ PACKAGE:
     # Start Nginx when the container is run
     CMD ["nginx", "-g", "daemon off;"]
 
-    SAVE IMAGE $image_name
+    # These steps are done outside the UDC.
+    
+    # Copy the static pages into the container like this...
+    #COPY $docs /usr/share/nginx/html
+
+    # And then save the image
+    # SAVE IMAGE image_name
     
