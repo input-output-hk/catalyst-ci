@@ -73,15 +73,13 @@ BUILD:
 PACKAGE:
     COMMAND
     ARG image_name
+    ARG docs
 
     # Use the official Nginx base image
     FROM nginx:alpine3.18-slim
 
-    # make sure docs are built.
-    BUILD +docs
-
     # Copy the static pages into the container
-    COPY +docs/ /usr/share/nginx/html
+    COPY $docs /usr/share/nginx/html
 
     # Expose port 80 for HTTP traffic
     EXPOSE 80
@@ -89,5 +87,5 @@ PACKAGE:
     # Start Nginx when the container is run
     CMD ["nginx", "-g", "daemon off;"]
 
-    SAVE IMAGE cat-voices-docs:latest    
+    SAVE IMAGE $image_name
     
