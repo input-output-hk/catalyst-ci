@@ -86,10 +86,7 @@ debug_sleep
 
 # Run postgreSQL database in this container if the host is localhost
 if [ "${DB_HOST}" == "localhost" ]; then
-    # Set the timeout value in seconds (default: 0 = wait forever)
-    TIMEOUT=${TIMEOUT:-0}
     POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD:-trust}
-    echo "TIMEOUT is set to ${TIMEOUT}"
     echo "POSTGRES_HOST_AUTH_METHOD is set to ${POSTGRES_HOST_AUTH_METHOD}"
 
     # Start PostgreSQL in the background
@@ -100,6 +97,9 @@ fi
 
 # Check if PostgreSQL is running using psql
 echo "Waiting for PostgreSQL to start..."
+# Set the timeout value in seconds (default: 0 = wait forever)
+TIMEOUT=${TIMEOUT:-0}
+echo "TIMEOUT is set to ${TIMEOUT}"
 until pg_isready -h $DB_HOST -p $DB_PORT -U $DB_SUPERUSER -d postgres >/dev/null 2>&1; do
     sleep 1
     if [ $TIMEOUT -gt 0 ]; then
