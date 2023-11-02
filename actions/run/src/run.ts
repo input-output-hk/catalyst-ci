@@ -16,6 +16,9 @@ export async function run(): Promise<void> {
   const command = 'earthly'
   const args: string[] = []
 
+  args.push('-P')
+  core.info(`args: ${args.join(' ')}`)
+
   if (runnerAddress) {
     args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`)
   }
@@ -23,8 +26,6 @@ export async function run(): Promise<void> {
   if (platform) {
     args.push('--platform', platform)
   }
-
-  args.push('-P')
 
   if (flags) {
     args.push(...flags.split(' '))
