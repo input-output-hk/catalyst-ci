@@ -84,6 +84,8 @@ build:
 test-1:
     FROM +postgres-base
 
+    COPY ../utils+shell-assert/assert.sh .
+
     ENV INIT_AND_DROP_DB true
     ENV WITH_MIGRATIONS true
     ENV WITH_SEED_DATA true
@@ -94,7 +96,11 @@ test-1:
         --service example \
         --allow-privileged
         RUN sleep 5;\
-            psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
+            res=$(psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users");\
+            
+            source assert.sh;\
+            expected=$(printf "  name   | age \n---------+-----\n Alice   |  20\n Bob     |  30\n Charlie |  40\n(3 rows)");\
+            assert_eq "$expected" "$res"
     END
 
 # Container runs PostgreSQL server, drops and initialises db, doesn't apply migrations, doesn't apply seed data.
@@ -118,6 +124,8 @@ test-2:
 test-3:
     FROM +postgres-base
 
+    COPY ../utils+shell-assert/assert.sh .
+
     ENV INIT_AND_DROP_DB true
     ENV WITH_MIGRATIONS true
     ENV WITH_SEED_DATA false
@@ -128,7 +136,11 @@ test-3:
         --service example \
         --allow-privileged
         RUN sleep 5;\
-            psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
+            res=$(psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users");\
+
+            source assert.sh;\
+            expected=$(printf " name | age \n------+-----\n(0 rows)");\
+            assert_eq "$expected" "$res"
     END
 
 # Invoke all tests
