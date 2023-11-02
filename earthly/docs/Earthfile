@@ -1,6 +1,8 @@
 VERSION 0.7
 FROM python:3.12-alpine3.18
 
+# cspell: words libgcc freetype lcms openjpeg
+
 mkdocs-material:
     # Derived from official mkdocs-material docker container.
     # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile

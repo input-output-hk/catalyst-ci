@@ -1,5 +1,7 @@
 # Contributing to Catalyst CI
 
+<!-- cspell: words rustc -->
+
 First off, thanks for taking the time to contribute! ❤️
 
 * [Contributing to Catalyst CI](#contributing-to-catalyst-ci)
