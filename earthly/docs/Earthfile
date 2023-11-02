@@ -1,102 +1,61 @@
 VERSION 0.7
-FROM python:3.11-bullseye
+FROM python:3.12-alpine3.18
 
 mkdocs-material:
     # Derived from official mkdocs-material docker container.
     # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile
+    # Due to docs being constructed not only from Doc source but Build artifacts,
+    # These docs do NOT support Live serving, and must be built.
+    # This is all the tooling needed to build the docs.
+
+    # Install extra packages we will need to support plugins.
+    RUN apk add --no-cache \    
+        bash \
+        graphviz \
+        curl \
+        zlib-dev \
+        jpeg-dev \
+        libxml2-dev \
+        libxslt-dev \
+        libffi-dev \
+        gcc \
+        musl-dev \
+        libgcc \
+        openssl-dev \
+        freetype-dev \
+        lcms2-dev \
+        openjpeg-dev \
+        tiff-dev \
+        tk-dev \
+        tcl-dev  \
+        git       
 
     # Install poetry and our python dependencies.
-    DO ../python+POETRY_SETUP --extra_file=start.sh
+    DO ../python+POETRY_SETUP
 
-    # Install extra debian packages we will need to support plugins.
-    RUN apt-get update && \
-        apt-get install -y --no-install-recommends \
-        graphviz
+    # Copy our run scripts
+    COPY --dir scripts /scripts
 
     # Trust directory, required for git >= 2.35.2. (mkdocs Git plugin requirement).
     RUN git config --global --add safe.directory /docs &&\
         git config --global --add safe.directory /site
 
-    # Carry the Kroki Docker Compose with this image.
-    COPY --dir services /
-
     # Set working directory
     WORKDIR /docs
+
+    # Live Docs are not supported, this is only used during testing.
 
     # Expose MkDocs development server port
     EXPOSE 8000
 
     # Start development server by default
-    ENTRYPOINT ["/poetry/start.sh"]
-    CMD ["serve", "--dev-addr=0.0.0.0:8000"]
-
-    # So we can extract these files in other steps.
-    SAVE ARTIFACT /services
-
-# Build the documentation statically
-MKDOCS_SETUP:
-    COMMAND
-    ARG src="."
-    ARG extra_files=""
-
-    # Ensure the mkdocs tools are built and up-to-date.
-    BUILD +mkdocs-material
-
-    FROM earthly/dind:alpine
-    WORKDIR /build
-    COPY +mkdocs-material/services/docker-compose.kroki.yml .
-
-    # Copy the src
-    RUN mkdir /extras 
-    COPY --dir $src /docs
-    FOR --sep=", " file IN $extra_files
-        COPY --dir $file /extras
-    END
-
-    # 
-    #RUN mkdocs build
-
-    # Docs need Kroki to build diagrams, so make sure its running.
-    #WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
-    #    RUN docker run \
-    #        --rm \
-    #        -v /docs:/docs \
-    #        --network=mkdocs \
-    #        mkdocs build
-    #END
-
-# Setup local documentation development.
-#DEVELOP:
-#    COMMAND
-
-#    ARG dest=$(echo ${PWD}/local)
-
-    # Ensure the mkdocs tools are built and up-to-date.
-#    BUILD +mkdocs-material
-
-    # Get local development artifacts
-#    COPY +mkdocs-material/services /local
-
-#    SAVE ARTIFACT /local AS LOCAL $dest
+    # Will live serve the docs in `/docs` on 0.0.0.0:8000
+    ENTRYPOINT ["/scripts/serve.sh"]
 
 
-check:
-    # Test of building docs.
-    # Run with `earthly -P +check`
-    FROM +mkdocs-material
-    
-    ARG dest=./site
+# See `<repo>/docs` for the example docs project which uses this tooling.
 
-    # Build the site (UDC creates the container itself.)
-    DO +MKDOCS_SETUP --src=./sample --extra_files="Readme.md, services, ../../+extra-docs/extra"
+# Docs fall outside the normal CI flow and have their own build and publish flow.
 
-    RUN mkdocs build
-
-    SAVE ARTIFACT /docs/site AS LOCAL $dest
-
-
-# Target which sets up the documentation to be served locally.
-mkdocs-develop-test:
-    FROM alpine:latest
-
-    DO +DEVELOP --dest=./local
+# We do however build a docs package which is used for locally serving the docs
+# which assists in documentation writing.

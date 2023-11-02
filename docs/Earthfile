@@ -1,16 +1,46 @@
 VERSION 0.7
 
-deps:
-    FROM python:3.11-bullseye
-    DO ../earthly/python+POETRY_SETUP
 
+# Copy all the source we need to build the docs
 src:
-    FROM +deps
+    FROM ../earthly/docs+mkdocs-material
 
-    COPY --dir src mkdocs.yml .
+    # Just copy the actual doc src here.
+    COPY --dir src includes macros overrides mkdocs.yml /docs
+
+    # Now copy into that any artifacts we pull from the builds.
+    COPY --dir ../+repo-docs/repo /docs/includes
+
+    # COPY /repo/*.md /docs/includes
+
+    #RUN ls -al /docs
+    #RUN ls -al /docs/includes
+    #RUN ls -al /docs/includes/repo
+    #RUN ls -al /docs/src
 
 docs:
     FROM +src
 
-    RUN poetry run mkdocs build --strict
-    SAVE ARTIFACT site/*
+    RUN /scripts/build.sh
+
+    SAVE ARTIFACT /site/*
+
+local:
+    # Build a self contained service to show built docs locally.
+
+    # Use the official Nginx base image
+    FROM nginx:alpine3.18-slim
+
+    # make sure docs are built.
+    BUILD +docs
+
+    # Copy the static pages into the container
+    COPY +docs/ /usr/share/nginx/html
+
+    # Expose port 80 for HTTP traffic
+    EXPOSE 80
+
+    # Start Nginx when the container is run
+    CMD ["nginx", "-g", "daemon off;"]
+
+    SAVE IMAGE cat-ci-docs:latest

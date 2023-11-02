@@ -23,10 +23,12 @@ spell-check:
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
 
 repo-docs:
-    # Create artefacts of extra files we embed inside the documentation when its built.
+    # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch
+    #FROM alpine:3.18
 
-    WORKDIR /
-    COPY --dir *.md /extra
+    WORKDIR /repo
+    COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
+    #RUN ls -al /repo
 
-    SAVE ARTIFACT /extra extra
+    SAVE ARTIFACT /repo repo

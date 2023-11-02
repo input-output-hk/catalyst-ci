@@ -1,10 +1,120 @@
-site_name: Catalyst CI Documentation
+# cspell: words Diagramsnet, pymdownx, linenums, inlinehilite, superfences,
+# cspell: words tasklist, betterem, materialx, twemoji, smartsymbols,
+# cspell: words kroki, excalidraw, glightbox, cips, pygments, arithmatex
+
+# Project Information
+site_name: Project Catalyst - Catalyst CI Documentation
+site_url: https://input-output-hk.github.io/catalyst-ci
+site_author: The Project Catalyst Team
+copyright: (c) 2023 Input Output
+
+# Repository
+repo_name: input-output-hk/catalyst-ci
+repo_url: https://github.com/input-output-hk/catalyst-ci
+
+# The Documentation src to build.
 docs_dir: src
+
 theme:
   name: material
+  custom_dir: overrides
+  palette:
+    # Palette toggle for light mode
+    - scheme: default
+      media: "(prefers-color-scheme: light)"
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - scheme: slate
+      media: "(prefers-color-scheme: dark)"
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
   features:
-    - navigation.indexes
+    - navigation.instant
+    - navigation.instant.progress
     - navigation.tracking
+    #- navigation.tabs
+    #- navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
+    - toc.follow
+    - toc.integrate
+    - search.suggest
+    - search.highlight
+
+plugins:
+  - search
+  - meta-manager
+  - macros:
+      module_name: macros
+  # - diagrams - Plugin is installed, but produces corrupted output
+  - kroki:
+      ServerURL: https://kroki.io
+      EnableDiagramsnet: true
+      HttpMethod: POST
+  - glightbox
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+  # Python Markdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      auto_append:
+        - includes/abbreviations.md
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  consent:
+    title: Cookie consent
+    description: >-
+
+      We use cookies to recognize your repeated visits and preferences, as well
+      as to measure the effectiveness of our documentation and whether users
+      find what they're searching for. With your consent, you're helping us to
+      make our documentation better.
+
+# Page tree
 nav:
   - Introduction: index.md
   - Onboarding: onboarding/index.md
@@ -13,6 +123,10 @@ nav:
       - guides/index.md
       - Languages:
           - Go: guides/languages/go.md
+          - Rust: guides/languages/rust.md
+          - Python: guides/languages/python.md
+          - Flutter/Dart: guides/languages/flutter.md
+          - SQL: guides/languages/sql.md
   - Reference:
       - reference/index.md
       - Workflows: reference/workflows.md
@@ -21,13 +135,17 @@ nav:
       - UDCs: reference/udc.md
   - Appendix:
       - Earthly: appendix/earthly.md
-markdown_extensions:
-  - admonition
-  - pymdownx.details
-  - pymdownx.superfences:
-      custom_fences:
-        - name: mermaid
-          class: mermaid
-          format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.tabbed:
-      alternate_style: true
+      - Documentation Examples:
+          - Examples: appendix/examples/index.md
+          - Abbreviations: appendix/examples/abbreviations.md
+          - Admonitions: appendix/examples/admonitions.md
+          - Code Formatting: appendix/examples/code-formatting.md
+          - Mermaid Diagrams: appendix/examples/mermaid-diagrams.md
+          - Kroki Diagrams: appendix/examples/kroki-diagrams.md
+      - Important Information:
+          - Important Information: appendix/important/index.md
+          - Contributing: appendix/important/contributing.md
+          - Code of Conduct: appendix/important/coc.md
+          - Security: appendix/important/security.md
+          - License: appendix/important/license.md
+
