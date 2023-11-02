@@ -17,7 +17,6 @@ export async function run(): Promise<void> {
   const args: string[] = []
 
   args.push('-P')
-  core.info(`args: ${args.join(' ')}`)
 
   if (runnerAddress) {
     args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`)
