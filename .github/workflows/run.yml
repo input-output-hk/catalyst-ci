@@ -106,7 +106,7 @@ jobs:
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Run
-        uses: input-output-hk/catalyst-ci/actions/run@fix/ci-run
+        uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
         with:
           privileged: ${{ inputs.privileged }}
