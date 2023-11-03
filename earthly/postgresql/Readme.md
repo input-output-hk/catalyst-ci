@@ -25,7 +25,7 @@ builder:
 
     WORKDIR /build
 
-    COPY --dir example/migrations example/data example/refinery.toml
+    COPY --dir ./example/migrations ./example/data ./example/refinery.toml .
     DO +BUILDER
 
 build:
