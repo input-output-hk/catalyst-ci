@@ -1,7 +1,5 @@
 VERSION 0.7
 
-# cspell: words runable
-
 # Copy all the source we need to build the docs
 src:
     FROM ../earthly/docs+mkdocs-material
@@ -19,17 +17,12 @@ docs:
 
     DO ../earthly/docs+BUILD
 
-    RUN /scripts/build.sh
 
-    SAVE ARTIFACT /site/*
-
-# Make a locally runable container that can serve the docs.
+# Make a container that can serve the docs for development purposes.
+# This target is only for local developer use.
 local:
-    # Build a self contained service to show built docs locally.
     DO ../earthly/docs+PACKAGE
 
-    # Copy the static pages into the container
     COPY +docs/ /usr/share/nginx/html
 
-    # This is a local only image, we do not publish it.
     SAVE IMAGE cat-ci-docs:latest
