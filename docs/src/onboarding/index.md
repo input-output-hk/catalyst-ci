@@ -1,3 +1,7 @@
+---
+icon: material/handshake-outline
+---
+
 # Welcome
 
 Welcome to the onboarding section of the documentation.

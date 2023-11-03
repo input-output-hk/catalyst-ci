@@ -1,4 +1,8 @@
-# Flutter / Dart
+---
+icon: simple/flutter
+---
+
+# :simple-flutter: Flutter / :simple-dart: Dart
 
 ## TODO
 

@@ -12,16 +12,17 @@ repo_url: https://github.com/input-output-hk/catalyst-ci
 nav:
   - Introduction: index.md
   - Onboarding: onboarding/index.md
-  - Style Guide: style.md
+  - Style Guide: style/index.md
   - Guides:
       - guides/index.md
       - Documentation: guides/docs.md
       - Languages:
+          - guides/languages/index.md
           - Go: guides/languages/go.md
           - Rust: guides/languages/rust.md
           - Python: guides/languages/python.md
           - Flutter/Dart: guides/languages/flutter.md
-          - SQL: guides/languages/sql.md
+          - PostgreSQL: guides/languages/postgresql.md
   - Reference:
       - reference/index.md
       - Workflows: reference/workflows.md
@@ -29,6 +30,7 @@ nav:
       - Targets: reference/targets.md
       - UDCs: reference/udc.md
   - Appendix:
+      - appendix/index.md
       - Earthly: appendix/earthly.md
       - Documentation Examples:
           - Examples: appendix/examples/index.md

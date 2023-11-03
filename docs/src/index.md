@@ -1,3 +1,7 @@
+---
+icon: material/pipe
+---
+
 # Introduction
 
 Welcome to the Catalyst CI documentation!

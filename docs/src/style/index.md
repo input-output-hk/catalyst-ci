@@ -1,3 +1,7 @@
+---
+icon: material/ruler-square-compass
+---
+
 # Style Guide
 
 ## Introduction

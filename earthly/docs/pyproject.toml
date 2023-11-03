@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-mkdocs-material = { version = "^9.4.6", extras = ["recommended","git","imaging"] }
+mkdocs-material = { version = "^9.4.7", extras = ["recommended","git","imaging"] }
 
 ### MkDocs Plugins we add.
 
