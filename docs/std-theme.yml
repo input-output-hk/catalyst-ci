@@ -30,16 +30,18 @@ theme:
     - navigation.instant
     - navigation.instant.progress
     - navigation.tracking
-    #- navigation.tabs
-    #- navigation.tabs.sticky
-    - navigation.sections
-    - navigation.expand
+    - navigation.tabs
+    - navigation.tabs.sticky
+    # - navigation.sections
+    # - navigation.expand
     - navigation.path
     - navigation.indexes
     - toc.follow
     - toc.integrate
     - search.suggest
     - search.highlight
+    - content.code.copy
+
 
 plugins:
   - search

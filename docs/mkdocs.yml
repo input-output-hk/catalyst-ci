@@ -15,6 +15,7 @@ nav:
   - Style Guide: style.md
   - Guides:
       - guides/index.md
+      - Documentation: guides/docs.md
       - Languages:
           - Go: guides/languages/go.md
           - Rust: guides/languages/rust.md
