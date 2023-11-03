@@ -1,9 +1,9 @@
 VERSION 0.7
-FROM python:3.12-alpine3.18
 
 # cspell: words libgcc freetype lcms openjpeg
 
-mkdocs-material:
+deps:
+    FROM python:3.12-alpine3.18
     # Derived from official mkdocs-material docker container.
     # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile
     # Due to docs being constructed not only from Doc source but Build artifacts,
@@ -45,14 +45,21 @@ mkdocs-material:
     # Set working directory
     WORKDIR /docs
 
-    # Live Docs are not supported, this is only used during testing.
 
-    # Expose MkDocs development server port
-    EXPOSE 8000
+# Common src setup
+SRC:
+    COMMAND
 
-    # Start development server by default
-    # Will live serve the docs in `/docs` on 0.0.0.0:8000
-    ENTRYPOINT ["/scripts/serve.sh"]
+    FROM +deps
+
+    COPY ../../docs+common/* /docs
+
+    # Just copy the actual doc src here.
+    COPY --dir src mkdocs.yml /docs
+
+    # Any files which replace the standard files are copied here
+    COPY --if-exists --dir includes macros overrides  /docs
+
 
 # Build the docs - We always do this in a `docs` target.  
 # The only target that needs customizing is the `src` target.
@@ -83,7 +90,7 @@ PACKAGE:
     CMD ["nginx", "-g", "daemon off;"]
 
     # These steps are done outside the UDC.
-    
+
     # Copy the static pages into the container like this...
     #COPY $docs /usr/share/nginx/html
 
