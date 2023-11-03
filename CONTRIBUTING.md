@@ -30,7 +30,7 @@ The community looks forward to your contributions. 🎉
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the
-[Catalyst voices Code of Conduct](https://github.com/input-output-hk/catalyst-voices/blob/main/CODE_OF_CONDUCT.md).
+[Catalyst CI Code of Conduct](https://github.com/input-output-hk/catalyst-ci/blob/main/CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code.
 Please report unacceptable behavior
 to <code-of-conduct@iohk.io>.
@@ -38,18 +38,18 @@ to <code-of-conduct@iohk.io>.
 ## I Have a Question
 
 > If you want to ask a question, we assume that you have read the available
-[Documentation](https://input-output-hk.github.io/catalyst-voices/).
+[Documentation](https://input-output-hk.github.io/catalyst-ci/).
 
 Before you ask a question, it is best to search for existing
-[Issues](https://github.com/input-output-hk/catalyst-voices/issues)
+[Issues](https://github.com/input-output-hk/catalyst-ci/issues)
 that might help you.
 In case you have found a suitable issue and still need clarification, you can write your question
-[here](https://github.com/input-output-hk/catalyst-voices/discussions).
+[here](https://github.com/input-output-hk/catalyst-ci/discussions).
 It is also advisable to search the internet for answers first.
 
 If you then still feel the need to ask a question and need clarification, we recommend the following:
 
-* Open an [Issue](https://github.com/input-output-hk/catalyst-voices/issues/new/choose).
+* Open an [Issue](https://github.com/input-output-hk/catalyst-ci/issues/new/choose).
 * Provide as much context as you can about what you're running into.
 * Provide project and platform versions (`rustc --version --verbose`, `flutter doctor -v`, etc),
 depending on what seems relevant.
@@ -69,11 +69,11 @@ Please complete the following steps in advance to help us fix any potential bug 
 * Make sure that you are using the latest version.
 * Determine if your bug is really a bug and not an error on your side.
   e.g. using incompatible environment components/versions (Make sure that you have read the
-  [documentation](https://input-output-hk.github.io/catalyst-voices).
+  [documentation](https://input-output-hk.github.io/catalyst-ci).
   If you are looking for support, you might want to check [this section](#i-have-a-question).
 * To see if other users have experienced (and potentially already solved) the same issue you are having.
   Check if there is not already a bug report existing for your bug or error in the
-[bug tracker](https://github.com/input-output-hk/catalyst-voices/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
+[bug tracker](https://github.com/input-output-hk/catalyst-ci/issues?q=is%3Aopen+is%3Aissue+label%3Abug).
 * Also make sure to search the internet (including Stack Overflow)
   to see if users outside the GitHub community have discussed the issue.
 * Collect information about the bug:
@@ -94,7 +94,7 @@ Please complete the following steps in advance to help us fix any potential bug 
 We use GitHub issues to track bugs and errors.
 If you run into an issue with the project:
 
-* Open an [Issue](https://github.com/input-output-hk/catalyst-voices/issues/new).
+* Open an [Issue](https://github.com/input-output-hk/catalyst-ci/issues/new).
   (Since we can't be sure at this point whether it is a bug or not,
   we ask you not to talk about a bug yet and not to label the issue.)
 * Explain the behavior you would expect and the actual behavior.
@@ -117,7 +117,7 @@ Once it's filed:
 
 ### Suggesting Enhancements
 
-This section guides you through submitting an enhancement suggestion for Catalyst voices,
+This section guides you through submitting an enhancement suggestion for Catalyst CI,
 **including completely new features and minor improvements to existing functionality**.
 Following these guidelines will help maintainers and the community to understand your suggestion and
 find related suggestions.
@@ -125,9 +125,9 @@ find related suggestions.
 #### Before Submitting an Enhancement
 
 * Make sure that you are using the latest version.
-* Read the [documentation](https://github.com/input-output-hk/catalyst-voices) carefully.
+* Read the [documentation](https://github.com/input-output-hk/catalyst-ci) carefully.
   Find out if the functionality is already covered, maybe by an individual configuration.
-* Perform a [search](https://github.com/input-output-hk/catalyst-voices/issues)
+* Perform a [search](https://github.com/input-output-hk/catalyst-ci/issues)
 to see if the enhancement has already been suggested.
   If it has, add a comment to the existing issue instead of opening a new one.
 * Find out whether your idea fits with the scope and aims of the project.
@@ -137,7 +137,7 @@ to see if the enhancement has already been suggested.
 
 #### How Do I Submit a Good Enhancement Suggestion?
 
-Enhancement suggestions are tracked as [GitHub issues](https://github.com/input-output-hk/catalyst-voices/issues).
+Enhancement suggestions are tracked as [GitHub issues](https://github.com/input-output-hk/catalyst-ci/issues).
 
 * Use a **clear and descriptive title** for the issue to identify the suggestion.
 * Provide a **step-by-step description of the suggested enhancement** in as many details as possible.
@@ -148,7 +148,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/input-
   You can use [this tool](https://www.cockos.com/licecap/) to record GIFs on macOS and Windows,
   and [this tool](https://github.com/colinkeenan/silentcast) or
   [this tool](https://github.com/GNOME/byzanz) on Linux.
-* **Explain why this enhancement would be useful** to most Catalyst voices users.
+* **Explain why this enhancement would be useful** to most Catalyst CI users.
   You may also want to point out the other projects that solved it better and which could serve as inspiration.
 
 ### Your First Code Contribution
