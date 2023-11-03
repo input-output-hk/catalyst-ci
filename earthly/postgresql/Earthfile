@@ -16,23 +16,23 @@ postgres-base:
             colordiff \
             musl-dev \
             curl \
-            gcc
+            gcc \
+            python3
 
     # Get refinery
     COPY ../rust+rust-base/refinery /bin
 
     COPY ./entry.sh .
-    RUN chmod ugo+x ./entry.sh
-    COPY setup-db.sql .
+    COPY ./setup-db.sql .
 
 # Common PostgreSQL setup.
 # Prepare important files needed for building image
 BUILDER:
     COMMAND
 
-    COPY ./entry.sh .
+    RUN cp /root/entry.sh .
     RUN chmod ugo+x ./entry.sh
-    COPY setup-db.sql .
+    RUN cp /root/setup-db.sql .
 
 # Base checks for sql files
 # TODO: https://github.com/input-output-hk/catalyst-ci/issues/62
