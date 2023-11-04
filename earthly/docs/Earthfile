@@ -1,6 +1,6 @@
 VERSION 0.7
 
-# cspell: words libgcc freetype lcms openjpeg
+# cspell: words libgcc freetype lcms openjpeg etag
 
 deps:
     FROM python:3.12-alpine3.18
