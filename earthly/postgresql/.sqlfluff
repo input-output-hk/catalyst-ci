@@ -1,3 +1,5 @@
+# cspell: words sqlfluff capitalisation
+
 [sqlfluff]
 dialect = postgres
 large_file_skip_char_limit = 0

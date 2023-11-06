@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
 VERSION 0.7
 
-# cspell: words colordiff rustup rustc psql
+# cspell: words colordiff rustup rustc psql sqlfluff
 
 postgres-base:
     FROM postgres:16.0-alpine3.18
