@@ -1,0 +1,177 @@
+# Common PostgreSQL Earthly builders
+VERSION 0.7
+
+# cspell: words colordiff rustup rustc psql
+
+postgres-base:
+    FROM postgres:16.0-alpine3.18
+
+    WORKDIR /root
+
+    # Install necessary packages 
+    # Expand this list as needed, rather than adding more tools in later containers.
+    RUN apk add --no-cache \
+            ripgrep \
+            bash \
+            colordiff \
+            musl-dev \
+            curl \
+            gcc \
+            python3
+
+    # Get refinery
+    COPY ../rust+rust-base/refinery /bin
+
+    COPY ./entry.sh .
+    COPY ./setup-db.sql .
+
+# Common PostgreSQL setup.
+# Prepare important files needed for building image
+BUILDER:
+    COMMAND
+
+    RUN cp /root/entry.sh .
+    RUN chmod ugo+x ./entry.sh
+    RUN cp /root/setup-db.sql .
+
+# Base checks for sql files
+# TODO: https://github.com/input-output-hk/catalyst-ci/issues/62
+CHECK:
+    COMMAND
+
+# Build PostgreSQL image.
+# REQUIREMENTS: 
+#  * prepare migrations files into the `./migrations` dir
+#  * prepare seed data files into the `./data` dir (optional)
+#  * prepare `refinery.toml` file
+# Arguments:
+#  * tag : The tag of the image, default value `latest`.
+#  * registry: The registry of the image.
+#  * image_name: The name of the image (required).
+BUILD:
+    COMMAND
+
+    ARG tag="latest"
+    ARG registry
+    ARG --required image_name
+
+    USER postgres:postgres
+
+    ENTRYPOINT ["./entry.sh"]
+
+    # Push the container...
+    SAVE IMAGE --push ${registry}${image_name}:$tag
+
+builder:
+    FROM +postgres-base
+
+    WORKDIR /build
+
+    COPY --dir ./example/migrations ./example/data ./example/refinery.toml .
+    DO +BUILDER
+
+check:
+    FROM +builder
+
+    DO +CHECK
+
+build:
+    FROM +builder
+
+    DO +BUILD --image_name=example-db
+
+# Container runs PostgreSQL server, drops and initialise db, applies migrations, applies seed data.
+test-1:
+    FROM +postgres-base
+
+    COPY ../utils+shell-assert/assert.sh .
+
+    ENV INIT_AND_DROP_DB true
+    ENV WITH_MIGRATIONS true
+    ENV WITH_SEED_DATA true
+    COPY ./example/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load example-db:latest=+build \
+        --service example \
+        --allow-privileged
+        RUN sleep 5;\
+            res=$(psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users");\
+            
+            source assert.sh;\
+            expected=$(printf "  name   | age \n---------+-----\n Alice   |  20\n Bob     |  30\n Charlie |  40\n(3 rows)");\
+            assert_eq "$expected" "$res"
+    END
+
+# Container runs PostgreSQL server, drops and initialise db, doesn't apply migrations, doesn't apply seed data.
+test-2:
+    FROM +postgres-base
+
+    ENV INIT_AND_DROP_DB true
+    ENV WITH_MIGRATIONS false
+    ENV WITH_SEED_DATA false
+    COPY ./example/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load example-db:latest=+build \
+        --service example \
+        --allow-privileged
+        RUN sleep 5;\
+            ! psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
+    END
+
+# Container runs PostgreSQL server, drops and initialise db, applies migrations, doesn't apply seed data.
+test-3:
+    FROM +postgres-base
+
+    COPY ../utils+shell-assert/assert.sh .
+
+    ENV INIT_AND_DROP_DB true
+    ENV WITH_MIGRATIONS true
+    ENV WITH_SEED_DATA false
+    COPY ./example/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --load example-db:latest=+build \
+        --service example \
+        --allow-privileged
+        RUN sleep 5;\
+            res=$(psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users");\
+
+            source assert.sh;\
+            expected=$(printf " name | age \n------+-----\n(0 rows)");\
+            assert_eq "$expected" "$res"
+    END
+
+# PostgreSQL server runs as a separate service, drops and initialise db, applies migrations, applies seed data.
+test-4:
+    FROM +postgres-base
+
+    COPY ../utils+shell-assert/assert.sh .
+
+    ENV DB_HOST postgres
+    ENV INIT_AND_DROP_DB true
+    ENV WITH_MIGRATIONS true
+    ENV WITH_SEED_DATA true
+    COPY ./example/docker-compose.yml .
+    WITH DOCKER \
+        --compose docker-compose.yml \
+        --pull postgres:16 \
+        --load example-db:latest=+build \
+        --service example \
+        --service postgres \
+        --allow-privileged
+        RUN sleep 5;\
+            res=$(psql postgresql://postgres:postgres@0.0.0.0:5433/ExampleDb -c "SELECT * FROM users");\
+            
+            source assert.sh;\
+            expected=$(printf "  name   | age \n---------+-----\n Alice   |  20\n Bob     |  30\n Charlie |  40\n(3 rows)");\
+            assert_eq "$expected" "$res"
+    END
+
+# Invoke all tests
+test:
+    BUILD +test-1
+    BUILD +test-2
+    BUILD +test-3
+    BUILD +test-4
