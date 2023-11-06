@@ -17,16 +17,11 @@ postgres-base:
             musl-dev \
             curl \
             gcc \
-            py3-pip
-
-    # Install SQLFluff
-    RUN pip3 install sqlfluff
-    RUN sqlfluff version
+            python3
 
     # Get refinery
     COPY ../rust+rust-base/refinery /bin
 
-    COPY ./.sqlfluff .
     COPY ./entry.sh .
     COPY ./setup-db.sql .
 
@@ -44,7 +39,19 @@ BUILDER:
 CHECK:
     COMMAND
 
-    RUN sqlfluff lint .
+    # Where we want to run the `lint` from.
+    ARG --required src
+
+    RUN docker run --rm -v $src:/sql sqlfluff/sqlfluff:latest lint .
+
+# Format sql files
+FORMAT:
+    COMMAND
+
+    # Where we want to run the `lint` from.
+    ARG --required src
+
+    RUN docker run --rm -v $src:/sql sqlfluff/sqlfluff:latest format .
 
 
 # Build PostgreSQL image.
@@ -79,9 +86,14 @@ builder:
     DO +BUILDER
 
 check:
-    FROM +builder
+    LOCALLY
 
-    DO +CHECK
+    DO +CHECK --src=$(echo ${PWD})
+
+format:
+    LOCALLY
+
+    DO +FORMAT --src=$(echo ${PWD})
 
 build:
     FROM +builder

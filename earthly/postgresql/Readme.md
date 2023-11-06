@@ -28,6 +28,16 @@ builder:
     COPY --dir ./example/migrations ./example/data ./example/refinery.toml .
     DO +BUILDER
 
+check:
+    LOCALLY
+
+    DO +CHECK --src=$(echo ${PWD})
+
+format:
+    LOCALLY
+
+    DO +FORMAT --src=$(echo ${PWD})
+
 build:
     FROM +builder
 

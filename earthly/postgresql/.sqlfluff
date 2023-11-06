@@ -1,5 +1,6 @@
 [sqlfluff]
 dialect = postgres
+large_file_skip_char_limit = 0
 
 [sqlfluff:indentation]
 tab_space_size = 2
