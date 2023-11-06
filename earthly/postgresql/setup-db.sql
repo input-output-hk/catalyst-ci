@@ -15,8 +15,7 @@
 \echo -> dbName ................. = :dbName
 \echo -> dbDescription .......... = :dbDescription
 \echo -> dbUser ................. = :dbUser
-\echo -> dbUserPw / $DB_USER_PW . = :dbUserPw
-
+\echo -> dbUserPw ............... = :dbUserPw
 
 -- Cleanup if we already ran this before.
 DROP DATABASE IF EXISTS :"dbName";
@@ -35,4 +34,3 @@ ALTER DEFAULT privileges IN SCHEMA public REVOKE EXECUTE ON functions FROM :"dbU
 CREATE DATABASE :"dbName" WITH OWNER :"dbUser";
 
 COMMENT ON DATABASE :"dbName" IS :'dbDescription';
-
