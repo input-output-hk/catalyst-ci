@@ -30,7 +30,6 @@ postgres-base:
 BUILDER:
     COMMAND
 
-    RUN cp /root/.sqlfluff .
     RUN cp /root/entry.sh .
     RUN chmod ugo+x ./entry.sh
     RUN cp /root/setup-db.sql .
