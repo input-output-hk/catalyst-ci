@@ -11,6 +11,18 @@ This repo defines common PostgreSQL targets and UDCs.
 This UDC prepares postgresSQL environment,
 takes `entry.sh` and `setup-db.sql` added in the `postgres-base`.
 
+### CHECK
+
+This UDC runs lints sql files from the provided directory.
+Necessary to specify `.sqlfluff` config file,
+which can be copied from this repo, and located in the place with the Earthfile.
+
+### FORMAT
+
+This UDC runs lint's formatting sql files from the provided directory.
+Necessary to specify `.sqlfluff` config file,
+which can be copied from this repo, and located in the place with the Earthfile.
+
 ### BUILD
 
 This UDC builds postgresSQL image with all prepared migrations and seed data.

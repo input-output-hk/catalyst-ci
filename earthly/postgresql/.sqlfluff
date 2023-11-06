@@ -1,4 +1,4 @@
-# cspell: words sqlfluff capitalisation
+# cspell: words capitalisation
 
 [sqlfluff]
 dialect = postgres

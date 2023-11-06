@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
 VERSION 0.7
 
-# cspell: words colordiff rustup rustc psql sqlfluff
+# cspell: words colordiff rustup rustc psql
 
 postgres-base:
     FROM postgres:16.0-alpine3.18
@@ -36,6 +36,8 @@ BUILDER:
     RUN cp /root/setup-db.sql .
 
 # Linter checks for sql files
+# Arguments:
+#  * src : Source directory with the sql files.
 CHECK:
     COMMAND
 
@@ -45,6 +47,8 @@ CHECK:
     RUN docker run --rm -v $src:/sql sqlfluff/sqlfluff:latest lint .
 
 # Format sql files
+# Arguments:
+#  * src : Source directory with the sql files.
 FORMAT:
     COMMAND
 
