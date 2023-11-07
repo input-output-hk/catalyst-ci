@@ -13,15 +13,16 @@ takes `entry.sh` and `setup-db.sql` added in the `postgres-base`.
 
 ### CHECK
 
-This UDC runs lints sql files from the provided directory.
-Necessary to specify `.sqlfluff` config file,
-which can be copied from this repo, and located in the place with the Earthfile.
+This UDC runs lints for the sql files.
 
 ### FORMAT
 
 This UDC runs lint's formatting sql files from the provided directory.
-Necessary to specify `.sqlfluff` config file,
-which can be copied from this repo, and located in the place with the Earthfile.
+*NOTE* that it is necessary to build `postgres-base` image using `postgres-base-image` target:
+
+```sh
+earthly +postgres-base-image
+```
 
 ### BUILD
 
@@ -41,9 +42,9 @@ builder:
     DO +BUILDER
 
 check:
-    LOCALLY
+    FROM +builder
 
-    DO +CHECK --src=$(echo ${PWD})
+    DO +CHECK
 
 format:
     LOCALLY
