@@ -30,14 +30,14 @@ postgres-base:
     COPY ./entry.sh .
     COPY ./setup-db.sql .
 
-postgres-base-image:
+sqlfluff-image:
     FROM +postgres-base
 
     WORKDIR /sql
 
     RUN cp /root/.sqlfluff .
 
-    SAVE IMAGE postgres-base:latest
+    SAVE IMAGE sqlfluff-image:latest
 
 # Common PostgreSQL setup.
 # Prepare important files needed for building image
@@ -57,7 +57,7 @@ CHECK:
 
 # Format sql files
 # REQUIREMENTS:
-#  * build `postgres-base` image via `earthly +postgres-base-image` target
+#  * build `sqlfluff-image` image via `earthly +sqlfluff-image` target
 # Arguments:
 #  * src : Source directory with the sql files.
 FORMAT:
@@ -66,7 +66,7 @@ FORMAT:
     # Where we want to run the `lint` from.
     ARG --required src
 
-    RUN docker run --rm -v $src:/sql postgres-base:latest sqlfluff format .
+    RUN docker run --rm -v $src:/sql sqlfluff-image:latest sqlfluff format .
 
 # Build PostgreSQL image.
 # REQUIREMENTS: 

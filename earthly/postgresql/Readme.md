@@ -18,10 +18,10 @@ This UDC runs lints for the sql files.
 ### FORMAT
 
 This UDC runs lint's formatting sql files from the provided directory.
-*NOTE* that it is necessary to build `postgres-base` image using `postgres-base-image` target:
+*NOTE* that it is necessary to build `sqlfluff-image` image using `+sqlfluff-image` target:
 
 ```sh
-earthly +postgres-base-image
+earthly +sqlfluff-image
 ```
 
 ### BUILD
