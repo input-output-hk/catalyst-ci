@@ -2,8 +2,12 @@ name: Docs
 
 on:
   push:
-    paths:
-      - "docs/**"
+    tags-ignore:
+      - '*'
+
+concurrency:
+  group: "docs"
+  cancel-in-progress: false
 
 permissions:
   id-token: write

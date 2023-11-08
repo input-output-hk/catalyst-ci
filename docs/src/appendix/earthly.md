@@ -1,3 +1,7 @@
+---
+icon: material/earth-plus
+---
+
 # Earthly
 
 This appendix is designed to get you quickly up and running with [Earthly](https://earthly.dev).

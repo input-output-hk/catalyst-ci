@@ -1,90 +1,108 @@
 VERSION 0.7
-FROM python:3.11-bullseye
 
-mkdocs-material:
+# cspell: words libgcc freetype lcms openjpeg etag
+
+deps:
+    FROM python:3.12-alpine3.18
     # Derived from official mkdocs-material docker container.
     # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile
+    # Due to docs being constructed not only from Doc source but Build artifacts,
+    # These docs do NOT support Live serving, and must be built.
+    # This is all the tooling needed to build the docs.
+
+    # Install extra packages we will need to support plugins.
+    RUN apk add --no-cache \    
+        bash \
+        graphviz \
+        curl \
+        zlib-dev \
+        jpeg-dev \
+        libxml2-dev \
+        libxslt-dev \
+        libffi-dev \
+        gcc \
+        musl-dev \
+        libgcc \
+        openssl-dev \
+        freetype-dev \
+        lcms2-dev \
+        openjpeg-dev \
+        tiff-dev \
+        tk-dev \
+        tcl-dev  \
+        git       
 
     # Install poetry and our python dependencies.
-    DO ../python+POETRY_SETUP --extra_file=start.sh
+    DO ../python+POETRY_SETUP
 
-    # Install extra debian packages we will need to support plugins.
-    RUN apt-get update && \
-        apt-get install -y --no-install-recommends \
-        graphviz
+    # Copy our run scripts
+    COPY --dir scripts /scripts
 
     # Trust directory, required for git >= 2.35.2. (mkdocs Git plugin requirement).
     RUN git config --global --add safe.directory /docs &&\
         git config --global --add safe.directory /site
 
-    # Carry the Kroki Docker Compose with this image.
-    COPY --dir services /
-
     # Set working directory
     WORKDIR /docs
 
-    # Expose MkDocs development server port
-    EXPOSE 8000
 
-    # Start development server by default
-    ENTRYPOINT ["/poetry/start.sh"]
-    CMD ["serve", "--dev-addr=0.0.0.0:8000"]
-
-    # So we can extract these files in other steps.
-    SAVE ARTIFACT /services
-
-# Build the documentation statically
-MKDOCS_BUILD:
-    COMMAND
-    ARG src
-
-    # Ensure the mkdocs tools are built and up-to-date.
-    BUILD +mkdocs-material
-
-    FROM earthly/dind:alpine
-    WORKDIR /build
-    COPY +mkdocs-material/services/docker-compose.kroki.yml .
-
-    # Copy the src
-    COPY --dir $src /docs
-
-    # Docs need Kroki to build diagrams, so make sure its running.
-    WITH DOCKER --compose docker-compose.kroki.yml --load mkdocs=+mkdocs-material
-        RUN docker run \
-            --rm \
-            -v /docs:/docs \
-            --network=mkdocs \
-            mkdocs build
-    END
-
-# Setup local documentation development.
-DEVELOP:
+# Common src setup
+SRC:
     COMMAND
 
-    ARG dest=$(echo ${PWD}/local)
+    FROM +deps
 
-    # Ensure the mkdocs tools are built and up-to-date.
-    BUILD +mkdocs-material
+    COPY ../../docs+common/* /docs
 
-    # Get local development artifacts
-    COPY +mkdocs-material/services /local
+    # Just copy the actual doc src here.
+    COPY --dir src mkdocs.yml /docs
 
-    SAVE ARTIFACT /local AS LOCAL $dest
-
-
-build-test:
-    # Test of building docs.
-    # Run with `earthly -P +build-test`
-    ARG dest=./site
-
-    # Build the site (UDC creates the container itself.)
-    DO +MKDOCS_BUILD --src=./sample
-
-    SAVE ARTIFACT /docs/site AS LOCAL $dest
+    # Any files which replace the standard files are copied here
+    COPY --if-exists --dir includes macros overrides  /docs
 
 
-# Target which sets up the documentation to be served locally.
-mkdocs-develop-test:
-    FROM alpine:latest
+# Build the docs - We always do this in a `docs` target.  
+# The only target that needs customizing is the `src` target.
+BUILD:
+    COMMAND
 
-    DO +DEVELOP --dest=./local
+    RUN /scripts/build.sh
+
+    SAVE ARTIFACT /site/*
+
+
+# See `<repo>/docs` for the example docs project which uses this tooling.
+
+# Docs fall outside the normal CI flow and have their own build and publish flow.
+
+# We do however build a docs package which is used for locally serving the docs
+# which assists in documentation writing.
+PACKAGE:
+    COMMAND
+
+    # Use the official Nginx base image
+    FROM nginx:alpine3.18-slim
+
+    # Force this server to disable the browsers cache for these files.
+    RUN echo "http {" > /etc/nginx/conf.d/disable-cache.conf; \
+        echo "    add_header Last-Modified \$date_gmt;" >> /etc/nginx/conf.d/disable-cache.conf; \
+        echo "    add_header Cache-Control 'private no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';" >> /etc/nginx/conf.d/disable-cache.conf; \
+        echo "    if_modified_since off;" >> /etc/nginx/conf.d/disable-cache.conf; \
+        echo "    expires off;" >> /etc/nginx/conf.d/disable-cache.conf; \
+        echo "    etag off;" >> /etc/nginx/conf.d/disable-cache.conf; \
+        echo "}" >> /etc/nginx/conf.d/disable-cache.conf
+
+    # Expose port 80 for HTTP traffic
+    EXPOSE 80
+
+    # Start Nginx when the container is run
+    CMD ["nginx", "-g", "daemon off;"]
+
+    # These steps are done outside the UDC.
+
+    # Copy the static pages into the container like this...
+    #COPY $docs /usr/share/nginx/html
+
+    # And then save the image
+    # SAVE IMAGE image_name
+    

@@ -235,8 +235,9 @@ integrate:
 
 # Publish packages if all integration tests have passed. 
 # (Failure to pass tests will prevent packages being published.)
-publish:
-    FROM scratch
+# Don't have a `publish` target if nothing to actually publish.
+#publish:
+#    FROM scratch
 
 ## -----------------------------------------------------------------------------
 

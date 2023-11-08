@@ -1,3 +1,6 @@
+---
+icon: material/file-document-multiple-outline
+---
 # Reference
 
 This section contains in-depth documentation about the various components that make up the Catalyst CI process.
