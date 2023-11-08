@@ -2,8 +2,10 @@ name: Docs
 
 on:
   push:
-    tags-ignore:
-      - '*'
+    branches:
+      - "*"
+    tags-ignore: 
+      - '**'
 
 concurrency:
   group: "docs"

@@ -1,5 +1,7 @@
 name: Branch Deleted
-on: delete
+on: 
+  delete:
+  workflow_call:
 
 concurrency:
   group: "docs"
