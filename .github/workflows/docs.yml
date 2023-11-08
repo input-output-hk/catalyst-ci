@@ -1,9 +1,6 @@
 name: Docs
 
-on:
-  push:
-    tags-ignore:
-      - '*'
+on: push
 
 concurrency:
   group: "docs"
