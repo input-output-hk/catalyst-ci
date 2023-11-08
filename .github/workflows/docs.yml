@@ -1,6 +1,11 @@
 name: Docs
 
-on: push
+on:
+  push:
+    branches:
+      - "*"
+    tags-ignore: 
+      - '**'
 
 concurrency:
   group: "docs"
