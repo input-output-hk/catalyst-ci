@@ -1,3 +1,7 @@
+---
+icon: material/map-legend
+---
+
 # Guides
 
 This section contains guides for using the Catalyst CI to perform common tasks.

@@ -1,9 +1,6 @@
 name: Docs
 
-on:
-  push:
-    paths:
-      - "docs/**"
+on: push
 
 permissions:
   id-token: write

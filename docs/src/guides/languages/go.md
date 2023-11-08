@@ -1,4 +1,8 @@
-# Go
+---
+icon: simple/go
+---
+
+# :simple-go: Go
 
 ## Introduction
 

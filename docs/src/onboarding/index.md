@@ -1,3 +1,7 @@
+---
+icon: material/handshake-outline
+---
+
 # Welcome
 
 Welcome to the onboarding section of the documentation.
@@ -139,7 +143,7 @@ is ready to be tested and shipped.
 
 ## Getting Started
 
-Before creating and/or modifying an `Earthfile`, it's imperative to review the [style guide](../style.md).
+Before creating and/or modifying an `Earthfile`, it's imperative to review the [style guide](../style/index.md).
 Due to the relative flexibility of Earthly, it's possible to structure an `Earthfile` in dozens of valid ways.
 To provide consistency across our projects, we have implemented a style guide which brings a level of standardization to
 `Earthfile`s.

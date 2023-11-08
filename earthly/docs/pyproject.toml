@@ -6,8 +6,8 @@ authors = ["Joshua Gilman", "Steven Johnson"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
-mkdocs-material = { version = "^9.4.1", extras = ["recommended","git","imaging"] }
+python = "^3.12"
+mkdocs-material = { version = "^9.4.7", extras = ["recommended","git","imaging"] }
 
 ### MkDocs Plugins we add.
 
@@ -21,10 +21,19 @@ mkdocs-redirects = "^v1.2.1"
 mkdocs-glightbox = "^0.3.4"
 
 # https://github.com/AVATEAM-IT-SYSTEMHAUS/mkdocs-kroki-plugin/tree/main
-mkdocs-kroki-plugin = "^0.6.1"
+# Using this fork: https://github.com/oniboni/mkdocs-kroki-plugin/tree/refactoring/image-handling
+# Because it properly handles the image files.
+#mkdocs-kroki-plugin = "^0.6.1"
+mkdocs-kroki-plugin = { git = "https://github.com/oniboni/mkdocs-kroki-plugin", branch="refactoring/image-handling" }
 
 # https://github.com/jdoiro3/mkdocs-multirepo-plugin
 mkdocs-multirepo-plugin = "^v0.6.3"
+
+# https://mkdocs-macros-plugin.readthedocs.io/en/latest/
+mkdocs-macros-plugin = "^v1.0.4"
+
+# https://github.com/timmeinerzhagen/mkdocs-meta-manager
+mkdocs-meta-manager = "^0.2.1"
 
 ### DO NOT ENABLE THESE BAD PLUGINS.
 ### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
