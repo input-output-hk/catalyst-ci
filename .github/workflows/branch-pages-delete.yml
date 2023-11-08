@@ -1,0 +1,33 @@
+name: Branch Pages Deleted
+on: 
+  workflow_call:
+
+jobs:
+  delete:
+    if: github.event.ref_type == 'branch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set env
+        run: |
+          GIT_BRANCH=$(echo ${{ github.event.ref }} | sed -e "s#refs/heads/##g")
+          DEST_DIR="branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+          echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV    
+
+      - name: Clean up
+        run: |
+          echo "Clean up for branch ${{ env.GIT_BRANCH }} at ${{ env.DEST_DIR }}"
+
+      - name: Get current published documentation
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+
+      - name: Remove branches draft docs
+        run: |
+          rm -rf ${{ env.DEST_DIR }}
+
+      - name: Save updated docs
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: Removed Draft Docs for ${{ env.GIT_BRANCH }}

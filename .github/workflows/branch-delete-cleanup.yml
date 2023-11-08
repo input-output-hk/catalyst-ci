@@ -1,42 +1,31 @@
 name: Branch Deleted
-on: 
+
+on:
   delete:
-  workflow_call:
+    branches:
+      - "**"
+    tags-ignore: 
+      - '**'
 
 concurrency:
   group: "docs"
   cancel-in-progress: false
 
+permissions:
+  id-token: write
+  contents: write
+  packages: write
+
 jobs:
-  delete:
-    name: On branch deleted
-    if: github.event.ref_type == 'branch'
+  ci:
+    uses: ./.github/workflows/branch-pages-delete.yml
+    with:
+      aws_role_arn: arn:aws:iam::332405224602:role/ci
+      aws_region: eu-central-1
+      ci_cli_version: 1.3.1
+      earthfile: ./docs
+      target: docs
+    secrets:
+      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set env
-        run: |
-          GIT_BRANCH=$(echo ${{ github.event.ref }} | sed -e "s#refs/heads/##g")
-          DEST_DIR="branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
-          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
-          echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV    
-          echo "branch deleted is $GIT_BRANCH found at $DEST_DIR"
-
-      - name: Clean up
-        run: |
-          echo "Clean up for branch ${{ env.GIT_BRANCH }}"
-
-      - name: Get current published documentation
-        uses: actions/checkout@v3
-        with:
-          ref: gh-pages
-
-      - name: Remove branches draft docs
-        run: |
-          ls -al ${{ env.DEST_DIR }}
-          rm -rf ${{ env.DEST_DIR }}
-
-      - name: Save updated docs
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Removed Draft Docs for ${{ env.GIT_BRANCH }}
