@@ -58,6 +58,13 @@ jobs:
   run:
     runs-on: ubuntu-latest
     steps:
+      - name: Check if tag push
+        run: |
+          if [[ $GITHUB_REF == refs/tags/* ]]; then
+            echo "This is a tag push. We don't build docs for tagged versions."
+            exit 0
+          fi
+          echo "This is not a tag push. Continuing to build docs."    
       - name: Checkout
         uses: actions/checkout@v3
       - name: Set env
