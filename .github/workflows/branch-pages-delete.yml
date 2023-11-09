@@ -1,6 +1,5 @@
-# WARNING: If you modify this workflow, please update the documentation
-
-on:
+name: Branch Pages Deleted
+on: 
   workflow_call:
     inputs:
       earthfile:
@@ -55,47 +54,31 @@ on:
         required: false
 
 jobs:
-  run:
+  delete:
+    if: github.event.ref_type == 'branch'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
       - name: Set env
         run: |
-          GIT_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-          if [[ $GIT_BRANCH == "${{ github.event.repository.default_branch }}" ]]; then
-            DEST_DIR="/"
-            CLEAN_EXCLUDE="/branch/*"
-          else
-            DEST_DIR="/branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
-            CLEAN_EXCLUDE="/nothing"
-          fi
+          GIT_BRANCH=$(echo ${{ github.event.ref }} | sed -e "s#refs/heads/##g")
+          DEST_DIR="branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
           echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV    
-          echo "CLEAN_EXCLUDE=$CLEAN_EXCLUDE" >> $GITHUB_ENV    
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+
+      - name: Clean up
+        run: |
+          echo "Clean up for branch ${{ env.GIT_BRANCH }} at ${{ env.DEST_DIR }}"
+
+      - name: Get current published documentation
+        uses: actions/checkout@v3
         with:
-          aws_role_arn: ${{ inputs.aws_role_arn }}
-          aws_region: ${{ inputs.aws_region }}
-          cli_version: ${{ inputs.ci_cli_version }}
-          earthly_version: ${{ inputs.earthly_version }}
-          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
-      - name: Build docs
-        uses: input-output-hk/catalyst-ci/actions/run@master
-        id: build
+          ref: gh-pages
+
+      - name: Remove branches draft docs
+        run: |
+          rm -rf ${{ env.DEST_DIR }}
+
+      - name: Save updated docs
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          earthfile: ${{ inputs.earthfile }}
-          target: ${{ inputs.target }}
-          runner_address: ${{ secrets.earthly_runner_address }}
-          artifact: "true"
-      - name: Publish docs
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
-        with:
-          clean: true
-          clean-exclude: |
-            ${{ env.CLEAN_EXCLUDE }}
-          single-commit: true
-          target-folder: ${{ env.DEST_DIR }}
-          branch: ${{ inputs.publish_branch }}
-          folder: ${{ steps.build.outputs.artifact }}
+          commit_message: Removed Draft Docs for ${{ env.GIT_BRANCH }}
