@@ -15,24 +15,21 @@
 \echo -> dbName ................. = :dbName
 \echo -> dbDescription .......... = :dbDescription
 \echo -> dbUser ................. = :dbUser
-\echo -> dbUserPw / $DB_USER_PW . = :dbUserPw
-
+\echo -> dbUserPw ............... = :dbUserPw
 
 -- Cleanup if we already ran this before.
-DROP DATABASE IF EXISTS :"dbName";
-
-DROP USER IF EXISTS :"dbUser";
+DROP DATABASE IF EXISTS :"dbName"; -- noqa: PRS
+DROP USER IF EXISTS :"dbUser"; -- noqa: PRS
 
 -- Create the test user we will use with the local dev database.
-CREATE USER :"dbUser" WITH PASSWORD :'dbUserPw';
+CREATE USER :"dbUser" WITH PASSWORD :'dbUserPw'; -- noqa: PRS
 
 -- Privileges for this user/role.
 ALTER DEFAULT privileges REVOKE EXECUTE ON functions FROM public;
 
-ALTER DEFAULT privileges IN SCHEMA public REVOKE EXECUTE ON functions FROM :"dbUser";
+ALTER DEFAULT privileges IN SCHEMA public REVOKE EXECUTE ON functions FROM :"dbUser"; -- noqa: PRS
 
 -- Create the database.
-CREATE DATABASE :"dbName" WITH OWNER :"dbUser";
+CREATE DATABASE :"dbName" WITH OWNER :"dbUser"; -- noqa: PRS
 
-COMMENT ON DATABASE :"dbName" IS :'dbDescription';
-
+COMMENT ON DATABASE :"dbName" IS :'dbDescription'; -- noqa: PRS

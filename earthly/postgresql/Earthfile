@@ -17,27 +17,56 @@ postgres-base:
             musl-dev \
             curl \
             gcc \
-            python3
+            py3-pip
+
+    # Install SQLFluff
+    RUN pip3 install sqlfluff==2.3.5
+    RUN sqlfluff version
 
     # Get refinery
     COPY ../rust+rust-base/refinery /bin
 
+    COPY ./.sqlfluff .
     COPY ./entry.sh .
     COPY ./setup-db.sql .
+
+sqlfluff-image:
+    FROM +postgres-base
+
+    WORKDIR /sql
+
+    RUN cp /root/.sqlfluff .
+
+    SAVE IMAGE sqlfluff-image:latest
 
 # Common PostgreSQL setup.
 # Prepare important files needed for building image
 BUILDER:
     COMMAND
 
+    RUN cp /root/.sqlfluff .
     RUN cp /root/entry.sh .
     RUN chmod ugo+x ./entry.sh
     RUN cp /root/setup-db.sql .
 
-# Base checks for sql files
-# TODO: https://github.com/input-output-hk/catalyst-ci/issues/62
+# Linter checks for sql files
 CHECK:
     COMMAND
+
+    RUN sqlfluff lint .
+
+# Format sql files
+# REQUIREMENTS:
+#  * build `sqlfluff-image` image via `earthly +sqlfluff-image` target
+# Arguments:
+#  * src : Source directory with the sql files.
+FORMAT:
+    COMMAND
+
+    # Where we want to run the `lint` from.
+    ARG --required src
+
+    RUN docker run --rm -v $src:/sql sqlfluff-image:latest sqlfluff format .
 
 # Build PostgreSQL image.
 # REQUIREMENTS: 
@@ -74,6 +103,11 @@ check:
     FROM +builder
 
     DO +CHECK
+
+format:
+    LOCALLY
+
+    DO +FORMAT --src=$(echo ${PWD})
 
 build:
     FROM +builder

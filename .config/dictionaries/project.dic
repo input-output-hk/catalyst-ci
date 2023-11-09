@@ -54,3 +54,4 @@ uniseg
 webkitallowfullscreen
 WORKDIR
 xerrors
+sqlfluff
