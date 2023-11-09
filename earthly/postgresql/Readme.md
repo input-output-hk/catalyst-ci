@@ -11,6 +11,19 @@ This repo defines common PostgreSQL targets and UDCs.
 This UDC prepares postgresSQL environment,
 takes `entry.sh` and `setup-db.sql` added in the `postgres-base`.
 
+### CHECK
+
+This UDC runs lints for the sql files.
+
+### FORMAT
+
+This UDC runs lint's formatting sql files from the provided directory.
+*NOTE* that it is necessary to build `sqlfluff-image` image using `+sqlfluff-image` target:
+
+```sh
+earthly +sqlfluff-image
+```
+
 ### BUILD
 
 This UDC builds postgresSQL image with all prepared migrations and seed data.
@@ -27,6 +40,16 @@ builder:
 
     COPY --dir ./example/migrations ./example/data ./example/refinery.toml .
     DO +BUILDER
+
+check:
+    FROM +builder
+
+    DO +CHECK
+
+format:
+    LOCALLY
+
+    DO +FORMAT --src=$(echo ${PWD})
 
 build:
     FROM +builder

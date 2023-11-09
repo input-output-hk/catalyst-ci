@@ -1,4 +1,3 @@
-
 CREATE TABLE users
 (
   name VARCHAR PRIMARY KEY,
