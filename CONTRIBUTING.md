@@ -154,7 +154,7 @@ Enhancement suggestions are tracked as [GitHub issues](https://github.com/input-
 ### Your First Code Contribution
 
 Embarking on your first code contribution can be an exhilarating yet intimidating endeavor.
-Here at Catalyst Voices, we foster a welcoming and supportive environment to ensure
+Here at Catalyst, we foster a welcoming and supportive environment to ensure
 that everyone can contribute to the codebase irrespective of their experience level.
 Below is a step-by-step guide to making your first code contribution to our repository:
 
@@ -186,7 +186,8 @@ Below is a step-by-step guide to making your first code contribution to our repo
    * Verify that your changes don't break any existing functionality.
 
 7. **Commit Your Changes**:
-   * Write a clear and concise commit message following the [Style guides](#style-guides) -> Commit Messages section guidelines.
+   * Write a clear and concise commit message following the
+   [Style guides](#style-guides) -> Commit Messages section guidelines.
 
 8. **Push Your Changes**:
    * Push your changes to your fork on GitHub.
@@ -204,7 +205,8 @@ Below is a step-by-step guide to making your first code contribution to our repo
     * Once your pull request is approved, it will be merged into the main codebase.
     * Celebrate your contribution and share it with the community!
 
-Remember, every contributor was new at some point, and we are thrilled to welcome new members to our community.
+Remember, every contributor was new at some point, and we are thrilled
+to welcome new members to our community.
 The journey of becoming an adept open-source contributor is rewarding and educational.
 Your contribution, no matter how small, can make a significant impact.
 Happy coding!
@@ -212,7 +214,8 @@ Happy coding!
 ### Improving The Documentation
 
 Documentation is a cornerstone of any successful open-source project.
-It aids developers in understanding the purpose, structure, and functioning of the code, making the project accessible to all,
+It aids developers in understanding the purpose, structure, and functioning of the code,
+making the project accessible to all,
 irrespective of their level of expertise.
 Our project thrives on the contributions from the community,
 and improving the documentation is one of the significant ways you can contribute.
@@ -229,7 +232,8 @@ contributing expanded explanations or new sections is highly encouraged.
   If you have examples that illustrate the use of our code, we'd love to include them.
 * **Consistency**: Ensure the documentation maintains a consistent style and tone.
   Adhering to the style guidelines specified in our [Style guides](#style-guides) section is crucial.
-* **Technical Accuracy**: Ensure that the documentation reflects the current state of the codebase and is technically accurate.
+* **Technical Accuracy**: Ensure that the documentation reflects the current state
+of the codebase and is technically accurate.
 
 Your contributions should follow the guidelines specified in our [Style guides](#style-guides)
 section to maintain high quality and consistency.
@@ -264,9 +268,9 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org) standa
 
 Here's a brief overview of the Conventional Commits standard:
 
-1. **Type**: The type of change being made (e.g., feat, fix, chore, docs, style, refactor, perf, test).
-2. **Scope (Optional)**: The scope of the change, denoting what part of the codebase is being altered.
-3. **Description**: A short, descriptive message of the change, written in the imperative mood.
+**Type**: The type of change being made (e.g., feat, fix, chore, docs, style, refactor, perf, test).
+**Scope (Optional)**: The scope of the change, denoting what part of the codebase is being altered.
+**Description**: A short, descriptive message of the change, written in the imperative mood.
 
 Format:
 
