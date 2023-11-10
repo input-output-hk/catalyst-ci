@@ -4,23 +4,23 @@
 
 First off, thanks for taking the time to contribute! ❤️
 
-- [Contributing to Catalyst CI](#contributing-to-catalyst-ci)
-  - [Code of Conduct](#code-of-conduct)
-  - [I Have a Question](#i-have-a-question)
-  - [I Want To Contribute](#i-want-to-contribute)
-    - [Reporting Bugs](#reporting-bugs)
-      - [Before Submitting a Bug Report](#before-submitting-a-bug-report)
-      - [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
-    - [Suggesting Enhancements](#suggesting-enhancements)
-      - [Before Submitting an Enhancement](#before-submitting-an-enhancement)
-      - [How Do I Submit a Good Enhancement Suggestion?](#how-do-i-submit-a-good-enhancement-suggestion)
-    - [Your First Code Contribution](#your-first-code-contribution)
-    - [Improving The Documentation](#improving-the-documentation)
-  - [Style guides](#style-guides)
-    - [Rust](#rust)
-    - [Dart](#dart)
-    - [Flutter](#flutter)
-    - [Commit Messages](#commit-messages)
+* [Contributing to Catalyst CI](#contributing-to-catalyst-ci)
+  * [Code of Conduct](#code-of-conduct)
+  * [I Have a Question](#i-have-a-question)
+  * [I Want To Contribute](#i-want-to-contribute)
+    * [Reporting Bugs](#reporting-bugs)
+      * [Before Submitting a Bug Report](#before-submitting-a-bug-report)
+      * [How Do I Submit a Good Bug Report?](#how-do-i-submit-a-good-bug-report)
+    * [Suggesting Enhancements](#suggesting-enhancements)
+      * [Before Submitting an Enhancement](#before-submitting-an-enhancement)
+      * [How Do I Submit a Good Enhancement Suggestion?](#how-do-i-submit-a-good-enhancement-suggestion)
+    * [Your First Code Contribution](#your-first-code-contribution)
+    * [Improving The Documentation](#improving-the-documentation)
+  * [Style guides](#style-guides)
+    * [Rust](#rust)
+    * [Dart](#dart)
+    * [Flutter](#flutter)
+    * [Commit Messages](#commit-messages)
 
 All types of contributions are encouraged and valued.
 Please make sure to read the relevant section before making your contribution.
@@ -196,11 +196,11 @@ Below is a step-by-step guide to making your first code contribution to our repo
    * Provide a detailed description of your changes, the issue it addresses,
    and any additional information that might help maintainers review your contribution.
 
-8.  **Review and Revision**:
+8. **Review and Revision**:
     * Respond to any feedback from the maintainers.
     * Make necessary revisions to your code.
 
-9.  **Merge and Celebrate**:
+9. **Merge and Celebrate**:
     * Once your pull request is approved, it will be merged into the main codebase.
     * Celebrate your contribution and share it with the community!
 
