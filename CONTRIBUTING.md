@@ -169,42 +169,44 @@ Below is a step-by-step guide to making your first code contribution to our repo
   Beginners might look for issues tagged as `good first issue`
    or `beginner-friendly`.
 
-1. **Understand the Issue**:
+3. **Understand the Issue**:
    * Thoroughly read through the issue to understand the problem.
    * Ask clarifying questions in the issue thread if necessary.
 
-2. **Branch Out**:
+4. **Branch Out**:
    * Create a new branch on your local machine to work on the issue.
    * It's a good practice to name your branch descriptively, e.g., `fix-button-bug.`
 
-3. **Work on the Issue**:
+5. **Work on the Issue**:
    * Work on the issue in your local development environment.
    * Adhere to the coding standards and guidelines provided in the [Style guides](#style-guides) section.
 
-4. **Test Your Changes**:
+6. **Test Your Changes**:
    * Ensure that your changes are well-tested.
    * Verify that your changes don't break any existing functionality.
 
-5. **Commit Your Changes**:
-   * Write a clear and concise commit message following the [Style guides](#style-guides) -> Commit Messages section guidelines.
+7. **Commit Your Changes**:
+   * Write a clear and concise commit message following the
+   [Style guides](#style-guides) -> Commit Messages section guidelines.
 
-6. **Push Your Changes**:
+8. **Push Your Changes**:
    * Push your changes to your fork on GitHub.
 
-7. **Open a Pull Request**:
+9. **Open a Pull Request**:
    * Open a pull request from your fork to the main repository.
    * Provide a detailed description of your changes, the issue it addresses,
    and any additional information that might help maintainers review your contribution.
 
-8. **Review and Revision**:
+10. **Review and Revision**:
     * Respond to any feedback from the maintainers.
     * Make necessary revisions to your code.
 
-9. **Merge and Celebrate**:
+11. **Merge and Celebrate**:
     * Once your pull request is approved, it will be merged into the main codebase.
     * Celebrate your contribution and share it with the community!
 
-Remember, every contributor was new at some point, and we are thrilled to welcome new members to our community.
+Remember, every contributor was new at some point, and we are thrilled
+to welcome new members to our community.
 The journey of becoming an adept open-source contributor is rewarding and educational.
 Your contribution, no matter how small, can make a significant impact.
 Happy coding!
@@ -212,7 +214,8 @@ Happy coding!
 ### Improving The Documentation
 
 Documentation is a cornerstone of any successful open-source project.
-It aids developers in understanding the purpose, structure, and functioning of the code, making the project accessible to all,
+It aids developers in understanding the purpose, structure, and functioning of the code,
+making the project accessible to all,
 irrespective of their level of expertise.
 Our project thrives on the contributions from the community,
 and improving the documentation is one of the significant ways you can contribute.
@@ -229,7 +232,8 @@ contributing expanded explanations or new sections is highly encouraged.
   If you have examples that illustrate the use of our code, we'd love to include them.
 * **Consistency**: Ensure the documentation maintains a consistent style and tone.
   Adhering to the style guidelines specified in our [Style guides](#style-guides) section is crucial.
-* **Technical Accuracy**: Ensure that the documentation reflects the current state of the codebase and is technically accurate.
+* **Technical Accuracy**: Ensure that the documentation reflects the current state
+of the codebase and is technically accurate.
 
 Your contributions should follow the guidelines specified in our [Style guides](#style-guides)
 section to maintain high quality and consistency.
@@ -264,9 +268,9 @@ We follow the [Conventional Commits](https://www.conventionalcommits.org) standa
 
 Here's a brief overview of the Conventional Commits standard:
 
-1. **Type**: The type of change being made (e.g., feat, fix, chore, docs, style, refactor, perf, test).
-2. **Scope (Optional)**: The scope of the change, denoting what part of the codebase is being altered.
-3. **Description**: A short, descriptive message of the change, written in the imperative mood.
+**Type**: The type of change being made (e.g., feat, fix, chore, docs, style, refactor, perf, test).
+**Scope (Optional)**: The scope of the change, denoting what part of the codebase is being altered.
+**Description**: A short, descriptive message of the change, written in the imperative mood.
 
 Format:
 
