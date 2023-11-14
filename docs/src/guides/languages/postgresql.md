@@ -48,7 +48,7 @@ You can choose to either delete the file and start from scratch, or read the gui
 
 ### Prepare base builder
 
-```Dockerfile
+```Earthfile
 VERSION 0.7
 
 builder:
@@ -69,7 +69,7 @@ dependencies, environment to properly run PostgreSQL database.
 
 ### Running checks
 
-```Dockerfile
+```Earthfile
 check:
     FROM +builder
 
@@ -105,7 +105,7 @@ which contains the same configuration and setup which is applied during the `+ch
 
 ### Build
 
-```Dockerfile
+```Earthfile
 build:
     FROM +builder
 
@@ -187,7 +187,7 @@ otherwise will relies on remote PostgreSQL server connection
 Finally we can test already configured and prepared PostgreSQL image
 and trial it against 4 different cases
 
-```Dockerfile
+```Earthfile
 # Container runs PostgreSQL server, drops and initialise db, applies migrations, applies seed data.
 test-1:
     FROM ./../../earthly/postgresql+postgres-base
@@ -291,6 +291,13 @@ Notice that it is used basic `postgres-base` environment instead of `builder` as
 because we dont need to have migrations and seed data as a part of the test environment itself.
 With the help of `ENV` we are specifying
 `DB_HOST`, `INIT_AND_DROP_DB`, `WITH_MIGRATIONS`, `WITH_SEED_DATA` environment variables for various test cases.
+
+### Release and publish
+
+To prepare a release artifact and publish it to some external container registries
+please follow this [guide](./../../onboarding/index.md).
+It is pretty strait forward for this builder process,
+because as a part of `+build` target we already creating a docker image.
 
 ## Conclusion
 
