@@ -2,6 +2,8 @@
 icon: material/pencil-ruler
 ---
 
+<!-- cspell: words Hruschka Gernot Starke -->
+
 <!-- markdownlint-disable MD025-->
 # Architecture
 

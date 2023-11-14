@@ -1,7 +1,7 @@
 ---
     title: 0004 rejected
     adr:
-        author: Jean-Loup Monnier
+        author: Steven Johnson
         created: 01-Aug-2023
         status:  rejected
         extends:

@@ -1,7 +1,7 @@
 ---
     title: 0002 proposed
     adr:
-        author: Jean-Loup Monnier
+        author: Steven Johnson
         created: 01-Aug-2023
         status:  proposed
     tags:

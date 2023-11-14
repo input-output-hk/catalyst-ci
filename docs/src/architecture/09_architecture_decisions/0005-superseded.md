@@ -1,7 +1,7 @@
 ---
     title: 0005 superseded
     adr:
-        author: Jean-Loup Monnier
+        author: Steven Johnson
         created: 01-Aug-2023
         status:  superseded
         superseded_by: 0006-test
