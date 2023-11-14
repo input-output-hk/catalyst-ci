@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-mkdocs-material = { version = "^9.4.7", extras = ["recommended","git","imaging"] }
+mkdocs-material = { version = "^9.4.8", extras = ["recommended","git","imaging"] }
 
 ### MkDocs Plugins we add.
 
@@ -35,6 +35,14 @@ mkdocs-macros-plugin = "^v1.0.4"
 # https://github.com/timmeinerzhagen/mkdocs-meta-manager
 mkdocs-meta-manager = "^0.2.1"
 
+# https://github.com/Kl0ven/mkdocs-material-adr
+# mkdocs-material-adr = "^1.1.0"
+mkdocs-material-adr = { git = "https://github.com/stevenj/mkdocs-material-adr" }
+
+# https://henrywhitaker3.github.io/mkdocs-material-dark-theme/plugins/awesome-pages/
+mkdocs-awesome-pages-plugin = "^2.9.2"
+
+
 ### DO NOT ENABLE THESE BAD PLUGINS.
 ### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
 # https://github.com/zoni/mkdocs-diagrams
@@ -42,6 +50,7 @@ mkdocs-meta-manager = "^0.2.1"
 
 # https://github.com/pawamoy/mkdocs-spellcheck
 #mkdocs-spellcheck[all] == 1.0.2 # We use cspell, don't use this.
+
 
 [build-system]
 requires = ["poetry-core"]
