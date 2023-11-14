@@ -10,17 +10,18 @@ Earthfile
 Earthfiles
 errchkjson
 extldflags
+fontawesome
 ginkgolinter
 gitops
 glightbox
+GOCACHE
 gofmt
+goimports
 golangci
 GOLANGCI
-GOCACHE
-GOMODCACHE
-goimports
 golines
 golint
+GOMODCACHE
 gopls
 gosec
 graphviz
@@ -44,6 +45,7 @@ pymdownx
 PYTHONDONTWRITEBYTECODE
 rivo
 runewidth
+sqlfluff
 subproject
 subprojects
 superfences
@@ -54,4 +56,3 @@ uniseg
 webkitallowfullscreen
 WORKDIR
 xerrors
-sqlfluff
