@@ -1,8 +1,13 @@
 ---
 icon: simple/go
+title: Go
+tags:
+    - Go
 ---
 
+<!-- markdownlint-disable single-h1 -->
 # :simple-go: Go
+<!-- markdownlint-enable single-h1 -->
 
 ## Introduction
 

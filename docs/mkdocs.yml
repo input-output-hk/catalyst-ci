@@ -1,5 +1,7 @@
 INHERIT: std-theme.yml
 
+# cspell: words fontawesome
+
 # Project Information
 site_name: Project Catalyst - CI Documentation
 site_url: https://input-output-hk.github.io/catalyst-ci
@@ -8,41 +10,44 @@ site_url: https://input-output-hk.github.io/catalyst-ci
 repo_name: input-output-hk/catalyst-ci
 repo_url: https://github.com/input-output-hk/catalyst-ci
 
-# Page tree
-nav:
-  - Introduction: index.md
-  - Onboarding: onboarding/index.md
-  - Style Guide: style/index.md
-  - Guides:
-      - guides/index.md
-      - Documentation: guides/docs.md
-      - Languages:
-          - guides/languages/index.md
-          - Go: guides/languages/go.md
-          - Rust: guides/languages/rust.md
-          - Python: guides/languages/python.md
-          - Flutter/Dart: guides/languages/flutter.md
-          - PostgreSQL: guides/languages/postgresql.md
-  - Reference:
-      - reference/index.md
-      - Workflows: reference/workflows.md
-      - Actions: reference/actions.md
-      - Targets: reference/targets.md
-      - UDCs: reference/udc.md
-  - Appendix:
-      - appendix/index.md
-      - Earthly: appendix/earthly.md
-      - Documentation Examples:
-          - Examples: appendix/examples/index.md
-          - Abbreviations: appendix/examples/abbreviations.md
-          - Admonitions: appendix/examples/admonitions.md
-          - Code Formatting: appendix/examples/code-formatting.md
-          - Mermaid Diagrams: appendix/examples/mermaid-diagrams.md
-          - Kroki Diagrams: appendix/examples/kroki-diagrams.md
-      - Important Information:
-          - Important Information: appendix/important/index.md
-          - Contributing: appendix/important/contributing.md
-          - Code of Conduct: appendix/important/coc.md
-          - Security: appendix/important/security.md
-          - License: appendix/important/license.md
+# Page tree - is created automatically.
+# See: https://henrywhitaker3.github.io/mkdocs-material-dark-theme/plugins/awesome-pages/
 
+#plugins:
+#  - material/tags:
+#      tags_file: appendix/index.md
+
+# Tags used in these docs
+extra:
+  tags:
+    HTML5: html
+    JavaScript: js
+    CSS: css
+    Rust: rust
+    Flutter: flutter
+    Dart: dart
+    Python: python
+    Go: go
+    PostgreSQL: postgres
+    Earthly: earthly
+    Github: github
+    Docker: docker
+    Kubernetes: kubernetes
+
+# Icons associated with the tags
+theme:
+  icon:
+    tag:
+      html: fontawesome/brands/html5
+      js: fontawesome/brands/js
+      css: fontawesome/brands/css3
+      rust: simple/rust
+      flutter: simple/flutter
+      dart: simple/dart
+      python: simple/python
+      go: simple/go
+      postgres: simple/postgresql
+      earthly: material/earth-plus
+      github: simple/github
+      docker: simple/docker
+      kubernetes: simple/kubernetes

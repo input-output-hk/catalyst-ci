@@ -1,5 +1,7 @@
 ---
 icon: material/earth-plus
+tags:
+    - Earthly
 ---
 
 # Earthly

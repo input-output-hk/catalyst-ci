@@ -1,6 +1,6 @@
 # cspell: words Diagramsnet, pymdownx, linenums, inlinehilite, superfences,
 # cspell: words tasklist, betterem, materialx, twemoji, smartsymbols,
-# cspell: words kroki, excalidraw, glightbox, cips, pygments, arithmatex
+# cspell: words kroki, excalidraw, glightbox, cips, pygments, arithmatex, fontawesome
 
 site_author: The Project Catalyst Team
 copyright: (c) 2023 Input Output Global Ltd.
@@ -9,7 +9,7 @@ copyright: (c) 2023 Input Output Global Ltd.
 docs_dir: src
 
 theme:
-  name: material
+  name: mkdocs-material-adr
   custom_dir: overrides
   palette:
     # Palette toggle for light mode
@@ -42,8 +42,12 @@ theme:
     - search.highlight
     - content.code.copy
 
-
 plugins:
+  - mkdocs-material-adr/adr:
+      graph_file: architecture/09_architecture_decisions/index.md
+  - awesome-pages
+  - material/tags:
+      tags_file: appendix/tags.md
   - search
   - meta-manager
   - macros:
@@ -108,3 +112,5 @@ extra:
       as to measure the effectiveness of our documentation and whether users
       find what they're searching for. With your consent, you're helping us to
       make our documentation better.
+
+    

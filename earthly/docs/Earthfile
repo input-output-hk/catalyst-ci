@@ -84,13 +84,12 @@ PACKAGE:
     FROM nginx:alpine3.18-slim
 
     # Force this server to disable the browsers cache for these files.
-    RUN echo "http {" > /etc/nginx/conf.d/disable-cache.conf; \
+    RUN echo " " > /etc/nginx/conf.d/disable-cache.conf; \
         echo "    add_header Last-Modified \$date_gmt;" >> /etc/nginx/conf.d/disable-cache.conf; \
         echo "    add_header Cache-Control 'private no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0';" >> /etc/nginx/conf.d/disable-cache.conf; \
         echo "    if_modified_since off;" >> /etc/nginx/conf.d/disable-cache.conf; \
         echo "    expires off;" >> /etc/nginx/conf.d/disable-cache.conf; \
-        echo "    etag off;" >> /etc/nginx/conf.d/disable-cache.conf; \
-        echo "}" >> /etc/nginx/conf.d/disable-cache.conf
+        echo "    etag off;" >> /etc/nginx/conf.d/disable-cache.conf;
 
     # Expose port 80 for HTTP traffic
     EXPOSE 80
