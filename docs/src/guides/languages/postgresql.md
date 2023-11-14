@@ -3,6 +3,8 @@ icon: simple/postgresql
 ---
 # :simple-postgresql: PostgreSQL
 
+<!-- cspell: words healthcheck isready psql -->
+
 ## Introduction
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
@@ -285,3 +287,10 @@ With the help of `ENV` we are specifying
 `DB_HOST`, `INIT_AND_DROP_DB`, `WITH_MIGRATIONS`, `WITH_SEED_DATA` environment variables for various test cases.
 
 ## Conclusion
+
+You can see the final `Earthfile` [here](https://github.com/input-output-hk/catalyst-ci/blob/master/examples/postgresql/Earthfile)
+and any other files in the same directory.
+This `Earthfile` will check the health of our source code, build and test PostgreSQL image,
+and then finally release it to GitHub and publish it to one or more container registries.
+At this point, please feel free to experiment more and run each target individually.
+Once you're ready, you can copy this example and modify it for your specific context.
