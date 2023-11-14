@@ -1,4 +1,3 @@
-# Common PostgreSQL Earthly builders
 VERSION 0.7
 
 # cspell: words psql
