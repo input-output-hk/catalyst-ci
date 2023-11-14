@@ -23,7 +23,10 @@ format:
 build:
     FROM +builder
 
-    DO ./../../earthly/postgresql+BUILD --image_name=example-db
+    ARG tag="latest"
+    ARG registry
+
+    DO ./../../earthly/postgresql+BUILD --image_name=example-db --tag=$tag --registry=$registry
 
 # Container runs PostgreSQL server, drops and initialise db, applies migrations, applies seed data.
 test-1:
