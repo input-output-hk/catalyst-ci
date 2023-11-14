@@ -60,7 +60,7 @@ builder:
     DO ./../../earthly/postgresql+BUILDER
 ```
 
-The first target we are going to create will be responsible to prepare a PostgreSQL environment (Earthly `+postgres-base` target),
+The first target we are going to consider will be responsible to prepare a PostgreSQL environment (Earthly `+postgres-base` target),
 migrations, migrations configuration and seed data (`COPY --dir ./migrations ./data ./refinery.toml .`),
 doing some final build step (Earthly `+BUILDER` UDC target).
 
@@ -83,8 +83,8 @@ format:
 
 With prepared environment and all data, we're now ready to start operating with the source code - `*.sql` files.
 At this step we can begin performing static checks against `*.sql` files.
-These checks are intended to verify the code is healthy and well formatted to a certain standard.
-These checks are done with the help of the `sqlfluff` tool which is already configured during the `+postgres-base` target.
+These checks are intended to verify the code is healthy and well formatted to a certain standard
+and done with the help of the `sqlfluff` tool which is already configured during the `+postgres-base` target.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Note
@@ -94,7 +94,7 @@ These checks are done with the help of the `sqlfluff` tool which is already conf
 
 To apply and fix some formatting issues you can run `+format` target which will picks up directory
 where your Earthly file lies in as a source dir for formatting and run `+FORMAT` UDC target.
-Under the hood `+FORMAT` UDC target runs `sqlfluff-image` docker container,
+Under the hood `+FORMAT` UDC target runs `sqlfluff-image` docker image,
 which contains the same configuration and setup which is applied during the `+check`.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
