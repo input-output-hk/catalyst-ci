@@ -1,7 +1,5 @@
 ---
-
-tags:
-    - tag1
+icon: material/arrow-decision-auto
 ---
 
 # Architecture Decisions
