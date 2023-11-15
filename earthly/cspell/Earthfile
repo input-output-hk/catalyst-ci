@@ -21,7 +21,7 @@ CSPELL_LOCALLY:
     RUN docker run \
         --rm \
         -v $src:/workdir \
-        ghcr.io/streetsidesoftware/cspell:latest \
+        ghcr.io/streetsidesoftware/cspell:8.0.0 \
         lint . --dot
 
 # A Test and example invocation of the above UDC.
