@@ -34,7 +34,7 @@ MDLINT_LOCALLY:
     RUN docker run \
         --rm \
         -v $src:/workdir \
-        davidanson/markdownlint-cli2-rules:next \
+        davidanson/markdownlint-cli2-rules:v0.10.0 \
         "**/*.md" \
         --config $cfg_file \
         $fix
