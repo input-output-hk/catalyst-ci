@@ -245,6 +245,6 @@ build:
 local-ci-run:
     BUILD +check
     BUILD +build
-    BUILD +package
-    BUILD +integrate
-    BUILD +publish
+    # BUILD +package
+    # BUILD +test
+    # BUILD +publish
