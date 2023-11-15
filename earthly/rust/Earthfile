@@ -125,8 +125,6 @@ CP_SRC:
         COPY --dir $file .
     END
 
-    RUN ls -al 
-
 
 # Steps we do during the `check` CI phase for all Rust programs
 CHECK:
@@ -226,12 +224,12 @@ build:
 
 
 # This step will build any packages we would intend to publish or integration test.
-package:
-    FROM scratch
+#package:
+#    FROM scratch
 
 # Run integration tests on all packages built during the `package` step.
-integrate:
-    FROM scratch
+#test:
+#    FROM scratch
 
 # Publish packages if all integration tests have passed. 
 # (Failure to pass tests will prevent packages being published.)
@@ -245,6 +243,6 @@ integrate:
 local-ci-run:
     BUILD +check
     BUILD +build
-    BUILD +package
-    BUILD +integrate
-    BUILD +publish
+    # BUILD +package
+    # BUILD +test
+    # BUILD +publish
