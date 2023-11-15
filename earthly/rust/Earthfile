@@ -125,8 +125,6 @@ CP_SRC:
         COPY --dir $file .
     END
 
-    RUN ls -al 
-
 
 # Steps we do during the `check` CI phase for all Rust programs
 CHECK:
