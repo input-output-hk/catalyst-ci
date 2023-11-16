@@ -1,3 +1,7 @@
+---
+icon: material/telescope
+---
+
 # System Scope and Context
 
 <!-- See: https://docs.arc42.org/section-3/ -->

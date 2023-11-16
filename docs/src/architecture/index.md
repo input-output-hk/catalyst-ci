@@ -1,5 +1,7 @@
 ---
 icon: material/pencil-ruler
+tags: 
+    - arc42
 ---
 
 <!-- cspell: words Hruschka Gernot Starke -->
