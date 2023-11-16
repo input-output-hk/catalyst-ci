@@ -33,6 +33,8 @@ extra:
     Github: github
     Docker: docker
     Kubernetes: kubernetes
+    arc42: arc42
+    ADR: adr
 
 # Icons associated with the tags
 theme:
@@ -51,3 +53,5 @@ theme:
       github: simple/github
       docker: simple/docker
       kubernetes: simple/kubernetes
+      arc42: material/pencil-ruler
+      adr: material/arrow-decision-auto
