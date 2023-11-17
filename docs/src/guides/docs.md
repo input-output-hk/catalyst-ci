@@ -55,7 +55,6 @@ It is mandatory to have a `src` directory with all documentation md files in it 
 This directory and file will be picked up as a part of the `+SRC` UDC target.
 Also it is possible to provide some additional files which should be added to the `/docs/includes` dir.
 
-
 ```Earthfile
 # Build the docs here.
 docs:
