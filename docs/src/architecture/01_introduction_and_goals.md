@@ -1,3 +1,7 @@
+---
+icon: octicons/goal-24
+---
+
 # Introduction and Goals
 
 <!-- See: https://docs.arc42.org/section-1/ -->

@@ -1,3 +1,7 @@
+---
+icon: material/format-list-group-plus
+---
+
 # Glossary
 
 <!-- See: https://docs.arc42.org/section-12/ -->
