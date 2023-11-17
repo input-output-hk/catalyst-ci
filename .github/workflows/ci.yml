@@ -45,6 +45,13 @@ on:
         required: false
         type: boolean
         default: false
+      skip_publish_on_default:
+        description: |
+          If set to true, images will not be published when the workflow is
+          triggered by a push to the default branch.
+        required: false
+        type: boolean
+        default: false
       tags:
         description: |
           A line separated list of additional tags that will be applied to
@@ -154,6 +161,7 @@ jobs:
       aws_region: ${{ inputs.aws_region }}
       ci_cli_version: ${{ inputs.ci_cli_version }}
       earthly_version: ${{ inputs.earthly_version }}
+      skip_publish_on_default: ${{ inputs.skip_publish_on_default }}
       tags: ${{ inputs.tags }}
     secrets:
       dockerhub_token: ${{ secrets.dockerhub_token }}
