@@ -47,13 +47,16 @@ src:
     DO ../earthly/docs+SRC
 
     # Now copy into that any artifacts we pull from the builds.
-    COPY --dir ../+repo-docs/repo /docs/includes
+    COPY --dir ../+repo-docs/repo includes
 ```
 
 The first step of building process it preparing a source files.
 It is mandatory to have a `src` directory with all documentation md files in it and `mkdocs.yml` file.
-This directory and file will be picked up as a part of the `+SRC` UDC target.
-Also it is possible to provide some additional files which should be added to the `/docs/includes` dir.
+This directory and file will be picked during the execution of `+SRC` UDC target.
+Also it is possible to replace defined `includes`, `macros` and `overrides` dirs
+to customize some docs appearance and configuration.
+Default value of the content of `includes`, `macros` and `overrides` dirs you can find in `earthly/docs` folder.
+Additionally it is possible to provide some additional files as for example to extend `includes` dir content.
 
 ```Earthfile
 # Build the docs here.
