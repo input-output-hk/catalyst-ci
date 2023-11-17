@@ -16,7 +16,7 @@ docs:
     DO ../earthly/docs+BUILD
 
 
-# Make a container that can serve the docs for development purposes.
+# Make a docker image that can serve the docs for development purposes.
 # This target is only for local developer use.
 local:
     DO ../earthly/docs+PACKAGE
