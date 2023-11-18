@@ -15,7 +15,7 @@ on:
       aws_ecr_registry:
         description: |
             The AWS ECR registry that will be used to publish images
-        required: true
+        required: false
         type: string
       aws_role_arn:
         description: |

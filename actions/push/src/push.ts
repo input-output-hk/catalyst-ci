@@ -10,6 +10,10 @@ export async function run(): Promise<void> {
     const imageName = image.split(':')[0]
 
     for (const registry of registries) {
+      if (registry === '') {
+        continue
+      }
+
       for (const tag of tags) {
         const fullImage = `${registry}/${imageName}:${tag}`
 

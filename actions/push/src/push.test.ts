@@ -24,7 +24,7 @@ describe('Discover Action', () => {
           case 'image':
             return 'image:latest'
           case 'registries':
-            return 'registry1\nregistry2'
+            return '\nregistry1\nregistry2'
           case 'tags':
             return 'tag1\ntag2'
           default:
