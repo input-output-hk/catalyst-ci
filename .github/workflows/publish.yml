@@ -15,7 +15,7 @@ on:
       aws_ecr_registry:
         description: |
             The AWS ECR registry that will be used to publish images
-        required: true
+        required: false
         type: string
       aws_role_arn:
         description: |
@@ -40,6 +40,13 @@ on:
         required: false
         type: string
         default: latest
+      skip_publish_on_default:
+        description: |
+          If set to true, images will not be published when the workflow is
+          triggered by a push to the default branch.
+        required: false
+        type: boolean
+        default: false
       tags:
         description: |
           A line separated list of additional tags that will be applied to
@@ -127,7 +134,7 @@ jobs:
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Push image
         uses: input-output-hk/catalyst-ci/actions/push@master
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !inputs.skip_publish_on_default
         with:
           image: ${{ steps.build.outputs.image }}
           registries: |
