@@ -1,6 +1,8 @@
 # Common Python UDCs and Builders.
 VERSION 0.7
 
+# cspell: words libgcc
+
 python-base:
     FROM python:3.12-alpine3.18
 
