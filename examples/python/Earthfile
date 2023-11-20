@@ -6,7 +6,6 @@ builder:
     COPY --dir ./src .
     DO ./../../earthly/python+BUILDER
 
-
 test:
     FROM +builder
 

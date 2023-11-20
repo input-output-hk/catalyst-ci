@@ -30,3 +30,51 @@ Navigate to `examples/python` to find a basic Python project, with the `Earthfil
 This is the `Earthfile` we will be building in this guide.
 You can choose to either delete the file and start from scratch,
 or read the guide and follow along in the file.
+
+## Building the Earthfile
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Note
+    The below sections will walk through building our `Earthfile` step-by-step.
+    In each section, only the fragments of the `Earthfile` relative to that section are displayed.
+    This means that, as you go through each section, you should be cumulatively building the `Earthfile`.
+    If you get stuck at any point, you can always take a look at the
+    [example](https://github.com/input-output-hk/catalyst-ci/blob/master/examples/python/Earthfile).
+<!-- markdownlint-enable max-one-sentence-per-line -->
+
+### Prepare base builder
+
+```Earthfile
+VERSION 0.7
+
+builder:
+    FROM ./../../earthly/python+python-base
+
+    COPY --dir ./src .
+    DO ./../../earthly/python+BUILDER
+```
+
+The first target `builder` is responsible to prepare an already configured Python environment,
+instal all needed tools and dependencies.
+Every Python project must be a [poetry](https://python-poetry.org) based project,
+so it is mandatory to have `pyproject.toml` file in the root dir of the project.
+
+The fist step of the `builder` target is prepare a Python environment
+with poetry via `+python-base` target.
+Next step is to copy source code of the project and finally finalize the build
+with some poetry project setup which is done with `+BUILDER` UDC target.
+
+### Test
+
+```Earthfile
+test:
+    FROM +builder
+
+    RUN poetry run pytest
+```
+
+As the final step, after proper setup of the Python project we can run tests,
+to do so
+inherit from the already discussed `+builder` target and just run `poetry run pytest`
+or with any other way which are suitable for your project setup.
+And that's it!
