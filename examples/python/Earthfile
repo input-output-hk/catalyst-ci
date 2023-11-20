@@ -3,4 +3,11 @@ VERSION 0.7
 builder:
     FROM ./../../earthly/python+python-base
 
-    DO ./../../earthly/python+POETRY_SETUP
+    COPY --dir ./src .
+    DO ./../../earthly/python+BUILDER
+
+
+test:
+    FROM +builder
+
+    RUN poetry run pytest
