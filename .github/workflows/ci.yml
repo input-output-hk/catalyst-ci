@@ -4,7 +4,7 @@ on:
       aws_ecr_registry:
         description: |
             The AWS ECR registry that will be used to publish images
-        required: true
+        required: false
         type: string
       aws_role_arn:
         description: |
@@ -42,6 +42,13 @@ on:
         description: |
           When set to true, the workflow will always produce a release artifact
           even when the current commit is not tagged.
+        required: false
+        type: boolean
+        default: false
+      skip_publish_on_default:
+        description: |
+          If set to true, images will not be published when the workflow is
+          triggered by a push to the default branch.
         required: false
         type: boolean
         default: false
@@ -154,6 +161,7 @@ jobs:
       aws_region: ${{ inputs.aws_region }}
       ci_cli_version: ${{ inputs.ci_cli_version }}
       earthly_version: ${{ inputs.earthly_version }}
+      skip_publish_on_default: ${{ inputs.skip_publish_on_default }}
       tags: ${{ inputs.tags }}
     secrets:
       dockerhub_token: ${{ secrets.dockerhub_token }}
