@@ -64,6 +64,10 @@ with poetry via `+python-base` target.
 Next step is to copy source code of the project and finally finalize the build
 with some poetry project setup which is done with `+BUILDER` UDC target.
 
+### Running checks
+
+[TODO](https://github.com/input-output-hk/catalyst-ci/issues/98)
+
 ### Test
 
 ```Earthfile
@@ -78,3 +82,16 @@ to do so
 inherit from the already discussed `+builder` target and just run `poetry run pytest`
 or with any other way which are suitable for your project setup.
 And that's it!
+
+### Release and publish
+
+To prepare a release artifact and publish it to some external container registries
+please follow this [guide](./../../onboarding/index.md).
+The only things you need is too define `release` and `publish` Earthly targets
+with the proper configuration of the artifacts for your project.
+
+## Conclusion
+
+You can see the final `Earthfile` [here](https://github.com/input-output-hk/catalyst-ci/blob/master/examples/python/Earthfile)
+and any other files in the same directory.
+We have learnt how to maintain and setup Python project, as you can see it is pretty simple.
