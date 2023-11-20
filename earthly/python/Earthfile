@@ -19,19 +19,16 @@ python-base:
     #   "Connection pool is full, discarding connection: pypi.org. Connection pool size: 10"
     RUN poetry config installer.max-workers 10
 
-# Common Poetry setup
+# Common python builder setup.
 # Parameters:
 #   opts      : Options passed to the `poetry install` command.
-#   extra_file: An extra file to copy into the poetry path.
 BUILDER:
     COMMAND
     ARG opts
-    ARG extra_file
 
     # Copy our dependencies.
     COPY pyproject.toml .
     COPY --if-exists poetry.lock .
-    COPY $extra_file .
 
     # Install it all with poetry
     RUN poetry install $opts
