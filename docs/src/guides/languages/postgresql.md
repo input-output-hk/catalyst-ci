@@ -176,11 +176,11 @@ PostgreSQL server runs as a part of the `example` service,
 otherwise will relies on remote PostgreSQL server connection
 (as an example already defined `postgres` service).
 * `INIT_AND_DROP_DB` env var defines to run initial initialization of the db with the clean state or not
-(could be omitted).
+(optional, default `false`).
 * `WITH_MIGRATIONS` env var defines to run migrations defined inside `./migrations` dir or not
-(could be omitted).
+(optional, default `false`).
 * `WITH_SEED_DATA` env var defines to setup db with some seed data defined inside `./data` dir or not
-(could be omitted).
+(optional, default `false`).
 
 ### Test
 
