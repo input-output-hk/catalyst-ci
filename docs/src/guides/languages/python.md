@@ -57,7 +57,7 @@ builder:
 The first target `builder` is responsible to prepare an already configured Python environment,
 instal all needed tools and dependencies.
 Every Python project must be a [poetry](https://python-poetry.org) based project,
-so it is mandatory to have `pyproject.toml` file in the root dir of the project.
+so it is mandatory to have `pyproject.toml` and `poetry.lock` files in the root dir of the project.
 
 The fist step of the `builder` target is prepare a Python environment
 with poetry via `+python-base` target.

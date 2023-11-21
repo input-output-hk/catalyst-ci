@@ -37,8 +37,7 @@ BUILDER:
     ARG opts
 
     # Copy our dependencies.
-    COPY pyproject.toml .
-    COPY --if-exists poetry.lock .
+    COPY pyproject.toml poetry.lock .
 
     # Install it all with poetry
     RUN poetry install $opts
