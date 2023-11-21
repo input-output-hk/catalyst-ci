@@ -55,8 +55,19 @@ It is mandatory to have a `src` directory with all documentation md files in it 
 This directory and file will be picked during the execution of `+SRC` UDC target.
 Also it is possible to replace defined `includes`, `macros` and `overrides` dirs
 to customize some docs appearance and configuration.
-Default value of the content of `includes`, `macros` and `overrides` dirs you can find in `earthly/docs` folder.
+
+Default value of the content of `includes`, `macros` and `overrides` dirs you can find in `earthly/docs/common` folder.
 Additionally it is possible to provide some additional files as for example to extend `includes` dir content.
+
+The standard theme is defined in the `std-theme.yml` which must be included in the first line of the documentations `mkdocs.yml` file like so:
+
+```yml
+INHERIT: std-theme.yml
+```
+
+This file can be found in the `earthly/docs/common` folder.  
+Changes to the standard theme should be intended to effect all documentation that uses the standard theme.  
+Individual documentation targets can customize the theme in their `mkdocs.yml` file.
 
 ```Earthfile
 # Build the docs here.
