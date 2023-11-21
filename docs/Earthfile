@@ -6,7 +6,7 @@ src:
     DO ../earthly/docs+SRC
 
     # Now copy into that any artifacts we pull from the builds.
-    COPY --dir ../+repo-docs/repo /docs/includes
+    COPY --dir ../+repo-docs/repo includes
 
 
 # Build the docs here.
@@ -16,7 +16,7 @@ docs:
     DO ../earthly/docs+BUILD
 
 
-# Make a container that can serve the docs for development purposes.
+# Make a docker image that can serve the docs for development purposes.
 # This target is only for local developer use.
 local:
     DO ../earthly/docs+PACKAGE
@@ -24,12 +24,3 @@ local:
     COPY +docs/ /usr/share/nginx/html
 
     SAVE IMAGE cat-ci-docs:latest
-
-# Documentation files used across all documentation builds.
-common:
-    #FROM scratch
-    FROM alpine:3.18
-
-    COPY --dir std-theme.yml includes macros overrides /std
-
-    SAVE ARTIFACT /std

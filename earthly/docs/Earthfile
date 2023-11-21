@@ -45,6 +45,8 @@ deps:
     # Set working directory
     WORKDIR /docs
 
+    # Documentation files used across all documentation builds.
+    COPY --dir std-theme.yml includes macros overrides .
 
 # Common src setup
 SRC:
@@ -52,13 +54,11 @@ SRC:
 
     FROM +deps
 
-    COPY ../../docs+common/* /docs
-
     # Just copy the actual doc src here.
-    COPY --dir src mkdocs.yml /docs
+    COPY --dir src mkdocs.yml .
 
     # Any files which replace the standard files are copied here
-    COPY --if-exists --dir includes macros overrides  /docs
+    COPY --if-exists --dir includes macros overrides .
 
 
 # Build the docs - We always do this in a `docs` target.  
