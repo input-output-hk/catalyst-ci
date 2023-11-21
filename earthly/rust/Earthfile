@@ -2,8 +2,8 @@
 VERSION 0.7
 
 # cspell: words rustup rustc automake autotools xutils miri nextest kani
-# cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT 
-# cspell: words USERPLATFORM USEROS USERARCH USERVARIANT 
+# cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT
+# cspell: words USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words ripgrep colordiff rustfmt stdcfgs toolset toolsets readelf
 
 # Base Rustup build container.
@@ -31,12 +31,12 @@ rust-base:
         echo "USERPLATFORM   = $USERPLATFORM"; \
         echo "USEROS         = $USEROS"; \
         echo "USERARCH       = $USERARCH"; \
-        echo "USERVARIANT    = $USERVARIANT"; 
+        echo "USERVARIANT    = $USERVARIANT";
 
 
     WORKDIR /root
 
-    # Install necessary packages 
+    # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
      RUN apk add --no-cache \
             musl-dev \
@@ -45,7 +45,8 @@ rust-base:
             ripgrep \
             bash \
             colordiff \
-            graphviz
+            graphviz \
+            pkgconfig
 
     # Make sure we have the clippy linter.
     RUN rustup component add clippy
@@ -78,7 +79,7 @@ rust-base:
 
 # Builds all the rust-base targets for each supported DOCKER architecture.
 # Currently only used for multi-platform cross build testing.
-# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for 
+# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
 # docker enabled on Mac.
 # Again, this is just a test target, and not for general use.
 rust-base-all-hosts:
@@ -165,7 +166,7 @@ check-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
+check-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
 build-hosted:
@@ -173,7 +174,7 @@ build-hosted:
 
     # Build the service
     FROM +builder
- 
+
     RUN /scripts/std_build.sh
 
     DO +SMOKE_TEST --bin=hello_world
@@ -183,7 +184,7 @@ build-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
+build-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
 ## -----------------------------------------------------------------------------
@@ -231,7 +232,7 @@ build:
 #test:
 #    FROM scratch
 
-# Publish packages if all integration tests have passed. 
+# Publish packages if all integration tests have passed.
 # (Failure to pass tests will prevent packages being published.)
 # Don't have a `publish` target if nothing to actually publish.
 #publish:
