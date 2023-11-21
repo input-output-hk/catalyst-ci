@@ -46,19 +46,29 @@ deps:
     WORKDIR /docs
 
 
+# Documentation files used across all documentation builds.
+common:
+    FROM scratch
+    #FROM alpine:3.18
+
+    COPY --dir common/includes common/macros common/overrides common/std-theme.yml /std
+
+    SAVE ARTIFACT /std
+
 # Common src setup
 SRC:
     COMMAND
 
     FROM +deps
 
-    COPY ../../docs+common/* /docs
+    # Copy Common documentation files.
+    COPY +common/* .
 
     # Just copy the actual doc src here.
-    COPY --dir src mkdocs.yml /docs
+    COPY --dir src mkdocs.yml .
 
     # Any files which replace the standard files are copied here
-    COPY --if-exists --dir includes macros overrides  /docs
+    COPY --if-exists --dir includes macros overrides .
 
 
 # Build the docs - We always do this in a `docs` target.  
