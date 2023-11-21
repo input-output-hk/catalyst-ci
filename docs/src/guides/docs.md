@@ -59,7 +59,8 @@ to customize some docs appearance and configuration.
 Default value of the content of `includes`, `macros` and `overrides` dirs you can find in `earthly/docs/common` folder.
 Additionally it is possible to provide some additional files as for example to extend `includes` dir content.
 
-The standard theme is defined in the `std-theme.yml` which must be included in the first line of the documentations `mkdocs.yml` file like so:
+The standard theme is defined in the `std-theme.yml`.
+It must be included in the first line of the documentations `mkdocs.yml` file like so:
 
 ```yml
 INHERIT: std-theme.yml
