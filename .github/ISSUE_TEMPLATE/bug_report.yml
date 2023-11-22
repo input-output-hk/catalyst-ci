@@ -41,6 +41,7 @@ body:
         - Android
         - Windows
         - Other (specify in Anything else section)
+        - Not Applicable
     validations:
       required: true
 
