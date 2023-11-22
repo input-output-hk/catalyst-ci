@@ -1,15 +1,18 @@
 # Common Python UDCs and Builders.
 VERSION 0.7
-FROM python:3.11-bullseye
 
-# Common Poetry setup
-# Parameters:
-#   opts      : Options passed to the `poetry install` command.
-#   extra_file: An extra file to copy into the poetry path.
-POETRY_SETUP:
-    COMMAND
-    ARG opts
-    ARG extra_file
+# cspell: words libgcc
+
+python-base:
+    FROM python:3.12-alpine3.18
+
+    # Install extra packages we will need to support plugins.
+    RUN apk add --no-cache \    
+        curl \
+        libffi-dev \
+        gcc \
+        musl-dev \
+        libgcc
 
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.
@@ -26,8 +29,15 @@ POETRY_SETUP:
     #   "Connection pool is full, discarding connection: pypi.org. Connection pool size: 10"
     RUN poetry config installer.max-workers 10
 
+# Common python builder setup.
+# Parameters:
+#   opts      : Options passed to the `poetry install` command.
+BUILDER:
+    COMMAND
+    ARG opts
+
     # Copy our dependencies.
-    COPY pyproject.toml poetry.lock $extra_file .
+    COPY pyproject.toml poetry.lock .
 
     # Install it all with poetry
     RUN poetry install $opts
