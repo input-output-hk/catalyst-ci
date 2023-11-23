@@ -27,7 +27,7 @@ build-hosted:
  
     RUN /scripts/std_build.sh
 
-    DO +SMOKE_TEST --bin=hello_world
+    DO ./../../earthly/rust+SMOKE_TEST --bin=hello_world
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world

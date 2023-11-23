@@ -1,38 +1,16 @@
 # Common Rust UDCs and Builders.
 VERSION 0.7
 
-# cspell: words rustup rustc automake autotools xutils miri nextest kani
-# cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT 
-# cspell: words USERPLATFORM USEROS USERARCH USERVARIANT 
-# cspell: words ripgrep colordiff rustfmt stdcfgs toolset toolsets readelf
+# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf
+# cspell: words TARGETARCH 
 
 # Base Rustup build container.
 rust-base:
-    ARG TARGETPLATFORM
-    ARG TARGETOS
-    ARG TARGETARCH
-    ARG TARGETVARIANT
-    ARG USERPLATFORM
-    ARG USEROS
-    ARG USERARCH
-    ARG USERVARIANT
-
-
     # This is our base Host toolset, and rustup.
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the RUST_SETUP UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
     FROM rust:1.73-alpine3.18
-
-    RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
-        echo "TARGETOS       = $TARGETOS"; \
-        echo "TARGETARCH     = $TARGETARCH"; \
-        echo "TARGETVARIANT  = $TARGETVARIANT"; \
-        echo "USERPLATFORM   = $USERPLATFORM"; \
-        echo "USEROS         = $USEROS"; \
-        echo "USERARCH       = $USERARCH"; \
-        echo "USERVARIANT    = $USERVARIANT"; 
-
 
     WORKDIR /root
 
@@ -113,8 +91,7 @@ CHECK:
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:
     COMMAND
-    ARG TARGETPLATFORM
-    ARG bin
+    ARG --required bin
 
     RUN ldd target/$TARGETARCH/release/$bin
     RUN readelf -p .comment target/$TARGETARCH/release/$bin
