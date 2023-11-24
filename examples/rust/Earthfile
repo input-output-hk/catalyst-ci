@@ -1,5 +1,7 @@
 VERSION 0.7
 
+# cspell: words TARGETARCH USERARCH toolsets
+
 # Set up our target toolchains, and copy our files.
 builder:
     FROM ./../../earthly/rust+rust-base

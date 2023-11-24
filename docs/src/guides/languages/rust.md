@@ -9,6 +9,8 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
+<!-- cspell: words USERARCH TARGETARCH toolsets fmtchk stdcfgs rustfmt nextest testci testdocs -->
+
 ## Introduction
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
@@ -45,7 +47,6 @@ Also we will take a look how we are setup Rust projects and what configuration i
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
 ### Prepare base builder
-
 
 ```Earthfile
 VERSION 0.7
@@ -104,13 +105,14 @@ check:
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
 The `check-hosted` target which actually performs all checks and validation
 with the help of `+CHECK` UDC target.
-The `+CHECK` UDC target performs static checks of the Rust project as `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting, find unused dependencies and any supply chain issues with dependencies.
+The `+CHECK` UDC target performs static checks of the Rust project as
+`cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
+find unused dependencies and any supply chain issues with dependencies.
 Here is the list of steps (look at `./earthly/rust/scripts/std_checks.sh`):
 
 1. `cargo fmtchk` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
-look at `./earthly/rust/stdcfgs/config.toml`)
-- Checking Rust Code Format.
-2. checking configuration files for consistency.
+look at `./earthly/rust/stdcfgs/config.toml`)Checking Rust Code Format.
+2. Checking configuration files for consistency.
 3. `cargo machete` - Checking for Unused Dependencies.
 4. `cargo deny check` - Checking for Supply Chain Issues.
 
@@ -177,16 +179,13 @@ here is the list of steps (look at `./earthly/rust/scripts/std_build.sh`):
 1. `cargo build` - Building all code in the workspace.
 2. `cargo lint` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)
-- Checking all Clippy Lints in the workspace.
+Checking all Clippy Lints in the workspace.
 3. `cargo docs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
-look at `./earthly/rust/stdcfgs/config.toml`)
-- Checking Documentation can be generated OK.
+look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation can be generated OK.
 4. `cargo testci` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
-look at `./earthly/rust/stdcfgs/config.toml`)
-- Checking Self contained Unit tests all pass.
+look at `./earthly/rust/stdcfgs/config.toml`)Checking Self contained Unit tests all pass.
 5. `cargo testdocs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
-look at `./earthly/rust/stdcfgs/config.toml`)
-- Checking Documentation tests all pass.
+look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation tests all pass.
 6. `cargo bench` - Checking Benchmarks all run to completion.
 
 Next steps is mandatory if you are going to produce a binary as an artifact,
