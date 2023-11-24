@@ -64,7 +64,10 @@ FORMAT:
     # Where we want to run the `lint` from.
     ARG --required src
 
-    RUN docker run --rm -v $src:/sql sqlfluff-image:latest sqlfluff format .
+    RUN --no-cache echo "`format` is currently disabled, as it changes the ownership of files to root:root."
+    RUN --no-cache echo "Run a locally installed version of `sqlfluff` instead for now."
+
+    #RUN docker run --rm -v $src:/sql sqlfluff-image:latest sqlfluff format .
 
 # Build PostgreSQL image.
 # REQUIREMENTS: 
