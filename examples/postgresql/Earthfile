@@ -2,6 +2,8 @@ VERSION 0.7
 
 # cspell: words psql
 
+# Internal: builder is our Event db builder target. Prepares all necessary artifacts.
+#   CI target : dependency
 builder:
     FROM ./../../earthly/postgresql+postgres-base
 
@@ -10,25 +12,52 @@ builder:
     COPY --dir ./migrations ./data ./refinery.toml .
     DO ./../../earthly/postgresql+BUILDER
 
+# check if the sqlfiles are properly formatted and pass lint quality checks.
+#   CI target : true
 check:
     FROM +builder
 
     DO ./../../earthly/postgresql+CHECK
 
+# Internal: build-sqlfluff is a target to build the necessary `sqlfluff` tool container.
+#   CI target : false
+# This allows us to run sqlfluff commands locally without needing to install it locally.
+# It does not need to be run directly, it is used by the `format` target.
+build-sqlfluff:
+    BUILD ./../../earthly/postgresql+sqlfluff-image   
+
+# format all SQL files in the current project.  Local developers tool.
+#   CI target : false
 format:
     LOCALLY
 
+    # This is a trick.  Earthly can NOT build and run a container in the same invocation.
+    # Because this target is running LOCALLY, and we know earthly must be installed, we can
+    # call earthly locally to build and publish the local target we need to run the sqlfluff linter.
+    # By recursively running earthly, we sidestep the limitation which prevents us from building 
+    # a container and running it in the same invocation.
+    RUN earthly +build-sqlfluff
+
     DO ./../../earthly/postgresql+FORMAT --src=$(echo ${PWD})
 
+# build an event db docker image.
+#   CI target : true
+# Arguments:
+#  * tag: docker image `tag`.
 build:
     FROM +builder
 
     ARG tag="latest"
-    ARG registry
 
-    DO ./../../earthly/postgresql+BUILD --image_name=example-db --tag=$tag --registry=$registry
+    DO ./../../earthly/postgresql+BUILD --image_name=example-db --tag=$tag
 
-# Container runs PostgreSQL server, drops and initialise db, applies migrations, applies seed data.
+# Internal: Test Scenario 1
+#   CI target : true
+# Steps:
+#   * Container runs PostgreSQL server
+#   * drops and initialise db
+#   * applies migrations
+#   * applies seed data.
 test-1:
     FROM ./../../earthly/postgresql+postgres-base
 
@@ -51,7 +80,13 @@ test-1:
             assert_eq "$expected" "$res"
     END
 
-# Container runs PostgreSQL server, drops and initialise db, doesn't apply migrations, doesn't apply seed data.
+# Internal: Test Scenario 2
+#   CI target : dependency
+# Steps:
+#   * Container runs PostgreSQL server
+#   * drops and initialise db
+#   * doesn't apply migrations
+#   * doesn't apply seed data.
 test-2:
     FROM ./../../earthly/postgresql+postgres-base
 
@@ -68,7 +103,13 @@ test-2:
             ! psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users"
     END
 
-# Container runs PostgreSQL server, drops and initialise db, applies migrations, doesn't apply seed data.
+# Internal: Test Scenario 3
+#   CI target : dependency
+# Steps:
+#   * Container runs PostgreSQL server
+#   * drops and initialise db
+#   * applies migrations
+#   * doesn't apply seed data.
 test-3:
     FROM ./../../earthly/postgresql+postgres-base
 
@@ -91,7 +132,13 @@ test-3:
             assert_eq "$expected" "$res"
     END
 
-# PostgreSQL server runs as a separate service, drops and initialise db, applies migrations, applies seed data.
+# Internal: Test SWcenario 4
+#   CI target : dependency
+# Steps:
+#   * PostgreSQL server runs as a separate service
+#   * drops and initialise db
+#   * applies migrations
+#   * applies seed data.
 test-4:
     FROM ./../../earthly/postgresql+postgres-base
 
@@ -117,7 +164,8 @@ test-4:
             assert_eq "$expected" "$res"
     END
 
-# Invoke all tests
+# test the event db database schema. Invokes all tests.
+#   CI target : true
 test:
     BUILD +test-1
     BUILD +test-2

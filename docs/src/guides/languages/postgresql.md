@@ -75,8 +75,13 @@ check:
 
     DO ./../../earthly/postgresql+CHECK
 
+build-sqlfluff:
+    BUILD ./../../earthly/postgresql+sqlfluff-image   
+
 format:
     LOCALLY
+
+    RUN earthly +build-sqlfluff
 
     DO ./../../earthly/postgresql+FORMAT --src=$(echo ${PWD})
 ```
@@ -85,12 +90,6 @@ With prepared environment and all data, we're now ready to start operating with 
 At this step we can begin performing static checks against `*.sql` files.
 These checks are intended to verify the code is healthy and well formatted to a certain standard
 and done with the help of the `sqlfluff` tool which is already configured during the `+postgres-base` target.
-
-<!-- markdownlint-disable max-one-sentence-per-line -->
-!!! Note
-    Before perform formatting it is needed to build `sqlfluff-image` docker image using following command
-    `earthly github.com/input-output-hk/catalyst-ci/earthly/postgresql+sqlfluff-image`
-<!-- markdownlint-enable max-one-sentence-per-line -->
 
 To apply and fix some formatting issues you can run `+format` target which will picks up directory
 where your Earthly file lies in as a source dir for formatting and run `+FORMAT` UDC target.
