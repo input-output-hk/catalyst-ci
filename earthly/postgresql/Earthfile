@@ -35,8 +35,6 @@ sqlfluff-image:
 
     WORKDIR /sql
 
-    RUN cp /root/.sqlfluff .
-
     SAVE IMAGE sqlfluff-image:latest
 
 # Common PostgreSQL setup.
@@ -44,7 +42,7 @@ sqlfluff-image:
 BUILDER:
     COMMAND
 
-    RUN cp /root/.sqlfluff .
+    RUN cp -n /root/.sqlfluff .
     RUN cp /root/entry.sh .
     RUN chmod ugo+x ./entry.sh
     RUN cp /root/setup-db.sql .
