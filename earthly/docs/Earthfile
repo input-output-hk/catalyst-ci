@@ -33,7 +33,7 @@ deps:
         git       
 
     # Install poetry and our python dependencies.
-    DO ../python+BUILDER
+    DO ../python+SETUP
 
     # Copy our run scripts
     COPY --dir scripts /scripts

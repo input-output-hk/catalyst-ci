@@ -41,7 +41,7 @@ sqlfluff-image:
 
 # Common PostgreSQL setup.
 # Prepare important files needed for building image
-BUILDER:
+SETUP:
     COMMAND
 
     RUN cp /root/.sqlfluff .

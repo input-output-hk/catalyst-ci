@@ -8,7 +8,7 @@ builder:
     WORKDIR /build
 
     COPY --dir ./migrations ./data ./refinery.toml .
-    DO ./../../earthly/postgresql+BUILDER
+    DO ./../../earthly/postgresql+SETUP
 
 check:
     FROM +builder

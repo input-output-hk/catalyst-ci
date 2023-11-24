@@ -57,12 +57,12 @@ builder:
     WORKDIR /build
 
     COPY --dir ./migrations ./data ./refinery.toml .
-    DO ./../../earthly/postgresql+BUILDER
+    DO ./../../earthly/postgresql+SETUP
 ```
 
 The first target we are going to consider will be responsible to prepare a PostgreSQL environment (Earthly `+postgres-base` target),
 migrations, migrations configuration and seed data (`COPY --dir ./migrations ./data ./refinery.toml .`),
-doing some final build step (Earthly `+BUILDER` UDC target).
+doing some final build step (Earthly `+SETUP` UDC target).
 
 In the next steps we are going to inheriting from this `+builder` target which contains all necessary data,
 dependencies, environment to properly run PostgreSQL database.
