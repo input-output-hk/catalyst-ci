@@ -18,13 +18,12 @@ check-hosted:
 check-all-hosts:    
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
-build-hosted:
-    ARG TARGETPLATFORM
 
-    # Build the service
+# Build the service.
+build-hosted:
     FROM +builder
  
-    RUN /scripts/std_build.sh
+    DO ./../../earthly/rust+BUILD
 
     DO ./../../earthly/rust+SMOKE_TEST --bin=hello_world
 

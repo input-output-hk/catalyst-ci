@@ -105,8 +105,20 @@ With prepared environment and all data, we're now ready to start operating with 
 The `check-hosted` target which actually performs all checks and validation
 with the help of `+CHECK` UDC target.
 The `+CHECK` UDC target performs static checks of the Rust project as `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting, find unused dependencies and any supply chain issues with dependencies.
-Also during it validates configuration files as `.cargo/config.toml`, `rustfmt.toml`, `.config/nextest.toml`, `clippy.toml`, `deny.toml`
+Here is the list of steps (look at `./earthly/rust/scripts/std_checks.sh`):
+
+1. `cargo fmtchk` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+look at `./earthly/rust/stdcfgs/config.toml`)
+- Checking Rust Code Format.
+2. checking configuration files for consistency.
+3. `cargo machete` - Checking for Unused Dependencies.
+4. `cargo deny check` - Checking for Supply Chain Issues.
+
+As it was mentioned above it validates configuration files as
+`.cargo/config.toml`, `rustfmt.toml`, `.config/nextest.toml`, `clippy.toml`, `deny.toml`
 to be the same as defined in `earthly/rust/stdcfgs` directory of the `catalyst-ci` repo.
+So when you are going to setup a new Rust project copy these configuration files
+described above to the appropriate location of your Rust project.
 
 Another targets as `check-all-hosts` and `check` (running on CI) just invoke `check-hosted`
 with the specified `--platform`.
@@ -114,3 +126,91 @@ It is important to define a `linux` target platform with a proper cpu architectu
 for the Rust project when you are building it inside Docker
 and check the build process with different scenarios.
 The same approach we will see for the another targets of this guide.
+
+### Build
+
+```Earthfile
+# Build the service.
+build-hosted:
+    FROM +builder
+ 
+    DO ./../../earthly/rust+BUILD
+
+    DO ./../../earthly/rust+SMOKE_TEST --bin=hello_world
+
+    SAVE ARTIFACT target/$TARGETARCH/doc doc
+    SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+build-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+
+# Run build using the most efficient host tooling
+# CI Automated Entry point.
+build:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +build-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +build-hosted
+    END
+```
+
+After successful performing checks of the Rust project we can finally build artifacts.
+As it was discussed in the previous section, actual job is done with `build-hosted` target,
+other targets needs to configure different platform running options.
+So we will focus on `build-hosted` target.
+Obviously it inherits `builder` target environment and than performs build of the binary.
+Important to note that in this particular example we are dealing with the executable Rust project,
+so it produces binary as a final artifact.
+Another case of the building Rust library we will consider later.
+Actual build process is done with `+BUILD` UDC target.
+Under this build process we perform different steps of compiling and validating of our Rust project,
+here is the list of steps (look at `./earthly/rust/scripts/std_build.sh`):
+
+1. `cargo build` - Building all code in the workspace.
+2. `cargo lint` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+look at `./earthly/rust/stdcfgs/config.toml`)
+- Checking all Clippy Lints in the workspace.
+3. `cargo docs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+look at `./earthly/rust/stdcfgs/config.toml`)
+- Checking Documentation can be generated OK.
+4. `cargo testci` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+look at `./earthly/rust/stdcfgs/config.toml`)
+- Checking Self contained Unit tests all pass.
+5. `cargo testdocs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+look at `./earthly/rust/stdcfgs/config.toml`)
+- Checking Documentation tests all pass.
+6. `cargo bench` - Checking Benchmarks all run to completion.
+
+Next steps is mandatory if you are going to produce a binary as an artifact,
+for Rust libraries the are not mandatory and could be omitted.
+The `+SMOKE_TEST` UDC target checks that produced binary with the specified name (`--bin` argument)
+is executable, isn't a busted mess.
+
+Final step is to provide desired artifacts: docs and binary.
+
+### Test
+
+As you already mentioned that running of unit tests is done during the `build` process,
+but if you need some integration tests pls follow how it is done for [PostgreSQL builder](./postgresql.md),
+Rust will have the same approach.
+
+### Release and publish
+
+To prepare a release artifact and publish it to some external container registries
+please follow this [guide](./../../onboarding/index.md).
+It is pretty strait forward for this builder process,
+because as a part of `+build` target we already creating a docker image.
+
+## Conclusion
+
+You can see the final `Earthfile` [here](https://github.com/input-output-hk/catalyst-ci/blob/master/examples/rust/Earthfile)
+and any other files in the same directory.
+We have learnt how to maintain and setup Rust project, as you can see it is pretty simple.

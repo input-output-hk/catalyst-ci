@@ -89,6 +89,12 @@ CHECK:
     # to pass without needing to iterate excessively.
     RUN /scripts/std_checks.sh
 
+# Step we do during the `build` CI phase for all Rust programs
+BUILD:
+    COMMAND
+
+    RUN /scripts/std_build.sh
+
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:
     COMMAND
