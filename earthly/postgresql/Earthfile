@@ -81,7 +81,6 @@ BUILD:
     COMMAND
 
     ARG tag="latest"
-    ARG registry
     ARG --required image_name
 
     USER postgres:postgres
@@ -89,4 +88,4 @@ BUILD:
     ENTRYPOINT ["./entry.sh"]
 
     # Push the container...
-    SAVE IMAGE --push ${registry}${image_name}:$tag
+    SAVE IMAGE ${image_name}:$tag
