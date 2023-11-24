@@ -3,9 +3,8 @@ VERSION 0.7
 # Set up our target toolchains, and copy our files.
 builder:
     FROM ./../../earthly/rust+rust-base
-    
-    COPY --dir "*" .
 
+    COPY --dir "*" .
     DO ./../../earthly/rust+SETUP
 
 # Test rust build container - Use best architecture host tools.

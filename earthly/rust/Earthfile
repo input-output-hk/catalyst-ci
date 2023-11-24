@@ -66,6 +66,7 @@ rust-base-all-hosts:
 SETUP:
     COMMAND
 
+    COPY ./rust-toolchain.toml .
     ENV default_rust_channel=$(rg -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)
 
     # Check that `default_rust_channel` and $RUST_VERSION from the rust-base container are exactly the same.
