@@ -1,0 +1,83 @@
+# Common Rust UDCs and Builders.
+VERSION 0.7
+
+# cspell: words rustup rustc automake autotools xutils miri nextest kani
+# cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT 
+# cspell: words USERPLATFORM USEROS USERARCH USERVARIANT 
+# cspell: words ripgrep colordiff rustfmt stdcfgs toolset toolsets readelf
+
+# Internal: Set up our target toolchains, and copy our files.
+builder:
+    FROM ../../earthly/rust+rust-base
+
+    DO ../../earthly/rust+SETUP --toolchain=rust-toolchain.toml
+
+    DO ../../earthly/rust+CP_SRC --src=".cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml src"
+
+# Internal: Run Project Checks - Use best architecture host tools.
+check-hosted:
+    FROM +builder
+
+    DO ../../earthly/rust+CHECK
+
+# check-all-hosts A developers test which runs check with all supported host tooling.  
+# Needs qemu or rosetta to run. 
+# Only used to validate tooling is working across host toolsets by developers.
+check-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
+
+build-hosted:
+    ARG TARGETPLATFORM
+
+    # Build the service
+    FROM +builder
+ 
+    RUN /scripts/std_build.sh
+
+    DO github.com/input-output-hk/catalyst-ci/earthly/rust:v2.0.3+SMOKE_TEST --bin=dbviz
+
+    SAVE ARTIFACT target/$TARGETARCH/doc doc
+    SAVE ARTIFACT target/$TARGETARCH/release/dbviz dbviz
+
+# build-all-hosts - A developers test which runs build with all supported host tooling.  
+# Needs qemu or rosetta to run.
+# Only used to validate build tooling is working across host toolsets.
+build-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+
+
+## -----------------------------------------------------------------------------
+##
+## Standard CI targets.
+##
+## These targets are discovered and executed automatically by CI.
+
+# check - Run check using the most efficient host tooling
+# CI Automated Entry point.
+check:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +check-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +check-hosted
+    END
+
+# build - Run build using the most efficient host tooling
+# CI Automated Entry point.
+build:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +build-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +build-hosted
+    END

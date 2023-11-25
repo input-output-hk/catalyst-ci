@@ -1,0 +1,222 @@
+{%- macro theme(x) -%}
+{{ {
+    "title_loc"             : "t",
+    "title_size"            : 30,
+    "title_color"           : "blue",
+    "graph_direction"       : "LR",
+    "default_fontsize"      : 16,
+    "pkey_bgcolor"          : "seagreen1",
+    "field_desc"            : "color='grey50' face='Monospace' point-size='14'",
+    "column_heading"        : "color='black' face='Courier bold' point-size='18'",
+    "table_heading_bgcolor" : "#009879",
+    "table_heading"         : "color='white' face='Courier bold italic' point-size='20'",
+    "table_desc_bgcolor"    : "grey20",
+    "table_description"     : "color='white' face='Monospace' point-size='14'"
+}[x] }}
+{%- endmacro -%}
+
+{%- macro data_type(data_type, default, max_chars, nullable) -%}
+
+    {%- if nullable == "YES" -%}
+    <i>
+    {%- endif -%}
+
+    {%- if data_type == "character varying" -%}
+    varchar
+    {%- elif data_type == "timestamp without time zone" -%}
+    timestamp
+    {%- else -%}
+    {{- data_type -}}
+    {%- endif -%}
+
+    {%- if max_chars is not none -%}
+    ({{max_chars}})
+    {%- endif -%}
+
+    {%- if default is startingwith("nextval") -%}
+    +
+    {%- endif -%}
+
+    {%- if nullable == "YES" -%}
+    </i>
+    {%- endif -%}
+
+{%- endmacro -%}
+
+{%- macro pkey_bgcolor(pkey) -%}
+    {%- if pkey -%}
+    bgcolor="{{ theme('pkey_bgcolor') }}"
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro column_name_x(name, pkey) -%}
+    <td port="{{name}}" {{ pkey_bgcolor(pkey) }} align='text'><font>{{name}}</font><br align='left'/></td>
+{%- endmacro -%}
+
+
+{%- macro column_name(field) -%}
+    {{- column_name_x(field.column, field.primary_key) -}}
+{%- endmacro -%}
+
+{%- macro final(field, final=true) -%}
+    {%- if final -%}
+    port="{{field.column}}_out"
+    {%- endif -%}
+{%- endmacro -%}
+
+{%- macro column_type(field, last=false) -%}
+    <td {{ final(field,last) }} {{ pkey_bgcolor(field.primary_key) }} ><font>{{ data_type(field.data_type, field.default, field.max_chars, field.nullable ) }}</font></td>
+{%- endmacro -%}
+
+{%- macro column_description(field) -%}
+    <td {{ final(field,true) }} {{ pkey_bgcolor(field.primary_key) }} align='text'><font {{ theme("field_desc") }} ><i>{{- field.description|trim|escape|replace("\n", "<br align='left'/>") -}}</i><br align="left"/></font></td>
+{%- endmacro -%}
+
+digraph erd {
+
+    {% if opts.title is not none %}
+    label = "{{ opts.title }}"
+    labelloc = {{ theme("title_loc") }}
+    fontsize = {{ theme("title_size") }}
+    fontcolor = {{ theme("title_color") }}
+    {% endif %}
+
+    graph [
+        rankdir = "{{theme('graph_direction')}}"
+    ];
+
+    node [
+        fontsize = "{{theme('default_fontsize')}}"
+        shape = "plaintext"
+    ];
+
+    edge [
+    ];
+
+    {% for table in schema.tables %}
+        {% if opts.comments %}
+
+    "{{table.name}}" [shape=plain label=<
+        <table border='0' cellborder='1' cellspacing='0' >
+            <tr>
+                <td colspan='3' bgcolor='{{theme("table_heading_bgcolor")}}' port='__title'><font {{theme("table_heading")}}><b>{{table.name}}</b></font></td>
+            </tr>
+            <tr>
+                <td><font {{ theme("column_heading") }} ><b>Column</b></font></td>
+                <td><font {{ theme("column_heading") }} ><b>Type</b></font></td>
+                <td><font {{ theme("column_heading") }} ><b>Description</b></font></td>
+            </tr>
+
+            {% for field in table.fields %}
+            <tr>
+                {{ column_name(field) }}
+                {{ column_type(field, false) }}
+                {{ column_description(field) }}
+            </tr>
+            {% endfor %}
+
+            {% if table.description is not none %}
+            <tr>
+                <td colspan='3' bgcolor="{{theme('table_desc_bgcolor')}}" align='text'><font {{theme("table_description")}}><i>{{- table.description|trim|escape|replace("\n", "<br align='left'/>") -}}</i><br align="left"/></font></td>
+            </tr>
+            {% endif %}
+
+        </table>
+    >];
+
+        {% else %}
+
+    "{{table.name}}" [label=<
+        <table border='0' cellborder='1' cellspacing='0'>
+            <tr>
+                <td colspan='2' bgcolor='{{theme("table_heading_bgcolor")}}' port='__title'><font {{theme("table_heading")}}><b>{{table.name}}</b></font></td>
+            </tr>
+            <tr>
+                <td><font {{ theme("column_heading") }} ><b>Column</b></font></td>
+                <td><font {{ theme("column_heading") }} ><b>Type</b></font></td>
+            </tr>
+
+            {% for field in table.fields %}
+            <tr>
+                {{ column_name(field) }}
+                {{ column_type(field, true) }}
+            </tr>
+            {% endfor %}
+
+        </table>
+    >];
+
+        {% endif %}
+    {% endfor %}
+
+    {% for partial in schema.partial_tables %}
+
+    "{{partial}}" [label=<
+        <table border='0' cellborder='1' cellspacing='0'>
+            <tr>
+                <td bgcolor='{{theme("table_heading_bgcolor")}}' port='__title'><font {{theme("table_heading")}}><b>{{partial}}</b></font></td>
+            </tr>
+            <tr>
+                <td><font {{ theme("column_heading") }} ><b>Column</b></font></td>
+            </tr>
+
+            {% for field in schema.partial_tables[partial] %}
+            <tr>
+                {{ column_name_x(field,false) }}
+            </tr>
+            {% endfor %}
+
+            <tr>
+                <td colspan='3' bgcolor="{{theme('table_desc_bgcolor')}}" align='text'><font {{theme("table_description")}}><i>ABRIDGED</i><br align="left"/></font></td>
+            </tr>
+        </table>
+    >];
+
+    {% endfor %}
+
+
+    "LEGEND" [label=<
+        <table border='0' cellborder='1' cellspacing='0'>
+            <tr>
+                <td colspan='2' bgcolor='Pink' port='__title'><font color='white' face='Courier bold italic' point-size='20'><b>LEGEND</b></font></td>
+            </tr>
+            <tr>
+                <td><font {{theme("column_heading")}}><b>Type</b></font></td>
+                <td><font {{theme("column_heading")}}><b>Example</b></font></td>
+            </tr>
+
+            <tr>
+                <td align='text' bgcolor="seagreen1" ><font>Primary Key</font><br align='left'/></td>
+                <td  bgcolor="{{theme('pkey_bgcolor')}}" ><font>{{ data_type("integer", "nextval", none, "NO") }}</font></td>
+            </tr>
+
+
+            <tr>
+                <td align='text'><font>Standard Field</font><br align='left'/></td>
+                <td><font>{{ data_type("bytea", none, none, "NO") }}</font></td>
+            </tr>
+
+            <tr>
+                <td align='text'><font>Nullable Field</font><br align='left'/></td>
+                <td><font>{{ data_type("text", none, none, "YES") }}</font></td>
+            </tr>
+
+            <tr>
+                <td align='text'><font>Sized Field</font><br align='left'/></td>
+                <td><font>{{ data_type("varchar", none, 32, "NO") }}</font></td>
+            </tr>
+
+            <tr>
+                <td align='text'><font>Autoincrement Field</font><br align='left'/></td>
+                <td><font>{{ data_type("integer", "nextval", none, "NO") }}</font></td>
+            </tr>
+
+        </table>
+    >];
+
+    {% for relation in schema.relations %}
+    "{{relation.on_table}}":"{{relation.on_field}}_out" -> "{{relation.to_table}}":"{{relation.to_field}}"
+    {% endfor %}
+
+
+}

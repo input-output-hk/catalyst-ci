@@ -12,7 +12,7 @@ builder:
     COPY --dir ./migrations ./data ./refinery.toml .
     DO ./../../earthly/postgresql+BUILDER
 
-# check if the sqlfiles are properly formatted and pass lint quality checks.
+# check if the sql files are properly formatted and pass lint quality checks.
 #   CI target : true
 check:
     FROM +builder
@@ -132,7 +132,7 @@ test-3:
             assert_eq "$expected" "$res"
     END
 
-# Internal: Test SWcenario 4
+# Internal: Test Scenario 4
 #   CI target : dependency
 # Steps:
 #   * PostgreSQL server runs as a separate service
