@@ -193,9 +193,9 @@ impl TryFrom<Row> for Index {
 
         Ok(Self {
             table: row.get(0),
-            //name: row.get(1),
+            // name: row.get(1),
             primary: row.get(2),
-            //unique: row.get(3),
+            // unique: row.get(3),
             fields,
         })
     }
