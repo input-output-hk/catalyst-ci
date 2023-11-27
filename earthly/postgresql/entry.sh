@@ -39,16 +39,16 @@ check_env_vars() {
 
     # Iterate over the array and check if each variable is set
     for var in "${env_vars[@]}"; do
-        echo "Checking $var"
-        if [ -z "${!var:-}" ]; then
-            echo ">>> Error: $var is required and not set."
+        echo "Checking ${var}"
+        if [[ -z "${!var:-}" ]]; then
+            echo ">>> Error: ${var} is required and not set."
             exit 1
         fi
     done
 }
 
 debug_sleep() {
-    if [ -n "${DEBUG_SLEEP:-}" ]; then
+    if [[ -n "${DEBUG_SLEEP:-}" ]]; then
         echo "DEBUG_SLEEP is set. Sleeping for ${DEBUG_SLEEP} seconds..."
         sleep "${DEBUG_SLEEP}"
     fi
@@ -70,22 +70,22 @@ REQUIRED_ENV=(
 check_env_vars "${REQUIRED_ENV[@]}"
 
 # Export environment variables
-export PGHOST="${DB_HOST}"
-export PGPORT="${DB_PORT}"
-export PGUSER="${DB_SUPERUSER}"
-export PGPASSWORD="${DB_SUPERUSER_PASSWORD}"
+export PGHOST="${DB_HOST:?}"
+export PGPORT="${DB_PORT:?}"
+export PGUSER="${DB_SUPERUSER:?}"
+export PGPASSWORD="${DB_SUPERUSER_PASSWORD:?}"
 
 # Sleep if DEBUG_SLEEP is set
 debug_sleep
 
 # Run postgreSQL database in this container if the host is localhost
-if [ "${DB_HOST}" == "localhost" ]; then
+if [[ "${DB_HOST}" == "localhost" ]]; then
     POSTGRES_HOST_AUTH_METHOD=${POSTGRES_HOST_AUTH_METHOD:-trust}
     echo "POSTGRES_HOST_AUTH_METHOD is set to ${POSTGRES_HOST_AUTH_METHOD}"
 
     # Start PostgreSQL in the background
     initdb -D /var/lib/postgresql/data || true
-    printf "\n host all all all %s \n" "$POSTGRES_HOST_AUTH_METHOD" >> /var/lib/postgresql/data/pg_hba.conf
+    printf "\n host all all all %s \n" "${POSTGRES_HOST_AUTH_METHOD}" >> /var/lib/postgresql/data/pg_hba.conf
     pg_ctl -D /var/lib/postgresql/data start &
 fi
 
@@ -96,9 +96,9 @@ TIMEOUT=${TIMEOUT:-0}
 echo "TIMEOUT is set to ${TIMEOUT}"
 until pg_isready -d postgres >/dev/null 2>&1; do
     sleep 1
-    if [ $TIMEOUT -gt 0 ]; then
+    if [[ ${TIMEOUT} -gt 0 ]]; then
         TIMEOUT=$((TIMEOUT - 1))
-        if [ $TIMEOUT -eq 0 ]; then
+        if [[ ${TIMEOUT} -eq 0 ]]; then
             echo "Timeout: PostgreSQL server did not start within the specified time"
             exit 1
         fi
@@ -107,35 +107,35 @@ done
 echo "PostgreSQL is running"
 
 # Initialize and drop database if necessary
-if [ "${INIT_AND_DROP_DB:-}" == "true" ]; then
+if [[ "${INIT_AND_DROP_DB:-}" == "true" ]]; then
     echo ">>> Initializing database..."
     psql -d postgres -f ./setup-db.sql \
-        -v dbName="${DB_NAME}" \
-        -v dbDescription="${DB_DESCRIPTION}" \
-        -v dbUser="${DB_USER}" \
-        -v dbUserPw="${DB_USER_PASSWORD}"
+        -v dbName="${DB_NAME:?}" \
+        -v dbDescription="${DB_DESCRIPTION:?}" \
+        -v dbUser="${DB_USER:?}" \
+        -v dbUserPw="${DB_USER_PASSWORD:?}"
 fi
 
 # Run migrations
-if [ "${WITH_MIGRATIONS:-}" == "true" ]; then
+if [[ "${WITH_MIGRATIONS:-}" == "true" ]]; then
     echo ">>> Running migrations..."
     export DATABASE_URL="postgres://${DB_USER}:${DB_USER_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
     refinery migrate -e DATABASE_URL -c ./refinery.toml -p ./migrations
 fi
 
 # Apply seed data
-if [ "${WITH_SEED_DATA:-}" == "true" ]; then
+if [[ "${WITH_SEED_DATA:-}" == "true" ]]; then
     echo ">>> Applying seed data..."
     while IFS= read -r -d '' file; do
-        echo "Applying seed data from $file"
-        psql -d $DB_NAME -f "$file"
-    done < <(find ./data -name '*.sql' -print0 | sort -z)
+        echo "Applying seed data from ${file}"
+        psql -d "${DB_NAME}" -f "${file}"
+    done < <(find ./data -name '*.sql' -print0 | sort -z) || true
 fi
 
 echo ">>> Finished entrypoint script"
 
 # Infinite loop to run until local PostgreSQL is ready
-until [ "${DB_HOST}" == "localhost" ] && ! pg_isready -d postgres >/dev/null 2>&1; 
+until [[ "${DB_HOST}" == "localhost" ]] && ! pg_isready -d postgres >/dev/null 2>&1; 
 do
     sleep 60
 done

@@ -9,7 +9,9 @@
 # Individual targets can add extra `check` steps, but these checks must always
 # pass. 
 
-source "$(dirname "$0")/colors.sh"
+basedir=$(dirname "$0")
+
+source "${basedir}/include/colors.sh"
 
 
 # This is set up so that ALL build steps are run and it will fail if any fail.
@@ -19,27 +21,32 @@ source "$(dirname "$0")/colors.sh"
 rc=0
 
 ## Build the code
-status $rc "Building all code in the workspace" \
+status "${rc}" "Building all code in the workspace" \
     cargo build --release --workspace --locked; rc=$?
 
 ## Check the code passes all clippy lint checks.
-status $rc "Checking all Clippy Lints in the workspace" \
+status "${rc}" "Checking all Clippy Lints in the workspace" \
     cargo lint; rc=$?
 
 ## Check we can generate all the documentation
-status $rc "Checking Documentation can be generated OK" \
+status "${rc}" "Checking Documentation can be generated OK" \
     cargo docs; rc=$?
 
 ## Check if all Self contained tests pass (Test that need no external resources).
-status $rc "Checking Self contained Unit tests all pass" \
+status "${rc}" "Checking Self contained Unit tests all pass" \
     cargo testci; rc=$?
 
 ## Check if all documentation tests pass.
-status $rc "Checking Documentation tests all pass" \
+status "${rc}" "Checking Documentation tests all pass" \
     cargo testdocs; rc=$?
 
+ls -al "${basedir}"
+ls -al "${basedir}/include"
+ls -al .
+ls -al ./include
+
 ## Check if any benchmarks defined run (We don;t validate the results.)
-status $rc "Checking Benchmarks all run to completion" \
+status "${rc}" "Checking Benchmarks all run to completion" \
     cargo bench --all-targets; rc=$?
 
 ## Generate Module Trees for documentation purposes.
@@ -52,4 +59,4 @@ status $rc "Checking Benchmarks all run to completion" \
 
 
 # Return an error if any of this fails.
-exit $rc
+exit "${rc}"

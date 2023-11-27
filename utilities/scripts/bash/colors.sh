@@ -29,5 +29,18 @@ status() {
     fi
 
     # Return the current status
-    return "$rc"
+    return "${rc}"
+}
+
+
+# Checks if two files that should exist DO, and are equal.
+# used to enforce consistency between local config files and the expected config locked in CI.
+check_vendored_files() {
+    local rc=$1
+    local localfile=$2
+    local vendorfile=$3
+
+    status "${rc}" "Checking if Local File '${localfile}' == Vendored File '${vendorfile}'" \
+        colordiff -Naur "${localfile}" "${vendorfile}"
+    return $?
 }

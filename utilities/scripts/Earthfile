@@ -1,0 +1,10 @@
+# Earthfile containing common scripts for easy reference
+VERSION 0.7
+
+# Internal: bash-scripts : Common bash scripts.
+bash-scripts:
+    FROM scratch
+
+    COPY --dir bash /
+
+    SAVE ARTIFACT /bash /include

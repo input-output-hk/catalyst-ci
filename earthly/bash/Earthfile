@@ -1,0 +1,31 @@
+# cspell UDCs and Containers.
+VERSION 0.7
+
+# Internal: builder creates a container we can use to execute shellcheck
+builder:
+    FROM alpine:3.18
+
+    RUN apk add --no-cache \
+        bash \
+        shellcheck
+
+    WORKDIR /work
+    COPY check-all.sh shellcheck-dir.sh duplicated-scripts.sh .
+
+    # Copy our common scripts so we can use them inside the container.
+    # Internally in the repo we use a symlink to accomplish this, but Earthly
+    # Will only copy the symlink and not what it references, so we nned to
+    # manually copy what it references.  This enables the script to work
+    # both in-repo and in-ci here.
+    COPY --dir ../../utilities/scripts+bash-scripts/include .
+
+# shellcheck - Check all shell files recursively in the src with shellcheck.
+SHELLCHECK:
+    COMMAND
+    ARG --required src
+
+    FROM +builder
+
+    COPY --dir $src /src
+
+    RUN ./check-all.sh /src

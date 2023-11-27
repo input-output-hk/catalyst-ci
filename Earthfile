@@ -1,6 +1,5 @@
 # Set the Earthly version to 0.7
 VERSION 0.7
-FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
@@ -22,6 +21,20 @@ spell-check:
 
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
 
+# Internal: shell-check - test all bash files lint properly according to shellcheck.
+shell-check:
+    FROM alpine:3.18
+
+    DO ./earthly/bash+SHELLCHECK --src=.
+
+# check all repo wide checks are run from here
+check:
+    FROM alpine:3.18
+
+    # Lint all bash files.
+    BUILD +shell-check
+
+# Internal: Reference to our repo root documentation used by docs builder.
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch
