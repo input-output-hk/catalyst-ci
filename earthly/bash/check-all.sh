@@ -20,7 +20,7 @@ rc_lint=$?
 status "${rc}" "Duplicated Bash Scripts" \
     [ "${rc_dup}" == 0 ]
 rc=$?
-status "${rc}" "Lint Errros in Bash Scripts" \
+status "${rc}" "Lint Errors in Bash Scripts" \
     [ "${rc_lint}" == 0 ]
 rc=$?
 

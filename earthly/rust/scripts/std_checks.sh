@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words localfile vendorfile colordiff Naur fmtchk fmtfix rustfmt stdcfgs
-# cspell: words nextest 
+# cspell: words fmtchk fmtfix rustfmt stdcfgs nextest 
 
 # This script is run inside the `check` stage for rust projects to perform all 
 # high level non-compilation checks.

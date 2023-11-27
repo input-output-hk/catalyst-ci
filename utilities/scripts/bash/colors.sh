@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# cspell: words localfile vendorfile colordiff Naur
+
 # shellcheck disable=SC2034 # This file is intended to bo sourced.
 
 BLACK='\033[0;30m'
