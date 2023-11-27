@@ -40,16 +40,13 @@ format:
 
     DO ./../../earthly/postgresql+FORMAT --src=$(echo ${PWD})
 
+
 # build an event db docker image.
 #   CI target : true
-# Arguments:
-#  * tag: docker image `tag`.
 build:
     FROM +builder
 
-    ARG tag="latest"
-
-    DO ./../../earthly/postgresql+BUILD --image_name=example-db --tag=$tag
+    DO ./../../earthly/postgresql+BUILD --image_name=example-db
 
 # Internal: Test Scenario 1
 #   CI target : true

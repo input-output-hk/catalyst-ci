@@ -30,6 +30,10 @@ postgres-base:
     COPY ./entry.sh .
     COPY ./setup-db.sql .
 
+    # Universal build scripts we will always need and are not target dependent.
+    COPY --dir scripts /scripts
+    COPY --dir ../../utilities/scripts+bash-scripts/include /scripts/include
+
 sqlfluff-image:
     FROM +postgres-base
 
@@ -51,7 +55,7 @@ BUILDER:
 CHECK:
     COMMAND
 
-    RUN sqlfluff lint .
+    RUN /scripts/std_checks.sh
 
 # Format sql files
 # REQUIREMENTS:
@@ -75,18 +79,17 @@ FORMAT:
 #  * prepare seed data files into the `./data` dir (optional)
 #  * prepare `refinery.toml` file
 # Arguments:
-#  * tag : The tag of the image, default value `latest`.
-#  * registry: The registry of the image.
 #  * image_name: The name of the image (required).
 BUILD:
     COMMAND
-
-    ARG tag="latest"
     ARG --required image_name
 
     USER postgres:postgres
 
+    RUN /scripts/std_build.sh
+
     ENTRYPOINT ["./entry.sh"]
 
     # Push the container...
-    SAVE IMAGE ${image_name}:$tag
+    SAVE IMAGE ${image_name}:latest
+

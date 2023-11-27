@@ -84,7 +84,7 @@ if [[ "${DB_HOST}" == "localhost" ]]; then
     echo "POSTGRES_HOST_AUTH_METHOD is set to ${POSTGRES_HOST_AUTH_METHOD}"
 
     # Start PostgreSQL in the background
-    initdb -D /var/lib/postgresql/data || true
+    initdb -D /var/lib/postgresql/data --locale-provider=icu --icu-locale=en_US || true
     printf "\n host all all all %s \n" "${POSTGRES_HOST_AUTH_METHOD}" >> /var/lib/postgresql/data/pg_hba.conf
     pg_ctl -D /var/lib/postgresql/data start &
 fi

@@ -34,6 +34,11 @@ status() {
     return "${rc}"
 }
 
+status_and_exit() {
+    if ! status 0 "$@"; then
+        exit 1
+    fi
+}
 
 # Checks if two files that should exist DO, and are equal.
 # used to enforce consistency between local config files and the expected config locked in CI.
