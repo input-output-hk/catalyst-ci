@@ -85,7 +85,6 @@ rust-base-all-hosts:
 #  * toolchain : The `rust-toolchain` toml file.
 SETUP:
     COMMAND
-
     ARG toolchain=./rust-toolchain.toml
 
     # Copy our toolchain dependency.
