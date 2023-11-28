@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# cspell: words dbname dbdesc dbpath pgsql dbreadytimeout
+
 # This script is run inside the `build` stage.
 # It validates that all the migrations and importable data are able to be
 # used without error.
@@ -39,7 +41,7 @@ status_and_exit "DB Ready" \
     wait_ready_pgsql "$@" --dbreadytimeout="10"
 
 # Setup Schema and run migrations.
-setup_and_migrate "Initilization" "$@"
+setup_and_migrate "Initialization" "$@"
 
 # Test each seed data set can apply cleanly
 rc=0
@@ -59,5 +61,5 @@ status_and_exit "DB Stop" \
 # We DO NOT want the tmp db in the final image, clean it up.
 rm -rf /tmp/data
 
-# These tests will immeditaley fail if the DB is not setup properly.
+# These tests will immediately fail if the DB is not setup properly.
 exit "${rc}"

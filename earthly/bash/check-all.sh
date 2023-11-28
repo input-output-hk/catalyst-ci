@@ -2,6 +2,8 @@
 # Run `shellcheck` on all files in a directory, recursively.
 # $1 = The directory to check.
 
+# cspell: words FORCECOLOR
+
 if [[ ${BASH_SOURCE[0]} = */* ]]; then
     basedir=${BASH_SOURCE%/*}
 else
@@ -34,7 +36,7 @@ status "${rc}" "ShellFmt Errors in Bash Scripts" \
 rc=$?
 
 if [[ ${rc_shfmt} -ne 0 ]]; then
-    echo "Shell files can be autoformated with: 'shfmt -w .' from the root of the repo."
+    echo "Shell files can be autoformatted with: 'shfmt -w .' from the root of the repo."
 fi
 
 exit "${rc}"

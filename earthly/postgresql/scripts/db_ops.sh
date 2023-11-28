@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+# cspell: words dbhost dbport dbuser dbuserpw dbname dbsuperuser dbsuperuserpw dbnamesuperuser dbdescription dbpath
+# cspell: words dbauthmethod dbcollation dbreadytimeout setupdbsql dbrefinerytoml dbmigrations dbseeddatasrc
+# cspell: words pgsql initdb pwfile dbconn isready dbdesc psql
+
 # This script is not intended to be run by itself, and provides common functions
 # for database operations.
 
@@ -156,7 +160,7 @@ function wait_ready_pgsql() {
         delay="${timeout} seconds"
     fi
 
-    # If there is no wait, then just reeturn.
+    # If there is no wait, then just return.
     echo "Waiting ${delay} for PostgreSQL to start..."
     if [[ ${timeout} -eq 0 ]]; then
         return 0
