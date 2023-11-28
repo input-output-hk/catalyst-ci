@@ -120,7 +120,7 @@ Since we need migration and seed data files,
 we'll inherit from the `builder` target.
 The actual image build process is pretty straight-forward
 and fully defined under the `+BUILD` UDC target.
-The only thing it is needed to specify is a few  arguments:
+The only thing it is needed to specify is a few arguments:
 
 * `tag` - the tag of the image, default value `latest`.
 * `registry` - the registry of the image.

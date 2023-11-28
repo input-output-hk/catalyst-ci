@@ -65,8 +65,12 @@ instal all needed tools and dependencies.
 The fist step of the `builder` target is to prepare a Rust environment via `+rust-base` target.
 Next step is to copy source code of the project and finally finalize the build
 which is done with `+SETUP` UDC target.
-The `+SETUP` UDC target requires to have a `rust-toolchain.toml` file,
+The `+SETUP` UDC target requires `rust-toolchain.toml` file,
 with the specified `channel` option in it.
+This `rust-toolchain.toml` file could be specified
+via the `toolchain` argument of the `+SETUP` target like this
+with defining the specific location of this file with the specific name.
+By default `toolchain` setup to `rust-toolchain.toml`.
 
 ### Running checks
 

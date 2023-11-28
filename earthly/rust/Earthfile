@@ -6,11 +6,29 @@ VERSION 0.7
 
 # Base Rustup build container.
 rust-base:
+    ARG TARGETPLATFORM
+    ARG TARGETOS
+    ARG TARGETARCH
+    ARG TARGETVARIANT
+    ARG USERPLATFORM
+    ARG USEROS
+    ARG USERARCH
+    ARG USERVARIANT
+
     # This is our base Host toolset, and rustup.
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
     FROM rust:1.73-alpine3.18
+
+    RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
+        echo "TARGETOS       = $TARGETOS"; \
+        echo "TARGETARCH     = $TARGETARCH"; \
+        echo "TARGETVARIANT  = $TARGETVARIANT"; \
+        echo "USERPLATFORM   = $USERPLATFORM"; \
+        echo "USEROS         = $USEROS"; \
+        echo "USERARCH       = $USERARCH"; \
+        echo "USERVARIANT    = $USERVARIANT"; 
 
     WORKDIR /root
 
@@ -63,10 +81,15 @@ rust-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
 
 # Common Rust setup.
+# Parameters:
+#  * toolchain : The `rust-toolchain` toml file.
 SETUP:
     COMMAND
 
-    COPY ./rust-toolchain.toml .
+    ARG toolchain=./rust-toolchain.toml
+
+    # Copy our toolchain dependency.
+    COPY $toolchain ./rust-toolchain.toml
     ENV default_rust_channel=$(rg -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)
 
     # Check that `default_rust_channel` and $RUST_VERSION from the rust-base container are exactly the same.
