@@ -1,10 +1,8 @@
 # Common Rust UDCs and Builders.
 VERSION 0.7
 
-# cspell: words rustup rustc automake autotools xutils miri nextest kani
-# cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT 
-# cspell: words USERPLATFORM USEROS USERARCH USERVARIANT 
-# cspell: words ripgrep colordiff rustfmt stdcfgs toolset toolsets readelf
+# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf
+# cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
 rust-base:
@@ -17,10 +15,9 @@ rust-base:
     ARG USERARCH
     ARG USERVARIANT
 
-
     # This is our base Host toolset, and rustup.
     # The ACTUAL version of rust that will be used, and available targets
-    # is controlled by a `rust-toolchain.toml` file when the RUST_SETUP UDC is run.
+    # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
     FROM rust:1.73-alpine3.18
 
@@ -32,7 +29,6 @@ rust-base:
         echo "USEROS         = $USEROS"; \
         echo "USERARCH       = $USERARCH"; \
         echo "USERVARIANT    = $USERVARIANT"; 
-
 
     WORKDIR /root
 
@@ -85,16 +81,26 @@ rust-base:
 rust-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
 
-# Common Rust setup
+CP_SRC:
+    # Copy the build src using this.
+    COMMAND
+    # This can be one directory like `"src/*"` or multiple src separated by `","`:
+    # eg, "example/Cargo.toml, example/Cargo.lock, example/src"
+    ARG src=""
+
+    # ONLY copy whats needed to build.  Not everything.
+    # Note: rust-toolchain.toml was already copied when rust was setup.
+    # Minimizing whats copied reduces needless cache misses.
+    FOR --sep=", " file IN $src
+        COPY --dir $file .
+    END
+
+# Common Rust setup.
 # Parameters:
 #  * toolchain : The `rust-toolchain` toml file.
 SETUP:
     COMMAND
     ARG toolchain=./rust-toolchain.toml
-
-    # Poetry Installation directory.
-    # Gives poetry and our poetry project a reliable location.
-    WORKDIR /build
 
     # Copy our toolchain dependency.
     COPY $toolchain ./rust-toolchain.toml
@@ -111,22 +117,6 @@ SETUP:
         cargo --version && \
         cargo +nightly --version
 
-
-CP_SRC:
-    # Copy the build src using this.
-    COMMAND
-    # This can be one directory like `"src/*"` or multiple src separated by `","`:
-    # eg, "example/Cargo.toml, example/Cargo.lock, example/src"
-    ARG src=""
-
-    # ONLY copy whats needed to build.  Not everything.
-    # Note: rust-toolchain.toml was already copied when rust was setup.
-    # Minimizing whats copied reduces needless cache misses.
-    FOR --sep=", " file IN $src
-        COPY --dir $file .
-    END
-
-
 # Steps we do during the `check` CI phase for all Rust programs
 CHECK:
     COMMAND
@@ -136,11 +126,16 @@ CHECK:
     # to pass without needing to iterate excessively.
     RUN /scripts/std_checks.sh
 
+# Step we do during the `build` CI phase for all Rust programs
+BUILD:
+    COMMAND
+
+    RUN /scripts/std_build.sh
+
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:
     COMMAND
-    ARG TARGETPLATFORM
-    ARG bin
+    ARG --required bin
 
     RUN ldd target/$TARGETARCH/release/$bin
     RUN readelf -p .comment target/$TARGETARCH/release/$bin
@@ -148,102 +143,3 @@ SMOKE_TEST:
 
     # ALL executables MUST have `--help` as an option.
     RUN target/$TARGETARCH/release/$bin --help
-
-
-# Set up our target toolchains, and copy our files.
-builder:
-    FROM +rust-base
-
-    DO +SETUP --toolchain=example/rust-toolchain.toml
-
-    DO +CP_SRC --src="example/*"
-
-# Test rust build container - Use best architecture host tools.
-check-hosted:
-    FROM +builder
-
-    DO +CHECK
-
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
-
-build-hosted:
-    ARG TARGETPLATFORM
-
-    # Build the service
-    FROM +builder
- 
-    RUN /scripts/std_build.sh
-
-    DO +SMOKE_TEST --bin=hello_world
-
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world
-
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
-
-## -----------------------------------------------------------------------------
-##
-## Standard CI targets.
-##
-## These targets are discovered and executed automatically by CI.
-
-# Run check using the most efficient host tooling
-# CI Automated Entry point.
-check:
-    FROM busybox
-    # This is necessary to pick the correct architecture build to suit the native machine.
-    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
-    # All target implementation of this should follow this pattern.
-    ARG USERARCH
-
-    IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +check-hosted
-    ELSE
-        BUILD --platform=linux/amd64 +check-hosted
-    END
-
-# Run build using the most efficient host tooling
-# CI Automated Entry point.
-build:
-    FROM busybox
-    # This is necessary to pick the correct architecture build to suit the native machine.
-    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
-    # All target implementation of this should follow this pattern.
-    ARG USERARCH
-
-    IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +build-hosted
-    ELSE
-        BUILD --platform=linux/amd64 +build-hosted
-    END
-
-
-# This step will build any packages we would intend to publish or integration test.
-#package:
-#    FROM scratch
-
-# Run integration tests on all packages built during the `package` step.
-#test:
-#    FROM scratch
-
-# Publish packages if all integration tests have passed. 
-# (Failure to pass tests will prevent packages being published.)
-# Don't have a `publish` target if nothing to actually publish.
-#publish:
-#    FROM scratch
-
-## -----------------------------------------------------------------------------
-
-# This step simulates the full CI run for local purposes only.
-local-ci-run:
-    BUILD +check
-    BUILD +build
-    # BUILD +package
-    # BUILD +test
-    # BUILD +publish
