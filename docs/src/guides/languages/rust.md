@@ -54,8 +54,10 @@ VERSION 0.7
 # Set up our target toolchains, and copy our files.
 builder:
     FROM ./../../earthly/rust+rust-base
-    
-    COPY --dir "*" .
+
+    DO ./../../earthly/rust+CP_SRC --src=".cargo, .config, benches, src, tests"
+    DO ./../../earthly/rust+CP_SRC --src="Cargo.lock, Cargo.toml"
+    DO ./../../earthly/rust+CP_SRC --src="clippy.toml, deny.toml, rustfmt.toml"
     DO ./../../earthly/rust+SETUP
 ```
 
@@ -63,8 +65,14 @@ The first target `builder` is responsible for preparing an already configured Ru
 instal all needed tools and dependencies.
 
 The fist step of the `builder` target is to prepare a Rust environment via `+rust-base` target.
-Next step is to copy source code of the project and finally finalize the build
-which is done with `+SETUP` UDC target.
+Next step is to copy source code of the project with the help of `+CP_SRC` UDC target.
+Note that you need to copy only needed files for Rust build process,
+any other irrelevant stuff should omitted,
+because it could overloads build process with unused files.
+The `+CP_SRC` command has only argument `src` where you can provide files, directories separated by comma,
+as it has been shown in example.
+
+And finally finalize the build with `+SETUP` UDC target.
 The `+SETUP` UDC target requires `rust-toolchain.toml` file,
 with the specified `channel` option in it.
 This `rust-toolchain.toml` file could be specified
