@@ -9,7 +9,7 @@ builder:
 
     WORKDIR /build
 
-    COPY --dir ./migrations ./data ./refinery.toml .
+    COPY --dir ./migrations ./seed ./refinery.toml .
     DO ./../../earthly/postgresql+BUILDER
 
 # check if the sql files are properly formatted and pass lint quality checks.
