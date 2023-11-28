@@ -4,7 +4,7 @@ builder:
     FROM ./../../earthly/python+python-base
 
     COPY --dir ./src .
-    DO ./../../earthly/python+SETUP
+    DO ./../../earthly/python+BUILDER
 
 test:
     FROM +builder

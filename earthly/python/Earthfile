@@ -32,7 +32,7 @@ python-base:
 # Common python builder setup.
 # Parameters:
 #   opts      : Options passed to the `poetry install` command.
-SETUP:
+BUILDER:
     COMMAND
     ARG opts
 
