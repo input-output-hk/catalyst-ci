@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
-basedir=$(dirname "$0")
+if [[ ${BASH_SOURCE[0]} = */* ]]; then
+    basedir=${BASH_SOURCE%/*}/
+else
+    basedir=./
+fi
 
 source "${basedir}/include/colors.sh"
 

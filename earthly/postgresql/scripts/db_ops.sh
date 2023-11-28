@@ -3,7 +3,13 @@
 # This script is not intended to be run by itself, and provides common functions
 # for database operations.
 
-basedir=$(dirname "$0")
+if [[ ${BASH_SOURCE[0]} = */* ]]; then
+    basedir=${BASH_SOURCE%/*}/
+else
+    basedir=./
+fi
+
+echo BASEDIR = "${basedir}"
 
 source "${basedir}/include/colors.sh"
 source "${basedir}/include/params.sh"

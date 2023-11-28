@@ -4,7 +4,11 @@
 # It validates that all the migrations and importable data are able to be
 # used without error.
 
-basedir=$(dirname "$0")
+if [[ ${BASH_SOURCE[0]} = */* ]]; then
+    basedir=${BASH_SOURCE%/*}
+else
+    basedir=.
+fi
 
 source "${basedir}/include/colors.sh"
 source "${basedir}/db_ops.sh"
@@ -46,7 +50,7 @@ do
 
     # Reset schema so all seed data get applied to a clean database.
     setup_and_migrate "Reset" "$@"
-done < <(find ./seed/* -maxdepth 1 -type d -print0 | sort -z)
+done < <(find ./seed/* -maxdepth 1 -type d -print0 | sort -z) || true
 
 # Stop the database
 status_and_exit "DB Stop" \

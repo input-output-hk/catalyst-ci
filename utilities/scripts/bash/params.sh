@@ -17,30 +17,30 @@ get_param() {
     # Access the values of the associative arrays
     local env_var_map
     local default_map
-    declare -n env_var_map="$env_var_map_name"
-    declare -n default_map="$default_map_name"
+    declare -n env_var_map="${env_var_map_name}"
+    declare -n default_map="${default_map_name}"
     shift 3
 
     # Check if ENV_VAR defined, has priority over options and defaults
-    local env_var_name="${env_var_map[$param_name]:-}"
-    if [[ -n "$env_var_name" ]]; then
+    local env_var_name="${env_var_map[${param_name}]:-}"
+    if [[ -n "${env_var_name}" ]]; then
         local env_var_value="${!env_var_name}"
-        if [[ -n "$env_var_value" ]]; then
-            echo "$env_var_value"
+        if [[ -n "${env_var_value}" ]]; then
+            echo "${env_var_value}"
             return
         fi
     fi
 
     # Check for the parameter in the named options
     for arg in "$@"; do
-        if [[ "$arg" == "--$param_name="* ]]; then
+        if [[ "${arg}" == "--${param_name}="* ]]; then
             echo "${arg#*=}"
             return
         fi
     done
 
     # Return the default value
-    local default_value="${default_map[$param_name]:-}"
+    local default_value="${default_map[${param_name}]:-}"
     echo "${default_value:-}"
 
     return
