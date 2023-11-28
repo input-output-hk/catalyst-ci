@@ -15,7 +15,7 @@
 \echo -> dbName ................. = :dbName
 \echo -> dbDescription .......... = :dbDescription
 \echo -> dbUser ................. = :dbUser
-\echo -> dbUserPw ............... = :dbUserPw
+\echo -> dbUserPw ............... = xxxx
 
 -- Cleanup if we already ran this before.
 DROP DATABASE IF EXISTS :"dbName"; -- noqa: PRS
