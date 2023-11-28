@@ -19,7 +19,7 @@ rc_dup=$?
 "${basedir}"/shellcheck-dir.sh "$1"
 rc_lint=$?
 
-FORCECOLOR=1 shfmt -d .
+FORCECOLOR=1 shfmt -d "$1"
 rc_shfmt=$?
 
 # Return an error if any of this fails.
