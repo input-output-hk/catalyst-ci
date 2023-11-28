@@ -1,0 +1,82 @@
+VERSION 0.7
+
+# cspell: words TARGETARCH USERARCH toolsets rustfmt
+
+# Set up our target toolchains, and copy our files.
+builder:
+    FROM ./../../earthly/rust+rust-base
+
+    COPY --dir .cargo .config benches src tests .
+    COPY Cargo.lock Cargo.toml .
+    COPY clippy.toml deny.toml rustfmt.toml .
+
+    DO ./../../earthly/rust+SETUP
+
+# Test rust build container - Use best architecture host tools.
+check-hosted:
+    FROM +builder
+
+    DO ./../../earthly/rust+CHECK
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+check-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
+
+
+# Build the service.
+build-hosted:
+    FROM +builder
+ 
+    DO ./../../earthly/rust+BUILD
+
+    DO ./../../earthly/rust+SMOKE_TEST --bin=hello_world
+
+    SAVE ARTIFACT target/$TARGETARCH/doc doc
+    SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+build-all-hosts:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+
+## -----------------------------------------------------------------------------
+##
+## Standard CI targets.
+##
+## These targets are discovered and executed automatically by CI.
+
+# Run check using the most efficient host tooling
+# CI Automated Entry point.
+check:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +check-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +check-hosted
+    END
+
+# Run build using the most efficient host tooling
+# CI Automated Entry point.
+build:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +build-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +build-hosted
+    END
+
+# This step simulates the full CI run for local purposes only.
+local-ci-run:
+    BUILD +check
+    BUILD +build
