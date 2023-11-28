@@ -6,9 +6,10 @@ VERSION 0.7
 builder:
     FROM ./../../earthly/rust+rust-base
 
-    DO ./../../earthly/rust+CP_SRC --src=".cargo, .config, benches, src, tests"
-    DO ./../../earthly/rust+CP_SRC --src="Cargo.lock, Cargo.toml"
-    DO ./../../earthly/rust+CP_SRC --src="clippy.toml, deny.toml, rustfmt.toml"
+    COPY --dir .cargo .config benches src tests .
+    COPY Cargo.lock Cargo.toml .
+    COPY clippy.toml deny.toml rustfmt.toml .
+
     DO ./../../earthly/rust+SETUP
 
 # Test rust build container - Use best architecture host tools.
