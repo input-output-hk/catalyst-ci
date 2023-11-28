@@ -9,6 +9,7 @@ builder:
 
     WORKDIR /build
 
+    COPY ./../../+repo-config/repo/.sqlfluff .
     COPY --dir ./migrations ./seed ./refinery.toml .
     DO ./../../earthly/postgresql+BUILDER
 

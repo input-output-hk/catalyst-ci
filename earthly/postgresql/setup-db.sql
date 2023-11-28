@@ -25,9 +25,9 @@ DROP USER IF EXISTS :"dbUser"; -- noqa: PRS
 CREATE USER :"dbUser" WITH PASSWORD :'dbUserPw'; -- noqa: PRS
 
 -- Privileges for this user/role.
-ALTER DEFAULT privileges REVOKE EXECUTE ON functions FROM public;
+ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM public;
 
-ALTER DEFAULT privileges IN SCHEMA public REVOKE EXECUTE ON functions FROM :"dbUser"; -- noqa: PRS
+ALTER DEFAULT PRIVILEGES IN SCHEMA public REVOKE EXECUTE ON FUNCTIONS FROM :"dbUser"; -- noqa: PRS
 
 -- Create the database.
 CREATE DATABASE :"dbName" WITH OWNER :"dbUser"; -- noqa: PRS
