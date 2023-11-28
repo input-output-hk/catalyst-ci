@@ -163,7 +163,7 @@ function wait_ready_pgsql() {
     fi
 
     # Check if PostgreSQL is running using pg_isready
-    until pg_isready -d "${dbconn}" >/dev/null 2>&1; do
+    until pg_isready -d "${dbconn}" > /dev/null 2>&1; do
         sleep 1
         if [[ ${timeout} -gt 0 ]]; then
             timeout=$((timeout - 1))

@@ -94,7 +94,7 @@ echo "Waiting for PostgreSQL to start..."
 # Set the timeout value in seconds (default: 0 = wait forever)
 TIMEOUT=${TIMEOUT:-0}
 echo "TIMEOUT is set to ${TIMEOUT}"
-until pg_isready -d postgres >/dev/null 2>&1; do
+until pg_isready -d postgres > /dev/null 2>&1; do
     sleep 1
     if [[ ${TIMEOUT} -gt 0 ]]; then
         TIMEOUT=$((TIMEOUT - 1))
@@ -135,8 +135,6 @@ fi
 echo ">>> Finished entrypoint script"
 
 # Infinite loop to run until local PostgreSQL is ready
-until [[ "${DB_HOST}" == "localhost" ]] && ! pg_isready -d postgres >/dev/null 2>&1; 
-do
+until [[ "${DB_HOST}" == "localhost" ]] && ! pg_isready -d postgres > /dev/null 2>&1; do
     sleep 60
 done
-

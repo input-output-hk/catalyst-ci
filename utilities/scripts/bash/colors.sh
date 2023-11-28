@@ -14,7 +14,6 @@ CYAN='\033[0;36m'
 WHITE='\033[0;37m'
 NC='\033[0m' # No Color
 
-
 status() {
     local rc="$1"
     local message="$2"

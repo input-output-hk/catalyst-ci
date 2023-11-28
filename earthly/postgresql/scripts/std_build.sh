@@ -12,7 +12,7 @@ fi
 
 source "${basedir}/include/colors.sh"
 source "${basedir}/db_ops.sh"
- 
+
 setup_and_migrate() {
     local reason="$1"
     shift 1
@@ -36,17 +36,17 @@ status_and_exit "DB Start" \
 
 # Start the db server
 status_and_exit "DB Ready" \
-    wait_ready_pgsql "$@" --dbreadytimeout="10" 
+    wait_ready_pgsql "$@" --dbreadytimeout="10"
 
 # Setup Schema and run migrations.
 setup_and_migrate "Initilization" "$@"
 
 # Test each seed data set can apply cleanly
 rc=0
-while IFS= read -r -d '' file
-do
+while IFS= read -r -d '' file; do
     status "${rc}" "Applying seed data from ${file}" \
-        apply_seed_data "${file}" --dbname=test; rc=$?
+        apply_seed_data "${file}" --dbname=test
+    rc=$?
 
     # Reset schema so all seed data get applied to a clean database.
     setup_and_migrate "Reset" "$@"
