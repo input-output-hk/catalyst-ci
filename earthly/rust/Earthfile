@@ -66,7 +66,8 @@ rust-base:
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
-    COPY --dir ../../utilities/scripts+bash-scripts/include /scripts/include
+    # Copy our common scripts so we can use them inside the container.
+    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
 
     # Standardized Rust configs.
     # Build will refuse to proceed if the projects rust configs do not match these.

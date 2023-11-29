@@ -4,21 +4,15 @@
 
 # cspell: words FORCECOLOR
 
-if [[ ${BASH_SOURCE[0]} = */* ]]; then
-    basedir=${BASH_SOURCE%/*}
-else
-    basedir=.
-fi
-
 # Get our includes relative to this file's location.
-source "${basedir}/include/colors.sh"
+source "/scripts/include/colors.sh"
 
 rc=0
 
-"${basedir}"/duplicated-scripts.sh "$1"
+./duplicated-scripts.sh "$1"
 rc_dup=$?
 
-"${basedir}"/shellcheck-dir.sh "$1"
+./shellcheck-dir.sh "$1"
 rc_lint=$?
 
 FORCECOLOR=1 shfmt -d "$1"

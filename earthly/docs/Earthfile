@@ -38,11 +38,7 @@ deps:
     # Copy our run scripts
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
-    # Internally in the repo we use a symlink to accomplish this, but Earthly
-    # Will only copy the symlink and not what it references, so we need to
-    # manually copy what it references.  This enables the script to work
-    # both in-repo and in-ci here.
-    COPY --dir ../../utilities/scripts+bash-scripts/include /scripts/include
+    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
 
     # Trust directory, required for git >= 2.35.2. (mkdocs Git plugin requirement).
     RUN git config --global --add safe.directory /docs &&\

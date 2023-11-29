@@ -7,16 +7,8 @@
 # This script is not intended to be run by itself, and provides common functions
 # for database operations.
 
-if [[ ${BASH_SOURCE[0]} = */* ]]; then
-    basedir=${BASH_SOURCE%/*}/
-else
-    basedir=./
-fi
-
-echo BASEDIR = "${basedir}"
-
-source "${basedir}/include/colors.sh"
-source "${basedir}/include/params.sh"
+source "/scripts/include/colors.sh"
+source "/scripts/include/params.sh"
 
 # define all the defaults we could need
 declare -A defaults
@@ -35,7 +27,7 @@ defaults=(
     ["dbauthmethod"]="trust"
     ["dbcollation"]="en_US.utf8"
     ["dbreadytimeout"]="-1"
-    ["setupdbsql"]="./setup-db.sql"
+    ["setupdbsql"]="/sql/setup-db.sql"
     ["dbrefinerytoml"]="./refinery.toml"
     ["dbmigrations"]="./migrations"
     ["dbseeddatasrc"]="./seed"

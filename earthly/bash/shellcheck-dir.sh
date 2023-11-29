@@ -2,8 +2,8 @@
 # Run `shellcheck` on all files in a directory, recursively.
 # $1 = The directory to check.
 
-# Get our includes relative to this file's location.
-source "$(dirname "$0")/include/colors.sh"
+# Import utility functions - only works inside containers.
+source "/scripts/include/colors.sh"
 
 shopt -s globstar
 rc=0

@@ -6,14 +6,8 @@
 # It validates that all the migrations and importable data are able to be
 # used without error.
 
-if [[ ${BASH_SOURCE[0]} = */* ]]; then
-    basedir=${BASH_SOURCE%/*}
-else
-    basedir=.
-fi
-
-source "${basedir}/include/colors.sh"
-source "${basedir}/db_ops.sh"
+source "/scripts/include/colors.sh"
+source "/scripts/include/db_ops.sh"
 
 setup_and_migrate() {
     local reason="$1"

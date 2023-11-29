@@ -2,7 +2,7 @@
 # Takes a single argument, the directory to check.
 
 # Get our includes relative to this file's location.
-source "$(dirname "$0")/include/colors.sh"
+source "/scripts/include/colors.sh"
 
 rc=0
 

@@ -9,13 +9,7 @@
 # Individual targets can add extra `check` steps, but these checks must always
 # pass.
 
-if [[ ${BASH_SOURCE[0]} = */* ]]; then
-    basedir=${BASH_SOURCE%/*}/
-else
-    basedir=./
-fi
-
-source "${basedir}/include/colors.sh"
+source "/scripts/include/colors.sh"
 
 # This is set up so that ALL checks are run and it will fail if any fail.
 # This improves visibility into all issues that need to be corrected for `check`

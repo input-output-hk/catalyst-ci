@@ -1,12 +1,6 @@
 #!/usr/bin/env bash
 
-if [[ ${BASH_SOURCE[0]} = */* ]]; then
-    basedir=${BASH_SOURCE%/*}/
-else
-    basedir=./
-fi
-
-source "${basedir}/include/colors.sh"
+source "/scripts/include/colors.sh"
 
 default_rust_channel=$1
 RUST_VERSION=$2

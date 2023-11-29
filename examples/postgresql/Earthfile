@@ -5,13 +5,7 @@ VERSION 0.7
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
 #   CI target : dependency
 builder:
-    FROM ./../../earthly/postgresql+postgres-base
-
-    WORKDIR /build
-
-    COPY ./../../+repo-config/repo/.sqlfluff .
-    COPY --dir ./migrations ./seed ./refinery.toml .
-    DO ./../../earthly/postgresql+BUILDER
+    DO ./../../earthly/postgresql+BUILDER --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
 
 # check if the sql files are properly formatted and pass lint quality checks.
 #   CI target : true
@@ -20,24 +14,10 @@ check:
 
     DO ./../../earthly/postgresql+CHECK
 
-# Internal: build-sqlfluff is a target to build the necessary `sqlfluff` tool container.
-#   CI target : false
-# This allows us to run sqlfluff commands locally without needing to install it locally.
-# It does not need to be run directly, it is used by the `format` target.
-build-sqlfluff:
-    BUILD ./../../earthly/postgresql+sqlfluff-image   
-
 # format all SQL files in the current project.  Local developers tool.
 #   CI target : false
 format:
     LOCALLY
-
-    # This is a trick.  Earthly can NOT build and run a container in the same invocation.
-    # Because this target is running LOCALLY, and we know earthly must be installed, we can
-    # call earthly locally to build and publish the local target we need to run the sqlfluff linter.
-    # By recursively running earthly, we sidestep the limitation which prevents us from building 
-    # a container and running it in the same invocation.
-    RUN earthly +build-sqlfluff
 
     DO ./../../earthly/postgresql+FORMAT --src=$(echo ${PWD})
 
@@ -49,6 +29,13 @@ build:
 
     DO ./../../earthly/postgresql+BUILD --image_name=example-db
 
+# Internal: common integration test image
+all-tests:
+    DO ./../../earthly/postgresql+INTEGRATION_TEST_SETUP
+    DO ./../../utilities/scripts+ADD_BASH_SCRIPTS
+    
+    COPY --dir tests 
+
 # Internal: Test Scenario 1
 #   CI target : true
 # Steps:
@@ -57,7 +44,10 @@ build:
 #   * applies migrations
 #   * applies seed data.
 test-1:
-    FROM ./../../earthly/postgresql+postgres-base
+    DO ./../../earthly/postgresql+INTEGRATION_TEST_SETUP
+
+    COPY tests/test1.sh .
+    FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
 
     COPY ./../../earthly/utils+shell-assert/assert.sh .
 

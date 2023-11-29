@@ -10,7 +10,7 @@
 # the environment, performing optional database initialization if configured,
 # and then runs the migrations.
 #
-# It expects the following environment variables to be set except where noted:
+# All ENVVARS are optional, although the passwords should be set for security reasons.
 #
 # DB_HOST - The hostname of the database server
 # DB_PORT - The port of the database server

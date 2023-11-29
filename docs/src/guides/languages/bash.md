@@ -64,16 +64,27 @@ check:
 
 It is not a good practice to copy bash scripts with common functionality.
 Accordingly, the *Utility* target `./utilities/scripts+bash-scripts` exists to provide a central location for common scripts.
-These are used locally to this repo.
+These are used locally to this repo and may be used by other repos using catalyst-ci.
 
-A common pattern is to create a symlink called `include/` with your scripts.
-You would then source (or call) the common scripts relative to `include/`.
-However as Earthly will not copy files from a symlink, in your Earthfile you will need to correct that with a line similar to:
+These scripts are intended to be used inside Earthly builds, and not locally.
+
+A common pattern to include these common scripts is the following:
 
 ```Earthfile
+    # Copy our target specific scripts
     COPY --dir scripts /scripts
-    COPY --dir ../../utilities/scripts+bash-scripts/include /scripts/include
+
+    # Copy our common scripts so we can use them inside the container.
+    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
 ```
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Note
+    Always source scripts using `source "/scripts/include/something.sh"`.
+    This will ensure the scripts are properly located.
+    bash has no concept of the directory a script is located and so relative
+    source commands are unreliable.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Note

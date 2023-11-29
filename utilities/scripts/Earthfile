@@ -8,3 +8,9 @@ bash-scripts:
     COPY --dir bash /
 
     SAVE ARTIFACT /bash /include
+
+# UDC to add our common bash scripts to a container image.
+ADD_BASH_SCRIPTS:
+    COMMAND
+
+    COPY --dir +bash-scripts/include /scripts/include

@@ -9,13 +9,7 @@
 # Individual targets can add extra `check` steps, but these checks must always
 # pass.
 
-if [[ ${BASH_SOURCE[0]} = */* ]]; then
-    basedir=${BASH_SOURCE%/*}/
-else
-    basedir=./
-fi
-
-source "${basedir}/include/colors.sh"
+source "/scripts/include/colors.sh"
 
 # This is set up so that ALL build steps are run and it will fail if any fail.
 # This improves visibility into all issues that need to be corrected for `build`
@@ -47,11 +41,6 @@ rc=$?
 status "${rc}" "Checking Documentation tests all pass" \
     cargo testdocs
 rc=$?
-
-ls -al "${basedir}"
-ls -al "${basedir}/include"
-ls -al .
-ls -al ./include
 
 ## Check if any benchmarks defined run (We don;t validate the results.)
 status "${rc}" "Checking Benchmarks all run to completion" \

@@ -26,30 +26,38 @@ postgres-base:
     # Get refinery
     COPY ../rust+rust-base/refinery /bin
 
-    COPY ./.sqlfluff .
-    COPY ./entry.sh .
-    COPY ./setup-db.sql .
+    # Copy our set SQL files
+    COPY --dir sql /sql
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
-    COPY --dir ../../utilities/scripts+bash-scripts/include /scripts/include
+    # Copy our common scripts so we can use them inside the container.
+    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
 
-sqlfluff-image:
-    FROM +postgres-base
+    SAVE ARTIFACT /scripts /scripts
 
-    WORKDIR /sql
-
-    SAVE IMAGE sqlfluff-image:latest
-
-# Common PostgreSQL setup.
-# Prepare important files needed for building image
+# Common build setup steps.
+# Arguments:
+#   sqlfluff_cfg - REQUIRED - Location of repos .sqlfluff configuration file.
+#   migrations - OPTIONAL - Location of Migrations directory - DEFAULT: ./migrations
+#   seed - OPTIONAL - Location of Seed data directory - DEFAULT: ./seed
+#   refinery_toml - OPTIONAL - Location of refinery,toml which configures migrations. DEFAULT: ./refinery.toml
 BUILDER:
     COMMAND
 
-    RUN cp -n /root/.sqlfluff .
-    RUN cp /root/entry.sh .
-    RUN chmod ugo+x ./entry.sh
-    RUN cp /root/setup-db.sql .
+    ARG --required sqlfluff_cfg
+    ARG migrations=./migrations
+    ARG seed=./seed
+    ARG refinery_toml=./refinery.toml
+    
+    FROM +postgres-base
+
+    WORKDIR /build
+
+    COPY --dir $sqlfluff_cfg .
+    COPY --dir $migrations .
+    COPY --dir $seed .
+    COPY --dir $refinery_toml .
 
 # Linter checks for sql files
 CHECK:
@@ -58,20 +66,27 @@ CHECK:
     RUN /scripts/std_checks.sh
 
 # Format sql files
-# REQUIREMENTS:
-#  * build `sqlfluff-image` image via `earthly +sqlfluff-image` target
-# Arguments:
-#  * src : Source directory with the sql files.
+# Just explains how to auto-format sql files.
+# Can not do it LOCALLY as the command will change ownership of the fixed files
+# if run within docker.
 FORMAT:
     COMMAND
 
-    # Where we want to run the `lint` from.
-    ARG --required src
+    # Can not run format LOCALLY as it changes permissions of files to root:root
+    RUN --no-cache printf "%s\n%s\n%s\n" \
+        "SQL can only be formatted locally from the command line." \
+        "Run locally installed 'sqlfluff' from the repo root:" \
+        "    $ sqlfluff fix ."
 
-    RUN --no-cache echo "`format` is currently disabled, as it changes the ownership of files to root:root."
-    RUN --no-cache echo "Run a locally installed version of `sqlfluff` instead for now."
+INTEGRATION_TEST_SETUP:
+    COMMAND
 
-    #RUN docker run --rm -v $src:/sql sqlfluff-image:latest sqlfluff format .
+    FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
+
+    COPY +postgres-base+scripts /scripts
+
+    WORKDIR /test
+
 
 # Build PostgreSQL image.
 # REQUIREMENTS: 
@@ -88,7 +103,7 @@ BUILD:
 
     RUN /scripts/std_build.sh
 
-    ENTRYPOINT ["./entry.sh"]
+    ENTRYPOINT ["/scripts/entry.sh"]
 
     # Push the container...
     SAVE IMAGE ${image_name}:latest
