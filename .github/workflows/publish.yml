@@ -35,6 +35,12 @@ on:
         required: false
         type: string
         default: latest
+      default_branch:
+        description: |
+          The default branch of the repository.
+        required: false
+        type: string
+        default: ${{ github.event.repository.default_branch }}
       earthly_version:
         description: The version of Earthly to use.
         required: false
@@ -134,7 +140,7 @@ jobs:
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Push image
         uses: input-output-hk/catalyst-ci/actions/push@master
-        if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && !inputs.skip_publish_on_default
+        if: github.ref == format('refs/heads/{0}', inputs.default_branch) && !inputs.skip_publish_on_default
         with:
           image: ${{ steps.build.outputs.image }}
           registries: |

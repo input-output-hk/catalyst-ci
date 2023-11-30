@@ -94,11 +94,12 @@ It then uses the custom `push` GitHub Action to re-tag the image and push it to 
 
 ### Inputs
 
-| Name             | Type   | Description                                                                        | Required | Default   |
-| ---------------- | ------ | ---------------------------------------------------------------------------------- | -------- | --------- |
-| target           | string | The target used to mark check builds                                               | No       | `publish` |
-| aws_ecr_registry | string | The AWS ECR registry that will be used to publish images                           | No       | `""`      |
-| tags             | string | A line separated list of additional tags that will be applied to published images. | No       | `""`      |
+| Name             | Type   | Description                                                                        | Required | Default                                         |
+| ---------------- | ------ | ---------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
+| aws_ecr_registry | string | The AWS ECR registry that will be used to publish images                           | No       | `""`                                            |
+| default_branch   | string | The default branch of the repository.                                              | No       | `${{ github.event.repository.default_branch }}` |
+| tags             | string | A line separated list of additional tags that will be applied to published images. | No       | `""`                                            |
+| target           | string | The target used to mark check builds                                               | No       | `publish`                                       |
 
 ## Release
 
