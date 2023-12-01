@@ -1,5 +1,5 @@
 # Common PostgreSQL Earthly builders
-VERSION 0.7
+VERSION --global-cache 0.7
 
 # cspell: words colordiff
 
@@ -25,6 +25,9 @@ postgres-base:
 
     # Get refinery
     COPY ../rust+rust-base/refinery /bin
+
+    # Get nushell
+    COPY ../../utilities/nushell+nushell-build/nu /bin
 
     # Copy our set SQL files
     COPY --dir sql /sql
@@ -85,6 +88,9 @@ integration-test:
     RUN apk add --no-cache \
             bash \
             postgresql15-client # We use PostgreSQL 16, but v15 clients will work OK with it.
+
+    # Get nushell
+    COPY ../../utilities/nushell+nushell-build/nu /bin
 
     COPY +postgres-base/scripts /scripts
 
