@@ -25,6 +25,7 @@ spell-check:
 # Check all source and documentation files.
 check-spelling:
     FROM ghcr.io/streetsidesoftware/cspell:8.0.0
+    # Use the existing directory from the image itself containing `cspell` binary.
     WORKDIR /app
 
     COPY . .
