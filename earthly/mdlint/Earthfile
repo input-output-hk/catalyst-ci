@@ -31,13 +31,13 @@ MDLINT_LOCALLY:
     # Run the linter with the given arguments, and recursively check all markdown files.
     # The directory to be checked `MUST` have a `.markdownlint-sli2.jsonc` file.
     # cspell: words davidanson
-    RUN docker run \
-        --rm \
-        -v $src:/workdir \
-        davidanson/markdownlint-cli2-rules:v0.10.0 \
+    FROM davidanson/markdownlint-cli2-rules:v0.10.0 
+    WORKDIR /work
+    COPY . .
+    RUN markdownlint-cli2 \
         "**/*.md" \
         --config $cfg_file \
-        $fix
+        $fix 
 
 # A Test and example invocation of the above UDC.
 mdlint-test:

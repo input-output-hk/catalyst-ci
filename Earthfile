@@ -7,7 +7,10 @@ FROM debian:stable-slim
 markdown-check:
     # Check Markdown in this repo.
     LOCALLY
+    DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
 
+# Check Markdown
+check-markdown: 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
 
 markdown-check-fix:
@@ -21,6 +24,9 @@ spell-check:
     LOCALLY
 
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
+
+check:
+    BUILD +check-markdown
 
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
