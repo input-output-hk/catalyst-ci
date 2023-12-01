@@ -22,6 +22,17 @@ spell-check:
 
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
 
+# Check all source and documentation files.
+check-spelling:
+    FROM ghcr.io/streetsidesoftware/cspell:8.0.0
+    WORKDIR /app
+
+    COPY . .
+    RUN npx cspell lint . --dot
+
+check:
+    BUILD +check-spelling
+
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch
