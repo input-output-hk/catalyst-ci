@@ -60,8 +60,7 @@ rust-base:
         cargo install cargo-machete --version=0.6.0  && \
         cargo install refinery_cli  --version=0.8.11 && \
         cargo install cargo-deny    --version=0.14.3 && \
-        cargo install cargo-modules --version=0.10.2 && \
-        cargo install nu            --version=0.87.1 --features static-link-openssl,extra,dataframe
+        cargo install cargo-modules --version=0.10.2
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
 
