@@ -4,13 +4,21 @@ source "/scripts/include/colors.sh"
 source "/scripts/include/assert.sh"
 source "/scripts/include/db_ops.sh"
 
+show_db_config
+
 # Wait until the server is running
 status_and_exit "DB Ready" \
-    wait_ready_pgsql "$@" --dbreadytimeout="10"
+    wait_ready_pgsql "$@" --dbreadytimeout="30"
+
+dbconn=$(pgsql_user_connection "$@")
 
 rc=0
-res=$(psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users")
-rc=$?
+if ! res=$(psql "${dbconn}" -c "SELECT * FROM users"); then
+    rc=1
+fi
+
+status 0 "DB Query: SELECT * FROM users" \
+    [ "${rc}" == 0 ]
 
 if [[ ${rc} -eq 0 ]]; then
     expected=$(printf "%s\n%s\n%s\n%s\n%s\n%s\n" \
@@ -20,7 +28,10 @@ if [[ ${rc} -eq 0 ]]; then
         " Bob     |  30" \
         " Charlie |  40" \
         "(3 rows)")
-    assert_eq "${expected}" "${res}"
+
+    status "${rc}" "Query Result" \
+        assert_eq "${expected}" "${res}"
+    rc=$?
 fi
 
 exit "${rc}"

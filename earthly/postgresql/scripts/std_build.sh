@@ -30,7 +30,7 @@ status_and_exit "DB Initial Setup" \
 status_and_exit "DB Start" \
     run_pgsql "$@" --dbpath="/tmp/data"
 
-# Start the db server
+# Wait for the DB server to actually start
 status_and_exit "DB Ready" \
     wait_ready_pgsql "$@" --dbreadytimeout="10"
 
@@ -50,7 +50,8 @@ done < <(find ./seed/* -maxdepth 1 -type d -print0 | sort -z) || true
 
 # Stop the database
 status_and_exit "DB Stop" \
-    stop_pgsql
+    stop_pgsql --dbpath="/tmp/data"
+
 
 # We DO NOT want the tmp db in the final image, clean it up.
 rm -rf /tmp/data

@@ -46,3 +46,18 @@ get_param() {
     return
 
 }
+
+# Check if a list of env vars have been set.
+check_env_vars() {
+    # shellcheck disable=SC2190 # This is an array, not an associative array
+    local env_vars=("$@")
+
+    # Iterate over the array and check if each variable is set
+    for var in "${env_vars[@]}"; do
+        echo "Checking ${var}"
+        if [[ -z "${!var:-}" ]]; then
+            echo ">>> Error: ${var} is required and not set."
+            exit 1
+        fi
+    done
+}

@@ -34,7 +34,7 @@ all-tests:
     DO ./../../earthly/postgresql+INTEGRATION_TEST_SETUP
     DO ./../../utilities/scripts+ADD_BASH_SCRIPTS
     
-    COPY --dir tests 
+    COPY --dir tests .
 
 # Internal: Test Scenario 1
 #   CI target : true
@@ -44,28 +44,27 @@ all-tests:
 #   * applies migrations
 #   * applies seed data.
 test-1:
-    DO ./../../earthly/postgresql+INTEGRATION_TEST_SETUP
-
-    COPY tests/test1.sh .
-    FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
-
-    COPY ./../../earthly/utils+shell-assert/assert.sh .
+    FROM +all-tests
 
     ENV INIT_AND_DROP_DB true
     ENV WITH_MIGRATIONS true
-    ENV WITH_SEED_DATA true
-    COPY ./docker-compose.yml .
+    ENV WITH_SEED_DATA "data"
+
+    ENV DB_HOST=localhost
+    ENV DB_NAME=ExampleDb
+    ENV DB_DESCRIPTION="Example DB"
+    ENV DB_SUPERUSER=postgres
+    ENV DB_SUPERUSER_PASSWORD=postgres
+    ENV DB_USER=example-dev
+    ENV DB_USER_PASSWORD=example-pass
+
+    COPY ./tests/docker-compose.yml .
     WITH DOCKER \
         --compose docker-compose.yml \
         --load example-db:latest=+build \
         --service example \
         --allow-privileged
-        RUN sleep 5;\
-            res=$(psql postgresql://example-dev:example-pass@0.0.0.0:5432/ExampleDb -c "SELECT * FROM users");\
-            
-            source assert.sh;\
-            expected=$(printf "  name   | age \n---------+-----\n Alice   |  20\n Bob     |  30\n Charlie |  40\n(3 rows)");\
-            assert_eq "$expected" "$res"
+        RUN ./tests/test1.sh
     END
 
 # Internal: Test Scenario 2

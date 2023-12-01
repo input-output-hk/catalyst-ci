@@ -78,14 +78,23 @@ FORMAT:
         "Run locally installed 'sqlfluff' from the repo root:" \
         "    $ sqlfluff fix ."
 
+# Internal: Integration Test container image
+integration-test:
+    FROM earthly/dind:alpine-3.18-docker-23.0.6-r7
+
+    RUN apk add --no-cache \
+            bash \
+            postgresql15-client # We use PostgreSQL 16, but v15 clients will work OK with it.
+
+    COPY +postgres-base/scripts /scripts
+
+    WORKDIR /test
+
+
 INTEGRATION_TEST_SETUP:
     COMMAND
 
-    FROM earthly/dind:alpine-3.18-docker-23.0.6-r4
-
-    COPY +postgres-base+scripts /scripts
-
-    WORKDIR /test
+    FROM +integration-test
 
 
 # Build PostgreSQL image.

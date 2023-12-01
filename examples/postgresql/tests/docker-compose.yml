@@ -17,6 +17,8 @@ services:
       retries: 10
     ports:
       - 5433:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
 
   example:
     image: example-db:latest
@@ -25,7 +27,7 @@ services:
       - DB_HOST=${DB_HOST:-localhost}
       - DB_PORT=5432
       - DB_NAME=ExampleDb
-      - DB_DESCRIPTION=Example DB
+      - DB_DESCRIPTION="Example DB"
       - DB_SUPERUSER=postgres
       - DB_SUPERUSER_PASSWORD=postgres
       - DB_USER=example-dev
@@ -36,3 +38,8 @@ services:
       - WITH_SEED_DATA=${WITH_SEED_DATA:-true}
     ports:
       - 5432:5432
+    volumes:
+      - /var/lib/postgresql/data # Temp volume, use -V to auto delete it when container stops.
+
+volumes :
+  postgres-data:
