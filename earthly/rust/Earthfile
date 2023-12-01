@@ -1,5 +1,5 @@
 # Common Rust UDCs and Builders.
-VERSION 0.7
+VERSION --global-cache 0.7
 
 # cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
@@ -60,7 +60,8 @@ rust-base:
         cargo install cargo-machete --version=0.6.0  && \
         cargo install refinery_cli  --version=0.8.11 && \
         cargo install cargo-deny    --version=0.14.3 && \
-        cargo install cargo-modules --version=0.10.2
+        cargo install cargo-modules --version=0.10.2 && \
+        cargo install nu            --version=0.87.1 --features static-link-openssl,extra,dataframe
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
 

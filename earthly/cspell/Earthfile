@@ -1,5 +1,5 @@
 # cspell UDCs and Containers.
-VERSION 0.7
+VERSION --global-cache 0.7
 
 CSPELL_LOCALLY:
     # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.

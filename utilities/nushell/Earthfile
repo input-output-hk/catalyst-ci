@@ -1,0 +1,66 @@
+# Common Rust UDCs and Builders.
+VERSION --global-cache 0.7
+
+# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf
+# cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
+
+# Base Rustup build container.
+nushell-build:
+    ARG TARGETPLATFORM
+    ARG TARGETOS
+    ARG TARGETARCH
+    ARG TARGETVARIANT
+    ARG USERPLATFORM
+    ARG USEROS
+    ARG USERARCH
+    ARG USERVARIANT
+
+    # This is our base Host toolset, and rustup.
+    # The ACTUAL version of rust that will be used, and available targets
+    # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
+    # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
+    FROM rust:1.73-alpine3.18
+
+    RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
+        echo "TARGETOS       = $TARGETOS"; \
+        echo "TARGETARCH     = $TARGETARCH"; \
+        echo "TARGETVARIANT  = $TARGETVARIANT"; \
+        echo "USERPLATFORM   = $USERPLATFORM"; \
+        echo "USEROS         = $USEROS"; \
+        echo "USERARCH       = $USERARCH"; \
+        echo "USERVARIANT    = $USERVARIANT"; 
+
+    WORKDIR /root
+
+    # Install necessary packages 
+    # Expand this list as needed, rather than adding more tools in later containers.
+     RUN apk add --no-cache \
+            musl-dev \
+            mold \
+            clang \
+            alpine-sdk \
+            openssl-dev \
+            perl \
+            openssl-libs-static
+
+    RUN OPENSSL_NO_VENDOR=Y cargo install nu --version=0.87.1 --features static-link-openssl,extra,dataframe
+
+    # Reduce the size of `nu` and make sure it can execute.
+    RUN strip $CARGO_HOME/bin/nu
+    RUN $CARGO_HOME/bin/nu --help
+
+    # Build nufmt from latest git.
+    RUN git clone https://github.com/nushell/nufmt
+
+    WORKDIR /root/nufmt
+
+    RUN cargo build --release 
+    RUN cargo install --path .
+    RUN ls -al $CARGO_HOME/bin/
+
+    # Reduce the size of `nufmt` and make sure it can execute.
+    RUN strip $CARGO_HOME/bin/nufmt
+    RUN $CARGO_HOME/bin/nufmt --help
+
+    SAVE ARTIFACT $CARGO_HOME/bin/nu nu
+    SAVE ARTIFACT $CARGO_HOME/bin/nufmt nufmt

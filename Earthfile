@@ -1,5 +1,5 @@
 # Set the Earthly version to 0.7
-VERSION 0.7
+VERSION --global-cache 0.7
 
 # cspell: words livedocs sitedocs
 

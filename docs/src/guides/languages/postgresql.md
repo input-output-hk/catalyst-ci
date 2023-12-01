@@ -49,7 +49,7 @@ You can choose to either delete the file and start from scratch, or read the gui
 ### Prepare base builder
 
 ```Earthfile
-VERSION 0.7
+VERSION --global-cache 0.7
 
 builder:
     FROM ./../../earthly/postgresql+postgres-base

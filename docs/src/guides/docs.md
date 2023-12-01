@@ -39,7 +39,7 @@ This folder already has an `Earthfile` in it, which contains all build process.
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
 ```Earthfile
-VERSION 0.7
+VERSION --global-cache 0.7
 
 # Copy all the source we need to build the docs
 src:

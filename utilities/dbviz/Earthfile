@@ -1,5 +1,5 @@
 # Common Rust UDCs and Builders.
-VERSION 0.7
+VERSION --global-cache 0.7
 
 # cspell: words rustup rustc automake autotools xutils miri nextest kani
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT 

@@ -1,4 +1,4 @@
-VERSION 0.7 
+VERSION --global-cache 0.7 
 # cspell: words markdownlint
 
 MDLINT_LOCALLY:
