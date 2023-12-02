@@ -4,21 +4,23 @@ FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
+# Check Markdown in this repo.
 markdown-check:
-    # Check Markdown in this repo.
     LOCALLY
+
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
 
-# Check Markdown
+# Check Markdown remotely.
 check-markdown: 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
 
+# Check Markdown with fix argument in this repo.
 markdown-check-fix:
-    # Check Markdown in this repo.
     LOCALLY
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
+# Check Markdown with fix argument remotely.
 check-markdown-fix:
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
