@@ -10,7 +10,7 @@ markdown-check:
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
 
-# Check Markdown remotely.
+# Check Markdown can be done remotely .
 check-markdown: 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
 
