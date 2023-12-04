@@ -29,7 +29,7 @@ CHECK:
     # See: cspell.org
     COMMAND
 
-    # Where we want to run the `lint` from.
+    # Where we want to run the `lint` from. Use `.` to check the whole repo.
     ARG --required src
 
     # Unlikely to need to change this.
