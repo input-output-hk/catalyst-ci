@@ -20,25 +20,35 @@ Use the `MDLINT` Earthly UDC to enable uniform and consistent Markdown Format ch
 This linter is to be used in preference to any other Markdown linter.
 This is because we need to provide uniform and consistent Markdown formatting and linting across the project and between projects.
 
-## Invocation
+## Using the markdown check
 
 In an Earthfile in your repo, add the following:
 
+### Checking the markdown in your repo
+
+Note that the source directory is not required since default is set as current directory.
+
 ```earthfile
 markdown-lint:
-    # Check Markdown in this repo.
-    LOCALLY
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:<tag>+CHECK
+```
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.0+MDLINT_LOCALLY --src=$(echo ${PWD})
+### Checking and fixing the markdown in your repo
 
+```earthfile
 markdown-lint-fix:
-    # Check Markdown in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:v1.2.0+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
+    DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:<tag>+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 ```
 
 In this use case, the UDC is run Locally, so that the markdown in the repo can be directly checked.
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Note
+    Please note that this command will fix the issues based on the capabilities of the linter.
+    Additionally, `tag` is needed to be specified.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 ## Configuration
 

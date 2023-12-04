@@ -37,16 +37,6 @@ If an error occurs, `earthly +markdown-check-fix` can be used to automatically f
     Please note that this command will fix the issues based on the capabilities of the linter.
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
-### Remotely
-
-#### Running check
-
-Running `check` stage can be done by referencing to the `check` target created in this repository by adding
-
-``` Earthfile
-IMPORT github.com/input-output-hk/catalyst-ci/:<tag>
-```
-
 ## Disable markdownlint rules
 
 Markdown linter rules can be disable for specific file or lines.
