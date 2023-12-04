@@ -6,7 +6,8 @@ icon: material/spellcheck
 
 ## Introduction
 
-Spell checking is integrated into the [`check`](https://input-output-hk.github.io/catalyst-ci/onboarding/#pipeline) pipeline to ensure the overall health of the project.
+Spell checking is integrated into the [`check`](https://input-output-hk.github.io/catalyst-ci/onboarding/#pipeline) pipeline.
+This is to ensure the overall health of the project.
 
 This utilizes [`cspell`](cspell.org) under the hood for checking code and other text documents.
 It can be used to check for misspelled words, identify potential errors, and suggest corrections.
