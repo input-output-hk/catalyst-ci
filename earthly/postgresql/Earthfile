@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
 VERSION --global-cache 0.7
 
-# cspell: words colordiff
+# cspell: words colordiff nushell
 
 postgres-base:
     FROM postgres:16.0-alpine3.18

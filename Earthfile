@@ -42,7 +42,6 @@ repo-docs:
 
     WORKDIR /repo
     COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
-    #RUN ls -al /repo
 
     SAVE ARTIFACT /repo repo
 

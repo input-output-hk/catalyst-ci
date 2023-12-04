@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 # cspell: words REINIT PGHOST PGPORT PGUSER PGPASSWORD psql initdb isready dotglob
+# cspell: words dbhost dbdesc dbdescription dbpath pgsql 
 
 # ---------------------------------------------------------------
 # Entrypoint script for database container
@@ -63,11 +64,6 @@ if [[ "${dbhost}" == "localhost" ]]; then
     # Init the db data in a tmp place
     status_and_exit "DB Initial Setup" \
         init_db "$@"
-
-echo --------
-cat "${dbpath}/pg_hba.conf"
-echo --------
-
 
     # Start the db server
     status_and_exit "DB Start" \

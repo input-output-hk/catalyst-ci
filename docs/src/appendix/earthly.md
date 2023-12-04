@@ -75,7 +75,7 @@ Like a `Dockerfile`, only a single `Earthfile` can exist per directory and it *m
 #### Sample Structure
 
 ```Earthfile
-VERSION --global-cache 0.7  # This defines the "schema" that this Earthfile satisfies, much like the version of a Docker Compose file
+VERSION --global-cache 0.7  # This defines the "schema version" that this Earthfile satisfies
 
 # A target, which is functionally equivalent to a `makefile` target.
 deps:

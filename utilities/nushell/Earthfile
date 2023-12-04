@@ -1,8 +1,8 @@
 # Common Rust UDCs and Builders.
 VERSION --global-cache 0.7
 
-# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
+# cspell: words nushell dataframe nufmt rustup toolset
 
 # Base Rustup build container.
 nushell-build:
@@ -56,7 +56,6 @@ nushell-build:
 
     RUN cargo build --release 
     RUN cargo install --path .
-    RUN ls -al $CARGO_HOME/bin/
 
     # Reduce the size of `nufmt` and make sure it can execute.
     RUN strip $CARGO_HOME/bin/nufmt

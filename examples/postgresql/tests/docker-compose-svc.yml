@@ -1,3 +1,4 @@
+# Separate Migrations Service and DB Service
 version: "3"
 
 # cspell: words healthcheck isready
@@ -10,21 +11,23 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: trust
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
       interval: 2s
       timeout: 5s
       retries: 10
     ports:
-      - 5433:5432
+      - 5432:5432
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - /var/lib/postgresql/data # Temp volume, use -V to auto delete it when container stops.
 
   example:
     image: example-db:latest
+    container_name: example-db
     environment:
       # Required environment variables for migrations
-      - DB_HOST=${DB_HOST:-localhost}
+      - DB_HOST=postgres
       - DB_PORT=5432
       - DB_NAME=ExampleDb
       - DB_DESCRIPTION="Example DB"
@@ -35,11 +38,4 @@ services:
 
       - INIT_AND_DROP_DB=${INIT_AND_DROP_DB:-true}
       - WITH_MIGRATIONS=${WITH_MIGRATIONS:-true}
-      - WITH_SEED_DATA=${WITH_SEED_DATA:-true}
-    ports:
-      - 5432:5432
-    volumes:
-      - /var/lib/postgresql/data # Temp volume, use -V to auto delete it when container stops.
-
-volumes :
-  postgres-data:
+      - WITH_SEED_DATA=${WITH_SEED_DATA:-}
