@@ -12,7 +12,7 @@ markdown-check:
 
 # Check Markdown can be done remotely .
 check-markdown: 
-    DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
+    DO ./earthly/mdlint+CHECK
 
 # Check Markdown with fix argument in this repo.
 markdown-check-fix:

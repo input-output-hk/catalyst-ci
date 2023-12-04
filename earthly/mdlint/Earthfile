@@ -31,13 +31,47 @@ MDLINT_LOCALLY:
     # Run the linter with the given arguments, and recursively check all markdown files.
     # The directory to be checked `MUST` have a `.markdownlint-sli2.jsonc` file.
     # cspell: words davidanson
-    FROM davidanson/markdownlint-cli2-rules:v0.10.0 
-    WORKDIR /work
-    COPY . .
-    RUN markdownlint-cli2 \
+    RUN docker run \
+        --rm \
+        -v $src:/workdir \
+        davidanson/markdownlint-cli2-rules:v0.11.0 \
         "**/*.md" \
         --config $cfg_file \
-        $fix 
+        $fix
+
+CHECK: 
+    # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
+    # IT IS NOT FOR CONTAINER BUILDS.
+    # See: https://github.com/earthly/earthly/issues/580
+
+    # Linting is done with MarkdownLint CLI2
+    # See: https://github.com/DavidAnson/markdownlint-cli2
+    # We use a special container which includes all rule extensions to markdownlint
+    # Notably, we rely on the `max-one-sentence-per-line` rule which helps keep
+    # diffs of markdown files small and legible.  This rule is only currently
+    # in the `next` branch of `markdownlint`.
+    # Container is built by:
+    #   https://github.com/DavidAnson/markdownlint-cli2/blob/next/docker/Dockerfile-rules
+    COMMAND
+
+    ARG src = .
+
+    # Unlikely this ever needs to be changed.
+    ARG cfg_file=.markdownlint-cli2.jsonc
+
+    FROM davidanson/markdownlint-cli2-rules:v0.11.0 
+
+    # Status line for what we are about to do.
+    RUN echo Linting Markdown Recursively from: $src
+
+    # Run the linter with the given arguments, and recursively check all markdown files.
+    # The directory to be checked `MUST` have a `.markdownlint-sli2.jsonc` file.
+    # cspell: words davidanson
+    WORKDIR /work
+    COPY $src .
+    RUN markdownlint-cli2 \
+        "**/*.md" \
+        --config $cfg_file 
 
 # A Test and example invocation of the above UDC.
 mdlint-test:
