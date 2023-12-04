@@ -20,10 +20,6 @@ markdown-check-fix:
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
-# Check Markdown with fix argument remotely.
-check-markdown-fix:
-    DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
-
 spell-check:
     # Check spelling in this repo.
     LOCALLY
@@ -32,7 +28,6 @@ spell-check:
 
 check:
     BUILD +check-markdown
-    BUILD +check-markdown-fix
 
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
