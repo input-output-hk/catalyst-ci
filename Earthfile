@@ -16,20 +16,15 @@ markdown-check-fix:
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
+# spell-check Check spelling in this repo locally.
 spell-check:
-    # Check spelling in this repo.
     LOCALLY
 
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
 
-# Check all source and documentation files.
+# check-spelling Check spelling in this repo inside a container.
 check-spelling:
-    FROM ghcr.io/streetsidesoftware/cspell:8.0.0
-    # Use the existing directory from the image itself containing `cspell` binary.
-    WORKDIR /app
-
-    COPY . .
-    RUN npx cspell lint . --dot
+    DO ./earthly/cspell+CHECK --src=.
 
 check:
     BUILD +check-spelling
