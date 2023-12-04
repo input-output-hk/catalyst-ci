@@ -1,5 +1,5 @@
 ---
-icon: material/simple-markdown
+icon: simple/markdown
 ---
 
 # Markdown Check
