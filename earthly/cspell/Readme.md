@@ -25,16 +25,18 @@ This is *INTENTIONAL*.
 
 IF this UDC is used inside a container build, it is **NOT** a bug if it does not do the correct thing.
 
-## Invocation
+## Using the spell checking
 
 In an Earthfile in your repo, add the following:
+
+### Spell checking in your repo
 
 ```earthfile
 spellcheck-lint:
     # Check spelling in this repo.
     LOCALLY
 
-    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:t1.2.0+CSPELL_LOCALLY --src=$(echo ${PWD})
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:<tag>+CSPELL_LOCALLY --src=$(echo ${PWD})
 ```
 
 In this use case, the UDC is run Locally, so that the src in the repo can be directly checked.

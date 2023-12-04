@@ -24,8 +24,9 @@ spell-check:
 
 # check-spelling Check spelling in this repo inside a container.
 check-spelling:
-    DO ./earthly/cspell+CHECK --src=.
+    DO ./earthly/cspell+CHECK
 
+# check Perform spell checking.
 check:
     BUILD +check-spelling
 

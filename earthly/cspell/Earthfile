@@ -30,7 +30,7 @@ CHECK:
     COMMAND
 
     # Where we want to run the `lint` from. Use `.` to check the whole repo.
-    ARG --required src
+    ARG src=.
 
     # Unlikely to need to change this.
     ARG cfg_file=cspell.json
