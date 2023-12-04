@@ -39,6 +39,7 @@ MDLINT_LOCALLY:
         --config $cfg_file \
         $fix
 
+# Markdown check used in standard CI target check.
 CHECK: 
     # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
     # IT IS NOT FOR CONTAINER BUILDS.

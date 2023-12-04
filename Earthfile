@@ -10,7 +10,7 @@ markdown-check:
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
 
-# Check Markdown can be done remotely .
+# check-markdown can be done remotely.
 check-markdown: 
     DO ./earthly/mdlint+CHECK
 
@@ -26,6 +26,13 @@ spell-check:
 
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
 
+## -----------------------------------------------------------------------------
+##
+## Standard CI targets.
+##
+## These targets are discovered and executed automatically by CI.
+
+# Run check on markdown files.
 check:
     BUILD +check-markdown
 
