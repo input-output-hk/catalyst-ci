@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words testci testdocs
+# cspell: words testci testdocs RUSTDOCFLAGS Zunstable depgraph
 
 # This script is run inside the `check` stage for rust projects to perform all 
 # high level non-compilation checks.
