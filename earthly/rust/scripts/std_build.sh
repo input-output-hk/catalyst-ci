@@ -18,6 +18,8 @@ source "$(dirname "$0")/colors.sh"
 
 rc=0
 
+export RUSTDOCFLAGS="--enable-index-page -Zunstable-options" 
+
 ## Build the code
 status $rc "Building all code in the workspace" \
     cargo build --release --workspace --locked; rc=$?
@@ -41,6 +43,11 @@ status $rc "Checking Documentation tests all pass" \
 ## Check if any benchmarks defined run (We don;t validate the results.)
 status $rc "Checking Benchmarks all run to completion" \
     cargo bench --all-targets; rc=$?
+
+## Generate dependency graphs
+cargo depgraph --workspace-only --dedup-transitive-deps > target/doc/workspace.dot
+cargo depgraph --dedup-transitive-deps > target/doc/full.dot
+cargo depgraph --all-deps --dedup-transitive-deps > target/doc/all.dot
 
 ## Generate Module Trees for documentation purposes.
 # cargo modules generate tree --orphans --types --traits --fns --tests --all-features --lib
