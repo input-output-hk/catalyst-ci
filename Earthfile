@@ -20,11 +20,15 @@ markdown-check-fix:
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
+# spell-check Check spelling in this repo locally.
 spell-check:
-    # Check spelling in this repo.
     LOCALLY
 
     DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
+
+# check-spelling Check spelling in this repo inside a container.
+check-spelling:
+    DO ./earthly/cspell+CHECK
 
 ## -----------------------------------------------------------------------------
 ##
@@ -32,8 +36,9 @@ spell-check:
 ##
 ## These targets are discovered and executed automatically by CI.
 
-# check - run all checks.
+# check run all checks.
 check:
+    BUILD +check-spelling
     BUILD +check-markdown
 
 repo-docs:
