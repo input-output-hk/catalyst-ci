@@ -6,10 +6,11 @@ icon: material/spellcheck
 
 ## Introduction
 
-Spell checking is integrated into the [`check`](https://input-output-hk.github.io/catalyst-ci/onboarding/#pipeline) pipeline.
-This is to ensure the overall health of the project.
+checking is integrated into the `check` pipeline.
+The reference to the pipeline can be found [here](https://input-output-hk.github.io/catalyst-ci/onboarding/).
+The goal of the `check` stage is to ensure the overall health of the project.
 
-This utilizes [`cspell`](cspell.org) under the hood for checking code and other text documents.
+This utilizes [`cspell`](https://cspell.org) under the hood for checking code and other text documents.
 It can be used to check for misspelled words, identify potential errors, and suggest corrections.
 
 ## Using the spell checking
@@ -25,7 +26,7 @@ Executing `earthly +check-spelling` will automatically run the spell checking to
 
 ## Configuration
 
-Each repo will need a [`cspell.json`](http://cspell.org/configuration/) file in the root of the repo.
+Each repo will need a [`cspell.json`](https://cspell.org/configuration/) file in the root of the repo.
 This file configures `cspell`.
 The file provided in the `Catalyst-CI` repo should be taken as a starting point
 for new projects.
