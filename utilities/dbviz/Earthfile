@@ -78,6 +78,14 @@ build:
 
     IF [ "$USERARCH" == "arm64" ]
         BUILD --platform=linux/arm64 +build-hosted
+        COPY +build-hosted/doc /doc
     ELSE
         BUILD --platform=linux/amd64 +build-hosted
     END
+
+    COPY --dir +build-hosted/doc .
+    COPY +build-hosted/dbviz .
+
+    SAVE ARTIFACT doc doc
+    SAVE ARTIFACT dbviz dbviz
+
