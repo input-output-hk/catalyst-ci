@@ -129,8 +129,8 @@ CHECK:
 # Step we do during the `build` CI phase for all Rust programs
 BUILD:
     COMMAND
-    ARG --required libs
-    ARG --required bins
+    ARG libs=""
+    ARG bins=""
 
     RUN /scripts/std_build.sh $libs $bins
 
