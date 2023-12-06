@@ -96,18 +96,20 @@ This can be made by adding `overrides` with custom specifications for specific f
 
 It is possible to specify custom words within a file by adding comments.
 
-```
+```text
 cspell: words <words>
 ```
 
 Here are some examples for inlining:
 
-- Comments on Earthfiles
+* Comments on Earthfiles
+
 ```earthly
 # cspell: words libgcc freetype lcms openjpeg etag 
 ```
 
-- Comments on markdown files
+* Comments on markdown files
+
 ```md
 <!-- cspell: words healthcheck isready psql --> 
 ```
