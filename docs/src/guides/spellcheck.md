@@ -22,6 +22,18 @@ check-spelling:
     DO github.com/input-output-hk/catalyst-ci/earthly/cspell:<tag>+check-spelling
 ```
 
+### Run locally
+
+```earthfile
+spellcheck-lint:
+    # Check spelling in this repo.
+    LOCALLY
+
+    DO github.com/input-output-hk/catalyst-ci/earthly/cspell:t1.2.0+CSPELL_LOCALLY --src=$(echo ${PWD})
+```
+
+In this use case, the UDC is run Locally, so that the src in the repo can be directly checked.
+
 Executing `earthly +check-spelling` will automatically run the spell checking to all files in the repository.
 
 ## Configuration
