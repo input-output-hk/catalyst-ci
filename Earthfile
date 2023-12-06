@@ -14,7 +14,7 @@ markdown-check:
 check-markdown: 
     DO ./earthly/mdlint+CHECK
 
-# Check Markdown with fix argument in this repo.
+# markdown-check-fix perform markdown check with fix in this repo.
 markdown-check-fix:
     LOCALLY
 
@@ -32,7 +32,7 @@ spell-check:
 ##
 ## These targets are discovered and executed automatically by CI.
 
-# Run check on markdown files.
+# check - run all checks.
 check:
     BUILD +check-markdown
 
