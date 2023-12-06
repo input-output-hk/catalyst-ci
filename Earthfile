@@ -4,14 +4,18 @@ FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
+# Check Markdown in this repo.
 markdown-check:
-    # Check Markdown in this repo.
     LOCALLY
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
 
+# check-markdown can be done remotely.
+check-markdown: 
+    DO ./earthly/mdlint+CHECK
+
+# markdown-check-fix perform markdown check with fix in this repo.
 markdown-check-fix:
-    # Check Markdown in this repo.
     LOCALLY
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
@@ -26,9 +30,16 @@ spell-check:
 check-spelling:
     DO ./earthly/cspell+CHECK
 
-# check Perform spell checking.
+## -----------------------------------------------------------------------------
+##
+## Standard CI targets.
+##
+## These targets are discovered and executed automatically by CI.
+
+# check run all checks.
 check:
     BUILD +check-spelling
+    BUILD +check-markdown
 
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
