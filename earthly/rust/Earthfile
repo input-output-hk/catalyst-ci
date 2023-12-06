@@ -60,7 +60,7 @@ rust-base:
         cargo install cargo-machete --version=0.6.0  && \
         cargo install refinery_cli  --version=0.8.11 && \
         cargo install cargo-deny    --version=0.14.3 && \
-        cargo install cargo-modules --version=0.10.2 && \
+        cargo install cargo-modules --version=0.12.0 && \
         cargo install cargo-depgraph --version=1.5.0
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
@@ -129,8 +129,10 @@ CHECK:
 # Step we do during the `build` CI phase for all Rust programs
 BUILD:
     COMMAND
+    ARG --required libs
+    ARG --required bins
 
-    RUN /scripts/std_build.sh
+    RUN /scripts/std_build.sh $libs $bins
 
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:

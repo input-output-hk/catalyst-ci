@@ -49,14 +49,25 @@ cargo depgraph --workspace-only --dedup-transitive-deps > target/doc/workspace.d
 cargo depgraph --dedup-transitive-deps > target/doc/full.dot
 cargo depgraph --all-deps --dedup-transitive-deps > target/doc/all.dot
 
+export NO_COLOR=1
 ## Generate Module Trees for documentation purposes.
-# cargo modules generate tree --orphans --types --traits --fns --tests --all-features --lib
-# cargo modules generate tree --orphans --types --traits --fns --tests --all-features --bin <name>
+for lib in $1;
+do
+    cargo modules generate tree --orphans --types --traits --tests --all-features \
+        --package $lib --lib > target/doc/$lib.lib.modules.tree; rc=$?
 
-## Generate Module Graphs for documentation purposes.
-#  cargo modules generate graph --all-features --types --traits --fns --modules --uses --externs --acyclic --lib
-#  cargo modules generate graph --all-features --types --traits --fns --modules --uses --externs --acyclic --bin <name>
+    cargo modules generate graph --all-features --modules \
+        --package $lib --lib > target/doc/$lib.lib.modules.dot; rc=$?
+done
+for bin in $2;
+do
+    IFS="/" read -r package bin <<< "$bin"
+    cargo modules generate tree --orphans --types --traits --tests --all-features \
+        --package $package --bin $bin > target/doc/$package.$bin.bin.modules.tree; rc=$?
 
+    cargo modules generate graph --all-features --modules \
+        --package $package --bin $bin > target/doc/$package.$bin.bin.modules.dot; rc=$?
+done
 
 # Return an error if any of this fails.
 exit $rc

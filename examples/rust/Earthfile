@@ -28,7 +28,7 @@ check-all-hosts:
 build-hosted:
     FROM +builder
  
-    DO ./../../earthly/rust+BUILD
+    DO ./../../earthly/rust+BUILD --libs="hello_world" --bins="hello_world/hello_world"
 
     DO ./../../earthly/rust+SMOKE_TEST --bin=hello_world
 
