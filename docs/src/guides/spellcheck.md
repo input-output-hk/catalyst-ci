@@ -63,6 +63,7 @@ The path can also be configured in the `cspell.json` file.
 Custom words and dictionaries for specific file patterns can be configured inside `cspell.json` in the root of the repo.
 This can be made by adding `overrides` with custom specifications for specific file patterns.
 
+<!-- cspell: disable -->
 ```json
 "overrides": [
     {
@@ -89,6 +90,7 @@ This can be made by adding `overrides` with custom specifications for specific f
     }
 ]
 ```
+<!-- cspell: enable -->
 
 ### Inline specific words
 
