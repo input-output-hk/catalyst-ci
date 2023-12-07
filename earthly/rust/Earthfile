@@ -132,7 +132,7 @@ BUILD:
     ARG libs=""
     ARG bins=""
 
-    RUN /scripts/std_build.sh $libs $bins
+    RUN /scripts/std_build.sh "$libs" "$bins"
 
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:
