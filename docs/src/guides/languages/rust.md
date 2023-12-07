@@ -55,7 +55,7 @@ VERSION 0.7
 builder:
     FROM ./../../earthly/rust+rust-base
 
-    COPY --dir .cargo .config benches src tests .
+    COPY --dir .cargo .config crates .
     COPY Cargo.lock Cargo.toml .
     COPY clippy.toml deny.toml rustfmt.toml .
 
@@ -145,12 +145,12 @@ The same approach we will see for the another targets of this guide.
 build-hosted:
     FROM +builder
  
-    DO ./../../earthly/rust+BUILD
+    DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
 
-    DO ./../../earthly/rust+SMOKE_TEST --bin=hello_world
+    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/hello_world hello_world
+    SAVE ARTIFACT target/$TARGETARCH/release/foo foo
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
