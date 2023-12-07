@@ -14,12 +14,6 @@ markdown-check-fix:
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
-# spell-check Check spelling in this repo locally.
-spell-check:
-    LOCALLY
-
-    DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
-
 # check-spelling Check spelling in this repo inside a container.
 check-spelling:
     DO ./earthly/cspell+CHECK
