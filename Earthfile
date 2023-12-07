@@ -4,12 +4,6 @@ FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
-# Check Markdown in this repo.
-markdown-check:
-    LOCALLY
-
-    DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
-
 # check-markdown can be done remotely.
 check-markdown: 
     DO ./earthly/mdlint+CHECK
@@ -19,12 +13,6 @@ markdown-check-fix:
     LOCALLY
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
-
-# spell-check Check spelling in this repo locally.
-spell-check:
-    LOCALLY
-
-    DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
 
 # check-spelling Check spelling in this repo inside a container.
 check-spelling:
