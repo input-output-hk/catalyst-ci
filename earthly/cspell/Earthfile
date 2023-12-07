@@ -24,10 +24,28 @@ CSPELL_LOCALLY:
         ghcr.io/streetsidesoftware/cspell:8.0.0 \
         lint . --dot
 
+CHECK:
+    # Spell checking all docs and code is done with cspell
+    # See: cspell.org
+    COMMAND
+
+    # Where we want to run the `lint` from. Use `.` to check the whole repo.
+    ARG src=.
+
+    # Unlikely to need to change this.
+    ARG cfg_file=cspell.json
+
+    FROM ghcr.io/streetsidesoftware/cspell:8.0.0
+    WORKDIR /work
+
+    COPY $src .
+    
+    RUN cspell-cli lint . --dot
+
 # A Test and example invocation of the above UDC.
 cspell-test:
     # As notes above, this check must only be run locally.
     LOCALLY
-    # Run with `earthly -P +cspell-test
+    # Run with `earthly -P +cspell-test`
     DO +CSPELL_LOCALLY --src=$(echo ${PWD}/../../)
 
