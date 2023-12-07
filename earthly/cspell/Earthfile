@@ -1,29 +1,6 @@
 # cspell UDCs and Containers.
 VERSION 0.7
 
-CSPELL_LOCALLY:
-    # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
-    # IT IS NOT FOR CONTAINER BUILDS.
-    # See: https://github.com/earthly/earthly/issues/580
-
-    # Spell checking all docs and code is done with cspell
-    # See: cspell.org
-    COMMAND
-
-    # Where we want to run the `lint` from.
-    ARG --required src
-
-    # Unlikely to need to change this.
-    ARG cfg_file=cspell.json
-
-    RUN echo Spell Checking Recursively from: $src
-
-    RUN docker run \
-        --rm \
-        -v $src:/workdir \
-        ghcr.io/streetsidesoftware/cspell:8.0.0 \
-        lint . --dot
-
 CHECK:
     # Spell checking all docs and code is done with cspell
     # See: cspell.org
@@ -44,8 +21,6 @@ CHECK:
 
 # A Test and example invocation of the above UDC.
 cspell-test:
-    # As notes above, this check must only be run locally.
-    LOCALLY
     # Run with `earthly -P +cspell-test`
-    DO +CSPELL_LOCALLY --src=$(echo ${PWD}/../../)
+    DO +CHECK --src=$(echo ${PWD}/../../)
 
