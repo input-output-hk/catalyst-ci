@@ -18,6 +18,8 @@ source "$(dirname "$0")/colors.sh"
 
 rc=0
 
+export RUSTDOCFLAGS="--enable-index-page -Zunstable-options" 
+
 ## Build the code
 status $rc "Building all code in the workspace" \
     cargo build --release --workspace --locked; rc=$?
