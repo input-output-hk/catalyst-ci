@@ -17,4 +17,4 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Check all markdown files are properly formatted
-        run: earthly -P +markdown-check
+        run: earthly -P +check-markdown
