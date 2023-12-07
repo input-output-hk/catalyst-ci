@@ -1,27 +1,9 @@
-[package]
-name = "hello_world"
-version = "0.1.0"
-edition = "2021"
-license = "MIT OR Apache-2.0"
+[workspace]
+resolver = "2"
+members = [
+    "crates/foo",
+    "crates/bar",
+]
 
-[dependencies]
-clap = {version= "4.4.7", features = ["derive" ] }
 
-[dev-dependencies]
-criterion = { version = "0.5.1", features = ["html_reports"] }
 
-[lib]
-name = "hello_world_lib"
-path = "src/lib.rs"
-
-[[bin]]
-name = "hello_world"
-path = "src/main.rs"
-
-[[test]]
-name = "integration_test"
-harness = false
-
-[[bench]]
-name = "benchmark"
-harness = false
