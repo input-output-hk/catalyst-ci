@@ -4,12 +4,6 @@ FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
-# Check Markdown in this repo.
-markdown-check:
-    LOCALLY
-
-    DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
-
 # check-markdown can be done remotely.
 check-markdown: 
     DO ./earthly/mdlint+CHECK
