@@ -127,6 +127,9 @@ CHECK:
     RUN /scripts/std_checks.sh
 
 # Step we do during the `build` CI phase for all Rust programs
+# Parameters:
+#  * libs : The list of lib crates `cargo-modules` docs to build.
+#  * bins : The list of binaries `cargo-modules` docs to build.
 BUILD:
     COMMAND
     ARG libs=""

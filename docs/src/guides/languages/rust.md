@@ -182,6 +182,13 @@ Important to note that in this particular example we are dealing with the execut
 so it produces binary as a final artifact.
 Another case of the building Rust library we will consider later.
 Actual build process is done with `+BUILD` UDC target.
+The `+BUILD` UDC have few arguments `libs` and `bins`,
+they should be specified to properly generate `cargo-modules` docs (see description below).
+The `libs` argument takes a list of library crate's names in your Rust project, e.g.
+`--libs="crate1 crate2"`.
+The `bins` argument takes a list of binary crate's names and binary names in your Rust project, e.g.
+`--bins="crate1/bin1 crate1/bin2 crate2/bin1"`, note that each binary name correspond to each crate
+and separated in this list with `/` symbol.
 Under this build process we perform different steps of compiling and validating of our Rust project,
 here is the list of steps (look at `./earthly/rust/scripts/std_build.sh`):
 
@@ -196,6 +203,13 @@ look at `./earthly/rust/stdcfgs/config.toml`)Checking Self contained Unit tests 
 5. `cargo testdocs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation tests all pass.
 6. `cargo bench` - Checking Benchmarks all run to completion.
+7. `cargo depgraph` - Generating dependency graph based on the Rust code.
+Generated artifacts are `doc/workspace.dot`, `doc/full.dot`, `doc/all.dot` files.
+8. `cargo modules` - Generating modules trees and graphs based on the Rust code.
+Generated artifacts are `doc/$crate.$bin.bin.modules.tree`, `doc/$crate.$bin.bin.modules.dot`
+for the specified `--bins="crate1/bin1"` argument
+and `target/doc/$crate.lib.modules.tree`, `target/doc/$crate.lib.modules.dot`
+for the specified `--libs="crate1"` argument of the `+BUILD` UDC.
 
 Next steps is mandatory if you are going to produce a binary as an artifact,
 for Rust libraries the are not mandatory and could be omitted.
