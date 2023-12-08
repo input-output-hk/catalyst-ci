@@ -1,7 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION 0.7
 
-# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf
+# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf depgraph
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
@@ -60,7 +60,8 @@ rust-base:
         cargo install cargo-machete --version=0.6.0  && \
         cargo install refinery_cli  --version=0.8.11 && \
         cargo install cargo-deny    --version=0.14.3 && \
-        cargo install cargo-modules --version=0.10.2
+        cargo install cargo-modules --version=0.10.2 && \
+        cargo install cargo-depgraph --version=1.5.0
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
 
@@ -112,10 +113,15 @@ CHECK:
     RUN /scripts/std_checks.sh
 
 # Step we do during the `build` CI phase for all Rust programs
+# Parameters:
+#  * libs : The list of lib crates `cargo-modules` docs to build.
+#  * bins : The list of binaries `cargo-modules` docs to build.
 BUILD:
     COMMAND
+    ARG libs=""
+    ARG bins=""
 
-    RUN /scripts/std_build.sh
+    RUN /scripts/std_build.sh "$libs" "$bins"
 
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:
