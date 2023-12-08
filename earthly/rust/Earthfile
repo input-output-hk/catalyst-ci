@@ -81,20 +81,6 @@ rust-base:
 rust-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
 
-CP_SRC:
-    # Copy the build src using this.
-    COMMAND
-    # This can be one directory like `"src/*"` or multiple src separated by `","`:
-    # eg, "example/Cargo.toml, example/Cargo.lock, example/src"
-    ARG src=""
-
-    # ONLY copy whats needed to build.  Not everything.
-    # Note: rust-toolchain.toml was already copied when rust was setup.
-    # Minimizing whats copied reduces needless cache misses.
-    FOR --sep=", " file IN $src
-        COPY --dir $file .
-    END
-
 # Common Rust setup.
 # Parameters:
 #  * toolchain : The `rust-toolchain` toml file.
