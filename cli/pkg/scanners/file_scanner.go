@@ -5,6 +5,7 @@ package scanners
 import (
 	"os"
 	"path/filepath"
+	"regexp"
 
 	"github.com/input-output-hk/catalyst-ci/cli/pkg"
 	"github.com/spf13/afero"
@@ -29,9 +30,15 @@ func (f *FileScanner) Scan() ([]pkg.Earthfile, error) {
 }
 
 func (f *FileScanner) ScanForTarget(target string) ([]pkg.Earthfile, error) {
+	// Should start with given target.
+	// Allowing an optional hyphen followed by one or more lowercase letters or numbers
+	regexPattern := "^" + regexp.QuoteMeta(target) + "(?:-[a-z0-9]+)?$"
+
+	r, _ := regexp.Compile(regexPattern)
+
 	earthfiles, err := f.scan(func(e pkg.Earthfile) (bool, error) {
 		for _, t := range e.Targets {
-			if t.Name == target {
+			if r.MatchString(t.Name) {
 				return true, nil
 			}
 		}
