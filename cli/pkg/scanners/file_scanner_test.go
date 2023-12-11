@@ -1,6 +1,6 @@
 package scanners_test
 
-// cspell: words onsi gomega afero
+// cspell: words onsi gomega afero testdocker
 
 import (
 	"errors"
@@ -120,7 +120,7 @@ var _ = Describe("FileScanner", func() {
 				Expect(earthfiles).To(BeEmpty())
 
 			},
-			Entry("target in file doesn't start with docker", "dtestdocker"),
+			Entry("target in file doesn't start with docker", "testdocker"),
 			Entry("target in file start with docker with hyphen but not followed by one or more lowercase letters or numbers ", "docker-"),
 			Entry("target in file start with docker with hyphen followed by special character", "docker-@"),
 			Entry("target in file start with docker with hyphen followed capital letter", "docker-TEST"),
