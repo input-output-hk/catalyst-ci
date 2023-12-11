@@ -78,63 +78,53 @@ var _ = Describe("FileScanner", func() {
 	})
 
 	Describe("ScanForTarget", func() {
-		BeforeEach(func() {
+		setup := func(target string) {
 			err := afero.WriteFile(
 				fs,
 				"/test/Earthfile",
-				[]byte("docker"),
+				[]byte(target),
 				0644,
 			)
+
 			Expect(err).NotTo(HaveOccurred())
 			parser = &mockParser{
 				earthfile: pkg.Earthfile{
 					Targets: []spec.Target{
 						{
-							Name: "docker",
+							Name: target,
 						},
 					},
 				},
 			}
-		})
-
-		It("should return Earthfiles with docker target", func() {
-			fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
-			earthfiles, err := fScanner.ScanForTarget("docker")
-			Expect(err).NotTo(HaveOccurred())
-			Expect(earthfiles).To(HaveLen(1))
-			Expect(earthfiles[0].Path).To(Equal("/test/Earthfile"))
-		})
-
-		Context("when the Earthfile does not contain docker target", func() {
-			BeforeEach(func() {
-				err := afero.WriteFile(
-					fs,
-					"/test/Earthfile",
-					[]byte("other"),
-					0644,
-				)
+		}
+		DescribeTable("when Earthfile contain valid docker targets",
+			func(target string) {
+				setup(target)
+				fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
+				earthfiles, err := fScanner.ScanForTarget("docker")
 				Expect(err).NotTo(HaveOccurred())
-				parser = &mockParser{
-					earthfile: pkg.Earthfile{
-						Targets: []spec.Target{
-							{
-								Name: "other",
-							},
-						},
-					},
-				}
-			})
+				Expect(earthfiles).To(HaveLen(1))
+				Expect(earthfiles[0].Path).To(Equal("/test/Earthfile"))
 
-			It("should return an empty slice", func() {
-				fScanner := scanners.NewFileScanner(
-					[]string{"/test"},
-					parser,
-					fs,
-				)
+			},
+			Entry("target in file is 'docker'", "docker"),
+			Entry("target in file is 'docker-<a-z>'", "docker-test"),
+			Entry("target in file is 'docker-<1-9>'", "docker-2test"),
+		)
+		DescribeTable("when Earthfile contain invalid docker target or no target",
+			func(target string) {
+				setup(target)
+				fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
 				earthfiles, err := fScanner.ScanForTarget("docker")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(earthfiles).To(BeEmpty())
-			})
-		})
+
+			},
+			Entry("target in file doesn't start with docker", "dtestdocker"),
+			Entry("target in file start with docker with hyphen but not followed by one or more lowercase letters or numbers ", "docker-"),
+			Entry("target in file start with docker with hyphen followed by special character", "docker-@"),
+			Entry("target in file start with docker with hyphen followed capital letter", "docker-TEST"),
+			Entry("no match target", "other"),
+		)
 	})
 })
