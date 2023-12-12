@@ -75,3 +75,8 @@ build:
     ELSE
         BUILD --platform=linux/amd64 +hosted-build
     END
+
+# This step simulates the full CI run for local purposes only.
+local-ci-run:
+    BUILD +check
+    BUILD +build
