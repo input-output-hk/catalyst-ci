@@ -81,15 +81,15 @@ By default `toolchain` setup to `rust-toolchain.toml`.
 
 ```Earthfile
 # Test rust build container - Use best architecture host tools.
-check-hosted:
+hosted-check:
     FROM +builder
 
     DO ./../../earthly/rust+CHECK
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
+all-hosts-check:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-check
 
 ## Standard CI targets.
 ##
@@ -105,14 +105,14 @@ check:
     ARG USERARCH
 
     IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +check-hosted
+        BUILD --platform=linux/arm64 +hosted-check
     ELSE
-        BUILD --platform=linux/amd64 +check-hosted
+        BUILD --platform=linux/amd64 +hosted-check
     END
 ```
 
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
-The `check-hosted` target which actually performs all checks and validation
+The `hosted-check` target which actually performs all checks and validation
 with the help of `+CHECK` UDC target.
 The `+CHECK` UDC target performs static checks of the Rust project as
 `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
@@ -131,7 +131,7 @@ to be the same as defined in `earthly/rust/stdcfgs` directory of the `catalyst-c
 So when you are going to setup a new Rust project copy these configuration files
 described above to the appropriate location of your Rust project.
 
-Another targets as `check-all-hosts` and `check` (running on CI) just invoke `check-hosted`
+Another targets as `all-hosts-check` and `check` (running on CI) just invoke `hosted-check`
 with the specified `--platform`.
 It is important to define a `linux` target platform with a proper cpu architecture
 for the Rust project when you are building it inside Docker
@@ -142,7 +142,7 @@ The same approach we will see for the another targets of this guide.
 
 ```Earthfile
 # Build the service.
-build-hosted:
+hosted-build:
     FROM +builder
  
     DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
@@ -154,8 +154,8 @@ build-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+all-hosts-build:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-build
 
 # Run build using the most efficient host tooling
 # CI Automated Entry point.
@@ -167,16 +167,16 @@ build:
     ARG USERARCH
 
     IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +build-hosted
+        BUILD --platform=linux/arm64 +hosted-build
     ELSE
-        BUILD --platform=linux/amd64 +build-hosted
+        BUILD --platform=linux/amd64 +hosted-build
     END
 ```
 
 After successful performing checks of the Rust project we can finally build artifacts.
-As it was discussed in the previous section, actual job is done with `build-hosted` target,
+As it was discussed in the previous section, actual job is done with `hosted-build` target,
 other targets needs to configure different platform running options.
-So we will focus on `build-hosted` target.
+So we will focus on `hosted-build` target.
 Obviously it inherits `builder` target environment and than performs build of the binary.
 Important to note that in this particular example we are dealing with the executable Rust project,
 so it produces binary as a final artifact.
