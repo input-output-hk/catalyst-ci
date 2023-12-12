@@ -144,21 +144,6 @@ jobs:
       dockerhub_username: ${{ secrets.dockerhub_username }}
       earthly_runner_address: ${{ secrets.earthly_runner_address }}
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
-  docs:
-    uses: ./.github/workflows/pages.yml
-    needs: [build, check, package, test]
-    with:
-      aws_role_arn: ${{ inputs.aws_role_arn }}
-      aws_region: ${{ inputs.aws_region }}
-      ci_cli_version: ${{ inputs.ci_cli_version }}
-      earthly_version: ${{ inputs.earthly_version }}
-      target: docs
-      privileged: true
-    secrets:
-      dockerhub_token: ${{ secrets.dockerhub_token }}
-      dockerhub_username: ${{ secrets.dockerhub_username }}
-      earthly_runner_address: ${{ secrets.earthly_runner_address }}
-      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   release:
     uses: ./.github/workflows/release.yml
     needs: [build, check, package, test]
