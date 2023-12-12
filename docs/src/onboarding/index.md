@@ -77,11 +77,12 @@ flowchart LR
     A[Check] --> B[Build] --> C[Package] --> D[Test]
     D --> E[Release]
     D --> F[Publish]
+    D --> G[Docs]
 ```
 
 The full CI process consists of combining the discovery and execution mechanisms into a complete pipeline, as shown above.
 Each of the boxes represent a distinct stage which consists of discovering and then executing a target.
-As previously mentioned, some stages, like the `release` and `publish` stages, have additional logic that occurs after executing the
+As previously mentioned, some stages, like the `release`, `publish`, and `docs` stages, have additional logic that occurs after executing the
 target.
 
 Each stage is self-contained and the only dependency occurs when validating that the previous stage was successful.
@@ -115,6 +116,7 @@ However, as a short introduction, here is a brief summary of each one:
    After the image is built by executing the target, the CI will perform other steps to transform the image.
    For example, tagging it with the git commit hash and performing general static analysis.
    The CI will automatically build and publish this image to configured registries during certain types of git events.
+1. `docs` - This stage is expected to build and publish documentation.
 
 Each of the above stages are purely optional and can be combined to perform different types of CI workflows.
 For smaller projects, only a number of stages will be utilized initially.
