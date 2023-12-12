@@ -154,8 +154,6 @@ jobs:
       earthfile: ./docs
       target: docs
     secrets:
-      dockerhub_token: ${{ secrets.dockerhub_token }}
-      dockerhub_username: ${{ secrets.dockerhub_username }}
       earthly_runner_address: ${{ secrets.earthly_runner_address }}
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   release:
