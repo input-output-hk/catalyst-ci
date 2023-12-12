@@ -13,19 +13,19 @@ builder:
     DO ./../../earthly/rust+SETUP
 
 # Test rust build container - Use best architecture host tools.
-check-hosted:
+hosted-check:
     FROM +builder
 
     DO ./../../earthly/rust+CHECK
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
+all-hosts-check:    
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
 
 # Build the service.
-build-hosted:
+hosted-build:
     FROM +builder
  
     DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
@@ -37,7 +37,7 @@ build-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
+all-hosts-build:    
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
 ## -----------------------------------------------------------------------------
@@ -71,12 +71,7 @@ build:
     ARG USERARCH
 
     IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +build-hosted
+        BUILD --platform=linux/arm64 +hosted-build
     ELSE
-        BUILD --platform=linux/amd64 +build-hosted
+        BUILD --platform=linux/amd64 +hosted-build
     END
-
-# This step simulates the full CI run for local purposes only.
-local-ci-run:
-    BUILD +check
-    BUILD +build

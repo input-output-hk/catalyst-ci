@@ -116,10 +116,3 @@ test-4:
             expected=$(printf "  name   | age \n---------+-----\n Alice   |  20\n Bob     |  30\n Charlie |  40\n(3 rows)");\
             assert_eq "$expected" "$res"
     END
-
-# Invoke all tests
-test:
-    BUILD +test-1
-    BUILD +test-2
-    BUILD +test-3
-    BUILD +test-4

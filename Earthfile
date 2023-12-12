@@ -18,17 +18,6 @@ markdown-check-fix:
 check-spelling:
     DO ./earthly/cspell+CHECK
 
-## -----------------------------------------------------------------------------
-##
-## Standard CI targets.
-##
-## These targets are discovered and executed automatically by CI.
-
-# check run all checks.
-check:
-    BUILD +check-spelling
-    BUILD +check-markdown
-
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch
