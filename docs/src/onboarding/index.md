@@ -48,7 +48,8 @@ environment.
 During a single run, the CI will go through multiple phases of discovery.
 In each of these discovery phases, a custom CLI provided by the `catalyst-ci` repository is executed.
 The CLI is responsible for recursively scanning the repository for `Earthfile`s and filtering them by target.
-For example, during the `check` phase of the CI, the CLI will return a list of `Earthfile`s that contain the `check` target.
+The targets will get recognized in the following pattern: `target` or `target-[a-z0-9]`.
+For example, in the CI's `check` phase, the CLI will return a list of `Earthfile`s that contain the `check` or `check-test` target.
 
 The discovery phase will then return a list of `Earthfile`s matching the given criteria.
 This list is fed into a [matrix job](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs) that multiplexes
@@ -125,7 +126,7 @@ However, as a project grows, it can begin incorporating more stages without havi
 Now that we've covered how the CI process works at a conceptual level, how can we use it practically?
 As a developer, the main interface you need to be most concerned with is the `Earthfile`.
 Each "stage" discussed in the previous section can be directly correlated to an Earthly target.
-For example, the `check` stage will search for and execute a `check` target.
+For example, the `check` stage will search for and execute `check` or `check-[a-z0-9]`targets.
 In your `Earthfile`, you'll be responsible for defining these targets and their associated logic within the context of your
 subproject.
 
