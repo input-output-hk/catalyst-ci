@@ -2,7 +2,7 @@
 //! Used as a test of the Rust CI/CD pipeline.
 
 use clap::Parser;
-use hello_world_lib::fmt_hello;
+use foo::fmt_hello;
 
 /// Simple program to greet a person
 #[derive(Parser, Debug)]
