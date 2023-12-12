@@ -82,8 +82,8 @@ flowchart LR
 
 The full CI process consists of combining the discovery and execution mechanisms into a complete pipeline, as shown above.
 Each of the boxes represent a distinct stage which consists of discovering and then executing a target.
-As previously mentioned, some stages, like the `release`, `publish`, and `docs` stages, have additional logic that occurs after executing the
-target.
+As previously mentioned, some stages, like the `release`, `publish`, and `docs` stages,
+have additional logic that occurs after executing the target.
 
 Each stage is self-contained and the only dependency occurs when validating that the previous stage was successful.
 For example, the `build` stage will not execute until the `check` stage has passed.
