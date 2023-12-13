@@ -29,6 +29,8 @@ check:
 build:
     FROM +src
 
+    RUN echo "building ci"
+
     ENV CGO_ENABLED=0
     RUN go build -ldflags="-extldflags=-static" -o bin/ci cmd/main.go
 
