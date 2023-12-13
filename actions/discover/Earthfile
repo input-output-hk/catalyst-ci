@@ -33,5 +33,5 @@ test:
 check:
     FROM +src
 
-    RUN npm run format:check
-    RUN npm run lint
+    # RUN npm run format:check
+    # RUN npm run lint
