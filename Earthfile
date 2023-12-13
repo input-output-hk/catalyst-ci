@@ -3,23 +3,30 @@ VERSION --global-cache 0.7
 
 # cspell: words livedocs sitedocs
 
-markdown-check:
-    # Check Markdown in this repo.
-    LOCALLY
+# check-markdown can be done remotely.
+check-markdown: 
+    DO ./earthly/mdlint+CHECK
 
-    DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD})
-
+# markdown-check-fix perform markdown check with fix in this repo.
 markdown-check-fix:
-    # Check Markdown in this repo.
     LOCALLY
 
     DO ./earthly/mdlint+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
-spell-check:
-    # Check spelling in this repo.
-    LOCALLY
+# check-spelling Check spelling in this repo inside a container.
+check-spelling:
+    DO ./earthly/cspell+CHECK
 
-    DO ./earthly/cspell+CSPELL_LOCALLY --src=$(echo ${PWD})
+## -----------------------------------------------------------------------------
+##
+## Standard CI targets.
+##
+## These targets are discovered and executed automatically by CI.
+
+# check run all checks.
+check:
+    BUILD +check-spelling
+    BUILD +check-markdown
 
 # Internal: shell-check - test all bash files lint properly according to shellcheck.
 shell-check:

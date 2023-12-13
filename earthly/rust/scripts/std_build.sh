@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words testci testdocs
+# cspell: words testci testdocs RUSTDOCFLAGS Zunstable depgraph
 
 # This script is run inside the `check` stage for rust projects to perform all
 # high level non-compilation checks.
@@ -47,13 +47,30 @@ status "${rc}" "Checking Benchmarks all run to completion" \
     cargo bench --all-targets
 rc=$?
 
-## Generate Module Trees for documentation purposes.
-# cargo modules generate tree --orphans --types --traits --fns --tests --all-features --lib
-# cargo modules generate tree --orphans --types --traits --fns --tests --all-features --bin <name>
+## Generate dependency graphs
+cargo depgraph --workspace-only --dedup-transitive-deps > target/doc/workspace.dot
+cargo depgraph --dedup-transitive-deps > target/doc/full.dot
+cargo depgraph --all-deps --dedup-transitive-deps > target/doc/all.dot
 
-## Generate Module Graphs for documentation purposes.
-#  cargo modules generate graph --all-features --types --traits --fns --modules --uses --externs --acyclic --lib
-#  cargo modules generate graph --all-features --types --traits --fns --modules --uses --externs --acyclic --bin <name>
+export NO_COLOR=1
+## Generate Module Trees for documentation purposes.
+for lib in $1;
+do
+    cargo modules generate tree --orphans --types --traits --tests --all-features \
+        --package $lib --lib > target/doc/$lib.lib.modules.tree; rc=$?
+
+    cargo modules generate graph --all-features --modules \
+        --package $lib --lib > target/doc/$lib.lib.modules.dot; rc=$?
+done
+for bin in $2;
+do
+    IFS="/" read -r package bin <<< "$bin"
+    cargo modules generate tree --orphans --types --traits --tests --all-features \
+        --package $package --bin $bin > target/doc/$package.$bin.bin.modules.tree; rc=$?
+
+    cargo modules generate graph --all-features --modules \
+        --package $package --bin $bin > target/doc/$package.$bin.bin.modules.dot; rc=$?
+done
 
 # Return an error if any of this fails.
 exit "${rc}"
