@@ -74,9 +74,9 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/discover@feat/targets-scanner
         id: discover
         with:
-          targets: check-markdown
+          targets: check
       - name: Check for empty output
-        id: check-markdown
+        id: check
         run: |
           output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           if [ "$output" == "null" ]; then
