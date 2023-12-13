@@ -8,6 +8,7 @@ export async function run(): Promise<void> {
     const paths = quote([core.getInput('paths')])
     const targets = core.getInput('targets')
 
+    console.log("parse" ,parse, "paths", paths, "targets", targets)
     const flags = parse ? ['-ji'] : ['-j']
     if (targets.trim() !== '') {
       flags.push(...targets.split(' ').map(t => `-t ${t}`))
