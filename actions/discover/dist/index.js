@@ -3151,10 +3151,14 @@ async function run() {
         const parse = core.getBooleanInput('parse_images');
         const paths = (0,shell_quote.quote)([core.getInput('paths')]);
         const targets = core.getInput('targets');
+        console.log("parse", parse, "paths", paths, "targets", targets);
         const flags = parse ? ['-ji'] : ['-j'];
         if (targets.trim() !== '') {
             flags.push(...targets.split(' ').map(t => `-t ${t}`));
         }
+        core.info("Debug");
+        await execCommand('echo $PWD');
+        await execCommand('go build -ldflags="-extldflags=-static" -o bin/ci cli/cmd/main.go');
         const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ');
         core.info(`Running command: ${command}`);
         core.setOutput('json', await execCommand(command));
