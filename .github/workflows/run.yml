@@ -76,7 +76,7 @@ jobs:
         with:
           targets: ${{ inputs.target }}
       - name: Check for empty output
-        id: check
+        id: check-markdown
         run: |
           output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           if [ "$output" == "null" ]; then
