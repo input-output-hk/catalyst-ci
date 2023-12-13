@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
 VERSION --global-cache 0.7
 
-# cspell: words colordiff nushell
+# cspell: words colordiff nushell psycopg dbviz
 
 postgres-base:
     FROM postgres:16.0-alpine3.18
@@ -17,7 +17,9 @@ postgres-base:
             musl-dev \
             curl \
             gcc \
-            py3-pip
+            py3-pip \
+            py3-rich \
+            py3-psycopg
 
     # Install SQLFluff
     RUN pip3 install sqlfluff==2.3.5
@@ -25,6 +27,10 @@ postgres-base:
 
     # Get refinery
     COPY ../rust+rust-base/refinery /bin
+
+    # Get dbviz
+    COPY ../../utilities/dbviz+build/dbviz /bin
+    RUN dbviz --help
 
     # Get nushell
     COPY ../../utilities/nushell+nushell-build/nu /bin
@@ -36,6 +42,7 @@ postgres-base:
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
     DO ../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
 
     SAVE ARTIFACT /scripts /scripts
 
@@ -61,6 +68,37 @@ BUILDER:
     COPY --dir $migrations .
     COPY --dir $seed .
     COPY --dir $refinery_toml .
+
+# DOCS - UDC to build the docs, needs to be run INSIDE the BUILDER like so:
+# 
+# 1. Create a ./docs/diagrams.json which has the options needed to run to generate the docs to /docs
+# 2. Define the following targets in your earthfile
+#
+# builder:
+#    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+BUILDER --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
+#
+# build:
+#    FROM +builder
+#
+#    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+BUILD --image_name=<name>
+#    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+DOCS
+DOCS:
+    COMMAND
+
+    ARG diagrams=./diagrams.json
+    ARG migrations=./migrations
+    ARG refinery_toml=./refinery.toml
+
+    USER postgres:postgres
+    WORKDIR /docs
+
+    COPY $diagrams ./diagrams.json
+    COPY --dir $migrations .
+    COPY --dir $refinery_toml .
+
+    RUN /scripts/std_docs.py ./diagrams.json
+
+
 
 # Linter checks for sql files
 CHECK:

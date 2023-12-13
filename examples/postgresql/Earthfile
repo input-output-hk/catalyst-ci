@@ -28,6 +28,7 @@ build:
     FROM +builder
 
     DO ./../../earthly/postgresql+BUILD --image_name=example-db
+    DO ./../../earthly/postgresql+DOCS
 
 # Internal: common integration test image
 all-tests:
