@@ -17,6 +17,13 @@ markdown-check-fix:
 check-spelling:
     DO ./earthly/cspell+CHECK
 
+# check-bash - test all bash files lint properly according to shellcheck.
+check-bash:
+    FROM alpine:3.18
+
+    DO ./earthly/bash+SHELLCHECK --src=.
+
+
 ## -----------------------------------------------------------------------------
 ##
 ## Standard CI targets.
@@ -27,19 +34,7 @@ check-spelling:
 check:
     BUILD +check-spelling
     BUILD +check-markdown
-
-# Internal: shell-check - test all bash files lint properly according to shellcheck.
-shell-check:
-    FROM alpine:3.18
-
-    DO ./earthly/bash+SHELLCHECK --src=.
-
-# check all repo wide checks are run from here
-check:
-    FROM alpine:3.18
-
-    # Lint all bash files.
-    BUILD +shell-check
+    BUILD +check-bash
 
 # Internal: Reference to our repo root documentation used by docs builder.
 repo-docs:
