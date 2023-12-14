@@ -3155,10 +3155,11 @@ async function run() {
         if (targets.trim() !== '') {
             flags.push(...targets.split(' ').map(t => `-t ${t}`));
         }
-        core.setOutput("ls", await execCommand("ls"));
-        const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ');
-        core.info(`Running command: ${command}`);
-        core.setOutput('json', await execCommand(command));
+        await execCommand('echo $PWD');
+        await execCommand('ls');
+        // const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
+        // core.info(`Running command: ${command}`)
+        // core.setOutput('json', await execCommand(command))
     }
     catch (error) {
         if (error instanceof Error) {
