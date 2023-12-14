@@ -2882,34 +2882,34 @@ async function run(platform = process.platform) {
         return;
     }
     core.info('Debug');
-    await (0,external_child_process_namespaceObject.exec)('ls', (err, stdout, stderr) => {
-        if (err || stderr) {
-            console.error(`exec error: ${err}`);
-            return;
-        }
-        console.log(`> ${stdout}`);
-    });
-    await (0,external_child_process_namespaceObject.exec)('ls cli', (err, stdout, stderr) => {
-        if (err || stderr) {
-            console.error(`exec error: ${err}`);
-            return;
-        }
-        console.log(`> ${stdout}`);
-    });
-    await (0,external_child_process_namespaceObject.exec)('ls -la cli/bin', (err, stdout, stderr) => {
-        if (err || stderr) {
-            console.error(`exec error: ${err}`);
-            return;
-        }
-        console.log(`> ${stdout}`);
-    });
-    await (0,external_child_process_namespaceObject.exec)('./cli/bin/ci scan --help', (err, stdout, stderr) => {
-        if (err || stderr) {
-            console.error(`exec error: ${err}`);
-            return;
-        }
-        console.log(`> ${stdout}`);
-    });
+    // await exec('ls', (err, stdout, stderr) => {
+    //   if (err || stderr) {
+    //     console.error(`exec error: ${err}`)
+    //     return
+    //   }
+    //   console.log(`> ${stdout}`)
+    // })
+    // await exec('ls cli', (err, stdout, stderr) => {
+    //   if (err || stderr) {
+    //     console.error(`exec error: ${err}`)
+    //     return
+    //   }
+    //   console.log(`> ${stdout}`)
+    // })
+    // await exec('ls -la cli/bin', (err, stdout, stderr) => {
+    //   if (err || stderr) {
+    //     console.error(`exec error: ${err}`)
+    //     return
+    //   }
+    //   console.log(`> ${stdout}`)
+    // })
+    // await exec('./cli/bin/ci scan --help', (err, stdout, stderr) => {
+    //   if (err || stderr) {
+    //     console.error(`exec error: ${err}`)
+    //     return
+    //   }
+    //   console.log(`> ${stdout}`)
+    // })
     try {
         // const token = core.getInput('token')
         // const version = core.getInput('version')
@@ -2942,7 +2942,8 @@ async function run(platform = process.platform) {
         // const downloadPath = await tc.downloadTool(finalURL)
         // const downloadPath = "input-output-hk/catalyst-ci/cli/bin@feat/targets-scanner"
         // const extractPath = await tc.(downloadPath, '/usr/local/bin')
-        await (0,external_child_process_namespaceObject.exec)('mv cli/bin/ci /usr/local/bin/ci ', (err, stdout, stderr) => {
+        core.info('move file');
+        await (0,external_child_process_namespaceObject.exec)('mv cli/bin/ci /usr/local/bin/ci && ./cli/bin/ci scan --help && ls -la cli/bin  ', (err, stdout, stderr) => {
             if (err || stderr) {
                 console.error(`exec error: ${err}`);
                 return;

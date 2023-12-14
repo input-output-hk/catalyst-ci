@@ -16,43 +16,41 @@ export async function run(
   }
 
   core.info('Debug')
-  await exec('ls', (err, stdout, stderr) => {
-    if (err || stderr) {
-      console.error(`exec error: ${err}`)
-      return
-    }
+  // await exec('ls', (err, stdout, stderr) => {
+  //   if (err || stderr) {
+  //     console.error(`exec error: ${err}`)
+  //     return
+  //   }
 
-    console.log(`> ${stdout}`)
-  })
+  //   console.log(`> ${stdout}`)
+  // })
 
-  await exec('ls cli', (err, stdout, stderr) => {
-    if (err || stderr) {
-      console.error(`exec error: ${err}`)
-      return
-    }
+  // await exec('ls cli', (err, stdout, stderr) => {
+  //   if (err || stderr) {
+  //     console.error(`exec error: ${err}`)
+  //     return
+  //   }
 
-    console.log(`> ${stdout}`)
-  })
+  //   console.log(`> ${stdout}`)
+  // })
 
-  await exec('ls -la cli/bin', (err, stdout, stderr) => {
-    if (err || stderr) {
-      console.error(`exec error: ${err}`)
-      return
-    }
+  // await exec('ls -la cli/bin', (err, stdout, stderr) => {
+  //   if (err || stderr) {
+  //     console.error(`exec error: ${err}`)
+  //     return
+  //   }
 
-    console.log(`> ${stdout}`)
-  })
+  //   console.log(`> ${stdout}`)
+  // })
 
-  await exec('./cli/bin/ci scan --help', (err, stdout, stderr) => {
-    if (err || stderr) {
-      console.error(`exec error: ${err}`)
-      return
-    }
+  // await exec('./cli/bin/ci scan --help', (err, stdout, stderr) => {
+  //   if (err || stderr) {
+  //     console.error(`exec error: ${err}`)
+  //     return
+  //   }
 
-    console.log(`> ${stdout}`)
-  })
-
-
+  //   console.log(`> ${stdout}`)
+  // })
 
   try {
     // const token = core.getInput('token')
@@ -92,12 +90,13 @@ export async function run(
     // const downloadPath = await tc.downloadTool(finalURL)
     // const downloadPath = "input-output-hk/catalyst-ci/cli/bin@feat/targets-scanner"
     // const extractPath = await tc.(downloadPath, '/usr/local/bin')
-    await exec('mv cli/bin/ci /usr/local/bin/ci ', (err, stdout, stderr) => {
+    core.info('move file')
+    await exec('mv cli/bin/ci /usr/local/bin/ci && ./cli/bin/ci scan --help && ls -la cli/bin  ', (err, stdout, stderr) => {
       if (err || stderr) {
         console.error(`exec error: ${err}`)
         return
       }
-  
+
       console.log(`> ${stdout}`)
     })
   } catch (error) {

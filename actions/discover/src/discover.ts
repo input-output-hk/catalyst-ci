@@ -15,7 +15,7 @@ export async function run(): Promise<void> {
     await execCommand('echo $PWD')
     await execCommand('ls')
     await execCommand('ls cli')
-    const command = ['./ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
+    const command = ['/user/local/bin/ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)
     core.setOutput('json', await execCommand(command))
