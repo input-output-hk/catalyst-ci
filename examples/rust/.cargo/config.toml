@@ -1,12 +1,12 @@
 # Use MOLD linker where possible, but ONLY in CI applicable targets.
-# cspell: words rustflags armv gnueabihf msvc nextest idents rustdocflags 
-# cspell: words rustdoc lintfix lintrestrict testfast testdocs codegen testci
+# cspell: words rustflags armv gnueabihf msvc nextest idents rustdocflags
+# cspell: words rustdoc lintfix lintrestrict testfast testdocs codegen testci testunit
 # cspell: words fmtchk fmtfix
 
 # Configure how Docker container targets build.
 
 # If you want to customize these targets for a local build, then customize them in you:
-#  $CARGO_HOME/config.toml  
+#  $CARGO_HOME/config.toml
 # NOT in the project itself.
 # These targets are ONLY the targets used by CI and inside docker builds.
 
@@ -116,6 +116,7 @@ lint-vscode = "clippy --workspace --message-format=json-diagnostic-rendered-ansi
 docs = "doc --workspace -r --all-features --no-deps --bins --document-private-items --examples --locked"
 # nightly docs build broken... when they are'nt we can enable these docs... --unit-graph --timings=html,json -Z unstable-options"
 testfast = "nextest run --release --workspace --locked"
+testunit = "nextest run --release --bins --lib --workspace --locked -P ci"
 testci = "nextest run --release --workspace --locked -P ci"
 testdocs = "test --doc --release --workspace --locked"
 
