@@ -33,6 +33,7 @@ async function execCommand(command: string): Promise<string> {
       if (error || stderr) {
         reject(new Error(error ? error.message : stderr))
       } else {
+        console.log(">", stdout)
         resolve(stdout)
       }
     })

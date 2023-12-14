@@ -3177,6 +3177,7 @@ async function execCommand(command) {
                 reject(new Error(error ? error.message : stderr));
             }
             else {
+                console.log(">", stdout);
                 resolve(stdout);
             }
         });
