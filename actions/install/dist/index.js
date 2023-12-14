@@ -2903,6 +2903,13 @@ async function run(platform = process.platform) {
         }
         console.log(`> ${stdout}`);
     });
+    await (0,external_child_process_namespaceObject.exec)('.cli/bin/ci scan --help', (err, stdout, stderr) => {
+        if (err || stderr) {
+            console.error(`exec error: ${err}`);
+            return;
+        }
+        console.log(`> ${stdout}`);
+    });
     // try {
     //   const token = core.getInput('token')
     //   const version = core.getInput('version')
