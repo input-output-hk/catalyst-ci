@@ -13715,7 +13715,10 @@ var core = __nccwpck_require__(2186);
 var tool_cache = __nccwpck_require__(7784);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
+// EXTERNAL MODULE: external "child_process"
+var external_child_process_ = __nccwpck_require__(2081);
 ;// CONCATENATED MODULE: ./src/install.ts
+
 
 
 
@@ -13727,15 +13730,21 @@ async function run(platform = process.platform) {
         core.setFailed('This action only supports Linux runners');
         return;
     }
-    // core.info('Debug')
-    // await exec('ls', (err, stdout, stderr) => {
-    //   if (err || stderr) {
-    //     console.error(`exec error: ${err}`)
-    //     return
-    //   }
-    //   console.log(`Show ${stdout}`)
-    // })
-    // return
+    core.info('Debug');
+    await (0,external_child_process_.exec)('ls', (err, stdout, stderr) => {
+        if (err || stderr) {
+            console.error(`exec error: ${err}`);
+            return;
+        }
+        console.log(`> ${stdout}`);
+    });
+    await (0,external_child_process_.exec)('ls cli', (err, stdout, stderr) => {
+        if (err || stderr) {
+            console.error(`exec error: ${err}`);
+            return;
+        }
+        console.log(`> ${stdout}`);
+    });
     try {
         const token = core.getInput('token');
         const version = core.getInput('version');

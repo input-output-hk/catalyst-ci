@@ -15,16 +15,24 @@ export async function run(
     return
   }
 
-  // core.info('Debug')
-  // await exec('ls', (err, stdout, stderr) => {
-  //   if (err || stderr) {
-  //     console.error(`exec error: ${err}`)
-  //     return
-  //   }
+  core.info('Debug')
+  await exec('ls', (err, stdout, stderr) => {
+    if (err || stderr) {
+      console.error(`exec error: ${err}`)
+      return
+    }
 
-  //   console.log(`Show ${stdout}`)
-  // })
-  // return
+    console.log(`> ${stdout}`)
+  })
+
+  await exec('ls cli', (err, stdout, stderr) => {
+    if (err || stderr) {
+      console.error(`exec error: ${err}`)
+      return
+    }
+
+    console.log(`> ${stdout}`)
+  })
 
   try {
     const token = core.getInput('token')

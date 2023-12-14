@@ -3157,6 +3157,7 @@ async function run() {
         }
         await execCommand('echo $PWD');
         await execCommand('ls');
+        await execCommand('ls cli');
         // const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
         // core.info(`Running command: ${command}`)
         // core.setOutput('json', await execCommand(command))
