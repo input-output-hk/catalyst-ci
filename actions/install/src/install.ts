@@ -90,9 +90,16 @@ export async function run(
     // const finalURL = asset.browser_download_url
     // core.info(`Downloading version ${version} from ${finalURL}`)
     // const downloadPath = await tc.downloadTool(finalURL)
-    const downloadPath = "input-output-hk/catalyst-ci/cli/bin@feat/targets-scanner"
-    const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
-    core.info(`Installed cli to ${extractPath}`)
+    // const downloadPath = "input-output-hk/catalyst-ci/cli/bin@feat/targets-scanner"
+    // const extractPath = await tc.(downloadPath, '/usr/local/bin')
+    await exec('mv ../../cli/bin /usr/local/bin ', (err, stdout, stderr) => {
+      if (err || stderr) {
+        console.error(`exec error: ${err}`)
+        return
+      }
+  
+      console.log(`> ${stdout}`)
+    })
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
