@@ -43,7 +43,7 @@ export async function run(
     console.log(`> ${stdout}`)
   })
 
-  await exec('.cli/bin/ci scan --help', (err, stdout, stderr) => {
+  await exec('./cli/bin/ci scan --help', (err, stdout, stderr) => {
     if (err || stderr) {
       console.error(`exec error: ${err}`)
       return
