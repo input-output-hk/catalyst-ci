@@ -70,6 +70,7 @@ runs:
       if: ${{ inputs.cli_skip_install != 'true' }}
       with:
         version: ${{ inputs.cli_version }}
+      run: ls
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
