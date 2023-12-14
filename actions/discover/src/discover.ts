@@ -8,14 +8,10 @@ export async function run(): Promise<void> {
     const paths = quote([core.getInput('paths')])
     const targets = core.getInput('targets')
 
-    console.log("parse" ,parse, "paths", paths, "targets", targets)
     const flags = parse ? ['-ji'] : ['-j']
     if (targets.trim() !== '') {
       flags.push(...targets.split(' ').map(t => `-t ${t}`))
     }
-    core.info("Debug")
-    await execCommand('echo $PWD')
-    await execCommand('go build -ldflags="-extldflags=-static" -o bin/ci cli/cmd/main.go')
     const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)

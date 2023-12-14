@@ -14,7 +14,7 @@ export async function run(): Promise<void> {
   const target = core.getInput('target')
   const targetFlags = core.getInput('target_flags')
 
-  const command = 'earthly --no-cache'
+  const command = 'earthly'
   const args: string[] = []
 
   if (privileged) {
