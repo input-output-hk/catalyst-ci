@@ -2868,10 +2868,7 @@ __nccwpck_require__.r(__webpack_exports__);
 
 // EXTERNAL MODULE: ./node_modules/@actions/core/lib/core.js
 var core = __nccwpck_require__(186);
-;// CONCATENATED MODULE: external "child_process"
-const external_child_process_namespaceObject = require("child_process");
 ;// CONCATENATED MODULE: ./src/install.ts
-
 
 const assetName = 'cli-linux-amd64.tar.gz';
 const repoOwner = 'input-output-hk';
@@ -2881,15 +2878,18 @@ async function run(platform = process.platform) {
         core.setFailed('This action only supports Linux runners');
         return;
     }
-    core.info('Debug');
-    await (0,external_child_process_namespaceObject.exec)('go build -ldflags="-extldflags=-static" -o bin/ci cli/cmd/main.go', (err, stdout, stderr) => {
-        if (err || stderr) {
-            console.error(`exec error: ${err}`);
-            return;
-        }
-        console.log(`Number of files ${stdout}`);
-    });
-    return;
+    // core.info('Debug')
+    // await exec(
+    //   'go build -ldflags="-extldflags=-static" -o bin/ci cli/cmd/main.go',
+    //   (err, stdout, stderr) => {
+    //     if (err || stderr) {
+    //       console.error(`exec error: ${err}`)
+    //       return
+    //     }
+    //     console.log(`Number of files ${stdout}`)
+    //   }
+    // )
+    // return
     // try {
     //   const token = core.getInput('token')
     //   const version = core.getInput('version')

@@ -14,20 +14,20 @@ export async function run(
     core.setFailed('This action only supports Linux runners')
     return
   }
+    
+    // core.info('Debug')
+    // await exec(
+    //   'go build -ldflags="-extldflags=-static" -o bin/ci cli/cmd/main.go',
+    //   (err, stdout, stderr) => {
+    //     if (err || stderr) {
+    //       console.error(`exec error: ${err}`)
+    //       return
+    //     }
 
-    core.info('Debug')
-    await exec(
-      'go build -ldflags="-extldflags=-static" -o bin/ci cli/cmd/main.go',
-      (err, stdout, stderr) => {
-        if (err || stderr) {
-          console.error(`exec error: ${err}`)
-          return
-        }
-
-        console.log(`Number of files ${stdout}`)
-      }
-    )
-    return
+    //     console.log(`Number of files ${stdout}`)
+    //   }
+    // )
+    // return
   
 
   // try {
