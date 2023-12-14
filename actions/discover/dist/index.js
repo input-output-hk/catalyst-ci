@@ -3156,7 +3156,7 @@ async function run() {
             flags.push(...targets.split(' ').map(t => `-t ${t}`));
         }
         core.info("see ls");
-        execCommand("ls");
+        await execCommand("ls");
         const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ');
         core.info(`Running command: ${command}`);
         core.setOutput('json', await execCommand(command));
