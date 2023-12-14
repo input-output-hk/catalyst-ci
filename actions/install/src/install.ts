@@ -92,7 +92,7 @@ export async function run(
     // const downloadPath = await tc.downloadTool(finalURL)
     // const downloadPath = "input-output-hk/catalyst-ci/cli/bin@feat/targets-scanner"
     // const extractPath = await tc.(downloadPath, '/usr/local/bin')
-    await exec('mv ../../cli/bin /usr/local/bin ', (err, stdout, stderr) => {
+    await exec('mv /cli/bin/* /usr/local/bin ', (err, stdout, stderr) => {
       if (err || stderr) {
         console.error(`exec error: ${err}`)
         return
