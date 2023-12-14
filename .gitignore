@@ -4,7 +4,7 @@
 .envrc.local
 
 # Earthly
-# bin/
+bin/
 
 # Node
 node_modules

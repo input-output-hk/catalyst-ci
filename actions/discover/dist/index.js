@@ -3155,10 +3155,6 @@ async function run() {
         if (targets.trim() !== '') {
             flags.push(...targets.split(' ').map(t => `-t ${t}`));
         }
-        await execCommand('echo $PWD');
-        await execCommand('ls');
-        await execCommand('ls cli');
-        await execCommand('ls /usr/local/bin');
         const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ');
         core.info(`Running command: ${command}`);
         core.setOutput('json', await execCommand(command));
@@ -3179,7 +3175,6 @@ async function execCommand(command) {
                 reject(new Error(error ? error.message : stderr));
             }
             else {
-                console.log(">", stdout);
                 resolve(stdout);
             }
         });

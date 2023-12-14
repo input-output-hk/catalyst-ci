@@ -12,10 +12,6 @@ export async function run(): Promise<void> {
     if (targets.trim() !== '') {
       flags.push(...targets.split(' ').map(t => `-t ${t}`))
     }
-    await execCommand('echo $PWD')
-    await execCommand('ls')
-    await execCommand('ls cli')
-    await execCommand('ls /usr/local/bin')
     const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)
@@ -35,7 +31,6 @@ async function execCommand(command: string): Promise<string> {
       if (error || stderr) {
         reject(new Error(error ? error.message : stderr))
       } else {
-        console.log(">", stdout)
         resolve(stdout)
       }
     })

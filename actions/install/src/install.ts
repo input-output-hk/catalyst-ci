@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
-import { exec } from 'child_process'
 
 const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
@@ -15,90 +14,44 @@ export async function run(
     return
   }
 
-  core.info('Debug')
-  // await exec('ls', (err, stdout, stderr) => {
-  //   if (err || stderr) {
-  //     console.error(`exec error: ${err}`)
-  //     return
-  //   }
-
-  //   console.log(`> ${stdout}`)
-  // })
-
-  // await exec('ls cli', (err, stdout, stderr) => {
-  //   if (err || stderr) {
-  //     console.error(`exec error: ${err}`)
-  //     return
-  //   }
-
-  //   console.log(`> ${stdout}`)
-  // })
-
-  // await exec('ls -la cli/bin', (err, stdout, stderr) => {
-  //   if (err || stderr) {
-  //     console.error(`exec error: ${err}`)
-  //     return
-  //   }
-
-  //   console.log(`> ${stdout}`)
-  // })
-
-  // await exec('./cli/bin/ci scan --help', (err, stdout, stderr) => {
-  //   if (err || stderr) {
-  //     console.error(`exec error: ${err}`)
-  //     return
-  //   }
-
-  //   console.log(`> ${stdout}`)
-  // })
-
   try {
-    // const token = core.getInput('token')
-    // const version = core.getInput('version')
+    const token = core.getInput('token')
+    const version = core.getInput('version')
 
-    // if (version !== 'latest' && !isSemVer(version)) {
-    //   core.setFailed('Invalid version')
-    //   return
-    // }
+    if (version !== 'latest' && !isSemVer(version)) {
+      core.setFailed('Invalid version')
+      return
+    }
 
-    // const octokit = github.getOctokit(token)
-    // const { data: releases } = await octokit.rest.repos.listReleases({
-    //   owner: repoOwner,
-    //   repo: repoName
-    // })
-
-    // let targetRelease
-    // if (version === 'latest') {
-    //   targetRelease = releases[0]
-    // } else {
-    //   targetRelease = releases.find(r => r.tag_name === `v${version}`)
-    // }
-
-    // if (!targetRelease) {
-    //   core.setFailed(`Version ${version} not found`)
-    //   return
-    // }
-
-    // const asset = targetRelease.assets.find(a => a.name === assetName)
-    // if (!asset) {
-    //   core.setFailed(`Asset for version v${version} not found`)
-    //   return
-    // }
-
-    // const finalURL = asset.browser_download_url
-    // core.info(`Downloading version ${version} from ${finalURL}`)
-    // const downloadPath = await tc.downloadTool(finalURL)
-    // const downloadPath = "input-output-hk/catalyst-ci/cli/bin@feat/targets-scanner"
-    // const extractPath = await tc.(downloadPath, '/usr/local/bin')
-    core.info('move file')
-    await exec('cp cli/bin/ci /usr/local/bin/ci && ls -la cli/bin && ls /usr/local/bin  ', (err, stdout, stderr) => {
-      if (err || stderr) {
-        console.error(`exec error: ${err}`)
-        return
-      }
-
-      console.log(`> ${stdout}`)
+    const octokit = github.getOctokit(token)
+    const { data: releases } = await octokit.rest.repos.listReleases({
+      owner: repoOwner,
+      repo: repoName
     })
+
+    let targetRelease
+    if (version === 'latest') {
+      targetRelease = releases[0]
+    } else {
+      targetRelease = releases.find(r => r.tag_name === `v${version}`)
+    }
+
+    if (!targetRelease) {
+      core.setFailed(`Version ${version} not found`)
+      return
+    }
+
+    const asset = targetRelease.assets.find(a => a.name === assetName)
+    if (!asset) {
+      core.setFailed(`Asset for version v${version} not found`)
+      return
+    }
+
+    const finalURL = asset.browser_download_url
+    core.info(`Downloading version ${version} from ${finalURL}`)
+    const downloadPath = await tc.downloadTool(finalURL)
+    const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
+    core.info(`Installed cli to ${extractPath}`)
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
