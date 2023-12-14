@@ -34,7 +34,7 @@ export async function run(
     console.log(`> ${stdout}`)
   })
 
-  await exec('ls cli/bin', (err, stdout, stderr) => {
+  await exec('ls -la cli/bin', (err, stdout, stderr) => {
     if (err || stderr) {
       console.error(`exec error: ${err}`)
       return
@@ -92,7 +92,7 @@ export async function run(
     // const downloadPath = await tc.downloadTool(finalURL)
     // const downloadPath = "input-output-hk/catalyst-ci/cli/bin@feat/targets-scanner"
     // const extractPath = await tc.(downloadPath, '/usr/local/bin')
-    await exec('mv /cli/bin/* /usr/local/bin ', (err, stdout, stderr) => {
+    await exec('mv cli/bin/ci /usr/local/bin/ci ', (err, stdout, stderr) => {
       if (err || stderr) {
         console.error(`exec error: ${err}`)
         return

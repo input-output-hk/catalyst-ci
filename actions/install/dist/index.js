@@ -2896,7 +2896,7 @@ async function run(platform = process.platform) {
         }
         console.log(`> ${stdout}`);
     });
-    await (0,external_child_process_namespaceObject.exec)('ls cli/bin', (err, stdout, stderr) => {
+    await (0,external_child_process_namespaceObject.exec)('ls -la cli/bin', (err, stdout, stderr) => {
         if (err || stderr) {
             console.error(`exec error: ${err}`);
             return;
@@ -2942,7 +2942,7 @@ async function run(platform = process.platform) {
         // const downloadPath = await tc.downloadTool(finalURL)
         // const downloadPath = "input-output-hk/catalyst-ci/cli/bin@feat/targets-scanner"
         // const extractPath = await tc.(downloadPath, '/usr/local/bin')
-        await (0,external_child_process_namespaceObject.exec)('mv /cli/bin/* /usr/local/bin ', (err, stdout, stderr) => {
+        await (0,external_child_process_namespaceObject.exec)('mv cli/bin/ci /usr/local/bin/ci ', (err, stdout, stderr) => {
             if (err || stderr) {
                 console.error(`exec error: ${err}`);
                 return;
