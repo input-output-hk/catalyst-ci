@@ -12,6 +12,8 @@ export async function run(): Promise<void> {
     if (targets.trim() !== '') {
       flags.push(...targets.split(' ').map(t => `-t ${t}`))
     }
+    core.info("see ls")
+    execCommand("ls")
     const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)
