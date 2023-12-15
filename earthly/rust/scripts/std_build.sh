@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words testci testdocs RUSTDOCFLAGS Zunstable depgraph
+# cspell: words testunit testdocs RUSTDOCFLAGS Zunstable depgraph
 
 # This script is run inside the `check` stage for rust projects to perform all
 # high level non-compilation checks.
@@ -8,6 +8,8 @@
 # will be scheduled to be `build`.
 # Individual targets can add extra `check` steps, but these checks must always
 # pass.
+
+source "$(dirname "$0")/colors.sh"
 
 source "/scripts/include/colors.sh"
 
@@ -33,9 +35,8 @@ status "${rc}" "Checking Documentation can be generated OK" \
 rc=$?
 
 ## Check if all Self contained tests pass (Test that need no external resources).
-status "${rc}" "Checking Self contained Unit tests all pass" \
-    cargo testci
-rc=$?
+status $rc "Checking Self contained Unit tests all pass" \
+    cargo testunit; rc=$?
 
 ## Check if all documentation tests pass.
 status "${rc}" "Checking Documentation tests all pass" \
@@ -48,28 +49,35 @@ status "${rc}" "Checking Benchmarks all run to completion" \
 rc=$?
 
 ## Generate dependency graphs
-cargo depgraph --workspace-only --dedup-transitive-deps > target/doc/workspace.dot
-cargo depgraph --dedup-transitive-deps > target/doc/full.dot
-cargo depgraph --all-deps --dedup-transitive-deps > target/doc/all.dot
+status $rc "Generating workspace dependency graphs" \
+    $(cargo depgraph --workspace-only --dedup-transitive-deps > target/doc/workspace.dot); rc=$?
+status $rc "Generating full dependency graphs" \
+    $(cargo depgraph --dedup-transitive-deps > target/doc/full.dot); rc=$?
+status $rc "Generating all dependency graphs" \
+    $(cargo depgraph --all-deps --dedup-transitive-deps > target/doc/all.dot); rc=$?
 
 export NO_COLOR=1
 ## Generate Module Trees for documentation purposes.
 for lib in $1;
 do
-    cargo modules generate tree --orphans --types --traits --tests --all-features \
-        --package $lib --lib > target/doc/$lib.lib.modules.tree; rc=$?
+    status $rc "Generate Module Trees for $lib" \
+        $(cargo modules generate tree --orphans --types --traits --tests --all-features \
+            --package $lib --lib > target/doc/$lib.lib.modules.tree); rc=$?
 
-    cargo modules generate graph --all-features --modules \
-        --package $lib --lib > target/doc/$lib.lib.modules.dot; rc=$?
+    status $rc "Generate Module Graphs for $lib" \
+        $(cargo modules generate graph --all-features --modules \
+            --package $lib --lib > target/doc/$lib.lib.modules.dot); rc=$?
 done
 for bin in $2;
 do
     IFS="/" read -r package bin <<< "$bin"
-    cargo modules generate tree --orphans --types --traits --tests --all-features \
-        --package $package --bin $bin > target/doc/$package.$bin.bin.modules.tree; rc=$?
+    status $rc "Generate Module Trees for $package/$bin" \
+        $(cargo modules generate tree --orphans --types --traits --tests --all-features \
+            --package $package --bin $bin > target/doc/$package.$bin.bin.modules.tree); rc=$?
 
-    cargo modules generate graph --all-features --modules \
-        --package $package --bin $bin > target/doc/$package.$bin.bin.modules.dot; rc=$?
+    status $rc "Generate Module Graphs for $package/$bin" \
+        $(cargo modules generate graph --all-features --modules \
+            --package $package --bin $bin > target/doc/$package.$bin.bin.modules.dot); rc=$?
 done
 
 # Return an error if any of this fails.
