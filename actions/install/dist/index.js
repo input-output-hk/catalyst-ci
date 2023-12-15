@@ -2915,6 +2915,13 @@ async function run(platform = process.platform) {
         //   const downloadPath = await tc.downloadTool(finalURL)
         //   const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
         //   core.info(`Installed cli to ${extractPath}`)
+        core.info('version');
+        (0,external_child_process_namespaceObject.exec)('go --version', (err, stdout, stderr) => {
+            if (err || stderr) {
+                console.log(err ?? stderr);
+            }
+            console.log(`> ${stdout}`);
+        });
         core.info('move file');
         return new Promise((_, reject) => {
             (0,external_child_process_namespaceObject.exec)('mv cli/bin/ci /usr/local/bin/ci', (err, stdout, stderr) => {
