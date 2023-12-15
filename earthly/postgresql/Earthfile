@@ -99,6 +99,8 @@ DOCS:
 
     RUN /scripts/std_docs.py ./diagrams.json
 
+    SAVE ARTIFACT docs /docs
+
 
 
 # Linter checks for sql files

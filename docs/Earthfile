@@ -8,6 +8,9 @@ src:
     # Now copy into that any artifacts we pull from the builds.
     COPY --dir ../+repo-docs/repo includes
 
+    # Copy docs we build in the postgres example.
+    COPY --dir ../examples/postgresql+build/docs src/appendix/built_docs/postgresql
+
 
 # Build the docs here.
 docs:
