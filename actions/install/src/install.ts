@@ -1,11 +1,11 @@
 import * as core from '@actions/core'
-import * as tc from '@actions/tool-cache'
-import * as github from '@actions/github'
+// import * as tc from '@actions/tool-cache'
+// import * as github from '@actions/github'
 import { exec } from 'child_process'
 
-const assetName = 'cli-linux-amd64.tar.gz'
-const repoOwner = 'input-output-hk'
-const repoName = 'catalyst-ci'
+// const assetName = 'cli-linux-amd64.tar.gz'
+// const repoOwner = 'input-output-hk'
+// const repoName = 'catalyst-ci'
 
 export async function run(
   platform: NodeJS.Process['platform'] = process.platform
@@ -54,17 +54,14 @@ export async function run(
     //   const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
     //   core.info(`Installed cli to ${extractPath}`)
     core.info('move file')
-    await exec(
-      'mv cli/bin/ci /usr/local/bin/ci',
-      (err, stdout, stderr) => {
+    return new Promise((_, reject) => {
+      exec('mv cli/bin/ci /usr/local/bin/ci', (err, stdout, stderr) => {
         if (err || stderr) {
-          console.error(`exec error: ${err}`)
-          return
+          reject(new Error(err ? err.message : stderr))
         }
-
         console.log(`> ${stdout}`)
-      }
-    )
+      })
+    })
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
@@ -74,6 +71,6 @@ export async function run(
   }
 }
 
-function isSemVer(version: string): boolean {
-  return /^\d+\.\d+\.\d+$/.test(version)
-}
+// function isSemVer(version: string): boolean {
+//   return /^\d+\.\d+\.\d+$/.test(version)
+// }
