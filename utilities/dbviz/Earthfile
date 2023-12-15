@@ -12,7 +12,7 @@ builder:
 
     DO ../../earthly/rust+SETUP --toolchain=rust-toolchain.toml
 
-    DO ../../earthly/rust+CP_SRC --src=".cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml src"
+    COPY --dir .cargo .config Cargo.* clippy.toml deny.toml rustfmt.toml src .
 
 # Internal: Run Project Checks - Use best architecture host tools.
 check-hosted:
