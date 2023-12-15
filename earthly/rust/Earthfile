@@ -41,7 +41,12 @@ rust-base:
             ripgrep \
             bash \
             colordiff \
-            graphviz
+            graphviz \
+            fontconfig \
+            ttf-liberation
+
+    # Fix up font cache
+    RUN fc-cache -f
 
     # Make sure we have the clippy linter.
     RUN rustup component add clippy

@@ -14,6 +14,8 @@ deps:
     RUN apk add --no-cache \    
         bash \
         graphviz \
+        fontconfig \
+        ttf-liberation \
         curl \
         zlib-dev \
         jpeg-dev \
@@ -30,7 +32,10 @@ deps:
         tiff-dev \
         tk-dev \
         tcl-dev  \
-        git       
+        git
+
+    # Fix up font cache
+    RUN fc-cache -f
 
     # Install poetry and our python dependencies.
     DO ../python+BUILDER
