@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cspell: words dbmigrations dbviz dbhost Tsvg
+# cspell: words dbmigrations dbviz dbhost dbuser dbuserpw Tsvg
 
 from typing import Optional
 import python.cli as cli
@@ -253,19 +253,30 @@ class Migrations:
         else:
             table_description_wrap = ""
 
-        return cli.run(
+        res = cli.run(
             f"dbviz -d {self.args.dbname}"
             + f" -h {self.args.dbhost}"
+            + f" -u {self.args.dbuser}"
+            + f" -p {self.args.dbuserpw}"
             + f"{title}"
             + f"{included_tables}"
             + f"{excluded_tables}"
             + f"{comments}"
             + f"{column_description_wrap}"
             + f"{table_description_wrap}"
-            + f" | /usr/bin/dot -Tsvg -o {filename}",
+            + f" > {filename}.dot",
             name=f"Generate Schema Diagram: {name}",
-            # verbose=True,
+            verbose=True
         )
+
+        if res.ok:
+            cli.run(
+                f"dot -Tsvg {filename}.dot -o {filename}",
+                name=f"Render Schema Diagram to SVG: {name}",
+                verbose=True,
+            )
+
+        return res
 
     def full_schema_diagram(self) -> cli.Result:
         # Create a full Schema Diagram.
@@ -344,12 +355,14 @@ class Migrations:
                 if os.path.exists(f"docs/migration-{version}.svg"):
                     markdown_file.write('??? example "Schema Diagram"\n\n')
                     markdown_file.write(
-                        f'    ![Migration {migration.migration_name}]'+
-                        f'(./migration-{version}.svg "{migration.migration_name}")\n\n'
+                        f"    ![Migration {migration.migration_name}]"
+                        + f'(./migration-{version}.svg "{migration.migration_name}")\n\n'
                     )
 
                 markdown_file.write('??? abstract "Schema Definition"\n\n')
-                markdown_file.write(indent(f"```postgres\n{sql_data}\n```", "    ") + "\n\n")
+                markdown_file.write(
+                    indent(f"```postgres\n{sql_data}\n```", "    ") + "\n\n"
+                )
 
         print("Markdown file created successfully at: {}".format(file_path))
 
