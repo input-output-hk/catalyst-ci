@@ -97,7 +97,7 @@ var _ = Describe("FileScanner", func() {
 				},
 			}
 		}
-		DescribeTable("when Earthfile contain valid docker targets",
+		DescribeTable("when Earthfile the target",
 			func(targeInput string, targetInFile string) {
 				setup(targetInFile)
 				fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
@@ -110,7 +110,7 @@ var _ = Describe("FileScanner", func() {
 			Entry("target in file is 'docker'", "docker", "docker"),
 			Entry("target in file is 'docker-[a-z0-9]'", "docker-*", "docker-test"),
 		)
-		DescribeTable("when Earthfile contain invalid docker target or no target",
+		DescribeTable("when Earthfile contain no target",
 			func(target string) {
 				setup(target)
 				fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
