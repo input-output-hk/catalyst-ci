@@ -2916,7 +2916,7 @@ async function run(platform = process.platform) {
         //   const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
         //   core.info(`Installed cli to ${extractPath}`)
         core.info('install');
-        await (0,external_child_process_namespaceObject.exec)('go install github.com/input-output-hk/catalyst-ci/ci@f0e13bf0e2b8357467d2c8db7a675518dd619043', (err, stdout, stderr) => {
+        await (0,external_child_process_namespaceObject.exec)('go install github.com/input-output-hk/catalyst-ci/cli@f0e13bf0e2b8357467d2c8db7a675518dd619043', (err, stdout, stderr) => {
             if (err || stderr) {
                 console.log(err ?? stderr);
             }
