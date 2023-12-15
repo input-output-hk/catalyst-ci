@@ -3,9 +3,11 @@ package scanners
 // cspell: words afero
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/input-output-hk/catalyst-ci/cli/pkg"
 	"github.com/spf13/afero"
@@ -30,10 +32,7 @@ func (f *FileScanner) Scan() ([]pkg.Earthfile, error) {
 }
 
 func (f *FileScanner) ScanForTarget(target string) ([]pkg.Earthfile, error) {
-	// Should start with given target.
-	// Allowing an optional hyphen followed by one or more lowercase letters or numbers
-	regexPattern := "^" + regexp.QuoteMeta(target) + "(?:-[a-z0-9]+)?$"
-
+	regexPattern := getTargetRegex(target)
 	r, _ := regexp.Compile(regexPattern)
 
 	earthfiles, err := f.scan(func(e pkg.Earthfile) (bool, error) {
@@ -50,6 +49,18 @@ func (f *FileScanner) ScanForTarget(target string) ([]pkg.Earthfile, error) {
 		return nil, err
 	}
 	return earthfiles, nil
+}
+
+func getTargetRegex(target string) string {
+	// If target ends with -*
+	if strings.HasSuffix(target, "-*") {
+		// Should start with given target
+		// followed by hyphen and followed by one or more lowercase letters or numbers
+		return fmt.Sprintf("^%s(?:-[a-z0-9]+)?$", regexp.QuoteMeta(target[:len(target)-2]))
+	}
+
+	// Match the exact target
+	return fmt.Sprintf("^%s$", regexp.QuoteMeta(target))
 }
 
 func (f *FileScanner) scan(

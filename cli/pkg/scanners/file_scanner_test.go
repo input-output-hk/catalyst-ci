@@ -98,18 +98,17 @@ var _ = Describe("FileScanner", func() {
 			}
 		}
 		DescribeTable("when Earthfile contain valid docker targets",
-			func(target string) {
-				setup(target)
+			func(targeInput string, targetInFile string) {
+				setup(targetInFile)
 				fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
-				earthfiles, err := fScanner.ScanForTarget("docker")
+				earthfiles, err := fScanner.ScanForTarget(targeInput)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(earthfiles).To(HaveLen(1))
 				Expect(earthfiles[0].Path).To(Equal("/test/Earthfile"))
 
 			},
-			Entry("target in file is 'docker'", "docker"),
-			Entry("target in file is 'docker-<a-z>'", "docker-test"),
-			Entry("target in file is 'docker-<1-9>'", "docker-2test"),
+			Entry("target in file is 'docker'", "docker", "docker"),
+			Entry("target in file is 'docker-[a-z0-9]'", "docker-*", "docker-test"),
 		)
 		DescribeTable("when Earthfile contain invalid docker target or no target",
 			func(target string) {
@@ -120,10 +119,7 @@ var _ = Describe("FileScanner", func() {
 				Expect(earthfiles).To(BeEmpty())
 
 			},
-			Entry("target in file doesn't start with docker", "testdocker"),
-			Entry("target in file start with docker with hyphen but not followed by one or more lowercase letters or numbers ", "docker-"),
-			Entry("target in file start with docker with hyphen followed by special character", "docker-@"),
-			Entry("target in file start with docker with hyphen followed capital letter", "docker-TEST"),
+			Entry("target in file doesn't match but contain the word docker", "testdocker"),
 			Entry("no match target", "other"),
 		)
 	})
