@@ -80,7 +80,6 @@ def process_sql_files(directory):
 
     migrations = {}
     largest_version = 0
-    clean_sql = ""
     title = None
     table_names = []
     included_tables = None
@@ -90,6 +89,7 @@ def process_sql_files(directory):
     table_description_wrap = None
 
     for filename in os.listdir(directory):
+        clean_sql = ""
         match = re.match(file_pattern, filename)
         if match:
             version = int(match.group(1))
