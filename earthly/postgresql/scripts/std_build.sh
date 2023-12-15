@@ -52,7 +52,6 @@ done < <(find ./seed/* -maxdepth 1 -type d -print0 | sort -z) || true
 status_and_exit "DB Stop" \
     stop_pgsql --dbpath="/tmp/data"
 
-
 # We DO NOT want the tmp db in the final image, clean it up.
 rm -rf /tmp/data
 

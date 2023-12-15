@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words pgsql dbreadytimeout dbconn psql 
+# cspell: words pgsql dbreadytimeout dbconn psql
 
 source "/scripts/include/colors.sh"
 source "/scripts/include/assert.sh"

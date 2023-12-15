@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words pgsql dbreadytimeout dbconn psql 
+# cspell: words pgsql dbreadytimeout dbconn psql
 
 source "/scripts/include/colors.sh"
 source "/scripts/include/assert.sh"
@@ -22,7 +22,6 @@ if ! res=$(psql "${dbconn}" -c "SELECT * FROM users"); then
     rc=1
 fi
 
-
 if [[ ${rc} -eq 0 ]]; then
     expected=$(printf "%s\n%s\n%s\n" \
         " name | age " \
@@ -33,7 +32,6 @@ if [[ ${rc} -eq 0 ]]; then
         assert_eq "${expected}" "${res}"
     rc=$?
 fi
-
 
 status 0 "DB Query with Empty DB: SELECT * FROM users" \
     [ "${rc}" == 0 ]

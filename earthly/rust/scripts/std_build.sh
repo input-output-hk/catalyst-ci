@@ -36,7 +36,8 @@ rc=$?
 
 ## Check if all Self contained tests pass (Test that need no external resources).
 status $rc "Checking Self contained Unit tests all pass" \
-    cargo testunit; rc=$?
+    cargo testunit
+rc=$?
 
 ## Check if all documentation tests pass.
 status "${rc}" "Checking Documentation tests all pass" \
@@ -50,34 +51,39 @@ rc=$?
 
 ## Generate dependency graphs
 status $rc "Generating workspace dependency graphs" \
-    $(cargo depgraph --workspace-only --dedup-transitive-deps > target/doc/workspace.dot); rc=$?
+    $(cargo depgraph --workspace-only --dedup-transitive-deps > target/doc/workspace.dot)
+rc=$?
 status $rc "Generating full dependency graphs" \
-    $(cargo depgraph --dedup-transitive-deps > target/doc/full.dot); rc=$?
+    $(cargo depgraph --dedup-transitive-deps > target/doc/full.dot)
+rc=$?
 status $rc "Generating all dependency graphs" \
-    $(cargo depgraph --all-deps --dedup-transitive-deps > target/doc/all.dot); rc=$?
+    $(cargo depgraph --all-deps --dedup-transitive-deps > target/doc/all.dot)
+rc=$?
 
 export NO_COLOR=1
 ## Generate Module Trees for documentation purposes.
-for lib in $1;
-do
+for lib in $1; do
     status $rc "Generate Module Trees for $lib" \
         $(cargo modules generate tree --orphans --types --traits --tests --all-features \
-            --package $lib --lib > target/doc/$lib.lib.modules.tree); rc=$?
+            --package $lib --lib > target/doc/$lib.lib.modules.tree)
+    rc=$?
 
     status $rc "Generate Module Graphs for $lib" \
         $(cargo modules generate graph --all-features --modules \
-            --package $lib --lib > target/doc/$lib.lib.modules.dot); rc=$?
+            --package $lib --lib > target/doc/$lib.lib.modules.dot)
+    rc=$?
 done
-for bin in $2;
-do
+for bin in $2; do
     IFS="/" read -r package bin <<< "$bin"
     status $rc "Generate Module Trees for $package/$bin" \
         $(cargo modules generate tree --orphans --types --traits --tests --all-features \
-            --package $package --bin $bin > target/doc/$package.$bin.bin.modules.tree); rc=$?
+            --package $package --bin $bin > target/doc/$package.$bin.bin.modules.tree)
+    rc=$?
 
     status $rc "Generate Module Graphs for $package/$bin" \
         $(cargo modules generate graph --all-features --modules \
-            --package $package --bin $bin > target/doc/$package.$bin.bin.modules.dot); rc=$?
+            --package $package --bin $bin > target/doc/$package.$bin.bin.modules.dot)
+    rc=$?
 done
 
 # Return an error if any of this fails.

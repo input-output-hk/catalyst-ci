@@ -121,8 +121,8 @@ function init_db() {
         return 1
     fi
 
-    echo "include_if_exists ${data_dir}/pg_hba.extra.conf" >>"${data_dir}/pg_hba.conf"
-    echo "include_if_exists /sql/pg_hba.extra.conf" >>"${data_dir}/pg_hba.conf"
+    echo "include_if_exists ${data_dir}/pg_hba.extra.conf" >> "${data_dir}/pg_hba.conf"
+    echo "include_if_exists /sql/pg_hba.extra.conf" >> "${data_dir}/pg_hba.conf"
 
     return 0
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # cspell: words REINIT PGHOST PGPORT PGUSER PGPASSWORD psql initdb isready dotglob
-# cspell: words dbhost dbdesc dbdescription dbpath pgsql 
+# cspell: words dbhost dbdesc dbdescription dbpath pgsql
 
 # ---------------------------------------------------------------
 # Entrypoint script for database container
