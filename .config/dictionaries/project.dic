@@ -11,6 +11,7 @@ Earthfiles
 errchkjson
 extldflags
 fontawesome
+fontconfig
 ginkgolinter
 gitops
 glightbox
