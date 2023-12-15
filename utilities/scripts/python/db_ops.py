@@ -169,14 +169,16 @@ class DBOps:
             + f' -v dbUser="{self.args.dbuser}"'
             + f' -v dbUserPw="{self.args.dbuserpw}"',
             name="Setup Database",
+            verbose=True
         )
 
     def migrate_schema(self) -> cli.Result:
         # Run schema migrations
         return cli.run(
-            f"DATABASE_URL={self.superuser_connection()}"
+            f"DATABASE_URL={self.user_connection()}"
             + f" refinery migrate -e DATABASE_URL"
             + f" -c {self.args.dbrefinerytoml} "
             + f" -p {self.args.dbmigrations}",
             name="Migrate Schema",
+            verbose=True,
         )
