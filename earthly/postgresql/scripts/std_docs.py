@@ -80,16 +80,17 @@ def process_sql_files(directory):
 
     migrations = {}
     largest_version = 0
-    title = None
-    table_names = []
-    included_tables = None
-    excluded_tables = None
-    comments = False
-    column_description_wrap = None
-    table_description_wrap = None
 
     for filename in os.listdir(directory):
         clean_sql = ""
+        title = None
+        table_names = []
+        included_tables = None
+        excluded_tables = None
+        comments = False
+        column_description_wrap = None
+        table_description_wrap = None
+        
         match = re.match(file_pattern, filename)
         if match:
             version = int(match.group(1))
@@ -227,7 +228,7 @@ class Migrations:
             title = f' --title "{title}"'
 
         if included_tables and len(included_tables) > 0:
-            included_tables = " -i " + '"' + ",".join(included_tables) + '"'
+            included_tables = " -i " + " ".join(included_tables)
         else:
             included_tables = ""
 
@@ -266,14 +267,14 @@ class Migrations:
             + f"{table_description_wrap}"
             + f" > {filename}.dot",
             name=f"Generate Schema Diagram: {name}",
-            verbose=True
+            #verbose=True
         )
 
         if res.ok:
             cli.run(
                 f"dot -Tsvg {filename}.dot -o {filename}",
                 name=f"Render Schema Diagram to SVG: {name}",
-                verbose=True,
+                #verbose=True,
             )
 
         return res
