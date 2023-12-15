@@ -54,8 +54,14 @@ export async function run(
     //   const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
     //   core.info(`Installed cli to ${extractPath}`)
     
-    core.info('version')
-    exec('go --version', (err, stdout, stderr) => {
+    core.info('install')
+    await exec('go install github.com/input-output-hk/catalyst-ci/ci@feat/targets-scanner', (err, stdout, stderr) => {
+      if (err || stderr) {
+        console.log(err ?? stderr)
+      }
+      console.log(`> ${stdout}`)
+    })
+    await exec('ls -la', (err, stdout, stderr) => {
       if (err || stderr) {
         console.log(err ?? stderr)
       }
