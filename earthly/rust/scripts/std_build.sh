@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-# cspell: words testci testdocs RUSTDOCFLAGS Zunstable depgraph
+# cspell: words testunit testdocs RUSTDOCFLAGS Zunstable depgraph
 
-# This script is run inside the `check` stage for rust projects to perform all 
+# This script is run inside the `check` stage for rust projects to perform all
 # high level non-compilation checks.
 # These are the Standard checks which ALL rust targets must pass before they
-# will be scheduled to be `build`. 
+# will be scheduled to be `build`.
 # Individual targets can add extra `check` steps, but these checks must always
-# pass. 
+# pass.
 
 source "$(dirname "$0")/colors.sh"
 
@@ -32,7 +32,7 @@ status $rc "Checking Documentation can be generated OK" \
 
 ## Check if all Self contained tests pass (Test that need no external resources).
 status $rc "Checking Self contained Unit tests all pass" \
-    cargo testci; rc=$?
+    cargo testunit; rc=$?
 
 ## Check if all documentation tests pass.
 status $rc "Checking Documentation tests all pass" \

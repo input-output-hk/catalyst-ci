@@ -9,7 +9,7 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
-<!-- cspell: words USERARCH TARGETARCH toolsets fmtchk stdcfgs rustfmt nextest testci testdocs depgraph -->
+<!-- cspell: words USERARCH TARGETARCH toolsets fmtchk stdcfgs rustfmt nextest testunit testdocs depgraph -->
 
 ## Introduction
 
@@ -144,7 +144,7 @@ The same approach we will see for the another targets of this guide.
 # Build the service.
 hosted-build:
     FROM +builder
- 
+
     DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
 
     DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
@@ -155,7 +155,7 @@ hosted-build:
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 all-hosts-build:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-build
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
 # Run build using the most efficient host tooling
 # CI Automated Entry point.
@@ -198,7 +198,7 @@ look at `./earthly/rust/stdcfgs/config.toml`)
 Checking all Clippy Lints in the workspace.
 3. `cargo docs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation can be generated OK.
-4. `cargo testci` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+4. `cargo testunit` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Self contained Unit tests all pass.
 5. `cargo testdocs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation tests all pass.
