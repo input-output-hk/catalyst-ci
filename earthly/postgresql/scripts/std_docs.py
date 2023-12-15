@@ -396,7 +396,7 @@ def main():
         results = migrations.create_diagrams(results)
 
     if res.ok():
-        migrations.create_markdown_file("/tmp/migrations.md")
+        migrations.create_markdown_file("docs/migrations.md")
         # cli.run("cat /tmp/migrations.md", verbose=True)
 
     results.print()

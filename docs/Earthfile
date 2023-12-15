@@ -9,8 +9,7 @@ src:
     COPY --dir ../+repo-docs/repo includes
 
     # Copy docs we build in the postgres example.
-    COPY --dir ../examples/postgresql+build/docs src/appendix/built_docs/postgresql
-
+    COPY --dir ../examples/postgresql+build/docs src/appendix/examples/built_docs/postgresql
 
 # Build the docs here.
 docs:
