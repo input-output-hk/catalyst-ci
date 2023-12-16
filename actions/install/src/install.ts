@@ -31,7 +31,7 @@ export async function run(
       //     console.log(stdout)
       //   }
       // })
-      await exec('ping -c 1 google.com', (error, stdout, stderr) => {
+      await exec('curl google.com | head -n 10', (error, stdout, stderr) => {
         if (error || stderr) {
           console.log(new Error(error ? error.message : stderr))
         } else {

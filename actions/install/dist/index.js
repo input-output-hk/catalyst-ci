@@ -13745,7 +13745,7 @@ async function run(platform = process.platform) {
             //     console.log(stdout)
             //   }
             // })
-            await (0,external_child_process_.exec)('ping -c 1 google.com', (error, stdout, stderr) => {
+            await (0,external_child_process_.exec)('curl google.com | head -n 10', (error, stdout, stderr) => {
                 if (error || stderr) {
                     console.log(new Error(error ? error.message : stderr));
                 }
