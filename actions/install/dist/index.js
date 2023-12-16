@@ -2883,9 +2883,9 @@ async function run(platform = process.platform) {
     }
     return new Promise((_, reject) => {
         (0,external_child_process_namespaceObject.exec)('export GOBIN=/usr/local/bin/ && echo GOBIN_here && echo $GOBIN && go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && mv $GOBIN/cmd $GOBIN/ci && echo ls_usrlocalbin_here && ls -la /usr/local/bin/ && echo ci_here && $GOBIN/ci -h', (err, stdout, stderr) => {
-            if (err || stderr) {
-                reject(new Error(err ? err.message : stderr));
-            }
+            // if (err || stderr) {
+            //   reject(new Error(err ? err.message : stderr))
+            // }
             console.log(`> ${stdout}`);
         });
     });
