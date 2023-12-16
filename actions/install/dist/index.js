@@ -13737,7 +13737,7 @@ async function run(platform = process.platform) {
         core.info(`> local ${local}`);
         if (local === 'true') {
             core.info('Local flag is used');
-            (0,external_child_process_.exec)('cd cli && env GOOS=linux GOARCH=amd64 go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (error, stdout, stderr) => {
+            await (0,external_child_process_.exec)('cd cli && go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (error, stdout, stderr) => {
                 if (error || stderr) {
                     console.log(new Error(error ? error.message : stderr));
                 }
@@ -13745,8 +13745,9 @@ async function run(platform = process.platform) {
                     console.log(stdout);
                 }
             });
+            core.info("Move file");
             return new Promise((_, reject) => {
-                (0,external_child_process_.exec)('', (err, stdout, stderr) => {
+                (0,external_child_process_.exec)('mv cli/bin/ci /usr/local/bin', (err, stdout, stderr) => {
                     if (err || stderr) {
                         reject(new Error(err ? err.message : stderr));
                     }

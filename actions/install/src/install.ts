@@ -23,16 +23,18 @@ export async function run(
     core.info(`> local ${local}`)
     if (local === 'true') {
       core.info('Local flag is used')
-      exec('cd cli && env GOOS=linux GOARCH=amd64 go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (error, stdout, stderr) => {
+      await exec('cd cli && go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (error, stdout, stderr) => {
         if (error || stderr) {
           console.log(new Error(error ? error.message : stderr))
         } else {
           console.log(stdout)
         }
       })
+
+      core.info("Move file")
       return new Promise((_, reject) => {
         exec(
-          '',
+          'mv cli/bin/ci /usr/local/bin',
           (err, stdout, stderr) => {
             if (err || stderr) {
               reject(new Error(err ? err.message : stderr))
