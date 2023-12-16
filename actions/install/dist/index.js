@@ -13737,7 +13737,7 @@ async function run(platform = process.platform) {
         core.info(`> local ${local}`);
         if (local === 'true') {
             core.info('Local flag is used');
-            (0,external_child_process_.exec)('cd cli && go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (error, stdout, stderr) => {
+            (0,external_child_process_.exec)('go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (error, stdout, stderr) => {
                 if (error || stderr) {
                     console.log(new Error(error ? error.message : stderr));
                 }

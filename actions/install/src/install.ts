@@ -23,7 +23,7 @@ export async function run(
     core.info(`> local ${local}`)
     if (local === 'true') {
       core.info('Local flag is used')
-      exec('cd cli && go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (error, stdout, stderr) => {
+      exec('go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (error, stdout, stderr) => {
         if (error || stderr) {
           console.log(new Error(error ? error.message : stderr))
         } else {
