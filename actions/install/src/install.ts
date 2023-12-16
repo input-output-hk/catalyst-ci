@@ -25,7 +25,7 @@ export async function run(
       core.info('Local flag is used')
       return new Promise((_, reject) => {
         exec(
-          'cd cli && go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go && mv bin/ci /usr/local/bin/ci',
+          'cd cli && go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go && ls && mv bin/ci /usr/local/bin/ci',
           (err, stdout, stderr) => {
             if (err || stderr) {
               reject(new Error(err ? err.message : stderr))
