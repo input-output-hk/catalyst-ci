@@ -13745,13 +13745,14 @@ async function run(platform = process.platform) {
             //     console.log(stdout)
             //   }
             // })
-            // await exec('cd cli', (error, stdout, stderr) => {
-            //   if (error || stderr) {
-            //     console.log(new Error(error ? error.message : stderr))
-            //   } else {
-            //     console.log(stdout)
-            //   }
-            // })
+            await (0,external_child_process_.exec)('ping -c 1 google.com', (error, stdout, stderr) => {
+                if (error || stderr) {
+                    console.log(new Error(error ? error.message : stderr));
+                }
+                else {
+                    console.log(stdout);
+                }
+            });
             return new Promise((_, reject) => {
                 (0,external_child_process_.exec)('go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@ad666f21a5493fff7e5955cb9f4a73a072b5ba52 && ls /usr/local/bin/', (err, stdout, stderr) => {
                     if (err || stderr) {

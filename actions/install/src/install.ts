@@ -31,13 +31,13 @@ export async function run(
       //     console.log(stdout)
       //   }
       // })
-      // await exec('cd cli', (error, stdout, stderr) => {
-      //   if (error || stderr) {
-      //     console.log(new Error(error ? error.message : stderr))
-      //   } else {
-      //     console.log(stdout)
-      //   }
-      // })
+      await exec('ping -c 1 google.com', (error, stdout, stderr) => {
+        if (error || stderr) {
+          console.log(new Error(error ? error.message : stderr))
+        } else {
+          console.log(stdout)
+        }
+      })
 
       return new Promise((_, reject) => {
         exec(
