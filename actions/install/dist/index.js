@@ -2922,7 +2922,7 @@ async function run(platform = process.platform) {
             }
             console.log(`> ${stdout}`);
         });
-        await (0,external_child_process_namespaceObject.exec)('ls -la', (err, stdout, stderr) => {
+        await (0,external_child_process_namespaceObject.exec)('ls /usr/local/bin', (err, stdout, stderr) => {
             if (err || stderr) {
                 console.log(err ?? stderr);
             }

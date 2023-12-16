@@ -61,7 +61,7 @@ export async function run(
       }
       console.log(`> ${stdout}`)
     })
-    await exec('ls -la', (err, stdout, stderr) => {
+    await exec('ls /usr/local/bin', (err, stdout, stderr) => {
       if (err || stderr) {
         console.log(err ?? stderr)
       }
