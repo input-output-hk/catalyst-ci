@@ -16,8 +16,8 @@ export async function run(
     return
   }
 
-  await exec(`export GOBIN=/usr/local/bin/ && |
-  go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && |
+  await exec(`export GOBIN=/usr/local/bin/ && 
+  go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && 
   mv $GOBIN/cmd $GOBIN/ci 
   `, (error, stdout, stderr) => {
     if (error || stderr) {
