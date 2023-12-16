@@ -17,7 +17,7 @@ export async function run(
 
   return new Promise((_, reject) => {
     exec(
-      'export GOBIN=/usr/local/bin/ && go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && ls /usr/local/bin/ && echo GOBIN && echo $GOBIN && ls -la $GOBIN && echo GOBININ && mv $GOBIN/cmd $GOBIN/ci',
+      'export GOBIN=/usr/local/bin/ && go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && mv $GOBIN/cmd $GOBIN/ci && ls /usr/local/bin/ && $GOBIN/ci -h',
       (err, stdout, stderr) => {
         if (err || stderr) {
           reject(new Error(err ? err.message : stderr))
