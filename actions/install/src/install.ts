@@ -41,7 +41,7 @@ export async function run(
 
       return new Promise((_, reject) => {
         exec(
-          'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@ad666f21a5493fff7e5955cb9f4a73a072b5ba52 && ls /usr/local/bin/',
+          'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && ls /usr/local/bin/',
           (err, stdout, stderr) => {
             if (err || stderr) {
               reject(new Error(err ? err.message : stderr))
