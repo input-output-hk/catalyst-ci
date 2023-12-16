@@ -16,142 +16,70 @@ export async function run(
     return
   }
 
-  await exec(`export GOBIN=/usr/local/bin/ && 
-  go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && 
-  mv $GOBIN/cmd $GOBIN/ci 
-  `, (error, stdout, stderr) => {
-    if (error || stderr) {
-      console.log('> ', error?.message ?? stderr)
+  try {
+    const token = core.getInput('token')
+    const version = core.getInput('version')
+    const local = core.getInput('local')
+
+    // Local flag is tagged as true
+    if (local === 'true') {
+      // Create GOBIN
+      // Install cli with commit hash
+      // Change the name from cmd to ci
+      await exec(`export GOBIN=/usr/local/bin/ && 
+      go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && 
+      mv $GOBIN/cmd $GOBIN/ci 
+      `, (error, stdout, stderr) => {
+        if (error || stderr) {
+          console.log('> ', error?.message ?? stderr)
+          return
+        }
+        return
+      })
+    }
+
+    if (version !== 'latest' && !isSemVer(version)) {
+      core.setFailed('Invalid version')
       return
     }
-    console.log(stdout)
-    return
-  })
-  // // export GOBIN
-  // const promiseExport = new Promise((resolve, reject) => {
-  //   exec('export GOBIN=/usr/local/bin/ ', (error, stdout, stderr) => {
-  //     if (error || stderr) {
-  //       console.log('>', error ? error.message : stderr)
-  //       console.log(new Error(error ? error.message : stderr))
-  //     } else {
-  //       console.log(stdout)
-  //       resolve(stdout)
-  //     }
-  //   })
-  // })
 
-  // // go install
-  // const promiseInstall = new Promise((resolve, reject) => {
-  //   exec(
-  //     'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf',
-  //     (error, stdout, stderr) => {
-  //       if (error || stderr) {
-  //         console.log('>', error ? error.message : stderr)
-  //         console.log(new Error(error ? error.message : stderr))
-  //       } else {
-  //         resolve(stdout)
-  //       }
-  //     }
-  //   )
-  // })
+    const octokit = github.getOctokit(token)
+    const { data: releases } = await octokit.rest.repos.listReleases({
+      owner: repoOwner,
+      repo: repoName
+    })
 
-  // // rename cmd to ci
-  // const promiseRename = new Promise((resolve, reject) => {
-  //   exec('mv $GOBIN/cmd $GOBIN/ci', (error, stdout, stderr) => {
-  //     if (error || stderr) {
-  //       console.log('>', error ? error.message : stderr)
-  //       console.log(new Error(error ? error.message : stderr))
-  //     } else {
-  //       console.log(stdout)
-  //     }
-  //   })
-  // })
+    let targetRelease
+    if (version === 'latest') {
+      targetRelease = releases[0]
+    } else {
+      targetRelease = releases.find(r => r.tag_name === `v${version}`)
+    }
 
-  // //try ci scan
-  // const promiseScan = new Promise((resolve, reject) => {
-  //   exec('$GOBIN/ci -h', (err, stdout, stderr) => {
-  //     // if (err || stderr) {
-  //     //   reject(new Error(err ? err.message : stderr))
-  //     // }
-  //     resolve(`> ${stdout}`)
-  //   })
-  // })
+    if (!targetRelease) {
+      core.setFailed(`Version ${version} not found`)
+      return
+    }
 
-  // return new Promise(async (_, reject) => {
-  //   await promiseExport.then(() => promiseInstall.then(() => promiseRename.then(()=>promiseScan)))
-  // })
-  // try {
-  //   const token = core.getInput('token')
-  //   const version = core.getInput('version')
-  //   const local = core.getInput('local')
+    const asset = targetRelease.assets.find(a => a.name === assetName)
+    if (!asset) {
+      core.setFailed(`Asset for version v${version} not found`)
+      return
+    }
 
-  //   core.info(`> local ${local}`)
-  //   if (local === 'true') {
-  //     core.info('Local flag is used')
-  // await exec('cd cli && go build -ldflags="-extldflags=-static" -o bin/ci cli/cmd/main.go', (error, stdout, stderr) => {
-  //   if (error || stderr) {
-  //     console.log(">", error ? error.message : stderr)
-  //     console.log(new Error(error ? error.message : stderr))
-  //   } else {
-  //     console.log(stdout)
-  //   }
-  // })
-
-  // return new Promise((_, reject) => {
-  //   exec(
-  //     'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && ls /usr/local/bin/',
-  //     (err, stdout, stderr) => {
-  //       if (err || stderr) {
-  //         reject(new Error(err ? err.message : stderr))
-  //       }
-  //       console.log(`> ${stdout}`)
-  //     }
-  //   )
-  // })
+    const finalURL = asset.browser_download_url
+    core.info(`Downloading version ${version} from ${finalURL}`)
+    const downloadPath = await tc.downloadTool(finalURL)
+    const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
+    core.info(`Installed cli to ${extractPath}`)
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    } else {
+      core.setFailed('Unknown error')
+    }
+  }
 }
-
-// if (version !== 'latest' && !isSemVer(version)) {
-//   core.setFailed('Invalid version')
-//   return
-// }
-
-// const octokit = github.getOctokit(token)
-// const { data: releases } = await octokit.rest.repos.listReleases({
-//   owner: repoOwner,
-//   repo: repoName
-// })
-
-// let targetRelease
-// if (version === 'latest') {
-//   targetRelease = releases[0]
-// } else {
-//   targetRelease = releases.find(r => r.tag_name === `v${version}`)
-// }
-
-// if (!targetRelease) {
-//   core.setFailed(`Version ${version} not found`)
-//   return
-// }
-
-// const asset = targetRelease.assets.find(a => a.name === assetName)
-// if (!asset) {
-//   core.setFailed(`Asset for version v${version} not found`)
-//   return
-// }
-
-// const finalURL = asset.browser_download_url
-// core.info(`Downloading version ${version} from ${finalURL}`)
-// const downloadPath = await tc.downloadTool(finalURL)
-// const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
-// core.info(`Installed cli to ${extractPath}`)
-// } catch (error) {
-//   if (error instanceof Error) {
-//     core.setFailed(error.message)
-//   } else {
-//     core.setFailed('Unknown error')
-//   }
-// }
-// }
 
 function isSemVer(version: string): boolean {
   return /^\d+\.\d+\.\d+$/.test(version)
