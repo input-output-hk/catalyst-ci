@@ -34,7 +34,7 @@ export async function run(
       core.info("Move file")
       return new Promise((_, reject) => {
         exec(
-          'ls && mv cli/bin/ci /usr/local/bin',
+          'ls cli && mv cli/bin/ci /usr/local/bin',
           (err, stdout, stderr) => {
             if (err || stderr) {
               reject(new Error(err ? err.message : stderr))
