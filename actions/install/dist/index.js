@@ -13733,8 +13733,9 @@ async function run(platform = process.platform) {
     try {
         const token = core.getInput('token');
         const version = core.getInput('version');
-        const isLocal = core.getInput('local') === 'true';
-        if (isLocal) {
+        const local = core.getInput('local');
+        core.info(`> local ${local}`);
+        if (local === 'true') {
             core.info('Local flag is used');
             return new Promise((_, reject) => {
                 (0,external_child_process_.exec)('cd cli && go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go && mv bin/ci /usr/local/bin/ci', (err, stdout, stderr) => {

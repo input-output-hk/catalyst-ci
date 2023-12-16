@@ -18,9 +18,10 @@ export async function run(
   try {
     const token = core.getInput('token')
     const version = core.getInput('version')
-    const isLocal = core.getInput('local') === 'true'
+    const local = core.getInput('local')
 
-    if (isLocal) {
+    core.info(`> local ${local}`)
+    if (local === 'true') {
       core.info('Local flag is used')
       return new Promise((_, reject) => {
         exec(
