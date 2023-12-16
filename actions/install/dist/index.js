@@ -2916,7 +2916,7 @@ async function run(platform = process.platform) {
         //   const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
         //   core.info(`Installed cli to ${extractPath}`)
         core.info('install');
-        await (0,external_child_process_namespaceObject.exec)('go install github.com/input-output-hk/catalyst-ci/cli@f0e13bf0e2b8357467d2c8db7a675518dd619043', (err, stdout, stderr) => {
+        await (0,external_child_process_namespaceObject.exec)('cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin  cmd/main.go', (err, stdout, stderr) => {
             if (err || stderr) {
                 console.log(err ?? stderr);
             }
@@ -2928,15 +2928,15 @@ async function run(platform = process.platform) {
             }
             console.log(`> ${stdout}`);
         });
-        core.info('move file');
-        return new Promise((_, reject) => {
-            (0,external_child_process_namespaceObject.exec)('mv cli/bin/ci /usr/local/bin/ci', (err, stdout, stderr) => {
-                if (err || stderr) {
-                    reject(new Error(err ? err.message : stderr));
-                }
-                console.log(`> ${stdout}`);
-            });
-        });
+        // core.info('move file')
+        // return new Promise((_, reject) => {
+        //   exec('mv cli/bin/ci /usr/local/bin/ci', (err, stdout, stderr) => {
+        //     if (err || stderr) {
+        //       reject(new Error(err ? err.message : stderr))
+        //     }
+        //     console.log(`> ${stdout}`)
+        //   })
+        // })
     }
     catch (error) {
         if (error instanceof Error) {
