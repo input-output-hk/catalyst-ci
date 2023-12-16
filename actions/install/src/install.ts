@@ -30,11 +30,18 @@ export async function run(
           console.log(stdout)
         }
       })
+      await exec('ls cli', (error, stdout, stderr) => {
+        if (error || stderr) {
+          console.log(new Error(error ? error.message : stderr))
+        } else {
+          console.log(stdout)
+        }
+      })
 
       core.info("Move file")
       return new Promise((_, reject) => {
         exec(
-          'ls cli && mv cli/bin/ci /usr/local/bin',
+          'ls /usr/local/bin',
           (err, stdout, stderr) => {
             if (err || stderr) {
               reject(new Error(err ? err.message : stderr))

@@ -13745,9 +13745,17 @@ async function run(platform = process.platform) {
                     console.log(stdout);
                 }
             });
+            await (0,external_child_process_.exec)('ls cli', (error, stdout, stderr) => {
+                if (error || stderr) {
+                    console.log(new Error(error ? error.message : stderr));
+                }
+                else {
+                    console.log(stdout);
+                }
+            });
             core.info("Move file");
             return new Promise((_, reject) => {
-                (0,external_child_process_.exec)('ls cli && mv cli/bin/ci /usr/local/bin', (err, stdout, stderr) => {
+                (0,external_child_process_.exec)('ls /usr/local/bin', (err, stdout, stderr) => {
                     if (err || stderr) {
                         reject(new Error(err ? err.message : stderr));
                     }
