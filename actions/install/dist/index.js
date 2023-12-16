@@ -2881,9 +2881,34 @@ async function run(platform = process.platform) {
         core.setFailed('This action only supports Linux runners');
         return;
     }
-    return new Promise(async (_, reject) => {
-        // export GOBIN
-        await (0,external_child_process_namespaceObject.exec)('export GOBIN=/usr/local/bin/ ', (error, stdout, stderr) => {
+    // export GOBIN
+    const promiseExport = new Promise((resolve, reject) => {
+        (0,external_child_process_namespaceObject.exec)('export GOBIN=/usr/local/bin/ ', (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.log('>', error ? error.message : stderr);
+                console.log(new Error(error ? error.message : stderr));
+            }
+            else {
+                console.log(stdout);
+                resolve(stdout);
+            }
+        });
+    });
+    // go install
+    const promiseInstall = new Promise((resolve, reject) => {
+        (0,external_child_process_namespaceObject.exec)('go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf', (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.log('>', error ? error.message : stderr);
+                console.log(new Error(error ? error.message : stderr));
+            }
+            else {
+                resolve(stdout);
+            }
+        });
+    });
+    // rename cmd to ci
+    const promiseRename = new Promise((resolve, reject) => {
+        (0,external_child_process_namespaceObject.exec)('mv $GOBIN/cmd $GOBIN/ci', (error, stdout, stderr) => {
             if (error || stderr) {
                 console.log('>', error ? error.message : stderr);
                 console.log(new Error(error ? error.message : stderr));
@@ -2892,32 +2917,18 @@ async function run(platform = process.platform) {
                 console.log(stdout);
             }
         });
-        // go install
-        await (0,external_child_process_namespaceObject.exec)('go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf', (error, stdout, stderr) => {
-            if (error || stderr) {
-                console.log('>', error ? error.message : stderr);
-                console.log(new Error(error ? error.message : stderr));
-            }
-            else {
-                console.log(stdout);
-            }
-        });
-        // rename cmd to ci
-        await (0,external_child_process_namespaceObject.exec)('mv $GOBIN/cmd $GOBIN/ci', (error, stdout, stderr) => {
-            if (error || stderr) {
-                console.log('>', error ? error.message : stderr);
-                console.log(new Error(error ? error.message : stderr));
-            }
-            else {
-                console.log(stdout);
-            }
-        });
-        await (0,external_child_process_namespaceObject.exec)('$GOBIN/ci -h', (err, stdout, stderr) => {
+    });
+    //try ci scan
+    const promiseScan = new Promise((resolve, reject) => {
+        (0,external_child_process_namespaceObject.exec)('$GOBIN/ci -h', (err, stdout, stderr) => {
             // if (err || stderr) {
             //   reject(new Error(err ? err.message : stderr))
             // }
-            console.log(`> ${stdout}`);
+            resolve(`> ${stdout}`);
         });
+    });
+    return new Promise(async (_, reject) => {
+        await promiseExport.then(() => promiseInstall.then(() => promiseRename.then(() => promiseScan)));
     });
     // try {
     //   const token = core.getInput('token')
