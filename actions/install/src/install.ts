@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
 import { exec } from 'child_process'
+import { stderr } from 'process'
 
 const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
@@ -15,59 +16,70 @@ export async function run(
     return
   }
 
-  // export GOBIN
-  const promiseExport = new Promise((resolve, reject) => {
-    exec('export GOBIN=/usr/local/bin/ ', (error, stdout, stderr) => {
-      if (error || stderr) {
-        console.log('>', error ? error.message : stderr)
-        console.log(new Error(error ? error.message : stderr))
-      } else {
-        console.log(stdout)
-        resolve(stdout)
-      }
-    })
+  await exec(`export GOBIN=/usr/local/bin/ && |
+  go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && |
+  mv $GOBIN/cmd $GOBIN/ci 
+  `, (error, stdout, stderr) => {
+    if (error || stderr) {
+      console.log('> ', error?.message ?? stderr)
+      return
+    }
+    console.log(stdout)
+    return
   })
+  // // export GOBIN
+  // const promiseExport = new Promise((resolve, reject) => {
+  //   exec('export GOBIN=/usr/local/bin/ ', (error, stdout, stderr) => {
+  //     if (error || stderr) {
+  //       console.log('>', error ? error.message : stderr)
+  //       console.log(new Error(error ? error.message : stderr))
+  //     } else {
+  //       console.log(stdout)
+  //       resolve(stdout)
+  //     }
+  //   })
+  // })
 
-  // go install
-  const promiseInstall = new Promise((resolve, reject) => {
-    exec(
-      'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf',
-      (error, stdout, stderr) => {
-        if (error || stderr) {
-          console.log('>', error ? error.message : stderr)
-          console.log(new Error(error ? error.message : stderr))
-        } else {
-          resolve(stdout)
-        }
-      }
-    )
-  })
+  // // go install
+  // const promiseInstall = new Promise((resolve, reject) => {
+  //   exec(
+  //     'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf',
+  //     (error, stdout, stderr) => {
+  //       if (error || stderr) {
+  //         console.log('>', error ? error.message : stderr)
+  //         console.log(new Error(error ? error.message : stderr))
+  //       } else {
+  //         resolve(stdout)
+  //       }
+  //     }
+  //   )
+  // })
 
-  // rename cmd to ci
-  const promiseRename = new Promise((resolve, reject) => {
-    exec('mv $GOBIN/cmd $GOBIN/ci', (error, stdout, stderr) => {
-      if (error || stderr) {
-        console.log('>', error ? error.message : stderr)
-        console.log(new Error(error ? error.message : stderr))
-      } else {
-        console.log(stdout)
-      }
-    })
-  })
+  // // rename cmd to ci
+  // const promiseRename = new Promise((resolve, reject) => {
+  //   exec('mv $GOBIN/cmd $GOBIN/ci', (error, stdout, stderr) => {
+  //     if (error || stderr) {
+  //       console.log('>', error ? error.message : stderr)
+  //       console.log(new Error(error ? error.message : stderr))
+  //     } else {
+  //       console.log(stdout)
+  //     }
+  //   })
+  // })
 
-  //try ci scan
-  const promiseScan = new Promise((resolve, reject) => {
-    exec('$GOBIN/ci -h', (err, stdout, stderr) => {
-      // if (err || stderr) {
-      //   reject(new Error(err ? err.message : stderr))
-      // }
-      resolve(`> ${stdout}`)
-    })
-  })
+  // //try ci scan
+  // const promiseScan = new Promise((resolve, reject) => {
+  //   exec('$GOBIN/ci -h', (err, stdout, stderr) => {
+  //     // if (err || stderr) {
+  //     //   reject(new Error(err ? err.message : stderr))
+  //     // }
+  //     resolve(`> ${stdout}`)
+  //   })
+  // })
 
-  return new Promise(async (_, reject) => {
-    await promiseExport.then(() => promiseInstall.then(() => promiseRename.then(()=>promiseScan)))
-  })
+  // return new Promise(async (_, reject) => {
+  //   await promiseExport.then(() => promiseInstall.then(() => promiseRename.then(()=>promiseScan)))
+  // })
   // try {
   //   const token = core.getInput('token')
   //   const version = core.getInput('version')
