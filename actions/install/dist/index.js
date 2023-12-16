@@ -2881,8 +2881,38 @@ async function run(platform = process.platform) {
         core.setFailed('This action only supports Linux runners');
         return;
     }
-    return new Promise((_, reject) => {
-        (0,external_child_process_namespaceObject.exec)('export GOBIN=/usr/local/bin/ && echo GOBIN_here && echo $GOBIN && go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && mv $GOBIN/cmd $GOBIN/ci && echo ls_usrlocalbin_here && ls -la /usr/local/bin/ && echo ci_here && $GOBIN/ci -h', (err, stdout, stderr) => {
+    return new Promise(async (_, reject) => {
+        // export GOBIN
+        await (0,external_child_process_namespaceObject.exec)('export GOBIN=/usr/local/bin/ ', (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.log('>', error ? error.message : stderr);
+                console.log(new Error(error ? error.message : stderr));
+            }
+            else {
+                console.log(stdout);
+            }
+        });
+        // go install
+        await (0,external_child_process_namespaceObject.exec)('go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf', (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.log('>', error ? error.message : stderr);
+                console.log(new Error(error ? error.message : stderr));
+            }
+            else {
+                console.log(stdout);
+            }
+        });
+        // rename cmd to ci
+        await (0,external_child_process_namespaceObject.exec)('mv $GOBIN/cmd $GOBIN/ci', (error, stdout, stderr) => {
+            if (error || stderr) {
+                console.log('>', error ? error.message : stderr);
+                console.log(new Error(error ? error.message : stderr));
+            }
+            else {
+                console.log(stdout);
+            }
+        });
+        await (0,external_child_process_namespaceObject.exec)('$GOBIN/ci -h', (err, stdout, stderr) => {
             // if (err || stderr) {
             //   reject(new Error(err ? err.message : stderr))
             // }
