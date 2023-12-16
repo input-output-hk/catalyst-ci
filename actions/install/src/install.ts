@@ -55,27 +55,27 @@ export async function run(
     //   core.info(`Installed cli to ${extractPath}`)
     
     core.info('install')
-    await exec('cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin  cmd/main.go', (err, stdout, stderr) => {
+    await exec('cd cli && go build -ldflags="-extldflags=-static" -o bin/ci  cmd/main.go', (err, stdout, stderr) => {
       if (err || stderr) {
         console.log(err ?? stderr)
       }
       console.log(`> ${stdout}`)
     })
-    await exec('ls /usr/local/bin', (err, stdout, stderr) => {
-      if (err || stderr) {
-        console.log(err ?? stderr)
-      }
-      console.log(`> ${stdout}`)
-    })
-    // core.info('move file')
-    // return new Promise((_, reject) => {
-    //   exec('mv cli/bin/ci /usr/local/bin/ci', (err, stdout, stderr) => {
-    //     if (err || stderr) {
-    //       reject(new Error(err ? err.message : stderr))
-    //     }
-    //     console.log(`> ${stdout}`)
-    //   })
+    // await exec('ls /usr/local/bin', (err, stdout, stderr) => {
+    //   if (err || stderr) {
+    //     console.log(err ?? stderr)
+    //   }
+    //   console.log(`> ${stdout}`)
     // })
+    core.info('move file')
+    return new Promise((_, reject) => {
+      exec('mv cli/bin/ci /usr/local/bin/ci', (err, stdout, stderr) => {
+        if (err || stderr) {
+          reject(new Error(err ? err.message : stderr))
+        }
+        console.log(`> ${stdout}`)
+      })
+    })
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
