@@ -30,7 +30,7 @@ export async function run(
           console.log(stdout)
         }
       })
-      await exec('ls cli', (error, stdout, stderr) => {
+      await exec('cd cli && cat go.mod', (error, stdout, stderr) => {
         if (error || stderr) {
           console.log(new Error(error ? error.message : stderr))
         } else {

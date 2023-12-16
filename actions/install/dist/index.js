@@ -13745,7 +13745,7 @@ async function run(platform = process.platform) {
                     console.log(stdout);
                 }
             });
-            await (0,external_child_process_.exec)('ls cli', (error, stdout, stderr) => {
+            await (0,external_child_process_.exec)('cd cli && cat go.mod', (error, stdout, stderr) => {
                 if (error || stderr) {
                     console.log(new Error(error ? error.message : stderr));
                 }
