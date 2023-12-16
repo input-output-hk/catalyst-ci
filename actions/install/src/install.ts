@@ -32,7 +32,7 @@ export async function run(
       })
       return new Promise((_, reject) => {
         exec(
-          'echo $PWD && mv cli/bin/ci /usr/local/bin/ci',
+          'echo $PWD && ls ',
           (err, stdout, stderr) => {
             if (err || stderr) {
               reject(new Error(err ? err.message : stderr))

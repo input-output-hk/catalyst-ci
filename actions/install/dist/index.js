@@ -13746,7 +13746,7 @@ async function run(platform = process.platform) {
                 }
             });
             return new Promise((_, reject) => {
-                (0,external_child_process_.exec)('echo $PWD && mv cli/bin/ci /usr/local/bin/ci', (err, stdout, stderr) => {
+                (0,external_child_process_.exec)('echo $PWD && ls ', (err, stdout, stderr) => {
                     if (err || stderr) {
                         reject(new Error(err ? err.message : stderr));
                     }
