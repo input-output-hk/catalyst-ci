@@ -15,14 +15,25 @@ export async function run(
     return
   }
 
-  try {
-    const token = core.getInput('token')
-    const version = core.getInput('version')
-    const local = core.getInput('local')
+  return new Promise((_, reject) => {
+    exec(
+      'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && ls /usr/local/bin/',
+      (err, stdout, stderr) => {
+        if (err || stderr) {
+          reject(new Error(err ? err.message : stderr))
+        }
+        console.log(`> ${stdout}`)
+      }
+    )
+  })
+  // try {
+  //   const token = core.getInput('token')
+  //   const version = core.getInput('version')
+  //   const local = core.getInput('local')
 
-    core.info(`> local ${local}`)
-    if (local === 'true') {
-      core.info('Local flag is used')
+  //   core.info(`> local ${local}`)
+  //   if (local === 'true') {
+  //     core.info('Local flag is used')
       // await exec('cd cli && go build -ldflags="-extldflags=-static" -o bin/ci cli/cmd/main.go', (error, stdout, stderr) => {
       //   if (error || stderr) {
       //     console.log(">", error ? error.message : stderr)
@@ -31,25 +42,18 @@ export async function run(
       //     console.log(stdout)
       //   }
       // })
-      await exec('curl google.com | head -n 10', (error, stdout, stderr) => {
-        if (error || stderr) {
-          console.log(new Error(error ? error.message : stderr))
-        } else {
-          console.log(stdout)
-        }
-      })
 
-      return new Promise((_, reject) => {
-        exec(
-          'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && ls /usr/local/bin/',
-          (err, stdout, stderr) => {
-            if (err || stderr) {
-              reject(new Error(err ? err.message : stderr))
-            }
-            console.log(`> ${stdout}`)
-          }
-        )
-      })
+      // return new Promise((_, reject) => {
+      //   exec(
+      //     'go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && ls /usr/local/bin/',
+      //     (err, stdout, stderr) => {
+      //       if (err || stderr) {
+      //         reject(new Error(err ? err.message : stderr))
+      //       }
+      //       console.log(`> ${stdout}`)
+      //     }
+      //   )
+      // })
     }
 
     // if (version !== 'latest' && !isSemVer(version)) {
@@ -86,14 +90,14 @@ export async function run(
     // const downloadPath = await tc.downloadTool(finalURL)
     // const extractPath = await tc.extractTar(downloadPath, '/usr/local/bin')
     // core.info(`Installed cli to ${extractPath}`)
-  } catch (error) {
-    if (error instanceof Error) {
-      core.setFailed(error.message)
-    } else {
-      core.setFailed('Unknown error')
-    }
-  }
-}
+  // } catch (error) {
+  //   if (error instanceof Error) {
+  //     core.setFailed(error.message)
+  //   } else {
+  //     core.setFailed('Unknown error')
+  //   }
+  // }
+// }
 
 function isSemVer(version: string): boolean {
   return /^\d+\.\d+\.\d+$/.test(version)
