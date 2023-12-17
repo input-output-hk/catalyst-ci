@@ -26,16 +26,20 @@ export async function run(
       // Create GOBIN
       // Install cli with commit hash
       // Change the name from cmd to ci
-      await exec(`export GOBIN=/usr/local/bin/ && 
-      go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && 
-      mv $GOBIN/cmd $GOBIN/ci 
-      `, (error, stdout, stderr) => {
-        if (error || stderr) {
-          console.log('> ', error?.message ?? stderr)
+      // export GOBIN=/usr/local/bin/ &&
+      // go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf &&
+      // mv $GOBIN/cmd $GOBIN/ci
+      await exec(
+        `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`,
+        (error, stdout, stderr) => {
+          if (error || stderr) {
+            console.log('> ', error?.message ?? stderr)
+            return
+          }
+          console.log('>', stdout)
           return
         }
-        return
-      })
+      )
     }
 
     if (version !== 'latest' && !isSemVer(version)) {

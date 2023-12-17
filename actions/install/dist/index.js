@@ -13739,14 +13739,15 @@ async function run(platform = process.platform) {
             // Create GOBIN
             // Install cli with commit hash
             // Change the name from cmd to ci
-            await (0,external_child_process_.exec)(`export GOBIN=/usr/local/bin/ && 
-      go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf && 
-      mv $GOBIN/cmd $GOBIN/ci 
-      `, (error, stdout, stderr) => {
+            // export GOBIN=/usr/local/bin/ &&
+            // go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf &&
+            // mv $GOBIN/cmd $GOBIN/ci
+            await (0,external_child_process_.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`, (error, stdout, stderr) => {
                 if (error || stderr) {
                     console.log('> ', error?.message ?? stderr);
                     return;
                 }
+                console.log('>', stdout);
                 return;
             });
         }
