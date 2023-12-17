@@ -29,8 +29,19 @@ export async function run(
       // export GOBIN=/usr/local/bin/ &&
       // go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf &&
       // mv $GOBIN/cmd $GOBIN/ci
+      
       await exec(
-        `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`,
+        `cd cli`,
+        (error, stdout, stderr) => {
+          if (error || stderr) {
+            console.log('> stderr cd', stderr)
+            console.log('> errorr cd', error?.message)
+          }
+          console.log('> outputt cd', stdout)
+        }
+      )
+      await exec(
+        `go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`,
         (error, stdout, stderr) => {
           if (error || stderr) {
             console.log('> stderr', stderr)
