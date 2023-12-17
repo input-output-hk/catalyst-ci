@@ -22,6 +22,7 @@ export async function run(
 
     // Local flag is tagged as true
     if (local === 'true') {
+      core.info('Building ci locally')
       // go into cli folder
       // build the ci and move to /usr/local/bin
       await exec(

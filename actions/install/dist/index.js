@@ -13736,6 +13736,7 @@ async function run(platform = process.platform) {
         const local = core.getInput('local');
         // Local flag is tagged as true
         if (local === 'true') {
+            core.info('Building ci locally');
             // go into cli folder
             // build the ci and move to /usr/local/bin
             await (0,external_child_process_.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`, (error) => {
