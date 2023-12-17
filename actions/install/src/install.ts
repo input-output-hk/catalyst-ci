@@ -2,7 +2,6 @@ import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
 import { exec } from 'child_process'
-import { stderr } from 'process'
 
 const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
@@ -23,28 +22,12 @@ export async function run(
 
     // Local flag is tagged as true
     if (local === 'true') {
-      // Create GOBIN
-      // Install cli with commit hash
-      // Change the name from cmd to ci
-      // export GOBIN=/usr/local/bin/ &&
-      // go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf &&
-      // mv $GOBIN/cmd $GOBIN/ci
-      
+      // go into cli folder
+      // build the ci and move to /usr/local/bin
       await exec(
-        `cd cli`,
-        (error, stdout, stderr) => {
-          if (error || stderr) {
-            console.log('> stderr cd', stderr)
-            console.log('> errorr cd', error?.message)
-          }
-          console.log('> outputt cd', stdout)
-        }
-      )
-      await exec(
-        `go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`,
-        (error, stdout, stderr) => {
-          if (error || stderr) {
-            console.log('> stderr', stderr)
+        `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`,
+        (error, stdout, _) => {
+          if (error) {
             console.log('> errorr', error?.message)
           }
           console.log('> outputt', stdout)

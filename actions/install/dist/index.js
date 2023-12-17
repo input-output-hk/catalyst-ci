@@ -13736,22 +13736,10 @@ async function run(platform = process.platform) {
         const local = core.getInput('local');
         // Local flag is tagged as true
         if (local === 'true') {
-            // Create GOBIN
-            // Install cli with commit hash
-            // Change the name from cmd to ci
-            // export GOBIN=/usr/local/bin/ &&
-            // go install -v github.com/input-output-hk/catalyst-ci/cli/cmd@468cdc9e4763b49f639c11186115cd0d782c8dbf &&
-            // mv $GOBIN/cmd $GOBIN/ci
-            await (0,external_child_process_.exec)(`cd cli`, (error, stdout, stderr) => {
-                if (error || stderr) {
-                    console.log('> stderr cd', stderr);
-                    console.log('> errorr cd', error?.message);
-                }
-                console.log('> outputt cd', stdout);
-            });
-            await (0,external_child_process_.exec)(`go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`, (error, stdout, stderr) => {
-                if (error || stderr) {
-                    console.log('> stderr', stderr);
+            // go into cli folder
+            // build the ci and move to /usr/local/bin
+            await (0,external_child_process_.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`, (error, stdout, _) => {
+                if (error) {
                     console.log('> errorr', error?.message);
                 }
                 console.log('> outputt', stdout);
