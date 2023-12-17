@@ -34,12 +34,11 @@ export async function run(
         (error, stdout, stderr) => {
           if (error || stderr) {
             console.log('> ', error?.message ?? stderr)
-            return
           }
-          console.log('>', stdout)
-          return
+          console.log('> outputt', stdout)
         }
       )
+      return
     }
 
     if (version !== 'latest' && !isSemVer(version)) {

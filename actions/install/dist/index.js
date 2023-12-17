@@ -13745,11 +13745,10 @@ async function run(platform = process.platform) {
             await (0,external_child_process_.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`, (error, stdout, stderr) => {
                 if (error || stderr) {
                     console.log('> ', error?.message ?? stderr);
-                    return;
                 }
-                console.log('>', stdout);
-                return;
+                console.log('> outputt', stdout);
             });
+            return;
         }
         if (version !== 'latest' && !isSemVer(version)) {
             core.setFailed('Invalid version');
