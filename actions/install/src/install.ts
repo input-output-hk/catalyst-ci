@@ -26,11 +26,10 @@ export async function run(
       // build the ci and move to /usr/local/bin
       await exec(
         `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`,
-        (error, stdout, _) => {
+        (error) => {
           if (error) {
-            console.log('> errorr', error?.message)
+            console.log('> error', error.message)
           }
-          console.log('> outputt', stdout)
         }
       )
       return

@@ -13738,11 +13738,10 @@ async function run(platform = process.platform) {
         if (local === 'true') {
             // go into cli folder
             // build the ci and move to /usr/local/bin
-            await (0,external_child_process_.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`, (error, stdout, _) => {
+            await (0,external_child_process_.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`, (error) => {
                 if (error) {
-                    console.log('> errorr', error?.message);
+                    console.log('> error', error.message);
                 }
-                console.log('> outputt', stdout);
             });
             return;
         }
