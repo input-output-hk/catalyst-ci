@@ -3301,6 +3301,7 @@ function getTargetsFromEarthfile(target, earthfile) {
         const mainTarget = target.slice(0, -2);
         const targetRegex = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`);
         line_reader/* open */.b(earthfile + '/Earthfile', (error, reader) => {
+            core.info(earthfile + '/Earthfile');
             if (error) {
                 core.setFailed(`Error reading earthfile: ${error}`);
             }
@@ -3312,11 +3313,13 @@ function getTargetsFromEarthfile(target, earthfile) {
                     }
                     const formatLine = line?.trim().slice(0, -1);
                     if (formatLine?.match(targetRegex)) {
+                        core.info(`formatline ${formatLine}`);
                         targets.push(formatLine);
                     }
                 });
             }
         });
+        core.info(`targets ${targets}`);
         return targets;
     }
     return [target];

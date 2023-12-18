@@ -126,6 +126,7 @@ function getTargetsFromEarthfile(
     const targetRegex: RegExp = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`)
 
     lr.open(earthfile + '/Earthfile', (error, reader) => {
+      core.info(earthfile + '/Earthfile')
       if (error) {
         core.setFailed(`Error reading earthfile: ${error}`)
       } 
@@ -137,11 +138,13 @@ function getTargetsFromEarthfile(
           } 
           const formatLine = line?.trim().slice(0, -1)
           if (formatLine?.match(targetRegex)) {
+            core.info(`formatline ${formatLine}`)
             targets.push(formatLine)
           }
         })
       }
     })
+    core.info(`targets ${targets}`)
     return targets
   }
   return [target]
