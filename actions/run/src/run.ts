@@ -2,7 +2,6 @@ import * as core from '@actions/core'
 import { exec, spawn } from 'child_process'
 import * as path from 'path'
 import * as fs from 'fs'
-import * as lr from 'line-reader'
 
 export async function run(): Promise<void> {
   const artifact = core.getBooleanInput('artifact')
@@ -121,30 +120,21 @@ function getTargetsFromEarthfile(
   core.info('in getTargetsfrom earthfile')
   if (target.endsWith('-*')) {
     core.info('in -*')
-    let targets: Array<string> = []
+    const targets: Array<string> = []
     const mainTarget: string = target.slice(0, -2)
     const targetRegex: RegExp = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`)
 
-    lr.open(earthfile + '/Earthfile', (error, reader) => {
-      core.info(earthfile + '/Earthfile')
-      if (error) {
-        core.setFailed(`Error reading earthfile: ${error}`)
-      } 
-      while (reader.hasNextLine()) {
-        reader.nextLine((error, line) => {
-          if (error) {
-            core.info(`Error reading line in earthfile : ${error}`)
-            return
-          } 
-          const formatLine = line?.trim().slice(0, -1)
-          if (formatLine?.match(targetRegex)) {
-            core.info(`formatline ${formatLine}`)
-            targets.push(formatLine)
-          }
-        })
+    const readFileLines = fs
+      .readFileSync(earthfile + '/Earthfile', 'utf8')
+      .split('\n')
+
+    readFileLines.map(line => {
+      const formatLine = line?.trim().slice(0, -1)
+      if (formatLine?.match(targetRegex)) {
+        targets.push(formatLine)
       }
     })
-    core.info(`targets ${targets}`)
+    core.info(`targetsss ${targets}`)
     return targets
   }
   return [target]
