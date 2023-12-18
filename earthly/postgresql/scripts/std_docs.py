@@ -239,6 +239,8 @@ class Migrations:
 
         if comments:
             comments = " --comments"
+        else:
+            comments = ""
 
         if column_description_wrap and column_description_wrap > 0:
             column_description_wrap = (
