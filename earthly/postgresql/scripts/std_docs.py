@@ -416,7 +416,9 @@ def main():
         # cli.run("cat /tmp/migrations.md", verbose=True)
 
     results.print()
-
+    
+    if not res.ok():
+        exit(1)
 
 if __name__ == "__main__":
     main()
