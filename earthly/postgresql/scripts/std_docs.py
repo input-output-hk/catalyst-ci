@@ -76,7 +76,7 @@ def process_sql_files(directory):
     file_pattern = r"V(\d+)__(\w+)\.sql"
     table_pattern = r"CREATE TABLE(?: IF NOT EXISTS)? (\w+)"
 
-    diagram_option_pattern = r"^--\s*(?:Title|Include|Exclude|Comment|Column Description Wrap|Table Description Wrap)\s+:\s*(.*)$"
+    diagram_option_pattern = r"^--\s*(Title|Include|Exclude|Comment|Column Description Wrap|Table Description Wrap)\s+:\s*(.*)$"
 
     migrations = {}
     largest_version = 0
