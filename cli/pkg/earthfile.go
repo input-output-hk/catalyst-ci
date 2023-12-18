@@ -73,7 +73,7 @@ func (e Earthfile) GetTarget(target string) (*spec.Target, error) {
 			return &t, nil
 		}
 	}
-
+	fmt.Println("Before fmt.error")
 	return nil, fmt.Errorf("target %s not found in %s", target, e.Path)
 }
 
