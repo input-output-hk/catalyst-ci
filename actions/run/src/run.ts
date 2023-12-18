@@ -38,6 +38,7 @@ export async function run(): Promise<void> {
   core.info(`Earhtlfile permissiong ${earthfile}`)
 
   const targets = getTargetsFromEarthfile(target, earthfile)
+  core.info(`>-------- ${targets}`)
   targets.map(t => {
     if (artifact) {
       args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
@@ -116,10 +117,13 @@ function getTargetsFromEarthfile(
   target: string,
   earthfile: string
 ): Array<string> {
+  core.info('in getTargetsfrom earthfile')
   if (target.endsWith('-*')) {
+    core.info('in -*')
     let targets: Array<string> = []
     fs.readFile(earthfile + '/Earthfile', 'utf8', (err, data) => {
       const mainTarget: string = target.slice(0, -2)
+      core.info(`main target ${mainTarget}`)
       if (err) {
         console.error(`Error reading Earthfile: ${err.message}`)
         return

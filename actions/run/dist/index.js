@@ -2907,6 +2907,7 @@ async function run() {
     core.info(`--artifact  target: ${target}`);
     core.info(`Earhtlfile permissiong ${earthfile}`);
     const targets = getTargetsFromEarthfile(target, earthfile);
+    core.info(`>-------- ${targets}`);
     targets.map(t => {
         if (artifact) {
             args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`);
@@ -2970,10 +2971,13 @@ async function spawnCommand(command, args) {
     });
 }
 function getTargetsFromEarthfile(target, earthfile) {
+    core.info('in getTargetsfrom earthfile');
     if (target.endsWith('-*')) {
+        core.info('in -*');
         let targets = [];
         external_fs_.readFile(earthfile + '/Earthfile', 'utf8', (err, data) => {
             const mainTarget = target.slice(0, -2);
+            core.info(`main target ${mainTarget}`);
             if (err) {
                 console.error(`Error reading Earthfile: ${err.message}`);
                 return;
