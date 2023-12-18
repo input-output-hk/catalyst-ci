@@ -2904,15 +2904,13 @@ async function run() {
     if (flags) {
         args.push(...flags.split(' '));
     }
-    core.info(`--artifact  target: ${target}`);
-    core.info(`Earhtlfile permissiong ${earthfile}`);
     const targets = getTargetsFromEarthfile(target, earthfile);
     targets.map(t => {
         if (artifact) {
             args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`);
         }
         else {
-            core.info(`pushing target ${t}`);
+            core.info(`Pushing target ${t}`);
             args.push(`${earthfile}+${t}`);
         }
     });
@@ -2951,7 +2949,6 @@ function parseImage(output) {
 async function spawnCommand(command, args) {
     return new Promise((resolve, reject) => {
         const child = (0,external_child_process_namespaceObject.spawn)(command, args);
-        core.info(`....> ${args}`);
         let output = '';
         child.stdout.on('data', (data) => {
             process.stdout.write(data);
@@ -2971,9 +2968,7 @@ async function spawnCommand(command, args) {
     });
 }
 function getTargetsFromEarthfile(target, earthfile) {
-    core.info('in getTargetsfrom earthfile');
     if (target.endsWith('-*')) {
-        core.info('in -*');
         const targets = [];
         const mainTarget = target.slice(0, -2);
         const targetRegex = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`);

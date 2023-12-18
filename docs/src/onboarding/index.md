@@ -128,11 +128,14 @@ Now that we've covered how the CI process works at a conceptual level, how can w
 As a developer, the main interface you need to be most concerned with is the `Earthfile`.
 Each "stage" discussed in the previous section can be directly correlated to an Earthly target.
 Two patterns `target` or `target-*` can be used according to your usage and preferences.
-- In case of `target`, it with scan for targets that exactly match the given `target`
-- In case of `target-*`, it will scan for targets that start with `target-` that followed by numbers or characters
+
+* In case of `target`, it with scan for targets that exactly match the given `target`
+* In case of `target-*`, it will scan for targets that start with `target-` that followed by numbers or characters
   
-For example, in the CI's `check` phase, if `check` is used, the CLI will return a list of `Earthfile`s that contain the `check` target.
-If the `check-*` is used, the CLI will return a list of `Earthfile`s that contain for example `check-test` and `check-test2`.
+The examples are provided below:
+
+* In the CI's `check` phase, if `check` is used, the CLI will return a list of `Earthfile`s that contain the `check` target.
+* If the `check-*` is used, the CLI will return a list of `Earthfile`s that contain for example `check-test` and `check-test2`.
 In your `Earthfile`, you'll be responsible for defining these targets and their associated logic within the context of your
 subproject.
 

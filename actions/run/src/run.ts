@@ -34,15 +34,12 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
-  core.info(`--artifact  target: ${target}`)
-  core.info(`Earhtlfile permissiong ${earthfile}`)
-
   const targets = getTargetsFromEarthfile(target, earthfile)
   targets.map(t => {
     if (artifact) {
       args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
     } else {
-      core.info(`pushing target ${t}`)
+      core.info(`Pushing target ${t}`)
       args.push(`${earthfile}+${t}`)
     }
   })
@@ -65,7 +62,6 @@ export async function run(): Promise<void> {
     core.info(`Found artifact: ${artifactOutput}`)
     core.setOutput('artifact', artifactOutput)
   }
-
 }
 
 function parseArtifact(output: string): string {
@@ -92,7 +88,6 @@ async function spawnCommand(command: string, args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args)
 
-    core.info(`....> ${args}`)
     let output = ''
 
     child.stdout.on('data', (data: string) => {
@@ -115,9 +110,7 @@ async function spawnCommand(command: string, args: string[]): Promise<string> {
 }
 
 function getTargetsFromEarthfile(target: string, earthfile: string): string[] {
-  core.info('in getTargetsfrom earthfile')
   if (target.endsWith('-*')) {
-    core.info('in -*')
     const targets: string[] = []
     const mainTarget: string = target.slice(0, -2)
     const targetRegex = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`)
