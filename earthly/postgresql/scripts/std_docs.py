@@ -74,7 +74,7 @@ class DiagramCfg:
 
 def process_sql_files(directory):
     file_pattern = r"V(\d+)__(\w+)\.sql"
-    table_pattern = r"CREATE TABLE (\w+)"
+    table_pattern = r"CREATE TABLE(?: IF NOT EXISTS)? (\w+)"
 
     diagram_option_pattern = r"^--\s*(?:Title|Include|Exclude|Comment|Column Description Wrap|Table Description Wrap)\s+:\s*(.*)$"
 
@@ -153,6 +153,8 @@ def process_sql_files(directory):
                 table_description_wrap,
                 clean_sql,
             )
+            
+            print(f"Found migration: {migrations[version]}")
 
     return migrations, largest_version
 
