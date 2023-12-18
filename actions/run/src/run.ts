@@ -39,14 +39,14 @@ export async function run(): Promise<void> {
 
   const targets = getTargetsFromEarthfile(target, earthfile)
   core.info(`>-------- ${targets}`)
-  targets.map(t => {
-    if (artifact) {
-      args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
-    } else {
-      core.info(`pushing target ${t}`)
-      args.push(`${earthfile}+${t}`)
-    }
-  })
+  // targets.map(t => {
+  //   if (artifact) {
+  //     args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
+  //   } else {
+  //     core.info(`pushing target ${t}`)
+  //     args.push(`${earthfile}+${t}`)
+  //   }
+  // })
 
   if (targetFlags) {
     args.push(...targetFlags.split(' '))
@@ -121,22 +121,26 @@ function getTargetsFromEarthfile(
   if (target.endsWith('-*')) {
     core.info('in -*')
     let targets: Array<string> = []
+    const mainTarget: string = target.slice(0, -2)
+    const targetRegex: RegExp = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?:$`)
+
     fs.readFile(earthfile + '/Earthfile', 'utf8', (err, data) => {
-      const mainTarget: string = target.slice(0, -2)
       core.info(`main target ${mainTarget}`)
       if (err) {
         console.error(`Error reading Earthfile: ${err.message}`)
         return
       }
-      const targetRegex: RegExp = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?:$`)
 
+      core.info(`regex ${targetRegex}`)
       let match
       while ((match = targetRegex.exec(data)) !== null) {
         core.info(`Found ${data}`)
         core.info(`match ${match}`)
-        targets.push(match[0]);
+        targets.push(match[0])
       }
     })
+    core.info(`targets output ${targets}`)
+
     return targets
   }
   return [target]
