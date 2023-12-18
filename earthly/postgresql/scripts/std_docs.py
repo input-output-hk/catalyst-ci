@@ -23,7 +23,7 @@ class DiagramCfg:
     tables: Optional[list[str]]
     included_tables: Optional[list[str]]
     excluded_tables: Optional[list[str]]
-    comments: bool
+    comments: Optional[bool]
     column_description_wrap: Optional[int]
     table_description_wrap: Optional[int]
     sql_data: str
@@ -87,7 +87,7 @@ def process_sql_files(directory):
         table_names = []
         included_tables = None
         excluded_tables = None
-        comments = False
+        comments = None
         column_description_wrap = None
         table_description_wrap = None
         
@@ -103,6 +103,7 @@ def process_sql_files(directory):
                 sql_data = file.read()
                 for line in sql_data.splitlines():
                     match = re.match(diagram_option_pattern, line)
+                    print(match)
                     if match:
                         if match.group(1).lower() == "title" and title is None:
                             title = match.group(2)
