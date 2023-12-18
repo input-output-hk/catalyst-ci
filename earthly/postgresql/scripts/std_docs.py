@@ -418,6 +418,7 @@ def main():
     results.print()
     
     if not res.ok():
+        print("Failed")
         exit(1)
 
 if __name__ == "__main__":
