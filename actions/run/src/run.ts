@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { exec, spawn } from 'child_process'
+import { spawn } from 'child_process'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -38,7 +38,6 @@ export async function run(): Promise<void> {
   core.info(`Earhtlfile permissiong ${earthfile}`)
 
   const targets = getTargetsFromEarthfile(target, earthfile)
-  core.info(`>-------- ${targets}`)
   targets.map(t => {
     if (artifact) {
       args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
@@ -113,19 +112,16 @@ async function spawnCommand(command: string, args: string[]): Promise<string> {
   })
 }
 
-function getTargetsFromEarthfile(
-  target: string,
-  earthfile: string
-): Array<string> {
+function getTargetsFromEarthfile(target: string, earthfile: string): string[] {
   core.info('in getTargetsfrom earthfile')
   if (target.endsWith('-*')) {
     core.info('in -*')
-    const targets: Array<string> = []
+    const targets: string[] = []
     const mainTarget: string = target.slice(0, -2)
-    const targetRegex: RegExp = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`)
+    const targetRegex = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`)
 
     const readFileLines = fs
-      .readFileSync(earthfile + '/Earthfile', 'utf8')
+      .readFileSync(earthfile.concat('/Earthfile'), 'utf8')
       .split('\n')
 
     readFileLines.map(line => {
@@ -134,7 +130,6 @@ function getTargetsFromEarthfile(
         targets.push(formatLine)
       }
     })
-    core.info(`targetsss ${targets}`)
     return targets
   }
   return [target]

@@ -2907,7 +2907,6 @@ async function run() {
     core.info(`--artifact  target: ${target}`);
     core.info(`Earhtlfile permissiong ${earthfile}`);
     const targets = getTargetsFromEarthfile(target, earthfile);
-    core.info(`>-------- ${targets}`);
     targets.map(t => {
         if (artifact) {
             args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`);
@@ -2977,7 +2976,7 @@ function getTargetsFromEarthfile(target, earthfile) {
         const targets = [];
         const mainTarget = target.slice(0, -2);
         const targetRegex = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`);
-        const readFileLines = external_fs_.readFileSync(earthfile + '/Earthfile', 'utf8')
+        const readFileLines = external_fs_.readFileSync(earthfile.concat('/Earthfile'), 'utf8')
             .split('\n');
         readFileLines.map(line => {
             const formatLine = line?.trim().slice(0, -1);
@@ -2985,7 +2984,6 @@ function getTargetsFromEarthfile(target, earthfile) {
                 targets.push(formatLine);
             }
         });
-        core.info(`targetsss ${targets}`);
         return targets;
     }
     return [target];
