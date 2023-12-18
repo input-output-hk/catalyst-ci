@@ -74,7 +74,7 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/discover@feat/targets-scanner
         id: discover
         with:
-          targets: "check-*"
+          targets: ${{ inputs.target }}
       - name: Check for empty output
         id: check
         run: |
