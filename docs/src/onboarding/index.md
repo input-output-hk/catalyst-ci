@@ -129,15 +129,13 @@ As a developer, the main interface you need to be most concerned with is the `Ea
 Each "stage" discussed in the previous section can be directly correlated to an Earthly target.
 Two patterns `target` or `target-*` can be used according to your usage and preferences.
 
-* In case of `target`, it with scan for targets that exactly match the given `target`
-* In case of `target-*`, it will scan for targets that start with `target-` that followed by numbers or characters
+* In case of `target`, it will scan for targets that match the exact target name (ie., `target`)
+* In case of `target-*`, it will scan for targets that start with `target-` and are followed by any number of digits or characters
   
 The examples are provided below:
 
 * In the CI's `check` phase, if `check` is used, the CLI will return a list of `Earthfile`s that contain the `check` target.
-* If the `check-*` is used, the CLI will return a list of `Earthfile`s that contain for example `check-test` and `check-test2`.
-In your `Earthfile`, you'll be responsible for defining these targets and their associated logic within the context of your
-subproject.
+* If the `check-*` is used, the CLI will return a list of `Earthfile`s that contain `check-test` and `check-test2`.
 
 If you're contributing a new subproject with deliverables, you'll need to include an initial `Earthfile` as part of the
 contribution.
