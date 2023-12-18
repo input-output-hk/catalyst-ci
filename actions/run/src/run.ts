@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import { exec, spawn } from 'child_process'
 import * as path from 'path'
 import * as fs from 'fs'
+import * as lr from 'line-reader'
 
 export async function run(): Promise<void> {
   const artifact = core.getBooleanInput('artifact')
@@ -39,14 +40,14 @@ export async function run(): Promise<void> {
 
   const targets = getTargetsFromEarthfile(target, earthfile)
   core.info(`>-------- ${targets}`)
-  // targets.map(t => {
-  //   if (artifact) {
-  //     args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
-  //   } else {
-  //     core.info(`pushing target ${t}`)
-  //     args.push(`${earthfile}+${t}`)
-  //   }
-  // })
+  targets.map(t => {
+    if (artifact) {
+      args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
+    } else {
+      core.info(`pushing target ${t}`)
+      args.push(`${earthfile}+${t}`)
+    }
+  })
 
   if (targetFlags) {
     args.push(...targetFlags.split(' '))
@@ -122,25 +123,25 @@ function getTargetsFromEarthfile(
     core.info('in -*')
     let targets: Array<string> = []
     const mainTarget: string = target.slice(0, -2)
-    const targetRegex: RegExp = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?:$`)
+    const targetRegex: RegExp = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`)
 
-    fs.readFile(earthfile + '/Earthfile', 'utf8', (err, data) => {
-      core.info(`main target ${mainTarget}`)
-      if (err) {
-        console.error(`Error reading Earthfile: ${err.message}`)
-        return
-      }
-
-      core.info(`regex ${targetRegex}`)
-      let match
-      while ((match = targetRegex.exec(data)) !== null) {
-        core.info(`Found ${data}`)
-        core.info(`match ${match}`)
-        targets.push(match[0])
+    lr.open(earthfile + '/Earthfile', (error, reader) => {
+      if (error) {
+        core.setFailed(`Error reading earthfile: ${error}`)
+      } 
+      while (reader.hasNextLine()) {
+        reader.nextLine((error, line) => {
+          if (error) {
+            core.info(`Error reading line in earthfile : ${error}`)
+            return
+          } 
+          const formatLine = line?.trim().slice(0, -1)
+          if (formatLine?.match(targetRegex)) {
+            targets.push(formatLine)
+          }
+        })
       }
     })
-    core.info(`targets output ${targets}`)
-
     return targets
   }
   return [target]

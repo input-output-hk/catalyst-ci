@@ -9,10 +9,12 @@
   "dependencies": {
     "@actions/core": "^1.10.0",
     "@actions/github": "^5.1.1",
+    "line-reader": "^0.4.0",
     "shell-quote": "^1.8.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.4",
+    "@types/line-reader": "^0.0.37",
     "@types/node": "^20.5.3",
     "@types/shell-quote": "^1.7.1",
     "@typescript-eslint/eslint-plugin": "^6.4.1",
