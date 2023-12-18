@@ -106,6 +106,7 @@ def process_sql_files(directory):
                     if match:
                         print(match)
                         print(match.group())
+                        print(match.group(0))
                         print(match.group(1))
                         if match.group(1).lower() == "title" and title is None:
                             title = match.group(2)
