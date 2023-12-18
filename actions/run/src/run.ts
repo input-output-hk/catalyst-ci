@@ -127,7 +127,7 @@ function getTargetsFromEarthfile(
 ): Array<string> {
   if (target.endsWith('-*')) {
     let targets: Array<string> = []
-    fs.readFile(earthfile, 'utf8', (err, data) => {
+    fs.readFile(earthfile + "/Earthfile", 'utf8', (err, data) => {
       const mainTarget: string = target.slice(0, -2)
       if (err) {
         console.error(`Error reading Earthfile: ${err.message}`)

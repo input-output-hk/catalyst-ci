@@ -2978,7 +2978,7 @@ async function spawnCommand(command, args) {
 function getTargetsFromEarthfile(target, earthfile) {
     if (target.endsWith('-*')) {
         let targets = [];
-        external_fs_.readFile(earthfile, 'utf8', (err, data) => {
+        external_fs_.readFile(earthfile + "/Earthfile", 'utf8', (err, data) => {
             const mainTarget = target.slice(0, -2);
             if (err) {
                 console.error(`Error reading Earthfile: ${err.message}`);
