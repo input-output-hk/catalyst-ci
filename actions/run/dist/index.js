@@ -2872,7 +2872,10 @@ var core = __nccwpck_require__(186);
 const external_child_process_namespaceObject = require("child_process");
 // EXTERNAL MODULE: external "path"
 var external_path_ = __nccwpck_require__(17);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(147);
 ;// CONCATENATED MODULE: ./src/run.ts
+
 
 
 
@@ -2902,13 +2905,17 @@ async function run() {
         args.push(...flags.split(' '));
     }
     core.info(`--artifact  target: ${target}`);
-    core.info(`--artifact  earthfile ${target}`);
-    if (artifact) {
-        args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`);
-    }
-    else {
-        args.push(`${earthfile}+${target}`);
-    }
+    core.info(`--artifact  earthfile ${earthfile}`);
+    const targets = getTargetsFromEarthfile(target, earthfile);
+    targets.map(t => {
+        if (artifact) {
+            args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`);
+        }
+        else {
+            core.info(`pushing target ${target}`);
+            args.push(`${earthfile}+${target}`);
+        }
+    });
     if (targetFlags) {
         args.push(...targetFlags.split(' '));
     }
@@ -2961,6 +2968,25 @@ async function spawnCommand(command, args) {
             }
         });
     });
+}
+function getTargetsFromEarthfile(target, earthfile) {
+    if (target.endsWith('-*')) {
+        let targets = [];
+        external_fs_.readFile(earthfile, 'utf8', (err, data) => {
+            const mainTarget = target.slice(0, -2);
+            if (err) {
+                console.error(`Error reading Earthfile: ${err.message}`);
+                return;
+            }
+            const targetRegex = new RegExp(`^%${mainTarget}(?:-[a-z0-9]+)?:$`);
+            if (targetRegex.test(data)) {
+                console.log(`Found ${data}`);
+                targets.push(data);
+            }
+        });
+        return targets;
+    }
+    return [target];
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts

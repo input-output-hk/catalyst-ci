@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import { spawn } from 'child_process'
 import * as path from 'path'
+import * as fs from 'fs'
 
 export async function run(): Promise<void> {
   const artifact = core.getBooleanInput('artifact')
@@ -34,12 +35,17 @@ export async function run(): Promise<void> {
   }
 
   core.info(`--artifact  target: ${target}`)
-  core.info(`--artifact  earthfile ${target}`)
-  if (artifact) {
-    args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`)
-  } else {
-    args.push(`${earthfile}+${target}`)
-  }
+  core.info(`--artifact  earthfile ${earthfile}`)
+
+  const targets = getTargetsFromEarthfile(target, earthfile)
+  targets.map(t => {
+    if (artifact) {
+      args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`)
+    } else {
+      core.info(`pushing target ${target}`)
+      args.push(`${earthfile}+${target}`)
+    }
+  })
 
   if (targetFlags) {
     args.push(...targetFlags.split(' '))
@@ -104,4 +110,30 @@ async function spawnCommand(command: string, args: string[]): Promise<string> {
       }
     })
   })
+}
+
+function getTargetsFromEarthfile(
+  target: string,
+  earthfile: string
+): Array<string> {
+  if (target.endsWith('-*')) {
+    let targets: Array<string> = []
+    fs.readFile(earthfile, 'utf8', (err, data) => {
+      const mainTarget: string = target.slice(0, -2)
+      if (err) {
+        console.error(`Error reading Earthfile: ${err.message}`)
+        return
+      }
+      const targetRegex: RegExp = new RegExp(`^%${mainTarget}(?:-[a-z0-9]+)?:$`)
+
+      if (targetRegex.test(data)) {
+        console.log(
+          `Found ${data}`
+        )
+        targets.push(data)
+      }
+    })
+    return targets
+  }
+  return [target]
 }
