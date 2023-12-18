@@ -65,6 +65,7 @@ export async function run(): Promise<void> {
     core.info(`Found artifact: ${artifactOutput}`)
     core.setOutput('artifact', artifactOutput)
   }
+
 }
 
 function parseArtifact(output: string): string {
@@ -91,6 +92,7 @@ async function spawnCommand(command: string, args: string[]): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args)
 
+    core.info(`....> ${args}`)
     let output = ''
 
     child.stdout.on('data', (data: string) => {

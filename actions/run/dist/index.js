@@ -2951,6 +2951,7 @@ function parseImage(output) {
 async function spawnCommand(command, args) {
     return new Promise((resolve, reject) => {
         const child = (0,external_child_process_namespaceObject.spawn)(command, args);
+        core.info(`....> ${args}`);
         let output = '';
         child.stdout.on('data', (data) => {
             process.stdout.write(data);
