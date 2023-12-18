@@ -2920,8 +2920,10 @@ async function run() {
     }
     core.info(`Running command: ${command} ${args.join(' ')}`);
     targetsArgs.map(async (t) => {
+        core.info(`>>> ${t}`);
         const spawnArgs = args.concat(t);
         const output = await spawnCommand(command, spawnArgs);
+        core.info(`>>>> ${t} .. ${output}`);
         const imageOutput = parseImage(output);
         if (imageOutput) {
             core.info(`Found image: ${imageOutput}`);
