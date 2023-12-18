@@ -2919,11 +2919,10 @@ async function run() {
         args.push(...targetFlags.split(' '));
     }
     core.info(`Running command: ${command} ${args.join(' ')}`);
-    targetsArgs.map(async (t) => {
-        core.info(`>>> ${t}`);
+    return new Promise(resolve => targetsArgs.map(async (t) => {
+        core.info(`Running: ${t}`);
         const spawnArgs = args.concat(t);
         const output = await spawnCommand(command, spawnArgs);
-        core.info(`>>>> ${t} .. ${output}`);
         const imageOutput = parseImage(output);
         if (imageOutput) {
             core.info(`Found image: ${imageOutput}`);
@@ -2934,7 +2933,8 @@ async function run() {
             core.info(`Found artifact: ${artifactOutput}`);
             core.setOutput('artifact', artifactOutput);
         }
-    });
+        resolve();
+    }));
 }
 function parseArtifact(output) {
     const regex = /^Artifact .*? output as (.*?)$/gm;
