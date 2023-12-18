@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { spawn } from 'child_process'
+import { exec, spawn } from 'child_process'
 import * as path from 'path'
 import * as fs from 'fs'
 
@@ -35,8 +35,17 @@ export async function run(): Promise<void> {
   }
 
   core.info(`--artifact  target: ${target}`)
-  core.info(`--artifact  earthfile ${earthfile}`)
-
+  core.info(`Earhtlfile permissiong ${earthfile}`)
+  await exec(
+    `ls ${earthfile}`,
+    (error, stdout) => {
+      if (error) {
+        console.log('> error', error.message)
+      }
+      console.log(`> ----- ${stdout}`)
+    }
+  )
+  
   const targets = getTargetsFromEarthfile(target, earthfile)
   targets.map(t => {
     if (artifact) {

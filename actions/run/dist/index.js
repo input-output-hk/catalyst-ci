@@ -2905,7 +2905,13 @@ async function run() {
         args.push(...flags.split(' '));
     }
     core.info(`--artifact  target: ${target}`);
-    core.info(`--artifact  earthfile ${earthfile}`);
+    core.info(`Earhtlfile permissiong ${earthfile}`);
+    await (0,external_child_process_namespaceObject.exec)(`ls ${earthfile}`, (error, stdout) => {
+        if (error) {
+            console.log('> error', error.message);
+        }
+        console.log(`> ----- ${stdout}`);
+    });
     const targets = getTargetsFromEarthfile(target, earthfile);
     targets.map(t => {
         if (artifact) {
