@@ -68,12 +68,10 @@ func (e Earthfile) GetCommands(
 
 func (e Earthfile) GetTarget(target string) (*spec.Target, error) {
 	for _, t := range e.Targets {
-		fmt.Println("In get target")
 		if t.Name == target {
 			return &t, nil
 		}
 	}
-	fmt.Println("Before fmt.error")
 	return nil, fmt.Errorf("target %s not found in %s", target, e.Path)
 }
 
