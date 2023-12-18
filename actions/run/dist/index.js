@@ -2982,7 +2982,7 @@ function getTargetsFromEarthfile(target, earthfile) {
                 console.error(`Error reading Earthfile: ${err.message}`);
                 return;
             }
-            const targetRegex = new RegExp(`^%${mainTarget}(?:-[a-z0-9]+)?:$`);
+            const targetRegex = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?:$`);
             let match;
             while ((match = targetRegex.exec(data)) !== null) {
                 core.info(`Found ${data}`);

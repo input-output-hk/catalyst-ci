@@ -128,7 +128,7 @@ function getTargetsFromEarthfile(
         console.error(`Error reading Earthfile: ${err.message}`)
         return
       }
-      const targetRegex: RegExp = new RegExp(`^%${mainTarget}(?:-[a-z0-9]+)?:$`)
+      const targetRegex: RegExp = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?:$`)
 
       let match
       while ((match = targetRegex.exec(data)) !== null) {
