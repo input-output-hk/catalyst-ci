@@ -130,3 +130,9 @@ class Results:
         )
 
         print(table)
+        
+    def ok(self) -> bool:
+        for result in self.results:
+            if not result.ok():
+                return False
+        return True

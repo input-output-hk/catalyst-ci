@@ -411,14 +411,13 @@ def main():
         migrations = Migrations(args)
         results = migrations.create_diagrams(results)
 
-    if res.ok():
+    if results.ok():
         migrations.create_markdown_file("docs/migrations.md")
         # cli.run("cat /tmp/migrations.md", verbose=True)
 
     results.print()
     
-    if not res.ok():
-        print("Failed")
+    if not results.ok():
         exit(1)
 
 if __name__ == "__main__":
