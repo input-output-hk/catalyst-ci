@@ -5,7 +5,11 @@ VERSION --global-cache 0.7
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
 #   CI target : dependency
 builder:
-    DO ./../../earthly/postgresql+BUILDER --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
+    DO ./../../earthly/postgresql+BUILDER
+
+    # MUST Manually copy the .sqlfluff config used in the repo because the FUNCTION
+    # above can not be passed a reference to a local target as an argument.
+    COPY ./../../+repo-config/repo/.sqlfluff .
 
 # check if the sql files are properly formatted and pass lint quality checks.
 #   CI target : true

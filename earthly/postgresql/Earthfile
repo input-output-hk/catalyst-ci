@@ -61,7 +61,6 @@ postgres-base:
 BUILDER:
     COMMAND
 
-    ARG --required sqlfluff_cfg
     ARG migrations=./migrations
     ARG seed=./seed
     ARG refinery_toml=./refinery.toml
