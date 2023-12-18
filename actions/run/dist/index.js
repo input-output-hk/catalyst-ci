@@ -2906,7 +2906,7 @@ async function run() {
     }
     core.info(`--artifact  target: ${target}`);
     core.info(`Earhtlfile permissiong ${earthfile}`);
-    await (0,external_child_process_namespaceObject.exec)(`ls ${earthfile}`, (error, stdout) => {
+    await (0,external_child_process_namespaceObject.exec)(`ls -la ${earthfile}`, (error, stdout) => {
         if (error) {
             console.log('> error', error.message);
         }

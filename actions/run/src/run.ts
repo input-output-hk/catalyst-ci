@@ -37,7 +37,7 @@ export async function run(): Promise<void> {
   core.info(`--artifact  target: ${target}`)
   core.info(`Earhtlfile permissiong ${earthfile}`)
   await exec(
-    `ls ${earthfile}`,
+    `ls -la ${earthfile}`,
     (error, stdout) => {
       if (error) {
         console.log('> error', error.message)
