@@ -33,6 +33,8 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
+  core.info(`--artifact  target: ${target}`)
+  core.info(`--artifact  earthfile ${target}`)
   if (artifact) {
     args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`)
   } else {

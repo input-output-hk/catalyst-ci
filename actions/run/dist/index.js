@@ -2901,6 +2901,8 @@ async function run() {
     if (flags) {
         args.push(...flags.split(' '));
     }
+    core.info(`--artifact  target: ${target}`);
+    core.info(`--artifact  earthfile ${target}`);
     if (artifact) {
         args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`);
     }
