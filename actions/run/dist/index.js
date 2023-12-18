@@ -2892,6 +2892,7 @@ async function run() {
     const targetFlags = core.getInput('target_flags');
     const command = 'earthly';
     const args = [];
+    const targetsArgs = [];
     if (privileged) {
         args.push('-P');
     }
@@ -2907,28 +2908,31 @@ async function run() {
     const targets = getTargetsFromEarthfile(target, earthfile);
     targets.map(t => {
         if (artifact) {
-            args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`);
+            targetsArgs.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`);
         }
         else {
             core.info(`Pushing target ${t}`);
-            args.push(`${earthfile}+${t}`);
+            targetsArgs.push(`${earthfile}+${t}`);
         }
     });
     if (targetFlags) {
         args.push(...targetFlags.split(' '));
     }
     core.info(`Running command: ${command} ${args.join(' ')}`);
-    const output = await spawnCommand(command, args);
-    const imageOutput = parseImage(output);
-    if (imageOutput) {
-        core.info(`Found image: ${imageOutput}`);
-        core.setOutput('image', imageOutput);
-    }
-    const artifactOutput = external_path_.join(earthfile, parseArtifact(output));
-    if (artifactOutput !== earthfile) {
-        core.info(`Found artifact: ${artifactOutput}`);
-        core.setOutput('artifact', artifactOutput);
-    }
+    targetsArgs.map(async (t) => {
+        const spawnArgs = args.concat(t);
+        const output = await spawnCommand(command, spawnArgs);
+        const imageOutput = parseImage(output);
+        if (imageOutput) {
+            core.info(`Found image: ${imageOutput}`);
+            core.setOutput('image', imageOutput);
+        }
+        const artifactOutput = external_path_.join(earthfile, parseArtifact(output));
+        if (artifactOutput !== earthfile) {
+            core.info(`Found artifact: ${artifactOutput}`);
+            core.setOutput('artifact', artifactOutput);
+        }
+    });
 }
 function parseArtifact(output) {
     const regex = /^Artifact .*? output as (.*?)$/gm;

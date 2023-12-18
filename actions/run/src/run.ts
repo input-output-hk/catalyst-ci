@@ -17,6 +17,7 @@ export async function run(): Promise<void> {
 
   const command = 'earthly'
   const args: string[] = []
+  const targetsArgs: string[] = []
 
   if (privileged) {
     args.push('-P')
@@ -37,10 +38,10 @@ export async function run(): Promise<void> {
   const targets = getTargetsFromEarthfile(target, earthfile)
   targets.map(t => {
     if (artifact) {
-      args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
+      targetsArgs.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
     } else {
       core.info(`Pushing target ${t}`)
-      args.push(`${earthfile}+${t}`)
+      targetsArgs.push(`${earthfile}+${t}`)
     }
   })
 
@@ -49,19 +50,21 @@ export async function run(): Promise<void> {
   }
 
   core.info(`Running command: ${command} ${args.join(' ')}`)
-  const output = await spawnCommand(command, args)
+  targetsArgs.map(async t => {
+    const spawnArgs = args.concat(t)
+    const output = await spawnCommand(command, spawnArgs)
+    const imageOutput = parseImage(output)
+    if (imageOutput) {
+      core.info(`Found image: ${imageOutput}`)
+      core.setOutput('image', imageOutput)
+    }
 
-  const imageOutput = parseImage(output)
-  if (imageOutput) {
-    core.info(`Found image: ${imageOutput}`)
-    core.setOutput('image', imageOutput)
-  }
-
-  const artifactOutput = path.join(earthfile, parseArtifact(output))
-  if (artifactOutput !== earthfile) {
-    core.info(`Found artifact: ${artifactOutput}`)
-    core.setOutput('artifact', artifactOutput)
-  }
+    const artifactOutput = path.join(earthfile, parseArtifact(output))
+    if (artifactOutput !== earthfile) {
+      core.info(`Found artifact: ${artifactOutput}`)
+      core.setOutput('artifact', artifactOutput)
+    }
+  })
 }
 
 function parseArtifact(output: string): string {
