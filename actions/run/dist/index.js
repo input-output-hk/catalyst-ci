@@ -2906,20 +2906,14 @@ async function run() {
     }
     core.info(`--artifact  target: ${target}`);
     core.info(`Earhtlfile permissiong ${earthfile}`);
-    await (0,external_child_process_namespaceObject.exec)(`ls -la ${earthfile}`, (error, stdout) => {
-        if (error) {
-            console.log('> error', error.message);
-        }
-        console.log(`> ----- ${stdout}`);
-    });
     const targets = getTargetsFromEarthfile(target, earthfile);
     targets.map(t => {
         if (artifact) {
-            args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`);
+            args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`);
         }
         else {
-            core.info(`pushing target ${target}`);
-            args.push(`${earthfile}+${target}`);
+            core.info(`pushing target ${t}`);
+            args.push(`${earthfile}+${t}`);
         }
     });
     if (targetFlags) {
@@ -2978,7 +2972,7 @@ async function spawnCommand(command, args) {
 function getTargetsFromEarthfile(target, earthfile) {
     if (target.endsWith('-*')) {
         let targets = [];
-        external_fs_.readFile(earthfile + "/Earthfile", 'utf8', (err, data) => {
+        external_fs_.readFile(earthfile + '/Earthfile', 'utf8', (err, data) => {
             const mainTarget = target.slice(0, -2);
             if (err) {
                 console.error(`Error reading Earthfile: ${err.message}`);
@@ -2986,7 +2980,7 @@ function getTargetsFromEarthfile(target, earthfile) {
             }
             const targetRegex = new RegExp(`^%${mainTarget}(?:-[a-z0-9]+)?:$`);
             if (targetRegex.test(data)) {
-                console.log(`Found ${data}`);
+                core.info(`Found ${data}`);
                 targets.push(data);
             }
         });
