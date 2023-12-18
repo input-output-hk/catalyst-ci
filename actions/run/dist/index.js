@@ -2983,9 +2983,11 @@ function getTargetsFromEarthfile(target, earthfile) {
                 return;
             }
             const targetRegex = new RegExp(`^%${mainTarget}(?:-[a-z0-9]+)?:$`);
-            if (targetRegex.test(data)) {
+            let match;
+            while ((match = targetRegex.exec(data)) !== null) {
                 core.info(`Found ${data}`);
-                targets.push(data);
+                core.info(`match ${match}`);
+                targets.push(match[0]);
             }
         });
         return targets;
