@@ -104,7 +104,9 @@ def process_sql_files(directory):
                 for line in sql_data.splitlines():
                     match = re.match(diagram_option_pattern, line)
                     if match:
-                        print(match.groupdict())
+                        print(match)
+                        print(match.group())
+                        print(match.group(1))
                         if match.group(1).lower() == "title" and title is None:
                             title = match.group(2)
                         elif (
