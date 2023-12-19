@@ -28,9 +28,9 @@ export async function run(
       // exec(
       //   `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
       // )
-      getExecOutput('echo $PATH')
-      getExecOutput('cd cli')
-      getExecOutput('ls')
+      getExecOutput('ls /usr/bin/')
+      // getExecOutput('cd cli')
+      // getExecOutput('ls')
       return
     }
 

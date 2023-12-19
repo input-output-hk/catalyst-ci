@@ -13742,9 +13742,9 @@ async function run(platform = process.platform) {
             // exec(
             //   `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
             // )
-            (0,exec.getExecOutput)('echo $PATH');
-            (0,exec.getExecOutput)('cd cli');
-            (0,exec.getExecOutput)('ls');
+            (0,exec.getExecOutput)('ls /usr/bin/');
+            // getExecOutput('cd cli')
+            // getExecOutput('ls')
             return;
         }
         if (version !== 'latest' && !isSemVer(version)) {
