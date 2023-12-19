@@ -25,6 +25,7 @@ export async function run(
       core.info('Building ci locally')
       // go into cli folder
       // build the ci and move to /usr/local/bin
+      exec('ls')
       exec(
         `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
       )
