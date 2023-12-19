@@ -13742,8 +13742,8 @@ async function run(platform = process.platform) {
             // exec(
             //   `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
             // )
-            (0,exec.getExecOutput)('ls /usr/bin/');
-            // getExecOutput('cd cli')
+            // getExecOutput('ls /usr/bin/')
+            (0,exec.getExecOutput)('cd', ['cli']);
             // getExecOutput('ls')
             return;
         }
