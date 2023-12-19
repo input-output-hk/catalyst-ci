@@ -27,11 +27,7 @@ export async function run(
       // build the ci and move to /usr/local/bin
       exec(
         `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
-      ).then(() => {
-        core.info('Build local ci completed')
-      }).catch(err => {
-        core.setFailed(`Error building ci: ${err}`)
-      })
+      )
 
       return
     }

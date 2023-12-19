@@ -13739,11 +13739,7 @@ async function run(platform = process.platform) {
             core.info('Building ci locally');
             // go into cli folder
             // build the ci and move to /usr/local/bin
-            (0,exec.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`).then(() => {
-                core.info('Build local ci completed');
-            }).catch(err => {
-                core.setFailed(`Error building ci: ${err}`);
-            });
+            (0,exec.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`);
             return;
         }
         if (version !== 'latest' && !isSemVer(version)) {
