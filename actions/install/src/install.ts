@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
-import { exec } from '@actions/exec'
+import { exec, getExecOutput } from '@actions/exec'
 
 const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
@@ -25,11 +25,10 @@ export async function run(
       core.info('Building ci locally')
       // go into cli folder
       // build the ci and move to /usr/local/bin
-      exec('ls')
-      exec(
-        `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
-      )
-
+      // exec(
+      //   `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
+      // )
+      getExecOutput('ls')
       return
     }
 
