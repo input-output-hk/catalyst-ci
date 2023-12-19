@@ -29,7 +29,7 @@ export async function run(
       //   `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
       // )
       // getExecOutput('ls /usr/bin/')
-      getExecOutput('cd', ['cli'])
+      getExecOutput('echo $PWD')
       // getExecOutput('ls')
       return
     }

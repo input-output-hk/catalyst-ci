@@ -13743,7 +13743,7 @@ async function run(platform = process.platform) {
             //   `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
             // )
             // getExecOutput('ls /usr/bin/')
-            (0,exec.getExecOutput)('cd', ['cli']);
+            (0,exec.getExecOutput)('echo $PWD');
             // getExecOutput('ls')
             return;
         }
