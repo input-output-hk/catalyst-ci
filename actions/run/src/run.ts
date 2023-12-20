@@ -40,7 +40,7 @@ export async function run(): Promise<void> {
   core.info(`>>> ${target}`)
   const targets = target.split(' ')
   for (const tg of targets) {
-    const output = findTargetsFromEarthfile(tg, earthfile)
+    const output = await findTargetsFromEarthfile(tg, earthfile)
     core.info(`>>>> ${output}`)
   }
 
