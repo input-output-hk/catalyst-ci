@@ -18,6 +18,11 @@ type Earthfile struct {
 	Version        *spec.Version        `json:"version,omitempty"`
 }
 
+type EarthTargets struct {
+	Earthfile Earthfile
+	Targets   []string
+}
+
 func (e Earthfile) GetImages(target string) ([]string, error) {
 	commands, err := e.GetCommands(target, "SAVE IMAGE")
 	if err != nil {
