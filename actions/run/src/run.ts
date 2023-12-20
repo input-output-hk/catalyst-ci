@@ -40,10 +40,8 @@ export async function run(): Promise<void> {
   core.info(`>>> ${target}`)
   const targets = target.split(' ')
   for (const tg of targets) {
-    const { exitCode, stdout, stderr } = await getExecOutput(
-      `ci find ${earthfile} -t ${tg}`
-    )
-    core.info(`>>>> ${stdout}`)
+    const output = findTargetsFromEarthfile(tg, earthfile)
+    core.info(`>>>> ${output}`)
   }
 
   // targets.map(t => {
@@ -124,4 +122,18 @@ async function spawnCommand(command: string, args: string[]): Promise<string> {
       }
     })
   })
+}
+
+async function findTargetsFromEarthfile(
+  target: string,
+  earthfile: string
+): Promise<string[]> {
+  if (target.endsWith('-*')) {
+    const { exitCode, stdout, stderr } = await getExecOutput(
+      `ci find ${earthfile} -t "check-*`
+    )
+    core.info(`stdout ${stdout}`)
+    return []
+  }
+  return [target]
 }
