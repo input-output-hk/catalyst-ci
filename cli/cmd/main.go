@@ -276,7 +276,11 @@ func (c *findTargetsCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(pathToEarthMap[c.Paths].Targets)
+	jsonOutput, err := json.Marshal(pathToEarthMap[c.Paths].Targets)
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(jsonOutput))
 	return nil
 }
 
