@@ -70,7 +70,7 @@ func getTargetRegex(target string) string {
 	if strings.HasSuffix(target, "-*") {
 		// Should start with given target
 		// followed by hyphen and followed by one or more lowercase letters or numbers
-		return fmt.Sprintf("^%s(?:-[a-z0-9]+)?$", regexp.QuoteMeta(target[:len(target)-2]))
+		return fmt.Sprintf("^%s-(?:[a-z0-9]+)?$", regexp.QuoteMeta(target[:len(target)-2]))
 	}
 
 	// Match the exact target
