@@ -36,7 +36,7 @@ status $rc "Checking Self contained Unit tests all pass" \
 
 ## Check if all documentation tests pass.
 status $rc "Checking Documentation tests all pass" \
-    cargo testdocs; rc=$?
+    cargo +nightly testdocs; rc=$?
 
 ## Check if any benchmarks defined run (We don;t validate the results.)
 status $rc "Checking Benchmarks all run to completion" \
