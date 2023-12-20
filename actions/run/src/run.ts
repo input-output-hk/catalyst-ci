@@ -2,6 +2,7 @@ import * as core from '@actions/core'
 import { spawn } from 'child_process'
 import * as path from 'path'
 import * as fs from 'fs'
+import { getExecOutput } from '@actions/exec'
 
 export async function run(): Promise<void> {
   const artifact = core.getBooleanInput('artifact')
@@ -37,15 +38,22 @@ export async function run(): Promise<void> {
 
   core.info(`>>>>>>> ${earthfile}`)
   core.info(`>>> ${target}`)
-  const targets = getTargetsFromEarthfile(target, earthfile)
-  targets.map(t => {
-    if (artifact) {
-      targetsArgs.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
-    } else {
-      core.info(`Pushing target ${t}`)
-      targetsArgs.push(`${earthfile}+${t}`)
-    }
-  })
+  const targets = target.split(' ')
+  for (const tg of targets) {
+    const { exitCode, stdout, stderr } = await getExecOutput(
+      `ci find ${earthfile} -t ${target}`
+    )
+    core.info(`>>>> ${stdout}`)
+  }
+
+  // targets.map(t => {
+  //   if (artifact) {
+  //     targetsArgs.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
+  //   } else {
+  //     core.info(`Pushing target ${t}`)
+  //     targetsArgs.push(`${earthfile}+${t}`)
+  //   }
+  // })
 
   if (targetFlags) {
     args.push(...targetFlags.split(' '))
@@ -116,25 +124,4 @@ async function spawnCommand(command: string, args: string[]): Promise<string> {
       }
     })
   })
-}
-
-function getTargetsFromEarthfile(target: string, earthfile: string): string[] {
-  if (target.endsWith('-*')) {
-    const targets: string[] = []
-    const mainTarget: string = target.slice(0, -2)
-    const targetRegex = new RegExp(`^${mainTarget}(?:-[a-z0-9]+)?$`)
-
-    const readFileLines = fs
-      .readFileSync(earthfile.concat('/Earthfile'), 'utf8')
-      .split('\n')
-
-    readFileLines.map(line => {
-      const formatLine = line?.trim().slice(0, -1)
-      if (formatLine?.match(targetRegex)) {
-        targets.push(formatLine)
-      }
-    })
-    return targets
-  }
-  return [target]
 }
