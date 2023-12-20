@@ -31,24 +31,38 @@ func (f *FileScanner) Scan() ([]pkg.Earthfile, error) {
 	return earthfiles, nil
 }
 
-func (f *FileScanner) ScanForTarget(target string) ([]pkg.Earthfile, error) {
+func (f *FileScanner) ScanForTarget(target string) (map[string]pkg.EarthTargets, error) {
 	regexPattern := getTargetRegex(target)
-	r, _ := regexp.Compile(regexPattern)
+	r, err := regexp.Compile(regexPattern)
 
-	earthfiles, err := f.scan(func(e pkg.Earthfile) (bool, error) {
+	if err != nil {
+		return nil, err
+	}
+
+	earthfileToTargets := make(map[string]pkg.EarthTargets)
+
+	_, err = f.scan(func(e pkg.Earthfile) (bool, error) {
+		var targets []string
 		for _, t := range e.Targets {
 			if r.MatchString(t.Name) {
-				return true, nil
+				targets = append(targets, t.Name)
 			}
 		}
-
+		if len(targets) != 0 {
+			earthfileToTargets[e.Path] = pkg.EarthTargets{
+				Earthfile: e,
+				Targets:   targets,
+			}
+			return true, nil
+		}
 		return false, nil
 	})
 
 	if err != nil {
 		return nil, err
 	}
-	return earthfiles, nil
+
+	return earthfileToTargets, nil
 }
 
 func getTargetRegex(target string) string {
