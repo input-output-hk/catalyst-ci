@@ -35,6 +35,8 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
+  core.info(`>>>>>>> ${earthfile}`)
+  core.info(`>>> ${target}`)
   const targets = getTargetsFromEarthfile(target, earthfile)
   targets.map(t => {
     if (artifact) {
