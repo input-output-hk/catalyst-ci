@@ -130,7 +130,7 @@ async function findTargetsFromEarthfile(
 ): Promise<string[]> {
   if (target.endsWith('-*')) {
     const { exitCode, stdout, stderr } = await getExecOutput(
-      `ci find ${earthfile} -t "check-*`
+      `ci find ${earthfile} -t =${target}`
     )
     core.info(`stdout ${stdout}`)
     return []
