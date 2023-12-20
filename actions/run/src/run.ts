@@ -41,7 +41,7 @@ export async function run(): Promise<void> {
   const targets = target.split(' ')
   for (const tg of targets) {
     const { exitCode, stdout, stderr } = await getExecOutput(
-      `ci find ${earthfile} -t ${target}`
+      `ci find ${earthfile} -t ${tg}`
     )
     core.info(`>>>> ${stdout}`)
   }

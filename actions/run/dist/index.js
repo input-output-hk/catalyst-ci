@@ -4164,7 +4164,7 @@ async function run() {
     core.info(`>>> ${target}`);
     const targets = target.split(' ');
     for (const tg of targets) {
-        const { exitCode, stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile} -t ${target}`);
+        const { exitCode, stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile} -t ${tg}`);
         core.info(`>>>> ${stdout}`);
     }
     // targets.map(t => {
