@@ -28,7 +28,7 @@ status $rc "Checking all Clippy Lints in the workspace" \
 
 ## Check we can generate all the documentation
 status $rc "Checking Documentation can be generated OK" \
-    cargo docs; rc=$?
+    cargo +nightly docs; rc=$?
 
 ## Check if all Self contained tests pass (Test that need no external resources).
 status $rc "Checking Self contained Unit tests all pass" \
@@ -36,7 +36,7 @@ status $rc "Checking Self contained Unit tests all pass" \
 
 ## Check if all documentation tests pass.
 status $rc "Checking Documentation tests all pass" \
-    cargo testdocs; rc=$?
+    cargo +nightly testdocs; rc=$?
 
 ## Check if any benchmarks defined run (We don;t validate the results.)
 status $rc "Checking Benchmarks all run to completion" \
