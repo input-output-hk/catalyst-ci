@@ -145,10 +145,39 @@ async function findTargetsFromEarthfile(
   target: string,
   earthfile: string
 ): Promise<string[]> {
-  const { stdout, stderr } = await getExecOutput(
-    `ci find ${earthfile.concat('/Earthfile')} -t ${target}`
-  )
+  try {
+    const { stdout, stderr } = await getExecOutput(
+      `ci find ${earthfile.concat('/Earthfile')} -t ${target}`
+    )
 
-  // No targets found or error, should return empty array.
-  return stdout.trim() === 'null' || stderr ? [] : JSON.parse(stdout)
+    // No targets found or error, should return empty array.
+    if (stdout.trim() === 'null') {
+      return []
+    }
+
+    if (stderr) {
+      core.setFailed(`Error stderr: ${stderr}`)
+    }
+
+    // eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment
+    const parsedResult = JSON.parse(stdout)
+
+    // Check whether the parsed result is valid type
+    if (
+      Array.isArray(parsedResult) &&
+      parsedResult.every(item => typeof item === 'string')
+    ) {
+      return parsedResult as string[]
+    } else {
+      // If the parsed result is not a valid array of strings.
+      core.setFailed(`Invalid JSON: ${stdout}`)
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      core.setFailed(error.message)
+    } else {
+      core.setFailed('Unknown error')
+    }
+  }
+  return []
 }
