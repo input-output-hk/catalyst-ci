@@ -43,12 +43,12 @@ class DiagramCfg:
         include_tables = set()
         if extra_includes and len(extra_includes) > 0:
             include_tables.update(extra_includes)
-        if self.excluded_tables and len(self.excluded_tables) > 0:
-            include_tables.difference_update(self.excluded_tables)
         if self.included_tables and len(self.included_tables) > 0:
             include_tables.update(self.included_tables)
         if self.tables and len(self.tables) > 0:
             include_tables.update(self.tables)
+        if self.excluded_tables and len(self.excluded_tables) > 0:
+            include_tables.difference_update(self.excluded_tables)
         if len(include_tables) == 0:
             include_tables = None
 
@@ -276,7 +276,7 @@ class Migrations:
             cli.run(
                 f"dot -Tsvg {filename}.dot -o {filename}",
                 name=f"Render Schema Diagram to SVG: {name}",
-                #verbose=True,
+                verbose=True,
             )
 
         return res
