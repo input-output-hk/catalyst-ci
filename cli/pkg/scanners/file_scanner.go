@@ -44,10 +44,12 @@ func (f *FileScanner) ScanForTarget(target string) (map[string]pkg.EarthTargets,
 	_, err = f.scan(func(e pkg.Earthfile) (bool, error) {
 		var targets []string
 		for _, t := range e.Targets {
+			// Matched target is added to a list.
 			if r.MatchString(t.Name) {
 				targets = append(targets, t.Name)
 			}
 		}
+		// If there are filtered targets, add to a map.
 		if len(targets) != 0 {
 			earthfileToTargets[e.Path] = pkg.EarthTargets{
 				Earthfile: e,

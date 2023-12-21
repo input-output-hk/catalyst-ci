@@ -85,6 +85,7 @@ func (c *scanCmd) Run() error {
 	var files []pkg.Earthfile
 	var err error
 
+	// Target tag is set.
 	if len(c.Target) != 0 {
 		for _, t := range c.Target {
 			pathToEarthMap, err := scanner.ScanForTarget(t)
@@ -92,12 +93,13 @@ func (c *scanCmd) Run() error {
 			if err != nil {
 				return err
 			}
+
+			// Loop through map to get only the Earthfiles.
 			for _, value := range pathToEarthMap {
 				files = append(files, value.Earthfile)
 			}
 
 		}
-
 	} else {
 		files, err = scanner.Scan()
 	}
@@ -225,15 +227,16 @@ func (c *findTargetsCmd) Run() error {
 	parser := parsers.NewEarthlyParser()
 	scanner := scanners.NewFileScanner([]string{c.Paths}, parser, afero.NewOsFs())
 
+	// Map of Earthfile path to Earthfile and filtered targets.
 	var pathToEarthMap map[string]pkg.EarthTargets
 	var err error
 	if c.Target != "" {
 		pathToEarthMap, err = scanner.ScanForTarget(c.Target)
 	}
-
 	if err != nil {
 		return err
 	}
+
 	jsonOutput, err := json.Marshal(pathToEarthMap[c.Paths].Targets)
 	if err != nil {
 		return err

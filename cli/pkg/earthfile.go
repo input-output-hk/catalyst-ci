@@ -18,6 +18,7 @@ type Earthfile struct {
 	Version        *spec.Version        `json:"version,omitempty"`
 }
 
+// Earthfile and its filtered targets.
 type EarthTargets struct {
 	Earthfile Earthfile
 	Targets   []string
