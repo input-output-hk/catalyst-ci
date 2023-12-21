@@ -140,7 +140,7 @@ async function findTargetsFromEarthfile(
     const { exitCode, stdout, stderr } = await getExecOutput(
       `ci find ${earthfile.concat('/Earthfile')} -t ${target}`
     )
-    return stdout !== null ? [stdout] : []
+    return stdout !== 'null' ? [stdout] : []
   }
   return [target]
 }
