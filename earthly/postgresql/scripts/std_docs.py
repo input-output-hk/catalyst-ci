@@ -40,15 +40,14 @@ class DiagramCfg:
         ):
             return None
 
-        include_tables = set()
-        if extra_includes and len(extra_includes) > 0:
-            include_tables.update(extra_includes)
-        if self.included_tables and len(self.included_tables) > 0:
-            include_tables.update(self.included_tables)
-        if self.tables and len(self.tables) > 0:
-            include_tables.update(self.tables)
-        if self.excluded_tables and len(self.excluded_tables) > 0:
-            include_tables.difference_update(self.excluded_tables)
+        include_tables = self.included_tables if self.included_tables else []
+        extra_includes = extra_includes if extra_includes else []
+        excluded_tables = self.excluded_tables if self.excluded_tables else []
+        
+        for table in extra_includes:
+            if table not in excluded_tables and table not in include_tables:
+                include_tables.append(table)
+
         if len(include_tables) == 0:
             include_tables = None
 
@@ -59,13 +58,12 @@ class DiagramCfg:
     ) -> Optional[list[str]]:
         # We exclude from the global exclude tables, any tables the migration
         # specifically includes.
-        exclude_tables = set()
-        if extra_excludes and len(extra_excludes) > 0:
-            exclude_tables.update(extra_excludes)
-        if self.included_tables and len(self.included_tables) > 0:
-            exclude_tables.difference_update(self.included_tables)
-        if self.excluded_tables and len(self.excluded_tables) > 0:
-            exclude_tables.update(self.excluded_tables)
+        exclude_tables = self.excluded_tables if self.excluded_tables else []
+        extra_excludes = extra_excludes if extra_excludes else []
+        for table in self.extra_excludes:
+            if table not in exclude_tables:
+                exclude_tables.append(table)
+        
         if len(exclude_tables) == 0:
             exclude_tables = None
 
