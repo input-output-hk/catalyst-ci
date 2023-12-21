@@ -41,17 +41,15 @@ export async function run(): Promise<void> {
   const targets = target.split(' ')
   for (const tg of targets) {
     const outputs = await findTargetsFromEarthfile(tg, earthfile)
-    if (outputs) {
-      outputs.map(o => {
-        core.info(` ooo> ${o}`)
-        if (artifact) {
-          targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`)
-        } else {
-          core.info(`Pushing target ${o}`)
-          targetsArgs.push(`${earthfile}+${o}`)
-        }
-      })
-    }
+    outputs.map(o => {
+      core.info(` ooo> ${o}`)
+      if (artifact) {
+        targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`)
+      } else {
+        core.info(`Pushing target ${o}`)
+        targetsArgs.push(`${earthfile}+${o}`)
+      }
+    })
   }
 
   // targets.map(t => {
@@ -142,7 +140,7 @@ async function findTargetsFromEarthfile(
     const { exitCode, stdout, stderr } = await getExecOutput(
       `ci find ${earthfile.concat('/Earthfile')} -t ${target}`
     )
-    return [stdout]
+    return stdout !== null ? [stdout] : []
   }
   return [target]
 }
