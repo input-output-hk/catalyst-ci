@@ -141,7 +141,7 @@ async function findTargetsFromEarthfile(
       `ci find ${earthfile.concat('/Earthfile')} -t ${target}`
     )
    core.info(`...... ${stdout} ${typeof(stdout)}`)
-    return stdout !== null ? [stdout] : []
+    return stdout.trim() !== "null" ? [stdout] : []
   }
   return [target]
 }
