@@ -269,7 +269,7 @@ class Migrations:
             + f"{table_description_wrap}"
             + f" > {filename}.dot",
             name=f"Generate Schema Diagram: {name}",
-            #verbose=True
+            verbose=True
         )
 
         if res.ok:

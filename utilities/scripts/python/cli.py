@@ -28,6 +28,8 @@ def format_execution_time(execution_time: float):
 
     return f"{execution_time:.4f} {unit}"
 
+def indent(text:str, first: str, rest: str) -> str:
+    return first + textwrap.indent(text, rest)[len(first):]
 
 @dataclass
 class Result:
@@ -69,8 +71,8 @@ class Result:
             f"[bold cyan]{self.get_name():<{name_width}}[/bold cyan] : {self.duration()} : {self.status()}"
         )
         if verbose or (self.rc != 0 and verbose_errors):
-            print(f"[italic]{textwrap.indent(self.get_command(), '  $ ')}[/italic]")
-            print(f"{textwrap.indent(self.out, '  > ')}")
+            print(f"[italic]{indent(self.get_command(), '  $ ','  . ' )}[/italic]")
+            print(f"{indent(self.out, '  > ', '  . ')}")
 
 
 def run(
