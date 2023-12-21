@@ -4164,8 +4164,17 @@ async function run() {
     core.info(`>>> ${target}`);
     const targets = target.split(' ');
     for (const tg of targets) {
-        const output = await findTargetsFromEarthfile(tg, earthfile);
-        core.info(`>>>> ${output}`);
+        const outputs = await findTargetsFromEarthfile(tg, earthfile);
+        outputs.map(o => {
+            core.info(` ooo> ${o}`);
+            if (artifact) {
+                targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`);
+            }
+            else {
+                core.info(`Pushing target ${o}`);
+                targetsArgs.push(`${earthfile}+${o}`);
+            }
+        });
     }
     // targets.map(t => {
     //   if (artifact) {
@@ -4235,9 +4244,8 @@ async function spawnCommand(command, args) {
 }
 async function findTargetsFromEarthfile(target, earthfile) {
     if (target.endsWith('-*')) {
-        const { exitCode, stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile.concat("/Earthfile")} -t ${target}`);
-        core.info(`stdout ${stdout}`);
-        return [];
+        const { exitCode, stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile.concat('/Earthfile')} -t ${target}`);
+        return [stdout];
     }
     return [target];
 }
