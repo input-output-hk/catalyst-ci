@@ -74,25 +74,6 @@ export async function run(): Promise<void> {
       core.setOutput('artifact', artifactOutput)
     }
   }
-  // return new Promise<void>(resolve =>
-  //   targetsArgs.map(async t => {
-  //     core.info(`Running: ${t}`)
-  //     const spawnArgs = args.concat(t)
-  //     const output = await spawnCommand(command, spawnArgs)
-  //     const imageOutput = parseImage(output)
-  //     if (imageOutput) {
-  //       core.info(`Found image: ${imageOutput}`)
-  //       core.setOutput('image', imageOutput)
-  //     }
-
-  //     const artifactOutput = path.join(earthfile, parseArtifact(output))
-  //     if (artifactOutput !== earthfile) {
-  //       core.info(`Found artifact: ${artifactOutput}`)
-  //       core.setOutput('artifact', artifactOutput)
-  //     }
-  //     resolve()
-  //   })
-  // )
 }
 
 function parseArtifact(output: string): string {
