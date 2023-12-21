@@ -302,11 +302,15 @@ class Migrations:
                 )
 
             exclude_tables = migration.exclude(self.all_schema_excluded_tables())
+            
+            title = f"{migration.migration_name}"
+            if migration.title and len(migration.title) > 0:
+                title = migration.title
 
             return self.dbviz(
                 f"docs/migration-{ver}.svg",
                 f"V{ver}__{migration.migration_name}",
-                f"{migration.title}\n{migration. migration_name}:V{ver}",
+                title,
                 included_tables=include_tables,
                 excluded_tables=exclude_tables,
                 comments=migration.comments,
