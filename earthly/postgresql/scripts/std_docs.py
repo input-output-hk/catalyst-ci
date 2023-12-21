@@ -316,6 +316,12 @@ class Migrations:
             title = f"{migration.migration_name}"
             if migration.title and len(migration.title) > 0:
                 title = migration.title
+                
+            comments=None
+            if migration.comments is not None:
+                comments = migration.comments
+            else:
+                comments = self.all_schema_comments()
 
             return self.dbviz(
                 f"docs/migration-{ver}.svg",
@@ -323,7 +329,7 @@ class Migrations:
                 title,
                 included_tables=include_tables,
                 excluded_tables=exclude_tables,
-                comments=migration.comments,
+                comments=comments,
                 column_description_wrap=migration.column_description_wrap,
                 table_description_wrap=migration.table_description_wrap,
             )
