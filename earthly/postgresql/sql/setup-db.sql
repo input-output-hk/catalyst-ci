@@ -1,4 +1,5 @@
 -- Initialize the Project Catalyst Event Database.
+-- sqlfluff:dialect:postgres
 
 -- cspell: words psql
 
@@ -18,7 +19,7 @@
 \echo -> dbUserPw ............... = xxxx
 
 -- Cleanup if we already ran this before.
-DROP OWNED BY :"dbUser";
+DROP OWNED BY :"dbUser"; -- noqa: PRS
 DROP DATABASE IF EXISTS :"dbName"; -- noqa: PRS
 DROP USER IF EXISTS :"dbUser"; -- noqa: PRS
 
