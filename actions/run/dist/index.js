@@ -4163,8 +4163,10 @@ async function run() {
     const targets = target.split(' ');
     for (const tg of targets) {
         // Get the filtered targets associated with the pattern target and earthfile.
+        core.info(`Target pattern ${tg}`);
         const outputs = await findTargetsFromEarthfile(tg, earthfile);
         outputs.map((o) => {
+            core.info(`Target ${o}`);
             if (artifact) {
                 core.info(`Pushing target ${o} with artifact tag`);
                 targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`);
@@ -4253,12 +4255,9 @@ async function spawnCommand(command, args) {
 }
 // Calling ci find command to get the filtered targets.
 async function findTargetsFromEarthfile(target, earthfile) {
-    if (target.endsWith('-*')) {
-        const { stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile.concat('/Earthfile')} -t ${target}`);
-        // No targets found or error, should return empty array.
-        return stdout.trim() === 'null' || stderr ? [] : [stdout];
-    }
-    return [target];
+    const { stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile.concat('/Earthfile')} -t ${target}`);
+    // No targets found or error, should return empty array.
+    return stdout.trim() === 'null' || stderr ? [] : [stdout];
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts

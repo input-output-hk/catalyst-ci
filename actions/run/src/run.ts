@@ -38,8 +38,10 @@ export async function run(): Promise<void> {
   const targets = target.split(' ')
   for (const tg of targets) {
     // Get the filtered targets associated with the pattern target and earthfile.
+    core.info(`Target pattern ${tg}`)
     const outputs = await findTargetsFromEarthfile(tg, earthfile)
     outputs.map((o: string) => {
+      core.info(`Target ${o}`)
       if (artifact) {
         core.info(`Pushing target ${o} with artifact tag`)
         targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`)
@@ -143,13 +145,10 @@ async function findTargetsFromEarthfile(
   target: string,
   earthfile: string
 ): Promise<string[]> {
-  if (target.endsWith('-*')) {
-    const { stdout, stderr } = await getExecOutput(
-      `ci find ${earthfile.concat('/Earthfile')} -t ${target}`
-    )
+  const { stdout, stderr } = await getExecOutput(
+    `ci find ${earthfile.concat('/Earthfile')} -t ${target}`
+  )
 
-    // No targets found or error, should return empty array.
-    return stdout.trim() === 'null' || stderr ? [] : [stdout]
-  }
-  return [target]
+  // No targets found or error, should return empty array.
+  return stdout.trim() === 'null' || stderr ? [] : [stdout]
 }
