@@ -150,5 +150,5 @@ async function findTargetsFromEarthfile(
   )
 
   // No targets found or error, should return empty array.
-  return stdout.trim() === 'null' || stderr ? [] : [stdout]
+  return stdout.trim() === 'null' || stderr ? [] : JSON.parse(stdout)
 }

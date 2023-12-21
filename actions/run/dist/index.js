@@ -4257,7 +4257,7 @@ async function spawnCommand(command, args) {
 async function findTargetsFromEarthfile(target, earthfile) {
     const { stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile.concat('/Earthfile')} -t ${target}`);
     // No targets found or error, should return empty array.
-    return stdout.trim() === 'null' || stderr ? [] : [stdout];
+    return stdout.trim() === 'null' || stderr ? [] : JSON.parse(stdout);
 }
 
 ;// CONCATENATED MODULE: ./src/index.ts
