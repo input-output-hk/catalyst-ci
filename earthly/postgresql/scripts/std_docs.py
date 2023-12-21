@@ -34,17 +34,12 @@ class DiagramCfg:
         # We exclude from the global include tables, any tables the migration
         # itself requests to be excluded.
 
-        # Don't draw anything if there are no tables to draw for this diagram.
-        if (self.included_tables is None or len(self.included_tables) == 0) and (
-            self.tables is None or len(self.tables) == 0
-        ):
-            return None
-
         include_tables = self.included_tables if self.included_tables else []
+        tables = self.tables if self.tables else []
         extra_includes = extra_includes if extra_includes else []
         excluded_tables = self.excluded_tables if self.excluded_tables else []
         
-        for table in extra_includes:
+        for table in tables + extra_includes:
             if table not in excluded_tables and table not in include_tables:
                 include_tables.append(table)
 
