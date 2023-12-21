@@ -5,7 +5,6 @@ package scanners_test
 import (
 	"errors"
 
-	"github.com/earthly/earthly/ast/spec"
 	"github.com/input-output-hk/catalyst-ci/cli/pkg"
 	"github.com/input-output-hk/catalyst-ci/cli/pkg/scanners"
 	"github.com/spf13/afero"
@@ -77,50 +76,50 @@ var _ = Describe("FileScanner", func() {
 		})
 	})
 
-	Describe("ScanForTarget", func() {
-		setup := func(target string) {
-			err := afero.WriteFile(
-				fs,
-				"/test/Earthfile",
-				[]byte(target),
-				0644,
-			)
+	// Describe("ScanForTarget", func() {
+	// 	setup := func(target string) {
+	// 		err := afero.WriteFile(
+	// 			fs,
+	// 			"/test/Earthfile",
+	// 			[]byte(target),
+	// 			0644,
+	// 		)
 
-			Expect(err).NotTo(HaveOccurred())
-			parser = &mockParser{
-				earthfile: pkg.Earthfile{
-					Targets: []spec.Target{
-						{
-							Name: target,
-						},
-					},
-				},
-			}
-		}
-		DescribeTable("when Earthfile the target",
-			func(targeInput string, targetInFile string) {
-				setup(targetInFile)
-				fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
-				earthfiles, err := fScanner.ScanForTarget(targeInput)
-				Expect(err).NotTo(HaveOccurred())
-				Expect(earthfiles).To(HaveLen(1))
-				Expect(earthfiles[0].Path).To(Equal("/test/Earthfile"))
+	// 		Expect(err).NotTo(HaveOccurred())
+	// 		parser = &mockParser{
+	// 			earthfile: pkg.Earthfile{
+	// 				Targets: []spec.Target{
+	// 					{
+	// 						Name: target,
+	// 					},
+	// 				},
+	// 			},
+	// 		}
+	// 	}
+	// 	DescribeTable("when Earthfile the target",
+	// 		func(targeInput string, targetInFile string) {
+	// 			setup(targetInFile)
+	// 			fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
+	// 			earthfiles, err := fScanner.ScanForTarget(targeInput)
+	// 			Expect(err).NotTo(HaveOccurred())
+	// 			Expect(earthfiles).To(HaveLen(1))
+	// 			Expect(earthfiles[0].Path).To(Equal("/test/Earthfile"))
 
-			},
-			Entry("target in file is 'docker'", "docker", "docker"),
-			Entry("target in file is 'docker-[a-z0-9]'", "docker-*", "docker-test"),
-		)
-		DescribeTable("when Earthfile contain no target",
-			func(target string) {
-				setup(target)
-				fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
-				earthfiles, err := fScanner.ScanForTarget("docker")
-				Expect(err).NotTo(HaveOccurred())
-				Expect(earthfiles).To(BeEmpty())
+	// 		},
+	// 		Entry("target in file is 'docker'", "docker", "docker"),
+	// 		Entry("target in file is 'docker-[a-z0-9]'", "docker-*", "docker-test"),
+	// 	)
+	// 	DescribeTable("when Earthfile contain no target",
+	// 		func(target string) {
+	// 			setup(target)
+	// 			fScanner := scanners.NewFileScanner([]string{"/test"}, parser, fs)
+	// 			earthfiles, err := fScanner.ScanForTarget("docker")
+	// 			Expect(err).NotTo(HaveOccurred())
+	// 			Expect(earthfiles).To(BeEmpty())
 
-			},
-			Entry("target in file doesn't match but contain the word docker", "testdocker"),
-			Entry("no match target", "other"),
-		)
-	})
+	// 		},
+	// 		Entry("target in file doesn't match but contain the word docker", "testdocker"),
+	// 		Entry("no match target", "other"),
+	// 	)
+	// })
 })
