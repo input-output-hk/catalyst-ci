@@ -227,15 +227,15 @@ class Migrations:
         if len(title) > 0:
             title = f' --title "{title}"'
 
-        if included_tables and len(included_tables) > 0:
-            included_tables = " -i ".join(included_tables)
-        else:
-            included_tables = ""
+        includes = ""
+        if included_tables:
+            for table in included_tables:
+                includes += f" -i {table}"
 
-        if excluded_tables and len(excluded_tables) > 0:
-            excluded_tables = " -e ".join(excluded_tables)
-        else:
-            excluded_tables = ""
+        excludes = ""
+        if excluded_tables:
+            for table in excluded_tables:
+                excludes += f" -e {table}"
 
         if comments:
             comments = " --comments"
@@ -262,8 +262,8 @@ class Migrations:
             + f" -u {self.args.dbuser}"
             + f" -p {self.args.dbuserpw}"
             + f"{title}"
-            + f"{included_tables}"
-            + f"{excluded_tables}"
+            + f"{includes}"
+            + f"{excludes}"
             + f"{comments}"
             + f"{column_description_wrap}"
             + f"{table_description_wrap}"
