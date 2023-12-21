@@ -228,12 +228,12 @@ class Migrations:
             title = f' --title "{title}"'
 
         if included_tables and len(included_tables) > 0:
-            included_tables = " -i " + " ".join(included_tables)
+            included_tables = " -i ".join(included_tables)
         else:
             included_tables = ""
 
         if excluded_tables and len(excluded_tables) > 0:
-            excluded_tables = " -e " + " ".join(excluded_tables)
+            excluded_tables = " -e ".join(excluded_tables)
         else:
             excluded_tables = ""
 
@@ -267,17 +267,18 @@ class Migrations:
             + f"{comments}"
             + f"{column_description_wrap}"
             + f"{table_description_wrap}"
-            + f" > {filename}.dot",
+            + f" | dot -Tsvg -o {filename}"
+            #+ f" > {filename}.dot",
             name=f"Generate Schema Diagram: {name}",
             verbose=True,
         )
 
-        if res.ok:
-            cli.run(
-                f"dot -Tsvg {filename}.dot -o {filename}",
-                name=f"Render Schema Diagram to SVG: {name}",
-                verbose=True,
-            )
+        #if res.ok:
+        #    cli.run(
+        #        f"dot -Tsvg {filename}.dot -o {filename}",
+        #        name=f"Render Schema Diagram to SVG: {name}",
+        #        verbose=True,
+        #    )
 
         return res
 
