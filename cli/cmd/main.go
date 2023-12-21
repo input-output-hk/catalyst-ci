@@ -8,7 +8,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"strings"
 	"text/template"
 	"time"
 
@@ -75,9 +74,8 @@ func (c *imagesCmd) Run() error {
 
 type scanCmd struct {
 	JSONOutput bool     `short:"j" long:"json"   help:"Output in JSON format"`
-	Images     bool     `short:"i" long:"images" help:"Also output images for the target of each Earthfile (requires -t option)"`
 	Paths      []string `                        help:"paths to scan for Earthfiles"                                             arg:"" type:"path"`
-	Target     string   `short:"t"               help:"filter by Earthfiles that include this target"                                               default:""`
+	Target     []string `short:"t"               help:"filter by Earthfiles that include this target"                                               default:""`
 }
 
 func (c *scanCmd) Run() error {
@@ -86,14 +84,18 @@ func (c *scanCmd) Run() error {
 
 	var files []pkg.Earthfile
 	var err error
-	if c.Target != "" {
-		pathToEarthMap, _ := scanner.ScanForTarget(c.Target)
 
-		if err != nil {
-			return err
-		}
-		for _, value := range pathToEarthMap {
-			files = append(files, value.Earthfile)
+	if len(c.Target) != 0 {
+		for _, t := range c.Target {
+			pathToEarthMap, err := scanner.ScanForTarget(t)
+
+			if err != nil {
+				return err
+			}
+			for _, value := range pathToEarthMap {
+				files = append(files, value.Earthfile)
+			}
+
 		}
 
 	} else {
@@ -102,50 +104,6 @@ func (c *scanCmd) Run() error {
 
 	if err != nil {
 		return err
-	}
-
-	if c.Images {
-		if c.Target == "" {
-			return fmt.Errorf(
-				"the --images (-i) option requires the --target (-t) option",
-			)
-		}
-
-		var output = make(map[string][]string)
-
-		for _, file := range files {
-			images, err := file.GetImages(c.Target)
-			if err != nil {
-				return err
-			}
-
-			output[filepath.Dir(file.Path)] = images
-		}
-
-		if c.JSONOutput {
-			var outFinal []interface{}
-			for path, images := range output {
-				out := struct {
-					Images []string `json:"images"`
-					Path   string   `json:"path"`
-				}{
-					Images: images,
-					Path:   path,
-				}
-				outFinal = append(outFinal, out)
-			}
-			jsonOutput, err := json.Marshal(outFinal)
-			if err != nil {
-				return err
-			}
-			fmt.Println(string(jsonOutput))
-		} else {
-			for path, images := range output {
-				fmt.Printf("%s %s\n", path, strings.Join(images, ","))
-			}
-		}
-
-		return nil
 	}
 
 	if c.JSONOutput {
