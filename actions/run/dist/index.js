@@ -4160,14 +4160,13 @@ async function run() {
     if (flags) {
         args.push(...flags.split(' '));
     }
-    core.info(`>>>>>>> ${earthfile}`);
-    core.info(`>>> ${target}`);
     const targets = target.split(' ');
     for (const tg of targets) {
+        // Get the filtered targets associated with the pattern target and earthfile.
         const outputs = await findTargetsFromEarthfile(tg, earthfile);
-        outputs.map(o => {
-            core.info(` ooo> ${o}`);
+        outputs.map((o) => {
             if (artifact) {
+                core.info(`Pushing target ${o} with artifact tag`);
                 targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`);
             }
             else {
@@ -4176,20 +4175,13 @@ async function run() {
             }
         });
     }
-    // targets.map(t => {
-    //   if (artifact) {
-    //     targetsArgs.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
-    //   } else {
-    //     core.info(`Pushing target ${t}`)
-    //     targetsArgs.push(`${earthfile}+${t}`)
-    //   }
-    // })
     if (targetFlags) {
         args.push(...targetFlags.split(' '));
     }
     core.info(`Running command: ${command} ${args.join(' ')}`);
-    return new Promise(resolve => targetsArgs.map(async (t) => {
-        core.info(`Running: ${t}`);
+    // Running each target command in different process.
+    for (const t of targetsArgs) {
+        core.info(`Running: target: ${t}`);
         const spawnArgs = args.concat(t);
         const output = await spawnCommand(command, spawnArgs);
         const imageOutput = parseImage(output);
@@ -4202,8 +4194,25 @@ async function run() {
             core.info(`Found artifact: ${artifactOutput}`);
             core.setOutput('artifact', artifactOutput);
         }
-        resolve();
-    }));
+    }
+    // return new Promise<void>(resolve =>
+    //   targetsArgs.map(async t => {
+    //     core.info(`Running: ${t}`)
+    //     const spawnArgs = args.concat(t)
+    //     const output = await spawnCommand(command, spawnArgs)
+    //     const imageOutput = parseImage(output)
+    //     if (imageOutput) {
+    //       core.info(`Found image: ${imageOutput}`)
+    //       core.setOutput('image', imageOutput)
+    //     }
+    //     const artifactOutput = path.join(earthfile, parseArtifact(output))
+    //     if (artifactOutput !== earthfile) {
+    //       core.info(`Found artifact: ${artifactOutput}`)
+    //       core.setOutput('artifact', artifactOutput)
+    //     }
+    //     resolve()
+    //   })
+    // )
 }
 function parseArtifact(output) {
     const regex = /^Artifact .*? output as (.*?)$/gm;
@@ -4242,11 +4251,12 @@ async function spawnCommand(command, args) {
         });
     });
 }
+// Calling ci find command to get the filtered targets.
 async function findTargetsFromEarthfile(target, earthfile) {
     if (target.endsWith('-*')) {
-        const { exitCode, stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile.concat('/Earthfile')} -t ${target}`);
-        core.info(`...... ${stdout} ${typeof (stdout)}`);
-        return stdout.trim() !== "null" ? [stdout] : [];
+        const { stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile.concat('/Earthfile')} -t ${target}`);
+        // No targets found or error, should return empty array.
+        return stdout.trim() === 'null' || stderr ? [] : [stdout];
     }
     return [target];
 }
