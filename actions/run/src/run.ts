@@ -41,15 +41,17 @@ export async function run(): Promise<void> {
   const targets = target.split(' ')
   for (const tg of targets) {
     const outputs = await findTargetsFromEarthfile(tg, earthfile)
-    outputs.map(o => {
-      core.info(` ooo> ${o}`)
-      if (artifact) {
-        targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`)
-      } else {
-        core.info(`Pushing target ${o}`)
-        targetsArgs.push(`${earthfile}+${o}`)
-      }
-    })
+    if (outputs) {
+      outputs.map(o => {
+        core.info(` ooo> ${o}`)
+        if (artifact) {
+          targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`)
+        } else {
+          core.info(`Pushing target ${o}`)
+          targetsArgs.push(`${earthfile}+${o}`)
+        }
+      })
+    }
   }
 
   // targets.map(t => {
