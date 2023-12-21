@@ -28,11 +28,11 @@ rust-base:
         echo "USERPLATFORM   = $USERPLATFORM"; \
         echo "USEROS         = $USEROS"; \
         echo "USERARCH       = $USERARCH"; \
-        echo "USERVARIANT    = $USERVARIANT"; 
+        echo "USERVARIANT    = $USERVARIANT";
 
     WORKDIR /root
 
-    # Install necessary packages 
+    # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
      RUN apk add --no-cache \
             musl-dev \
@@ -47,7 +47,7 @@ rust-base:
     RUN rustup component add clippy
 
     # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component llvm-tools-preview
 
     # Install the default cargo config.
     COPY stdcfgs/cargo_config.toml $CARGO_HOME/config.toml
@@ -61,7 +61,8 @@ rust-base:
         cargo install refinery_cli  --version=0.8.11 && \
         cargo install cargo-deny    --version=0.14.3 && \
         cargo install cargo-modules --version=0.10.2 && \
-        cargo install cargo-depgraph --version=1.5.0
+        cargo install cargo-depgraph --version=1.5.0 && \
+        cargo install cargo-llvm-cov --version=0.5.39
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
 
@@ -75,7 +76,7 @@ rust-base:
 
 # Builds all the rust-base targets for each supported DOCKER architecture.
 # Currently only used for multi-platform cross build testing.
-# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for 
+# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
 # docker enabled on Mac.
 # Again, this is just a test target, and not for general use.
 rust-base-all-hosts:
@@ -122,6 +123,16 @@ BUILD:
     ARG bins=""
 
     RUN /scripts/std_build.sh "$libs" "$bins"
+
+# Run unit tests and generates test and coverage report artifacts
+UNIT_TEST:
+    COMMAND
+    # remove artifacts that may affect the coverage results
+    RUN cargo llvm-cov clean --workspace
+    # run unit tests and display test result and test coverage
+    RUN cargo llvm-cov nextest --release --bins --lib --workspace --locked -P ci
+    # generate lcov report
+    RUN cargo llvm-cov report --release --output-path coverage-report.info
 
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:

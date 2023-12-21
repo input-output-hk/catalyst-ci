@@ -20,24 +20,29 @@ check-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:    
+check-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
 
 
 # Build the service.
 build-hosted:
     FROM +builder
- 
+
     DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
+
+    DO ./../../earthly/rust+UNIT_TEST
 
     DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/foo foo
+    SAVE ARTIFACT target/$TARGETARCH/nextest/ci/junit.xml junit-report.xml
+    SAVE ARTIFACT coverage-report.info coverage-report.info
+
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:    
+build-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
 
 ## -----------------------------------------------------------------------------
