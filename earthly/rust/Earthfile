@@ -46,8 +46,11 @@ rust-base:
     # Make sure we have the clippy linter.
     RUN rustup component add clippy
 
+    # Needed to generate code coverage.
+    RUN rustup component add llvm-tools-preview
+
     # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component llvm-tools-preview
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
 
     # Install the default cargo config.
     COPY stdcfgs/cargo_config.toml $CARGO_HOME/config.toml
