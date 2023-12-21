@@ -1,7 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION 0.7
 
-# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf depgraph
+# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf depgraph lcov
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.

@@ -1,6 +1,6 @@
 VERSION 0.7
 
-# cspell: words TARGETARCH USERARCH toolsets rustfmt
+# cspell: words TARGETARCH USERARCH toolsets rustfmt nextest
 
 # Set up our target toolchains, and copy our files.
 builder:
