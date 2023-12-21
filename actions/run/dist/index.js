@@ -4245,7 +4245,8 @@ async function spawnCommand(command, args) {
 async function findTargetsFromEarthfile(target, earthfile) {
     if (target.endsWith('-*')) {
         const { exitCode, stdout, stderr } = await (0,exec.getExecOutput)(`ci find ${earthfile.concat('/Earthfile')} -t ${target}`);
-        return stdout !== 'null' ? [stdout] : [];
+        core.info(`...... ${stdout} ${typeof (stdout)}`);
+        return stdout !== null ? [stdout] : [];
     }
     return [target];
 }
