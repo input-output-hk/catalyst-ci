@@ -55,7 +55,7 @@ class DiagramCfg:
         # specifically includes.
         exclude_tables = self.excluded_tables if self.excluded_tables else []
         extra_excludes = extra_excludes if extra_excludes else []
-        for table in self.extra_excludes:
+        for table in extra_excludes:
             if table not in exclude_tables:
                 exclude_tables.append(table)
         
