@@ -29,7 +29,9 @@ class DiagramCfg:
     sql_data: str
 
     def include(
-        self, extra_includes: Optional[list[str]] = None
+        self,
+        extra_includes: Optional[list[str]] = None,
+        extra_excludes: Optional[list[str]] = None,
     ) -> Optional[list[str]]:
         # We exclude from the global include tables, any tables the migration
         # itself requests to be excluded.
@@ -38,12 +40,14 @@ class DiagramCfg:
         tables = self.tables if self.tables else []
         extra_includes = extra_includes if extra_includes else []
         excluded_tables = self.excluded_tables if self.excluded_tables else []
-        
-        print(excluded_tables)
-        print(include_tables)
+        extra_excludes = extra_excludes if extra_excludes else []
+
         for table in tables + extra_includes:
-            print(table)
-            if table not in excluded_tables and table not in include_tables:
+            if (
+                table not in excluded_tables
+                and table not in extra_excludes
+                and table not in include_tables
+            ):
                 include_tables.append(table)
 
         if len(include_tables) == 0:
@@ -61,7 +65,7 @@ class DiagramCfg:
         for table in extra_excludes:
             if table not in exclude_tables:
                 exclude_tables.append(table)
-        
+
         if len(exclude_tables) == 0:
             exclude_tables = None
 
@@ -86,7 +90,7 @@ def process_sql_files(directory):
         comments = None
         column_description_wrap = None
         table_description_wrap = None
-        
+
         match = re.match(file_pattern, filename)
         if match:
             version = int(match.group(1))
@@ -265,7 +269,7 @@ class Migrations:
             + f"{table_description_wrap}"
             + f" > {filename}.dot",
             name=f"Generate Schema Diagram: {name}",
-            verbose=True
+            verbose=True,
         )
 
         if res.ok:
@@ -294,7 +298,9 @@ class Migrations:
         if ver in self.migrations:
             migration = self.migrations[ver]
 
-            include_tables = migration.include(self.all_schema_included_tables())
+            include_tables = migration.include(
+                self.all_schema_included_tables(), self.all_schema_excluded_tables()
+            )
             if include_tables is None:
                 return cli.Result(
                     0,
@@ -305,7 +311,7 @@ class Migrations:
                 )
 
             exclude_tables = migration.exclude(self.all_schema_excluded_tables())
-            
+
             title = f"{migration.migration_name}"
             if migration.title and len(migration.title) > 0:
                 title = migration.title
@@ -416,9 +422,10 @@ def main():
         # cli.run("cat /tmp/migrations.md", verbose=True)
 
     results.print()
-    
+
     if not results.ok():
         exit(1)
+
 
 if __name__ == "__main__":
     main()
