@@ -21,7 +21,7 @@ tags:
 This guide will get you started with using the Catalyst CI to build projects that include Bash scripts.
 By the end of the guide, we'll have an `Earthfile` that utilizes the Catalyst CI that can check your Bash scripts.
 
-Bash is not considered a stand alone target,  although bash scripts ar used extensively across multiple targets.
+Bash is not considered a stand alone target,  although bash scripts are used extensively across multiple targets.
 The Bash support consists solely of a single repo wide `check` target which validates:
 
 * Are any of the `bash` shell scripts redundant.
