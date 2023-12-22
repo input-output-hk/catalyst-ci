@@ -30,20 +30,23 @@ build-hosted:
 
     DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
 
-    DO ./../../earthly/rust+UNIT_TEST
-
     DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
     SAVE ARTIFACT target/$TARGETARCH/doc doc
     SAVE ARTIFACT target/$TARGETARCH/release/foo foo
-    SAVE ARTIFACT target/$TARGETARCH/nextest/ci/junit.xml junit-report.xml
-    SAVE ARTIFACT coverage-report.info coverage-report.info
-
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 build-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+
+test-hosted:
+    FROM +builder
+
+    DO ./../../earthly/rust+UNIT_TEST
+
+    SAVE ARTIFACT target/$TARGETARCH/nextest/ci/junit.xml junit-report.xml
+    SAVE ARTIFACT coverage-report.info coverage-report.info
 
 ## -----------------------------------------------------------------------------
 ##
@@ -81,7 +84,21 @@ build:
         BUILD --platform=linux/amd64 +build-hosted
     END
 
+test:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +test-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +test-hosted
+    END
+
 # This step simulates the full CI run for local purposes only.
 local-ci-run:
     BUILD +check
     BUILD +build
+    BUILD +test
