@@ -45,7 +45,7 @@ test-hosted:
 
     DO ./../../earthly/rust+UNIT_TEST
 
-    SAVE ARTIFACT target/$TARGETARCH/nextest/ci/junit.xml junit-report.xml
+    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
     SAVE ARTIFACT coverage-report.info coverage-report.info
 
 ## -----------------------------------------------------------------------------
