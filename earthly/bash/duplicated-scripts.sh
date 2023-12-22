@@ -9,7 +9,6 @@ rc=0
 # Create an associative array to store the file contents and their corresponding filenames
 declare -A files
 
-# Loop through all files with the .sh extension recursively
 # Loop through all files with the .sh extension recursively, excluding symlinked directories
 while IFS= read -r -d '' file; do
     # Calculate the MD5 hash of the file's contents
