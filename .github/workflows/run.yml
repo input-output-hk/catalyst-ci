@@ -85,6 +85,7 @@ jobs:
           else
             echo "json=$output" >> $GITHUB_OUTPUT
             paths=$(echo "$output" | jq -r 'keys_unsorted[]')
+            echo ${{steps.discover.outputs.paths}}
             fi
 
   run:
