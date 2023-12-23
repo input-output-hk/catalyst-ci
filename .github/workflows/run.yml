@@ -1,67 +1,68 @@
 # WARNING: If you modify this workflow, please update the documentation
 
 on:
-    workflow_call:
-      inputs:
-        privileged:
-          description: |
-            Whether the workflow should run earthly in privileged mode (earthly -P flag).
-          required: false
-          type: boolean
-          default: false
-        target:
-          description: |
-            The target to run.
-          required: true
-          type: string
-        aws_role_arn:
-          description: |
-            The ARN of the AWS role that will be assumed by the workflow. Only
-            required when configuring a remote Earthly runner.
-          required: false
-          type: string
-        aws_region:
-          description: |
-            The AWS region that will be used by the workflow. Only required when
-            configuring a remote Earthly runner.
-          required: false
-          type: string
-        ci_cli_version:
-          description: |
-            The version of the CI CLI to use.
-          required: false
-          type: string
-          default: latest
-        earthly_version:
-          description: The version of Earthly to use.
-          required: false
-          type: string
-          default: latest
-      secrets:
-        dockerhub_username:
-          description: The token to use for logging into the DockerHub registry.
-          required: false
-        dockerhub_token:
-          description: The token to use for logging into the DockerHub registry.
-          required: false
-        earthly_runner_address:
-          description: |
-            The address of the Earthly runner that will be used to build the
-            Earthly files.
-          required: false
-        earthly_runner_secret:
-          description: |
-            The ID of the AWS secret holding Earthly remote runner credentials.
-            This secret must contain the runner address and the necessary TLS
-            certificates required to authenticate with it. If omitted, a remote
-            Earthly runner will not be configured.
-          required: false
+  workflow_call:
+    inputs:
+      privileged:
+        description: |
+          Whether the workflow should run earthly in privileged mode (earthly -P flag).
+        required: false
+        type: boolean
+        default: false
+      target:
+        description: |
+          The target to run.
+        required: true
+        type: string
+      aws_role_arn:
+        description: |
+          The ARN of the AWS role that will be assumed by the workflow. Only
+          required when configuring a remote Earthly runner.
+        required: false
+        type: string
+      aws_region:
+        description: |
+          The AWS region that will be used by the workflow. Only required when
+          configuring a remote Earthly runner.
+        required: false
+        type: string
+      ci_cli_version:
+        description: |
+          The version of the CI CLI to use.
+        required: false
+        type: string
+        default: latest
+      earthly_version:
+        description: The version of Earthly to use.
+        required: false
+        type: string
+        default: latest
+    secrets:
+      dockerhub_username:
+        description: The token to use for logging into the DockerHub registry.
+        required: false
+      dockerhub_token:
+        description: The token to use for logging into the DockerHub registry.
+        required: false
+      earthly_runner_address:
+        description: |
+          The address of the Earthly runner that will be used to build the
+          Earthly files.
+        required: false
+      earthly_runner_secret:
+        description: |
+          The ID of the AWS secret holding Earthly remote runner credentials.
+          This secret must contain the runner address and the necessary TLS
+          certificates required to authenticate with it. If omitted, a remote
+          Earthly runner will not be configured.
+        required: false
 
 jobs:
   discover:
     runs-on: ubuntu-latest
     outputs:
       json: ${{ steps.check.outputs.json }}
+      paths: ${{ steps.check.outputs.paths }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
@@ -83,6 +84,7 @@ jobs:
             echo "json=[]" >> $GITHUB_OUTPUT
           else
             echo "json=$output" >> $GITHUB_OUTPUT
+            paths=$(echo "$output" | jq -r 'to_entries | map(.value[].path) | join(",")')
           fi
 
   run:
@@ -92,7 +94,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        earthfile: ${{ fromJson(needs.discover.outputs.json) }}
+        earthfile: ${{ fromJson(needs.discover.outputs.paths) }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
@@ -113,3 +115,4 @@ jobs:
           earthfile: ${{ matrix.earthfile }}
           target: ${{ inputs.target }}
           runner_address: ${{ secrets.earthly_runner_address }}
+          earthfile_map_targets: ${{ fromJson(needs.discover.outputs.json) }}

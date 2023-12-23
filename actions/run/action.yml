@@ -35,6 +35,10 @@ inputs:
   target_flags:
     description: Additional flags to pass to the target
     required: false
+  earthfile_map_targets:
+    description: Map of Earthfile directory and its corresponding filtered targets.
+    required: true
+
 runs:
   using: "node20"
   main: "dist/index.js"

@@ -82,11 +82,9 @@ func (c *scanCmd) Run() error {
 	parser := parsers.NewEarthlyParser()
 	scanner := scanners.NewFileScanner(c.Paths, parser, afero.NewOsFs())
 
-	var files []pkg.Earthfile
-	var err error
-
 	// Target tag is set.
 	if len(c.Target) != 0 {
+		var fileMapTarget = make(map[string][]string)
 		for _, t := range c.Target {
 			pathToEarthMap, err := scanner.ScanForTarget(t)
 
@@ -94,37 +92,43 @@ func (c *scanCmd) Run() error {
 				return err
 			}
 
-			// Loop through map to get only the Earthfiles.
-			for _, value := range pathToEarthMap {
-				files = append(files, value.Earthfile)
+			for key, value := range pathToEarthMap {
+				if existingTargets, ok := fileMapTarget[filepath.Dir(key)]; ok {
+					fileMapTarget[filepath.Dir(key)] = append(existingTargets, value.Targets...)
+				} else {
+					fileMapTarget[filepath.Dir(key)] = value.Targets
+				}
 			}
-
 		}
+
+		c.printOutput(fileMapTarget)
+
 	} else {
-		files, err = scanner.Scan()
-	}
-
-	if err != nil {
-		return err
-	}
-
-	if c.JSONOutput {
+		files, err := scanner.Scan()
+		if err != nil {
+			return err
+		}
 		paths := make([]string, 0)
 		for _, file := range files {
 			paths = append(paths, filepath.Dir(file.Path))
 		}
 
-		jsonFiles, err := json.Marshal(paths)
+		c.printOutput(paths)
+	}
+
+	return nil
+}
+
+func (c *scanCmd) printOutput(data any) error {
+	if c.JSONOutput {
+		jsonOutput, err := json.Marshal(data)
 		if err != nil {
 			return err
 		}
-		fmt.Println(string(jsonFiles))
-	} else {
-		for _, file := range files {
-			fmt.Println(filepath.Dir(file.Path))
-		}
+		fmt.Println(string(jsonOutput))
+		return nil
 	}
-
+	fmt.Println(data)
 	return nil
 }
 
