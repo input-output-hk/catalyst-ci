@@ -34,6 +34,7 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
+  core.info(`Log: >> ${earthfileMapTargets}`)
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
   const targets = JSON.parse(earthfileMapTargets)[earthfile]
 
