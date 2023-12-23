@@ -2885,7 +2885,6 @@ async function run() {
     const privileged = core.getBooleanInput('privileged');
     const runnerAddress = core.getInput('runner_address');
     const runnerPort = core.getInput('runner_port');
-    const target = core.getInput('target');
     const targetFlags = core.getInput('target_flags');
     const earthfileMapTargets = core.getInput('earthfile_map_targets');
     const command = 'earthly';
@@ -2903,9 +2902,8 @@ async function run() {
     if (flags) {
         args.push(...flags.split(' '));
     }
-    // eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment
-    const parsedResult = JSON.parse(earthfileMapTargets);
-    const targets = parsedResult[earthfile];
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
+    const targets = JSON.parse(earthfileMapTargets)[earthfile];
     for (const tg of targets) {
         // Get the filtered targets associated with the pattern target and earthfile.
         if (artifact) {

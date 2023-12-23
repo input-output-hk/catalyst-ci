@@ -29,9 +29,6 @@ inputs:
     description: The port to use for connecting to the remote runner
     required: false
     default: "8372"
-  target:
-    description: The name of the target to run
-    required: true
   target_flags:
     description: Additional flags to pass to the target
     required: false

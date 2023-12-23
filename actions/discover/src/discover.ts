@@ -17,12 +17,13 @@ export async function run(): Promise<void> {
     core.info(`Running command: ${command}`)
     const data = await execCommand(command)
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const parsedData = JSON.parse(data)
 
     const pathsArray = []
 
     for (const key in parsedData) {
-      if (parsedData.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(parsedData, key)) {
         pathsArray.push(key)
       }
     }

@@ -115,6 +115,5 @@ jobs:
         with:
           privileged: ${{ inputs.privileged }}
           earthfile: ${{ matrix.earthfile }}
-          target: ${{ inputs.target }}
           runner_address: ${{ secrets.earthly_runner_address }}
           earthfile_map_targets: ${{ needs.discover.outputs.json }}
