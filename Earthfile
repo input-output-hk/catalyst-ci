@@ -4,6 +4,10 @@ FROM debian:stable-slim
 
 # cspell: words livedocs sitedocs
 
+
+check: 
+    DO ./earthly/mdlint+CHECK
+
 # check-markdown can be done remotely.
 check-markdown: 
     DO ./earthly/mdlint+CHECK
