@@ -84,8 +84,8 @@ jobs:
             echo "json=[]" >> $GITHUB_OUTPUT
           else
             echo "json=$output" >> $GITHUB_OUTPUT
-            paths=$(echo "$output" | jq -r 'to_entries | map(.value[].path) | join(",")')
-          fi
+            paths=$(echo "$output" | jq -r 'keys_unsorted[]')
+            fi
 
   run:
     runs-on: ubuntu-latest
