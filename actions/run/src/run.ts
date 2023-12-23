@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import { spawn } from 'child_process'
 import * as path from 'path'
-import { getExecOutput } from '@actions/exec'
 
 export async function run(): Promise<void> {
   const artifact = core.getBooleanInput('artifact')
@@ -14,6 +13,7 @@ export async function run(): Promise<void> {
   const runnerPort = core.getInput('runner_port')
   const target = core.getInput('target')
   const targetFlags = core.getInput('target_flags')
+  const earthfileMapTargets = core.getInput('earthfile_map_targets')
 
   const command = 'earthly'
   const args: string[] = []
@@ -35,21 +35,19 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
-  const targets = target.split(' ')
+  // eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment
+  const parsedResult = JSON.parse(earthfileMapTargets)
+
+  const targets = parsedResult[earthfile]
   for (const tg of targets) {
     // Get the filtered targets associated with the pattern target and earthfile.
-    core.info(`Target pattern ${tg}`)
-    const outputs = await findTargetsFromEarthfile(tg, earthfile)
-    outputs.map((o: string) => {
-      core.info(`Target ${o}`)
-      if (artifact) {
-        core.info(`Pushing target ${o} with artifact tag`)
-        targetsArgs.push('--artifact', `${earthfile}+${o}/`, `${artifactPath}`)
-      } else {
-        core.info(`Pushing target ${o}`)
-        targetsArgs.push(`${earthfile}+${o}`)
-      }
-    })
+    if (artifact) {
+      core.info(`Pushing target ${tg} with artifact tag`)
+      targetsArgs.push('--artifact', `${earthfile}+${tg}/`, `${artifactPath}`)
+    } else {
+      core.info(`Pushing target ${tg}`)
+      targetsArgs.push(`${earthfile}+${tg}`)
+    }
   }
 
   if (targetFlags) {
@@ -119,46 +117,4 @@ async function spawnCommand(command: string, args: string[]): Promise<string> {
       }
     })
   })
-}
-
-// Calling ci find command to get the filtered targets.
-async function findTargetsFromEarthfile(
-  target: string,
-  earthfile: string
-): Promise<string[]> {
-  try {
-    const { stdout, stderr } = await getExecOutput(
-      `ci find ${earthfile.concat('/Earthfile')} -t ${target}`
-    )
-
-    // No targets found or error, should return empty array.
-    if (stdout.trim() === 'null') {
-      return []
-    }
-
-    if (stderr) {
-      core.setFailed(`Error stderr: ${stderr}`)
-    }
-
-    // eslint-disable-next-line  @typescript-eslint/no-unsafe-assignment
-    const parsedResult = JSON.parse(stdout)
-
-    // Check whether the parsed result is valid type
-    if (
-      Array.isArray(parsedResult) &&
-      parsedResult.every(item => typeof item === 'string')
-    ) {
-      return parsedResult as string[]
-    } else {
-      // If the parsed result is not a valid array of strings.
-      core.setFailed(`Invalid JSON: ${stdout}`)
-    }
-  } catch (error) {
-    if (error instanceof Error) {
-      core.setFailed(error.message)
-    } else {
-      core.setFailed('Unknown error')
-    }
-  }
-  return []
 }
