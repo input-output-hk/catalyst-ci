@@ -15,7 +15,20 @@ export async function run(): Promise<void> {
     const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)
-    core.setOutput('json', await execCommand(command))
+    const data = await execCommand(command)
+
+    const parsedData = JSON.parse(data)
+
+    const pathsArray = []
+
+    for (const key in parsedData) {
+      if (parsedData.hasOwnProperty(key)) {
+        pathsArray.push(key)
+      }
+    }
+
+    core.setOutput('json', data)
+    core.setOutput('paths', pathsArray)
   } catch (error) {
     if (error instanceof Error) {
       core.setFailed(error.message)
