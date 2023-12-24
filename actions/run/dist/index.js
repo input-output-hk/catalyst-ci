@@ -2902,22 +2902,22 @@ async function run() {
     if (flags) {
         args.push(...flags.split(' '));
     }
-    core.info(`Log: >> ${earthfileMapTargets}`);
+    if (targetFlags) {
+        args.push(...targetFlags.split(' '));
+    }
+    core.info(`Map of earthfile and its targets >> ${earthfileMapTargets}`);
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
     const targets = JSON.parse(earthfileMapTargets)[earthfile];
     for (const tg of targets) {
         // Get the filtered targets associated with the pattern target and earthfile.
         if (artifact) {
             core.info(`Pushing target ${tg} with artifact tag`);
-            targetsArgs.push('--artifact', `${earthfile}+${tg}/`, `${artifactPath}`);
+            targetsArgs.push(`--artifact ${earthfile}+${tg}/ ${artifactPath}`);
         }
         else {
             core.info(`Pushing target ${tg}`);
             targetsArgs.push(`${earthfile}+${tg}`);
         }
-    }
-    if (targetFlags) {
-        args.push(...targetFlags.split(' '));
     }
     core.info(`Running command: ${command} ${args.join(' ')}`);
     // Running each target command in different process.

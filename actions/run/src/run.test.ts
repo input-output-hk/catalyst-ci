@@ -31,9 +31,9 @@ describe('Run Action', () => {
         output: '',
         runnerAddress: '',
         runnerPort: '',
-        target: 'target',
+        earthfileMapTargets: '{"./earthfile":["target"]}',
         targetFlags: '--flag1 test -f2 test2',
-        command: ['./earthfile+target', '--flag1', 'test', '-f2', 'test2'],
+        command: [['--flag1', 'test', '-f2', 'test2', './earthfile+target']],
         imageOutput: '',
         artifactOutput: ''
       },
@@ -47,9 +47,9 @@ describe('Run Action', () => {
         output: 'Artifact +target/artifact output as out\n',
         runnerAddress: '',
         runnerPort: '',
-        target: 'target',
+        earthfileMapTargets: '{"./earthfile":["target"]}',
         targetFlags: '',
-        command: ['--test', '--artifact', './earthfile+target/', 'out'],
+        command: [['--test', '--artifact ./earthfile+target/ out']],
         imageOutput: '',
         artifactOutput: 'earthfile/out'
       },
@@ -63,12 +63,10 @@ describe('Run Action', () => {
         output: '',
         runnerAddress: 'localhost',
         runnerPort: '8372',
-        target: 'target',
+        earthfileMapTargets: '{"./earthfile":["target"]}',
         targetFlags: '',
         command: [
-          '--buildkit-host',
-          'tcp://localhost:8372',
-          './earthfile+target'
+          ['--buildkit-host', 'tcp://localhost:8372', './earthfile+target']
         ],
         imageOutput: '',
         artifactOutput: ''
@@ -83,19 +81,41 @@ describe('Run Action', () => {
         output: 'Image +docker output as image1:tag1\n',
         runnerAddress: '',
         runnerPort: '',
-        target: 'target',
+        earthfileMapTargets: '{"./earthfile":["target"]}',
         targetFlags: '',
         command: [
-          '-P',
-          '--platform',
-          'linux/amd64',
-          '--flag1',
-          'test',
-          '-f2',
-          'test2',
-          './earthfile+target'
+          [
+            '-P',
+            '--platform',
+            'linux/amd64',
+            '--flag1',
+            'test',
+            '-f2',
+            'test2',
+            './earthfile+target'
+          ]
         ],
         imageOutput: 'image1:tag1',
+        artifactOutput: ''
+      },
+      {
+        artifact: '',
+        artifactPath: '',
+        earthfile: './targets/earthfile',
+        flags: '',
+        platform: 'linux/amd64',
+        privileged: 'true',
+        output: '',
+        runnerAddress: '',
+        runnerPort: '',
+        earthfileMapTargets:
+          '{"./targets/earthfile":["target", "target-test"]}',
+        targetFlags: '',
+        command: [
+          ['-P', '--platform', 'linux/amd64', './targets/earthfile+target'],
+          ['-P', '--platform', 'linux/amd64', './targets/earthfile+target-test']
+        ],
+        imageOutput: '',
         artifactOutput: ''
       }
     ])(
@@ -110,7 +130,7 @@ describe('Run Action', () => {
         output,
         runnerAddress,
         runnerPort,
-        target,
+        earthfileMapTargets,
         targetFlags,
         command,
         imageOutput,
@@ -136,8 +156,8 @@ describe('Run Action', () => {
               return runnerAddress
             case 'runner_port':
               return runnerPort
-            case 'target':
-              return target
+            case 'earthfile_map_targets':
+              return earthfileMapTargets
             case 'target_flags':
               return targetFlags
             default:
@@ -161,8 +181,10 @@ describe('Run Action', () => {
 
         await run()
 
-        expect(spawn).toHaveBeenCalledTimes(1)
-        expect(spawn).toHaveBeenCalledWith('earthly', command)
+        expect(spawn).toHaveBeenCalledTimes(command.length)
+        command.map(cmd => {
+          expect(spawn).toHaveBeenCalledWith('earthly', cmd)
+        })
         expect(stdoutSpy).toHaveBeenCalledWith('stdout')
         expect(stderrSpy).toHaveBeenCalledWith(output)
 
