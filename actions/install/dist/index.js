@@ -13741,7 +13741,7 @@ async function run(platform = process.platform) {
             // build the ci and move to /usr/local/bin
             await (0,exec.exec)('go', [
                 'build',
-                '-ldflags="-extldflags=-static"',
+                "-ldflags='-extldflags=-static'",
                 '-o',
                 '/usr/local/bin/ci',
                 'cmd/main.go'

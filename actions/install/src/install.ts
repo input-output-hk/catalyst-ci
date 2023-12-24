@@ -29,7 +29,7 @@ export async function run(
         'go',
         [
           'build',
-          '-ldflags="-extldflags=-static"',
+          "-ldflags='-extldflags=-static'",
           '-o',
           '/usr/local/bin/ci',
           'cmd/main.go'
