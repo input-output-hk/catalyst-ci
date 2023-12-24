@@ -70,7 +70,15 @@ describe('Setup Action', () => {
         it('should call local ci build command', async () => {
           await run(platform)
           expect(exec).toHaveBeenCalledWith(
-            'cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go'
+            'go',
+            [
+              'build',
+              '-ldflags="-extldflags=-static"',
+              '-o',
+              '/usr/local/bin/ci',
+              'cmd/main.go'
+            ],
+            { cwd: 'cli/' }
           )
         })
       })

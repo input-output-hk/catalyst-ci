@@ -13739,7 +13739,13 @@ async function run(platform = process.platform) {
             core.info('Building ci locally');
             // go into cli folder
             // build the ci and move to /usr/local/bin
-            await (0,exec.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`);
+            await (0,exec.exec)('go', [
+                'build',
+                '-ldflags="-extldflags=-static"',
+                '-o',
+                '/usr/local/bin/ci',
+                'cmd/main.go'
+            ], { cwd: 'cli/' });
             return;
         }
         if (version !== 'latest' && !isSemVer(version)) {

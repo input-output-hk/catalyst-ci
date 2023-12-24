@@ -26,8 +26,17 @@ export async function run(
       // go into cli folder
       // build the ci and move to /usr/local/bin
       await exec(
-        `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
+        'go',
+        [
+          'build',
+          '-ldflags="-extldflags=-static"',
+          '-o',
+          '/usr/local/bin/ci',
+          'cmd/main.go'
+        ],
+        { cwd: 'cli/' }
       )
+
       return
     }
 
