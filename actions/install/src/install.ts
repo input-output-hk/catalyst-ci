@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
-import { exec } from 'child_process'
+import { exec } from '@actions/exec'
 
 const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
@@ -25,13 +25,8 @@ export async function run(
       core.info('Building ci locally')
       // go into cli folder
       // build the ci and move to /usr/local/bin
-      exec(
-        `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`,
-        error => {
-          if (error) {
-            console.log('> error', error.message)
-          }
-        }
+      await exec(
+        `cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`
       )
       return
     }

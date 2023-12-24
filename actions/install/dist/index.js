@@ -13715,8 +13715,8 @@ var core = __nccwpck_require__(2186);
 var tool_cache = __nccwpck_require__(7784);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
-// EXTERNAL MODULE: external "child_process"
-var external_child_process_ = __nccwpck_require__(2081);
+// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
+var exec = __nccwpck_require__(1514);
 ;// CONCATENATED MODULE: ./src/install.ts
 
 
@@ -13739,11 +13739,7 @@ async function run(platform = process.platform) {
             core.info('Building ci locally');
             // go into cli folder
             // build the ci and move to /usr/local/bin
-            (0,external_child_process_.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`, error => {
-                if (error) {
-                    console.log('> error', error.message);
-                }
-            });
+            await (0,exec.exec)(`cd cli && go build -ldflags="-extldflags=-static" -o /usr/local/bin/ci cmd/main.go`);
             return;
         }
         if (version !== 'latest' && !isSemVer(version)) {
