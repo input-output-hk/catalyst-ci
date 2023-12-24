@@ -4,15 +4,14 @@ import { run } from './discover'
 
 jest.mock('@actions/core', () => ({
   getInput: jest.fn(),
-  setOutput: jest.fn()
+  setOutput: jest.fn(),
+  setFailed: jest.fn(),
+  info: jest.fn()
 }))
-
-// Reusable function to set up mock for getExecOutput
-const mockGetExecOutput = (stdout: string): void => {
-  const mock = getExecOutput as jest.Mock
-  mock.mockResolvedValueOnce({ stdout })
-  return
-}
+jest.mock('@actions/exec', () => ({
+  getExecOutput: jest.fn()
+}))
+const mockGetExecOutput = getExecOutput as jest.Mock
 
 describe('Discover Action', () => {
   afterEach(() => {
@@ -72,7 +71,7 @@ describe('Discover Action', () => {
         }
       })
 
-      mockGetExecOutput(expectedJson)
+      mockGetExecOutput.mockResolvedValueOnce({ stdout: expectedJson })
       await run()
 
       expect(getExecOutput).toHaveBeenCalledWith(expectedCommand)
