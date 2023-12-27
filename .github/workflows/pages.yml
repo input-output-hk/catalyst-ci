@@ -84,7 +84,7 @@ jobs:
       - name: Create Earthfile to targets JSON format
         id: create-json
         run: |
-          json=$(echo "{\"${{inputs.earthfile}}\": $(echo "${{inputs.target}}" | jq -c -R 'split(" ")')")
+          json=$(echo "{\"${{inputs.earthfile}}\": $(echo "${{inputs.target}}" | jq -c -R 'split(" ")')}")
           echo "json=$json" >> $GITHUB_OUTPUT
       - name: Build docs
         uses: input-output-hk/catalyst-ci/actions/run@feat/targets-scanner
