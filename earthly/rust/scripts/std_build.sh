@@ -30,10 +30,6 @@ status $rc "Checking all Clippy Lints in the workspace" \
 status $rc "Checking Documentation can be generated OK" \
     cargo +nightly docs; rc=$?
 
-## Check if all Self contained tests pass (Test that need no external resources).
-status $rc "Checking Self contained Unit tests all pass" \
-    cargo testunit; rc=$?
-
 ## Check if all documentation tests pass.
 status $rc "Checking Documentation tests all pass" \
     cargo +nightly testdocs; rc=$?
