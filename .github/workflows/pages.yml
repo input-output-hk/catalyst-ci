@@ -81,10 +81,11 @@ jobs:
           cli_version: ${{ inputs.ci_cli_version }}
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
-      - name: Create Earghfile to targets JSON format
+      - name: Create Earthfile to targets JSON format
         id: create-json
         run: |
-          echo "{\"${inputs.earthfile}}\": $(echo "${inputs.target}"  | jq -c -R 'split(" ")')=$json" >> "$GITHUB_OUTPUT"
+          json=$(echo "{\"${inputs.earthfile}\": $(echo "${inputs.target}" | jq -c -R 'split(" ")')")
+          echo "json=$json" >> GITHUB_OUTPUT
       - name: Build docs
         uses: input-output-hk/catalyst-ci/actions/run@feat/targets-scanner
         id: build
