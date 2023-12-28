@@ -55,7 +55,9 @@ export async function run(): Promise<void> {
     if (artifact) {
       core.info(`Pushing target ${t} with artifact tag`)
       args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
-    } 
+    } else {
+      args.push(t)
+    }
     core.info(`Running command: ${command} ${args.join(' ')}`)
     const output = await spawnCommand(command, args)
     const imageOutput = parseImage(output)
