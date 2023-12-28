@@ -44,14 +44,14 @@ export async function run(): Promise<void> {
 
   for (const tg of targets) {
     // Get the filtered targets associated with the pattern target and earthfile.
-      core.info(`Pushing target ${tg}`)
-      targetsArgs.push(`${earthfile}+${tg}`)
+    core.info(`Pushing target ${tg}`)
+    targetsArgs.push(`${earthfile}+${tg}`)
   }
 
   // Running each target command in different process.
   for (const t of targetsArgs) {
     core.info(`Target: ${t}`)
-    const argsSpawn = [...args]    
+    const argsSpawn = [...args]
     // Artifact is set
     if (artifact) {
       core.info(`Pushing target ${t} with artifact tag`)
