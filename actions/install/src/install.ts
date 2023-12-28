@@ -24,7 +24,7 @@ export async function run(
     if (local === 'true') {
       core.info('Building ci locally')
       // go into cli folder
-      // build the ci and move to /usr/local/bin
+      // build the ci and move to /usr/local/bin/ci
       await exec(
         'go',
         [

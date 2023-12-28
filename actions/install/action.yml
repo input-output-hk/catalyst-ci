@@ -10,8 +10,9 @@ inputs:
     required: false
     default: latest
   local:
-    description: Use the local Catalyst-CI CLI
+    description: Build and use the local version of the Catalyst-CI CLI
     required: false
+    # TODO - Change default
     default: 'true'
 runs:
   using: node20

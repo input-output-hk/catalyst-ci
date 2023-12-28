@@ -146,7 +146,7 @@ jobs:
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   docs:
     uses: ./.github/workflows/pages.yml
-    needs: []
+    needs: [build, check, package, test]
     with:
       aws_role_arn: ${{ inputs.aws_role_arn }}
       aws_region: ${{ inputs.aws_region }}
