@@ -44,21 +44,20 @@ export async function run(): Promise<void> {
 
   for (const tg of targets) {
     // Get the filtered targets associated with the pattern target and earthfile.
-    if (artifact) {
-      core.info(`Pushing target ${tg} with artifact tag`)
-      targetsArgs.push(`--artifact ${earthfile}+${tg}/ ${artifactPath}`)
-    } else {
       core.info(`Pushing target ${tg}`)
       targetsArgs.push(`${earthfile}+${tg}`)
-    }
   }
 
   // Running each target command in different process.
   for (const t of targetsArgs) {
-    core.info(`Target: ${t}`)
-    const argsSpawn = [...args, t]
-    core.info(`Running command: ${command} ${argsSpawn.join(' ')}`)
-    const output = await spawnCommand(command, argsSpawn)
+    core.info(`Target: ${t}`)    
+    // Artifact is set
+    if (artifact) {
+      core.info(`Pushing target ${t} with artifact tag`)
+      args.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`)
+    } 
+    core.info(`Running command: ${command} ${args.join(' ')}`)
+    const output = await spawnCommand(command, args)
     const imageOutput = parseImage(output)
     if (imageOutput) {
       core.info(`Found image: ${imageOutput}`)
