@@ -85,13 +85,15 @@ jobs:
       - name: Create Earthfile to targets JSON format
         id: create-json
         run: |
-          json=$(echo "{\"${PWD}/${{inputs.earthfile}}\": $(echo "${{inputs.target}}" | jq -c -R 'split(" ")')}")
+          docPath=$(echo "${PWD}/${{inputs.earthfile}}")
+          json=$(echo "{\"${docPath}\": $(echo "${{inputs.target}}" | jq -c -R 'split(" ")')}")
           echo "json=$json" >> $GITHUB_OUTPUT
+          echo "docPath=$docPath" >> $GITHUB_OUTPUT
       - name: Build docs
         uses: input-output-hk/catalyst-ci/actions/run@feat/targets-scanner
         id: build
         with:
-          earthfile: ${PWD}/${{ inputs.earthfile }}
+          earthfile: ${{ steps.create-json.outputs.docPath }}
           earthfile_map_targets: ${{ steps.create-json.outputs.json }}
           runner_address: ${{ secrets.earthly_runner_address }}
           artifact: "true"
