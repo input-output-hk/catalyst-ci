@@ -285,7 +285,7 @@ func runEarthlyTarget(wg *sync.WaitGroup, earthlyCmd string) {
 	if err != nil {
 		log.Fatalf("cmd.Run() failed with %s\n", err)
 	}
-	outStr, errStr := string(stdoutBuf.Bytes()), string(stderrBuf.Bytes())
+	outStr, errStr := stdoutBuf.String(), stderrBuf.String()
 	fmt.Printf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
 }
 
