@@ -2922,9 +2922,9 @@ async function run() {
     // Running each target command in different process.
     for (const t of targetsArgs) {
         core.info(`Target: ${t}`);
-        args.push(t);
-        core.info(`Running command: ${command} ${args.join(' ')}`);
-        const output = await spawnCommand(command, args);
+        const argsSpawn = [...args, t];
+        core.info(`Running command: ${command} ${argsSpawn.join(' ')}`);
+        const output = await spawnCommand(command, argsSpawn);
         const imageOutput = parseImage(output);
         if (imageOutput) {
             core.info(`Found image: ${imageOutput}`);
