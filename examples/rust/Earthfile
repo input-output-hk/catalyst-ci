@@ -1,6 +1,6 @@
 VERSION 0.7
 
-# cspell: words TARGETARCH USERARCH toolsets rustfmt
+# cspell: words TARGETARCH USERARCH toolsets rustfmt nextest
 
 # Set up our target toolchains, and copy our files.
 builder:
@@ -27,7 +27,7 @@ all-hosts-check:
 # Build the service.
 hosted-build:
     FROM +builder
- 
+
     DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
 
     DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
@@ -39,6 +39,14 @@ hosted-build:
 # Only used to validate tooling is working across host toolsets.
 all-hosts-build:    
     BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-build
+
+test-hosted:
+    FROM +builder
+
+    DO ./../../earthly/rust+UNIT_TEST
+
+    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
+    SAVE ARTIFACT coverage-report.info coverage-report.info
 
 ## -----------------------------------------------------------------------------
 ##
@@ -76,7 +84,21 @@ build:
         BUILD --platform=linux/amd64 +hosted-build
     END
 
+test:
+    FROM busybox
+    # This is necessary to pick the correct architecture build to suit the native machine.
+    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
+    # All target implementation of this should follow this pattern.
+    ARG USERARCH
+
+    IF [ "$USERARCH" == "arm64" ]
+        BUILD --platform=linux/arm64 +test-hosted
+    ELSE
+        BUILD --platform=linux/amd64 +test-hosted
+    END
+
 # This step simulates the full CI run for local purposes only.
 local-ci-run:
     BUILD +check
     BUILD +build
+    BUILD +test
