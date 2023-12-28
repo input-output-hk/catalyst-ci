@@ -91,7 +91,7 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/run@feat/targets-scanner
         id: build
         with:
-          earthfile: ${{ inputs.earthfile }}
+          earthfile: ${PWD}/${{ inputs.earthfile }}
           earthfile_map_targets: ${{ steps.create-json.outputs.json }}
           runner_address: ${{ secrets.earthly_runner_address }}
           artifact: "true"
