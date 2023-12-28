@@ -13738,7 +13738,7 @@ async function run(platform = process.platform) {
         if (local === 'true') {
             core.info('Building ci locally');
             // go into cli folder
-            // build the ci and move to /usr/local/bin
+            // build the ci and move to /usr/local/bin/ci
             await (0,exec.exec)('go', [
                 'build',
                 '-ldflags=-extldflags=-static',
