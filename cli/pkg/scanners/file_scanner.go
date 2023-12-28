@@ -31,6 +31,11 @@ func (f *FileScanner) Scan() ([]pkg.Earthfile, error) {
 	return earthfiles, nil
 }
 
+// This function return a map.
+// Key is the path to the Earthfile.
+// Value is struct containing Earthfile and list of filtered target
+// If no match found, return [].
+// eg. map[/test/Earthfile]: {Earthfile, [filteredTargets]}.
 func (f *FileScanner) ScanForTarget(target string) (map[string]pkg.EarthTargets, error) {
 	regexPattern := getTargetRegex(target)
 	r, err := regexp.Compile(regexPattern)
@@ -39,7 +44,7 @@ func (f *FileScanner) ScanForTarget(target string) (map[string]pkg.EarthTargets,
 		return nil, err
 	}
 
-	earthfileToTargets := make(map[string]pkg.EarthTargets)
+	pathToEarthTargets := make(map[string]pkg.EarthTargets)
 
 	_, err = f.scan(func(e pkg.Earthfile) (bool, error) {
 		var targets []string
@@ -51,7 +56,7 @@ func (f *FileScanner) ScanForTarget(target string) (map[string]pkg.EarthTargets,
 		}
 		// If there are filtered targets, add to a map.
 		if len(targets) != 0 {
-			earthfileToTargets[e.Path] = pkg.EarthTargets{
+			pathToEarthTargets[e.Path] = pkg.EarthTargets{
 				Earthfile: e,
 				Targets:   targets,
 			}
@@ -64,7 +69,7 @@ func (f *FileScanner) ScanForTarget(target string) (map[string]pkg.EarthTargets,
 		return nil, err
 	}
 
-	return earthfileToTargets, nil
+	return pathToEarthTargets, nil
 }
 
 func getTargetRegex(target string) string {
