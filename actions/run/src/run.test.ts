@@ -49,7 +49,7 @@ describe('Run Action', () => {
         runnerPort: '',
         earthfileMapTargets: '{"./earthfile":["target"]}',
         targetFlags: '',
-        command: [['--test', '--artifact ./earthfile+target/ out']],
+        command: [['--test', '--artifact', './earthfile+target/' ,'out']],
         imageOutput: '',
         artifactOutput: 'earthfile/out'
       },

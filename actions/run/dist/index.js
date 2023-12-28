@@ -2920,7 +2920,7 @@ async function run() {
         // Artifact is set
         if (artifact) {
             core.info(`Pushing target ${t} with artifact tag`);
-            argsSpawn.push('--artifact', `${earthfile}+${t}/`, `${artifactPath}`);
+            argsSpawn.push('--artifact', `${t}/`, `${artifactPath}`);
         }
         else {
             argsSpawn.push(t);
