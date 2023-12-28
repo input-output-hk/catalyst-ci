@@ -53,12 +53,12 @@ export async function run(): Promise<void> {
     }
   }
 
-  core.info(`Running command: ${command} ${args.join(' ')}`)
   // Running each target command in different process.
   for (const t of targetsArgs) {
-    core.info(`Running: target: ${t}`)
-    const spawnArgs = args.concat(t)
-    const output = await spawnCommand(command, spawnArgs)
+    core.info(`Target: ${t}`)
+    args.push(t)
+    core.info(`Running command: ${command} ${args.join(' ')}`)
+    const output = await spawnCommand(command, args)
     const imageOutput = parseImage(output)
     if (imageOutput) {
       core.info(`Found image: ${imageOutput}`)
