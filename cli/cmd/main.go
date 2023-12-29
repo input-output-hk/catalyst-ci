@@ -235,7 +235,7 @@ func (c *tagsCmd) Run() error {
 }
 
 type simulateCmd struct {
-	Path   string   `                      help:"path to Earthfile"               arg:"" type:"path"`
+	Path   string   `                      help:"directory path to be iterated to search for targets within the Earthfile"               arg:"" type:"path"`
 	Target []string `short:"t"               help:"Earthly targets pattern"                                               default:"check check-* build test test-*"`
 }
 
@@ -274,7 +274,7 @@ func runEarthlyTarget(wg *sync.WaitGroup, earthlyCmd string) {
 	defer wg.Done()
 	command := "earthly"
 
-	// Create the command
+	// Create the command.
 	cmd := exec.Command(command, earthlyCmd)
 
 	var stdoutBuf, stderrBuf bytes.Buffer
