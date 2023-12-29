@@ -1,5 +1,5 @@
 ---
-icon: joystick
+icon: material/gamepad-variant
 ---
 
 # Earthly Simulator
