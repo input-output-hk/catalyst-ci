@@ -8,7 +8,7 @@
 # and if thats not found return a default
 # the default can be an individual value, or a map, in which case the default will
 # be retrieved according to the <param_name>
-# get_param <param_name> <env_var_map_name> <default_value_map> [--param1=value1 --param2=value2 ...]
+# get_param <param_name> <env_var_map_name> <default_map_name> [--param1=value1 --param2=value2 ...]
 get_param() {
     local param_name="$1"
     local env_var_map_name="$2"

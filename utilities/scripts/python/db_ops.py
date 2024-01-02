@@ -11,7 +11,6 @@ import time
 from typing import Optional
 import python.cli as cli
 import tempfile
-import multiprocessing
 import threading
 
 DB_ARGUMENTS = [
@@ -39,6 +38,15 @@ DB_ARGUMENTS = [
 
 
 def add_args(parser: argparse.ArgumentParser):
+    """
+    Adds the command line arguments to the given `argparse.ArgumentParser` object.
+
+    Args:
+        parser (argparse.ArgumentParser): The `argparse.ArgumentParser` object to which the command line arguments will be added.
+
+    Returns:
+        None
+    """
     for opt in DB_ARGUMENTS:
         parser.add_argument(
             f"--{opt[0]}",
@@ -106,6 +114,18 @@ class DBOps:
         return res
 
     def __start(self):
+        """
+        Start the database.
+
+        This function starts the database by running the command `pg_ctl -D "{dbpath}" start`,
+        where `dbpath` is the path to the database directory.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
         # print("Starting Database")
         cli.run(
             f'pg_ctl -D "{self.args.dbpath}" start',
@@ -118,7 +138,7 @@ class DBOps:
         Start the process of starting the database server.
 
         This function starts the database server by spawning a subprocess using `pg_ctl` command.
-        It does this inside a `multiprocessing.Process` to prevent the `Popen` from returning
+        It does this inside a `threading.Thread` to prevent the `Popen` from returning
         and checks for the database to start later.
 
         Parameters:
@@ -139,11 +159,25 @@ class DBOps:
         return
 
     def db_ready(self) -> cli.Result:
+        """
+        Check if the database is ready for use.
+
+        :return: A `cli.Result` object containing the result of the `pg_isready` command.
+        """
         return cli.run(
             f"pg_isready -d {self.superuser_connection()}", name="Database Ready"
         )
 
     def wait_ready(self, timeout: Optional[int] = None) -> cli.Result:
+        """
+        Waits for the database to be ready within the specified timeout period.
+
+        Parameters:
+            timeout (Optional[int]): The maximum number of seconds to wait for the database to be ready. Defaults to None.
+
+        Returns:
+            cli.Result: An object representing the result of the database readiness check.
+        """
         start_time = time.perf_counter()
 
         while not self.db_ready().ok() and (
@@ -157,6 +191,14 @@ class DBOps:
         return res
 
     def setup(self) -> cli.Result:
+        """
+        Setup the default User and Database.
+        
+        WARNING: Will destroy all data in the DB
+        
+        :return: The result of running the setup command.
+        :rtype: cli.Result
+        """
         # Setup the default User and Database
         # WARNING: Will destroy all data in the DB
 
@@ -173,6 +215,11 @@ class DBOps:
         )
 
     def migrate_schema(self) -> cli.Result:
+        """
+        Run schema migrations.
+
+        :return: A cli.Result object representing the result of running the migrations.
+        """
         # Run schema migrations
         return cli.run(
             f"DATABASE_URL={self.user_connection()}"

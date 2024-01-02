@@ -64,7 +64,7 @@ impl Conn {
         }
     }
 
-    /// Do we include this table name?
+    /// Do we exclude this table name?
     fn exclude_table(&self, name: &String) -> bool {
         match &self.opts.exclude_tables {
             Some(inc) => inc.contains(name),

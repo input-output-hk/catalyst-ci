@@ -9,14 +9,32 @@ from rich.table import Table
 from dataclasses import dataclass
 import textwrap
 import time
-import shlex
 
 
 def status_for_rc(rc: int) -> str:
+    """
+    Returns a status emoji based on the given RC (return code) value.
+    
+    Parameters:
+        rc (int): The return code to evaluate.
+    
+    Returns:
+        str: The corresponding status emoji (":white_check_mark:" for rc == 0, ":x:" otherwise).
+    """
     return ":white_check_mark:" if rc == 0 else ":x:"
 
 
 def format_execution_time(execution_time: float):
+    """
+    Formats the given execution time into a human-readable string representation.
+
+    Args:
+        execution_time (float): The execution time to format.
+
+    Returns:
+        str: The formatted execution time string.
+
+    """
     if execution_time < 1e-3:
         execution_time *= 1e6
         unit = "us"
@@ -29,6 +47,17 @@ def format_execution_time(execution_time: float):
     return f"{execution_time:.4f} {unit}"
 
 def indent(text:str, first: str, rest: str) -> str:
+    """
+    Indent the given text using the specified indentation strings.
+
+    Args:
+        text (str): The text to be indented.
+        first (str): The string to be used as the first line indentation.
+        rest (str): The string to be used as the indentation for the subsequent lines.
+
+    Returns:
+        str: The indented text.
+    """
     return first + textwrap.indent(text, rest)[len(first):]
 
 @dataclass
@@ -56,17 +85,45 @@ class Result:
         return self.name or self.get_command()
 
     def ok(self) -> bool:
+        """
+        Check if the value of `rc` is equal to 0.
+
+        :param self: The current instance of the class.
+        :return: True if `rc` is equal to 0, False otherwise.
+        :rtype: bool
+        """
         return self.rc == 0
 
     def status(self) -> str:
+        """
+        Returns the status of the object.
+        :return: A string representing the status.
+        """
         return status_for_rc(self.rc)
 
     def duration(self) -> str:
+        """
+        Calculates the duration of the function execution.
+
+        :return: A string representing the formatted execution time.
+        :rtype: str
+        """
         return format_execution_time(self.runtime)
 
     def print(
         self, verbose: bool = False, verbose_errors: bool = False, name_width: int = 0
     ) -> None:
+        """
+        Print the information about the task, including its name, duration, and status.
+
+        Args:
+            verbose (bool, optional): Whether to print additional information. Defaults to False.
+            verbose_errors (bool, optional): Whether to print errors even when verbose is False. Defaults to False.
+            name_width (int, optional): The width of the name field. Defaults to 0.
+
+        Returns:
+            None
+        """
         print(
             f"[bold cyan]{self.get_name():<{name_width}}[/bold cyan] : {self.duration()} : {self.status()}"
         )
@@ -83,6 +140,29 @@ def run(
     timeout=None,
     verbose=False,
 ) -> Result:
+    """
+    Execute a command and return the result.
+
+    Args:
+        command (str): The command to be executed.
+        name (Optional[str], optional): The name of the command. Defaults to None.
+        log (bool, optional): Whether to log the result. Defaults to True.
+        input (Optional[str], optional): The input to be passed to the command. Defaults to None.
+        timeout (Any, optional): The maximum time to wait for the command to complete. Defaults to None.
+        verbose (bool, optional): Whether to print verbose errors. Defaults to False.
+
+    Returns:
+        Result: The result of executing the command.
+
+    Note:
+        - If `name` is not provided, it is set to the command itself.
+        - If `input` is not provided, no input is passed to the command.
+        - If `timeout` is not provided, there is no time limit for the command.
+        - If `log` is True, the result is logged using `Result.print()`.
+
+    Example:
+        >>> result = run('ls -l', name='List Files', log=True, verbose=True)
+    """
     start_time = time.perf_counter()
 
     result = subprocess.run(
@@ -107,13 +187,40 @@ def run(
 
 class Results:
     def __init__(self, title: str) -> None:
+        """
+        Initializes a new instance of the class.
+        
+        Args:
+            title (str): The title of the instance.
+        
+        Returns:
+            None
+        """
         self.title = title
         self.results = []
 
     def add(self, result: Result):
+        """
+        Add a result to the list of results.
+
+        Args:
+            result (Result): The result object to be added.
+
+        Returns:
+            None
+        """
         self.results.append(result)
 
     def print(self):
+        """
+        Prints the results of a test run in a formatted table.
+
+        Parameters:
+            None
+
+        Returns:
+            None
+        """
         table = Table(title=self.title)
         table.add_column("Step", style="cyan")
         table.add_column("Duration", style="magenta")
@@ -134,6 +241,13 @@ class Results:
         print(table)
         
     def ok(self) -> bool:
+        """
+        Check if all results in the list are ok.
+
+        :param self: The current object.
+        :return: True if all results are ok, False otherwise.
+        :rtype: bool
+        """
         for result in self.results:
             if not result.ok():
                 return False

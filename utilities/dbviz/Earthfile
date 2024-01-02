@@ -20,7 +20,7 @@ check-hosted:
 
     DO ../../earthly/rust+CHECK
 
-# check-all-hosts A developers test which runs check with all supported host tooling.  
+# check-all-hosts - A developers test which runs check with all supported host tooling.  
 # Needs qemu or rosetta to run. 
 # Only used to validate tooling is working across host toolsets by developers.
 check-all-hosts:    

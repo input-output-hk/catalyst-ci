@@ -17,7 +17,7 @@ rc=0
 # This improves visibility into all issues that need to be corrected for `check`
 # to pass without needing to iterate excessively.
 
-## Check configs are as they should be.
+# Check configs are as they should be.
 check_vendored_files "${rc}" .sqlfluff /sql/.sqlfluff
 rc=$?
 
