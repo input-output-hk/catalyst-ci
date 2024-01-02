@@ -1,0 +1,30 @@
+# Earthfile containing common scripts for easy reference
+VERSION --global-cache 0.7
+
+# Internal: bash-scripts : Common bash scripts.
+bash-scripts:
+    FROM scratch
+
+    COPY --dir bash /
+
+    SAVE ARTIFACT /bash /include
+
+# Internal: bash-scripts : Common bash scripts.
+python-scripts:
+    FROM scratch
+
+    COPY --dir python /
+
+    SAVE ARTIFACT /python /python
+
+# UDC to add our common bash scripts to a container image.
+ADD_BASH_SCRIPTS:
+    COMMAND
+
+    COPY --dir +bash-scripts/include /scripts/include
+
+# UDC to add our common bash scripts to a container image.
+ADD_PYTHON_SCRIPTS:
+    COMMAND
+
+    COPY --dir +python-scripts/python /scripts/python    

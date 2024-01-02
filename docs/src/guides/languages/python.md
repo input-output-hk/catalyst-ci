@@ -45,7 +45,7 @@ or read the guide and follow along in the file.
 ### Prepare base builder
 
 ```Earthfile
-VERSION 0.7
+VERSION --global-cache 0.7
 
 builder:
     FROM ./../../earthly/python+python-base

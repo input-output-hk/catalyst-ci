@@ -19,7 +19,7 @@ Any `Earthfile` which does not adhere to this style guide will be rejected if no
 The following structure should be used to provide a consistent structure to `Earthfile`s:
 
 ```Earthfile
-VERSION 0.7  # Should be the same across the repository
+VERSION --global-cache 0.7  # Should be the same across the repository
 
 deps:
     FROM <base image>
@@ -87,7 +87,7 @@ This target is made up of the commands that appear outside of an existing target
 For example:
 
 ```Earthfile
-VERSION 0.7
+VERSION --global-cache 0.7
 FROM ubuntu:latest  # Apart of the base target
 WORKDIR /work  # Apart of the base target
 ```
@@ -104,7 +104,7 @@ As such, the base target should be avoided, and individual targets should be
 clear about their intentions:
 
 ```Earthfile
-VERSION 0.7
+VERSION --global-cache 0.7
 
 deps:
     FROM ubuntu:latest
