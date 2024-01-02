@@ -24,8 +24,6 @@ check-bash:
 
     DO ./earthly/bash+SHELLCHECK --src=.
 
-    BUILD +check-bash
-
 # Internal: Reference to our repo root documentation used by docs builder.
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
