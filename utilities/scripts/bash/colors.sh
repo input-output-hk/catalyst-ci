@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# cspell: words localfile vendorfile colordiff Naur
+
 # shellcheck disable=SC2034 # This file is intended to bo sourced.
 
 BLACK='\033[0;30m'
@@ -11,7 +13,6 @@ MAGENTA='\033[0;35m'
 CYAN='\033[0;36m'
 WHITE='\033[0;37m'
 NC='\033[0m' # No Color
-
 
 status() {
     local rc="$1"
@@ -29,5 +30,23 @@ status() {
     fi
 
     # Return the current status
-    return "$rc"
+    return "${rc}"
+}
+
+status_and_exit() {
+    if ! status 0 "$@"; then
+        exit 1
+    fi
+}
+
+# Checks if two files that should exist DO, and are equal.
+# used to enforce consistency between local config files and the expected config locked in CI.
+check_vendored_files() {
+    local rc=$1
+    local localfile=$2
+    local vendorfile=$3
+
+    status "${rc}" "Checking if Local File '${localfile}' == Vendored File '${vendorfile}'" \
+        colordiff -Naur "${localfile}" "${vendorfile}"
+    return $?
 }

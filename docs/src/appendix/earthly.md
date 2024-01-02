@@ -75,7 +75,7 @@ Like a `Dockerfile`, only a single `Earthfile` can exist per directory and it *m
 #### Sample Structure
 
 ```Earthfile
-VERSION 0.7  # This defines the "schema" that this Earthfile satisfies, much like the version of a Docker Compose file
+VERSION --global-cache 0.7  # This defines the "schema version" that this Earthfile satisfies
 
 # A target, which is functionally equivalent to a `makefile` target.
 deps:
@@ -104,7 +104,7 @@ A target can be thought of as a grouping of image layers, similar to the way mul
 Each target then specifies one or more commands that create the image layers associated with that target.
 
 ```Earthfile
-VERSION 0.7
+VERSION --global-cache 0.7
 
 deps:
     FROM golang:1.20-alpine3.18

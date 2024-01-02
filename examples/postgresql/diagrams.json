@@ -1,0 +1,21 @@
+{
+    "name": "Example Postgresql Database",
+    "all_schema": {
+        "comments": true,
+        "included_tables": [],
+        "excluded_tables": [
+            "refinery_schema_history"
+        ],
+        "column_description_wrap": 50,
+        "table_description_wrap": 50
+    },
+    "full_schema": {
+        "excluded_tables": [
+            "refinery_schema_history"
+        ],
+        "title": "Full Schema",
+        "comments": true,
+        "column_description_wrap": 50,
+        "table_description_wrap": 50
+    }
+}

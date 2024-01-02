@@ -1,4 +1,4 @@
-VERSION 0.7
+VERSION --global-cache 0.7
 
 # cspell: words libgcc freetype lcms openjpeg etag
 
@@ -14,6 +14,8 @@ deps:
     RUN apk add --no-cache \    
         bash \
         graphviz \
+        fontconfig \
+        ttf-liberation \
         curl \
         zlib-dev \
         jpeg-dev \
@@ -30,13 +32,18 @@ deps:
         tiff-dev \
         tk-dev \
         tcl-dev  \
-        git       
+        git
+
+    # Fix up font cache
+    RUN fc-cache -f
 
     # Install poetry and our python dependencies.
     DO ../python+BUILDER
 
     # Copy our run scripts
     COPY --dir scripts /scripts
+    # Copy our common scripts so we can use them inside the container.
+    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
 
     # Trust directory, required for git >= 2.35.2. (mkdocs Git plugin requirement).
     RUN git config --global --add safe.directory /docs &&\

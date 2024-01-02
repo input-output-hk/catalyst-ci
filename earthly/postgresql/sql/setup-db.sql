@@ -1,4 +1,5 @@
 -- Initialize the Project Catalyst Event Database.
+-- sqlfluff:dialect:postgres
 
 -- cspell: words psql
 
@@ -15,9 +16,10 @@
 \echo -> dbName ................. = :dbName
 \echo -> dbDescription .......... = :dbDescription
 \echo -> dbUser ................. = :dbUser
-\echo -> dbUserPw ............... = :dbUserPw
+\echo -> dbUserPw ............... = xxxx
 
 -- Cleanup if we already ran this before.
+--DROP OWNED BY IF EXISTS :"dbUser"; -- noqa: PRS
 DROP DATABASE IF EXISTS :"dbName"; -- noqa: PRS
 DROP USER IF EXISTS :"dbUser"; -- noqa: PRS
 
@@ -25,9 +27,9 @@ DROP USER IF EXISTS :"dbUser"; -- noqa: PRS
 CREATE USER :"dbUser" WITH PASSWORD :'dbUserPw'; -- noqa: PRS
 
 -- Privileges for this user/role.
-ALTER DEFAULT privileges REVOKE EXECUTE ON functions FROM public;
+ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO public;
 
-ALTER DEFAULT privileges IN SCHEMA public REVOKE EXECUTE ON functions FROM :"dbUser"; -- noqa: PRS
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO :"dbUser"; -- noqa: PRS
 
 -- Create the database.
 CREATE DATABASE :"dbName" WITH OWNER :"dbUser"; -- noqa: PRS

@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
-VERSION 0.7
+VERSION --global-cache 0.7
 
-# cspell: words colordiff
+# cspell: words colordiff nushell psycopg dbviz
 
 postgres-base:
     FROM postgres:16.0-alpine3.18
@@ -17,7 +17,15 @@ postgres-base:
             musl-dev \
             curl \
             gcc \
-            py3-pip
+            py3-pip \
+            py3-rich \
+            py3-psycopg \
+            graphviz \
+            fontconfig \
+            ttf-liberation
+
+    # Fix up font cache
+    RUN fc-cache -f
 
     # Install SQLFluff
     RUN pip3 install sqlfluff==2.3.5
@@ -26,47 +34,119 @@ postgres-base:
     # Get refinery
     COPY ../rust+rust-base/refinery /bin
 
-    COPY ./.sqlfluff .
-    COPY ./entry.sh .
-    COPY ./setup-db.sql .
+    # Get dbviz
+    COPY ../../utilities/dbviz+build/dbviz /bin
+    RUN dbviz --help
 
-sqlfluff-image:
-    FROM +postgres-base
+    # Get nushell
+    COPY ../../utilities/nushell+nushell-build/nu /bin
 
-    WORKDIR /sql
+    # Copy our set SQL files
+    COPY --dir sql /sql
 
-    RUN cp /root/.sqlfluff .
+    # Universal build scripts we will always need and are not target dependent.
+    COPY --dir scripts /scripts
+    # Copy our common scripts so we can use them inside the container.
+    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
 
-    SAVE IMAGE sqlfluff-image:latest
+    SAVE ARTIFACT /scripts /scripts
 
-# Common PostgreSQL setup.
-# Prepare important files needed for building image
+# Common build setup steps.
+# Arguments:
+#   sqlfluff_cfg - REQUIRED - Location of repos .sqlfluff configuration file.
+#   migrations - OPTIONAL - Location of Migrations directory - DEFAULT: ./migrations
+#   seed - OPTIONAL - Location of Seed data directory - DEFAULT: ./seed
+#   refinery_toml - OPTIONAL - Location of refinery,toml which configures migrations. DEFAULT: ./refinery.toml
 BUILDER:
     COMMAND
 
-    RUN cp /root/.sqlfluff .
-    RUN cp /root/entry.sh .
-    RUN chmod ugo+x ./entry.sh
-    RUN cp /root/setup-db.sql .
+    ARG migrations=./migrations
+    ARG seed=./seed
+    ARG refinery_toml=./refinery.toml
+    
+    FROM +postgres-base
+
+    WORKDIR /build
+
+    COPY --dir $sqlfluff_cfg .
+    COPY --dir $migrations .
+    COPY --dir $seed .
+    COPY --dir $refinery_toml .
+
+# DOCS - UDC to build the docs, needs to be run INSIDE the BUILDER like so:
+# 
+# 1. Create a ./docs/diagrams.json which has the options needed to run to generate the docs to /docs
+# 2. Define the following targets in your earthfile
+#
+# builder:
+#    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+BUILDER --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
+#
+# build:
+#    FROM +builder
+#
+#    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+BUILD --image_name=<name>
+#    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+DOCS
+DOCS:
+    COMMAND
+
+    ARG diagrams=./diagrams.json
+    ARG migrations=./migrations
+    ARG refinery_toml=./refinery.toml
+
+    USER postgres:postgres
+    WORKDIR /docs
+
+    COPY $diagrams ./diagrams.json
+    COPY --dir $migrations .
+    COPY --dir $refinery_toml .
+
+    RUN /scripts/std_docs.py ./diagrams.json
+
+    SAVE ARTIFACT docs /docs
+
+
 
 # Linter checks for sql files
 CHECK:
     COMMAND
 
-    RUN sqlfluff lint .
+    RUN /scripts/std_checks.sh
 
 # Format sql files
-# REQUIREMENTS:
-#  * build `sqlfluff-image` image via `earthly +sqlfluff-image` target
-# Arguments:
-#  * src : Source directory with the sql files.
+# Just explains how to auto-format sql files.
+# Can not do it LOCALLY as the command will change ownership of the fixed files
+# if run within docker.
 FORMAT:
     COMMAND
 
-    # Where we want to run the `lint` from.
-    ARG --required src
+    # Can not run format LOCALLY as it changes permissions of files to root:root
+    RUN --no-cache printf "%s\n%s\n%s\n" \
+        "SQL can only be formatted locally from the command line." \
+        "Run locally installed 'sqlfluff' from the repo root:" \
+        "    $ sqlfluff fix ."
 
-    RUN docker run --rm -v $src:/sql sqlfluff-image:latest sqlfluff format .
+# Internal: Integration Test container image
+integration-test:
+    FROM earthly/dind:alpine-3.18-docker-23.0.6-r7
+
+    RUN apk add --no-cache \
+            bash \
+            postgresql15-client # We use PostgreSQL 16, but v15 clients will work OK with it.
+
+    # Get nushell
+    COPY ../../utilities/nushell+nushell-build/nu /bin
+
+    COPY +postgres-base/scripts /scripts
+
+    WORKDIR /test
+
+
+INTEGRATION_TEST_SETUP:
+    COMMAND
+
+    FROM +integration-test
+
 
 # Build PostgreSQL image.
 # REQUIREMENTS: 
@@ -74,19 +154,17 @@ FORMAT:
 #  * prepare seed data files into the `./data` dir (optional)
 #  * prepare `refinery.toml` file
 # Arguments:
-#  * tag : The tag of the image, default value `latest`.
-#  * registry: The registry of the image.
 #  * image_name: The name of the image (required).
 BUILD:
     COMMAND
-
-    ARG tag="latest"
-    ARG registry
     ARG --required image_name
 
     USER postgres:postgres
 
-    ENTRYPOINT ["./entry.sh"]
+    RUN /scripts/std_build.sh
+
+    ENTRYPOINT ["/scripts/entry.sh"]
 
     # Push the container...
-    SAVE IMAGE --push ${registry}${image_name}:$tag
+    SAVE IMAGE ${image_name}:latest
+
