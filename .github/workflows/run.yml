@@ -102,7 +102,7 @@ jobs:
         run: |
           echo ${{ matrix.earthfile }}
           echo ${{ needs.discover.outputs.json }}
-          value=$(echo "${{ steps.discover.outputs.json }}" | jq -r ".${{ matrix.earthfile }}[]")
+          values=$(echo "${{ steps.discover.outputs.json }}" | jq -r --arg key "${{ matrix.earthfile }}" '.[$key][]')
           echo $value
       - uses: actions/checkout@v3
       - name: Setup CI
