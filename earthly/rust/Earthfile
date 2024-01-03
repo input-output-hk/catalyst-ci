@@ -34,10 +34,13 @@ rust-base:
 
     # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
-     RUN apk add --no-cache \
+    RUN apk add --no-cache \
             musl-dev \
             mold \
             clang \
+            py3-pip \
+            py3-rich \
+            py3-psycopg \
             ripgrep \
             bash \
             colordiff \
@@ -79,6 +82,7 @@ rust-base:
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
     DO ../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
 
     # Standardized Rust configs.
     # Build will refuse to proceed if the projects rust configs do not match these.
@@ -122,7 +126,7 @@ CHECK:
     # This is set up so that ALL checks are run and it will fail if any fail.
     # This improves visibility into all issues that need to be corrected for `check`
     # to pass without needing to iterate excessively.
-    RUN /scripts/std_checks.sh
+    RUN /scripts/std_checks.py
 
 # Step we do during the `build` CI phase for all Rust programs
 # Parameters:

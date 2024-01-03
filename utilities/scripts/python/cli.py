@@ -1,10 +1,9 @@
-#!/usr/bin/env python3
-
 # cspell: words rtype
 
 import subprocess
 from typing import Optional
 from rich import print
+from rich.text import Text
 from rich.table import Table
 from dataclasses import dataclass
 import textwrap
@@ -129,7 +128,7 @@ class Result:
         )
         if verbose or (self.rc != 0 and verbose_errors):
             print(f"[italic]{indent(self.get_command(), '  $ ','  . ' )}[/italic]")
-            print(f"{indent(self.out, '  > ', '  . ')}")
+            print(Text(indent(self.out, '  > ', '  . ')))
 
 
 def run(

@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+
+# cspell: words
+
+import python.cli as cli
+import python.vendor_files_check as vendor_files_check
+import argparse
+import rich
+from rich import print
+import os
+
+# This script is run inside the `check` stage for rust projects to perform all
+# high level non-compilation checks.
+# These are the Standard checks which ALL rust targets must pass before they
+# will be scheduled to be `build`.
+# Individual targets can add extra `check` steps, but these checks must always
+# pass.
+
+def main():
+    # Force color output in CI
+    rich.reconfigure(color_system="256")
+
+    parser = argparse.ArgumentParser(
+        description="Rust high level non-compilation checks processing."
+    )
+
+    results = cli.Results("Rust checks")
+
+    # Check if the rust src is properly formatted.
+    res = cli.run("cargo +nightly fmtchk", name="Rust Code Format Check")
+    results.add(res)
+    if not res.ok():
+        print("[yellow]You can locally fix format errors by running: [/yellow] \n [red bold]cargo +nightly fmtfix [/red bold]")
+
+    # Check config files
+    results.add(vendor_files_check.colordiff_check(f"{os.environ.get('CARGO_HOME')}/config.toml", ".cargo/config.toml"))
+    results.add(vendor_files_check.colordiff_check("/stdcfgs/rustfmt.toml", "rustfmt.toml"))
+    results.add(vendor_files_check.colordiff_check("/stdcfgs/nextest.toml", ".config/nextest.toml"))
+    results.add(vendor_files_check.colordiff_check("/stdcfgs/clippy.toml", "clippy.toml"))
+    results.add(vendor_files_check.colordiff_check("/stdcfgs/deny.toml", "deny.toml"))
+
+    # Check if we have unused dependencies declared in our Cargo.toml files.
+    results.add(cli.run("cargo machete", name="Unused Dependencies Check"))
+    # Check if we have any supply chain issues with dependencies.
+    results.add(cli.run("cargo deny check", name="Supply Chain Issues Check"))
+
+
+    results.print()
+    
+    if not results.ok():
+        exit(1)
+
+
+if __name__ == "__main__":
+    main()
