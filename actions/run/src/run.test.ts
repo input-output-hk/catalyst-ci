@@ -31,7 +31,7 @@ describe('Run Action', () => {
         output: '',
         runnerAddress: '',
         runnerPort: '',
-        earthfileMapTargets: '{"./earthfile":["target"]}',
+        targets: 'target',
         targetFlags: '--flag1 test -f2 test2',
         command: [['--flag1', 'test', '-f2', 'test2', './earthfile+target']],
         imageOutput: '',
@@ -47,7 +47,7 @@ describe('Run Action', () => {
         output: 'Artifact +target/artifact output as out\n',
         runnerAddress: '',
         runnerPort: '',
-        earthfileMapTargets: '{"./earthfile":["target"]}',
+        targets: 'target',
         targetFlags: '',
         command: [['--test', '--artifact', './earthfile+target/', 'out']],
         imageOutput: '',
@@ -63,7 +63,7 @@ describe('Run Action', () => {
         output: '',
         runnerAddress: 'localhost',
         runnerPort: '8372',
-        earthfileMapTargets: '{"./earthfile":["target"]}',
+        targets: 'target',
         targetFlags: '',
         command: [
           ['--buildkit-host', 'tcp://localhost:8372', './earthfile+target']
@@ -81,7 +81,7 @@ describe('Run Action', () => {
         output: 'Image +docker output as image1:tag1\n',
         runnerAddress: '',
         runnerPort: '',
-        earthfileMapTargets: '{"./earthfile":["target"]}',
+        targets: 'target',
         targetFlags: '',
         command: [
           [
@@ -108,8 +108,7 @@ describe('Run Action', () => {
         output: '',
         runnerAddress: '',
         runnerPort: '',
-        earthfileMapTargets:
-          '{"./targets/earthfile":["target", "target-test"]}',
+        targets: 'target target-test',
         targetFlags: '',
         command: [
           ['-P', '--platform', 'linux/amd64', './targets/earthfile+target'],
@@ -130,7 +129,7 @@ describe('Run Action', () => {
         output,
         runnerAddress,
         runnerPort,
-        earthfileMapTargets,
+        targets,
         targetFlags,
         command,
         imageOutput,
@@ -156,8 +155,8 @@ describe('Run Action', () => {
               return runnerAddress
             case 'runner_port':
               return runnerPort
-            case 'earthfile_map_targets':
-              return earthfileMapTargets
+            case 'targets':
+              return targets
             case 'target_flags':
               return targetFlags
             default:
