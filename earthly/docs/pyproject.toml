@@ -7,7 +7,7 @@ readme = "Readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-mkdocs-material = { version = "^9.4.8", extras = ["recommended","git","imaging"] }
+mkdocs-material = { version = "^9.5.3", extras = ["recommended","git","imaging"] }
 
 ### MkDocs Plugins we add.
 
@@ -18,7 +18,7 @@ mkdocs-minify-plugin = "^0.7.1"
 mkdocs-redirects = "^v1.2.1"
 
 # https://github.com/Blueswen/mkdocs-glightbox
-mkdocs-glightbox = "^0.3.4"
+mkdocs-glightbox = "^0.3.5"
 
 # https://github.com/AVATEAM-IT-SYSTEMHAUS/mkdocs-kroki-plugin/tree/main
 # Using this fork: https://github.com/oniboni/mkdocs-kroki-plugin/tree/refactoring/image-handling
@@ -40,6 +40,7 @@ mkdocs-meta-manager = "^0.2.1"
 mkdocs-material-adr = { git = "https://github.com/stevenj/mkdocs-material-adr" }
 
 # https://henrywhitaker3.github.io/mkdocs-material-dark-theme/plugins/awesome-pages/
+# https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
 mkdocs-awesome-pages-plugin = "^2.9.2"
 
 
