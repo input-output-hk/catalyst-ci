@@ -29,12 +29,12 @@ inputs:
     description: The port to use for connecting to the remote runner
     required: false
     default: "8372"
+  targets:
+    description: The name of the targets to run
+    required: true
   target_flags:
     description: Additional flags to pass to the target
     required: false
-  earthfile_map_targets:
-    description: Map of Earthfile directory and its corresponding filtered targets.
-    required: true
 
 runs:
   using: "node20"
