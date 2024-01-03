@@ -79,7 +79,6 @@ jobs:
       - name: Check for empty output
         id: check
         run: |
-          echo ${{ steps.discover.outputs.json }}
           output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
           if [ "$output" == "null" ]; then
@@ -99,6 +98,12 @@ jobs:
       matrix:
         earthfile: ${{ fromJson(needs.discover.outputs.paths) }}
     steps:
+      - name: Get filtered targets
+        run: | 
+            echo ${{ matrix.earthfile }}
+            echo ${{ needs.discover.outputs.json }}
+            value=$(echo ${{ needs.discover.outputs.json }} | jq -r ".${{ matrix.earthfile }}[]")
+            echo $value
       - uses: actions/checkout@v3
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@feat/targets-scanner
