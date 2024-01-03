@@ -79,12 +79,13 @@ jobs:
       - name: Check for empty output
         id: check
         run: |
+          json=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
           if [ "$output" == "null" ]; then
             echo "json=[]" >> $GITHUB_OUTPUT
             echo "paths=[]" >> $GITHUB_OUTPUT
           else
-            echo "json=${{ steps.discover.outputs.json }}" >> $GITHUB_OUTPUT
+            echo "json=$json" >> $GITHUB_OUTPUT
             echo "paths=$paths" >> $GITHUB_OUTPUT
           fi
 
