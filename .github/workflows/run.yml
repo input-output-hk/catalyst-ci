@@ -101,9 +101,9 @@ jobs:
       - name: Get filtered targets
         id: get_target
         run: |
-          targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][] | join(" ")')
+          targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
           echo $targets
-          echo "targets=$(printf '%s' "$targets")" >> $GITHUB_OUTPUT
+          echo "targets=$targets" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@feat/targets-scanner
