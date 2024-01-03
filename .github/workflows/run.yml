@@ -103,7 +103,7 @@ jobs:
         run: |
           targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][] | join(" ")')
           echo $targets
-          echo "targets=$targets" >> $GITHUB_OUTPUT
+          echo "targets=$(printf '%s' "$targets")" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@feat/targets-scanner
