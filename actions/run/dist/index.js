@@ -2886,7 +2886,7 @@ async function run() {
     const runnerAddress = core.getInput('runner_address');
     const runnerPort = core.getInput('runner_port');
     const targetFlags = core.getInput('target_flags');
-    const earthfileMapTargets = core.getInput('earthfile_map_targets');
+    const targets = core.getInput('targets');
     const command = 'earthly';
     const args = [];
     const targetsArgs = [];
@@ -2905,10 +2905,9 @@ async function run() {
     if (targetFlags) {
         args.push(...targetFlags.split(' '));
     }
-    core.info(`Map of earthfile and its targets >> ${earthfileMapTargets}`);
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment
-    const targets = JSON.parse(earthfileMapTargets)[earthfile];
-    for (const tg of targets) {
+    core.info(`Filtered targets >> ${targets}`);
+    const targetsArr = targets.split(' ');
+    for (const tg of targetsArr) {
         // Get the filtered targets associated with the pattern target and earthfile.
         core.info(`Pushing target ${tg}`);
         targetsArgs.push(`${earthfile}+${tg}`);
