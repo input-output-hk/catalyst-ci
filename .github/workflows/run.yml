@@ -79,13 +79,12 @@ jobs:
       - name: Check for empty output
         id: check
         run: |
-          output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
           if [ "$output" == "null" ]; then
             echo "json=[]" >> $GITHUB_OUTPUT
             echo "paths=[]" >> $GITHUB_OUTPUT
           else
-            echo "json=$output" >> $GITHUB_OUTPUT
+            echo "json=${{ steps.discover.outputs.json }}" >> $GITHUB_OUTPUT
             echo "paths=$paths" >> $GITHUB_OUTPUT
           fi
 
@@ -102,8 +101,7 @@ jobs:
         run: |
           echo ${{ matrix.earthfile }}
           echo ${{ needs.discover.outputs.json }}
-          echo ${{ steps.discover.outputs.json }}
-          values=$(echo '${{ steps.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
+          values=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
           echo $values
       - uses: actions/checkout@v3
       - name: Setup CI
