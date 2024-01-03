@@ -99,7 +99,9 @@ jobs:
     steps:
       - name: Get filtered targets
         run: |
+          echo matrix
           echo ${{ matrix.earthfile }}
+          echo json
           echo ${{ needs.discover.outputs.json }}
           values=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
           echo $values
