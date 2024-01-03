@@ -29,6 +29,9 @@ rustflags = [
 ]
 
 
+[target.wasm32-unknown-unknown]
+rustflags = ["--cap-lints", "warn"]
+
 [build]
 
 rustflags = [
