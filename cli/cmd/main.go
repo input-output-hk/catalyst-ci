@@ -80,31 +80,29 @@ func (c *imagesCmd) Run() error {
 type scanCmd struct {
 	JSONOutput bool     `short:"j" long:"json"   help:"Output in JSON format"`
 	Paths      []string `                        help:"paths to scan for Earthfiles"                                             arg:"" type:"path"`
-	Target     []string `short:"t"               help:"filter by Earthfiles that include this target"                                               default:""`
+	Target     string   `short:"t"               help:"filter by Earthfiles that include this target"                                               default:""`
 }
 
 func (c *scanCmd) Run() error {
 	parser := parsers.NewEarthlyParser()
 	scanner := scanners.NewFileScanner(c.Paths, parser, afero.NewOsFs())
 
-	var err error
 	// Target tag is set.
-	if len(c.Target) != 0 {
+	if c.Target != "" {
 		var fileMapTarget = make(map[string][]string)
-		for _, t := range c.Target {
-			pathToEarthMap, err := scanner.ScanForTarget(t)
+		pathToEarthMap, err := scanner.ScanForTarget(c.Target)
 
-			if err != nil {
-				return err
+		if err != nil {
+			return err
+		}
+
+		for key, value := range pathToEarthMap {
+			if existingTargets, ok := fileMapTarget[filepath.Dir(key)]; ok {
+				fileMapTarget[filepath.Dir(key)] = append(existingTargets, value.Targets...)
+			} else {
+				fileMapTarget[filepath.Dir(key)] = value.Targets
 			}
 
-			for key, value := range pathToEarthMap {
-				if existingTargets, ok := fileMapTarget[filepath.Dir(key)]; ok {
-					fileMapTarget[filepath.Dir(key)] = append(existingTargets, value.Targets...)
-				} else {
-					fileMapTarget[filepath.Dir(key)] = value.Targets
-				}
-			}
 		}
 
 		err = c.printOutput(fileMapTarget)

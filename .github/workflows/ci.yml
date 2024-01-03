@@ -151,7 +151,7 @@ jobs:
       aws_role_arn: ${{ inputs.aws_role_arn }}
       aws_region: ${{ inputs.aws_region }}
       ci_cli_version: ${{ inputs.ci_cli_version }}
-      earthfile: docs
+      earthfile: ./docs
       target: docs
     secrets:
       earthly_runner_address: ${{ secrets.earthly_runner_address }}

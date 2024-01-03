@@ -1,5 +1,5 @@
 # cspell UDCs and Containers.
-VERSION 0.7
+VERSION --global-cache 0.7
 
 CHECK:
     # Spell checking all docs and code is done with cspell

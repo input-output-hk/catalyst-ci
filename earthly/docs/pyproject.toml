@@ -3,7 +3,7 @@ name = "Documentation Tooling"
 version = "0.1.0"
 description = "Common Project Catalyst Documentation Tooling."
 authors = ["Joshua Gilman", "Steven Johnson"]
-readme = "README.md"
+readme = "Readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"

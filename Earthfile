@@ -1,6 +1,5 @@
 # Set the Earthly version to 0.7
-VERSION 0.7
-FROM debian:stable-slim
+VERSION --global-cache 0.7
 
 # cspell: words livedocs sitedocs
 
@@ -19,6 +18,13 @@ markdown-check-fix:
 check-spelling:
     DO ./earthly/cspell+CHECK
 
+# check-bash - test all bash files lint properly according to shellcheck.
+check-bash:
+    FROM alpine:3.18
+
+    DO ./earthly/bash+SHELLCHECK --src=.
+
+# Internal: Reference to our repo root documentation used by docs builder.
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch
@@ -26,6 +32,14 @@ repo-docs:
 
     WORKDIR /repo
     COPY --dir *.md LICENSE-APACHE LICENSE-MIT .
-    #RUN ls -al /repo
+
+    SAVE ARTIFACT /repo repo
+
+repo-config:
+    # Create artifacts of config file we need to refer to in builders.
+    FROM scratch
+
+    WORKDIR /repo
+    COPY --dir .sqlfluff .
 
     SAVE ARTIFACT /repo repo
