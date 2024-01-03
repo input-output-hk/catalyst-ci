@@ -99,11 +99,11 @@ jobs:
         earthfile: ${{ fromJson(needs.discover.outputs.paths) }}
     steps:
       - name: Get filtered targets
-        run: | 
-            echo ${{ matrix.earthfile }}
-            echo ${{ needs.discover.outputs.json }}
-            value=$(echo ${{ needs.discover.outputs.json }} | jq -r ".${{ matrix.earthfile }}[]")
-            echo $value
+        run: |
+          echo ${{ matrix.earthfile }}
+          echo ${{ needs.discover.outputs.json }}
+          value=$(echo "${{ steps.discover.outputs.json }}" | jq -r ".${{ matrix.earthfile }}[]")
+          echo $value
       - uses: actions/checkout@v3
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@feat/targets-scanner
