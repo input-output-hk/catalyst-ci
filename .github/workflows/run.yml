@@ -79,6 +79,7 @@ jobs:
       - name: Check for empty output
         id: check
         run: |
+          echo ${{ steps.discover.outputs.json }}
           output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
           if [ "$output" == "null" ]; then
