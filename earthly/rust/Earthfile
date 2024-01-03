@@ -70,7 +70,8 @@ rust-base:
         cargo install cargo-deny    --version=0.14.3 && \
         cargo install cargo-modules --version=0.10.2 && \
         cargo install cargo-depgraph --version=1.5.0 && \
-        cargo install cargo-llvm-cov --version=0.5.39
+        cargo install cargo-llvm-cov --version=0.5.39 && \
+        cargo install --git https://github.com/bytecodealliance/wasmtime --tag v16.0.0 verify-component-adapter
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
 
