@@ -21,3 +21,6 @@ target/
 
 # Python junk
 **/*.pyc
+
+# Generated Earthfile
+/cli/generate

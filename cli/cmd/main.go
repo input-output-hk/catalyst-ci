@@ -3,6 +3,7 @@ package main
 // cspell: words alecthomas afero sess tfstate
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -41,6 +42,7 @@ var cli struct {
 	State    stateCmd    `cmd:"" help:"Fetch outputs from remote Terraform state buckets."`
 	Tags     tagsCmd     `cmd:"" help:"Generate image tags with the current git context."`
 	Simulate simulateCmd `cmd:"" help:"Simulate earthly commands."`
+	Generate generateCmd `cmd:"" help:"Generate Earthfile from the given targets"`
 }
 
 type imagesCmd struct {
@@ -285,6 +287,72 @@ func runEarthlyTarget(wg *sync.WaitGroup, earthlyCmd string) {
 	}
 	outStr, errStr := stdoutBuf.String(), stderrBuf.String()
 	fmt.Printf("\nout:\n%s\nerr:\n%s\n", outStr, errStr)
+}
+
+type generateCmd struct {
+	Path    string   `                      help:"directory path to be iterated to search for targets within the Earthfile"               arg:"" type:"path"`
+	Target  []string `short:"t"             help:"Earthly targets pattern"                                               default:"check check-* build test test-*"`
+	Version string   `short:"v"             help:"Earthly version"                    default:"0.7"`
+}
+
+// Generate Earthfile with given targets.
+// All targets associated with the given targets will be listed inside.
+func (c *generateCmd) Run() error {
+	// Directory path and file name.
+	dirPath := "generate"
+	fileName := "Earthfile"
+
+	// Create the directory.
+	err := os.MkdirAll(dirPath, os.ModePerm)
+	if err != nil {
+		return nil
+	}
+
+	filePath := filepath.Join(dirPath, fileName)
+
+	file, err := os.Create(filePath)
+	if err != nil {
+		return nil
+	}
+	writer := bufio.NewWriter(file)
+
+	parser := parsers.NewEarthlyParser()
+	scanner := scanners.NewFileScanner([]string{c.Path}, parser, afero.NewOsFs())
+
+	setup := fmt.Sprintf("VERSION --global-cache %s \nall:\n", c.Version)
+
+	_, err = writer.WriteString(setup)
+	if err != nil {
+		return nil
+	}
+	// Loop through target patterns.
+	for _, tp := range strings.Fields(c.Target[0]) {
+		pathToEarthMap, err := scanner.ScanForTarget(tp)
+		if err != nil {
+			return err
+		}
+		for _, e := range pathToEarthMap {
+			fmt.Println(e.Earthfile.Path, e.Targets)
+			for _, tg := range e.Targets {
+				target := filepath.Join(filepath.Dir(e.Earthfile.Path), "+"+tg)
+				data := fmt.Sprintf("\t BUILD %s\n", target)
+				fmt.Println(">>> Target Path", data)
+				_, err = writer.WriteString(data)
+				if err != nil {
+					return nil
+				}
+
+			}
+
+		}
+		err = writer.Flush()
+		if err != nil {
+			return nil
+		}
+
+	}
+	return nil
+
 }
 
 func main() {
