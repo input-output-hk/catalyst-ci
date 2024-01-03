@@ -102,7 +102,7 @@ jobs:
         id: get_target
         run: |
           targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
-          echo
+          echo $targets
           echo "targets=$targets" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
