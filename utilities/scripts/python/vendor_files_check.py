@@ -1,3 +1,6 @@
+
+# cspell: words colordiff
+
 # Checks if two files that should exist DO, and are equal.
 # used to enforce consistency between local config files and the expected config locked in CI.
 

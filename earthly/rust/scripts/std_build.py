@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cspell: words
+# cspell: words lcov testdocs nextest testunit depgraph
 
 import python.cli as cli
 import argparse

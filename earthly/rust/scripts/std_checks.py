@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cspell: words
+# cspell: words depgraph fmtchk fmtfix colordiff stdcfgs rustfmt stdcfgs nextest
 
 import python.cli as cli
 import python.vendor_files_check as vendor_files_check
