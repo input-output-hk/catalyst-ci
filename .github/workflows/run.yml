@@ -79,13 +79,13 @@ jobs:
       - name: Check for empty output
         id: check
         run: |
-          output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
+          json=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
           if [ "$output" == "null" ]; then
             echo "json=[]" >> $GITHUB_OUTPUT
             echo "paths=[]" >> $GITHUB_OUTPUT
           else
-            echo "json=$output" >> $GITHUB_OUTPUT
+            echo "json=$json" >> $GITHUB_OUTPUT
             echo "paths=$paths" >> $GITHUB_OUTPUT
           fi
 
@@ -98,6 +98,13 @@ jobs:
       matrix:
         earthfile: ${{ fromJson(needs.discover.outputs.paths) }}
     steps:
+      - name: Get filtered targets
+        id: get_target
+        run: |
+          targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
+          echo $targets
+          targets_with_space=$(echo $targets | tr '\n' ' ')
+          echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@feat/targets-scanner
@@ -116,4 +123,4 @@ jobs:
           privileged: ${{ inputs.privileged }}
           earthfile: ${{ matrix.earthfile }}
           runner_address: ${{ secrets.earthly_runner_address }}
-          earthfile_map_targets: ${{ needs.discover.outputs.json }}
+          targets: ${{ steps.get_target.outputs.targets }}
