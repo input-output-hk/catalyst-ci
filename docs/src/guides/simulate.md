@@ -81,7 +81,7 @@ Specific stages can be simulated by adding target flag.
 The argument is a list of target pattern, for example, `-t "<target> <target2>"`
 
 ``` bash
-ci simulate . -t "test test-*"
+ci simulate . -t "test" -t "test-*"
 ```
 
 ## Generate Command Usage
@@ -116,12 +116,12 @@ eg. `BUILD /User/work/test/+target`
 
 Customization can be done by specifying flags.
 
-* Adding target flag `-t "<target> <target2>"`
+* Adding target flag `-t "<target>" -t "<target2>"`
 * Adding version flag `-v <version>`
 * Adding directory flag `-d <directory>`
 
 ``` bash
-ci generate . -t "test-* check-*" -v 0.6 -d ../
+ci generate . -t "test-*" -t "check-*" -v 0.6 -d ../
 ```
 
 The command above will iterate through the current directory.

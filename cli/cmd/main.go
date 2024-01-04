@@ -291,7 +291,7 @@ func runEarthlyTarget(wg *sync.WaitGroup, earthlyCmd string) {
 
 type generateCmd struct {
 	Path      string   `                      help:"directory path to be iterated to search for targets within the Earthfile"               arg:"" type:"path"`
-	Targets   []string `short:"t"             help:"Earthly targets pattern"                                               default:"check check-* build test test-*"`
+	Targets   []string `short:"t"             help:"Earthly targets pattern"                                               default:"check,check-*,build,test,test-*"`
 	Version   string   `short:"v"             help:"Earthly version"                    default:"0.7"`
 	Directory string   `short:"d"             help:"Directory to create a Earthfile"    default:"generate"`
 }
@@ -325,7 +325,7 @@ func (c *generateCmd) Run() error {
 	parser := parsers.NewEarthlyParser()
 	scanner := scanners.NewFileScanner([]string{c.Path}, parser, afero.NewOsFs())
 	// Loop through target patterns.
-	for _, tp := range strings.Fields(c.Targets[0]) {
+	for _, tp := range c.Targets {
 		fmt.Println(">>>>>>> Detecting", tp, "target")
 		pathToEarthMap, err := scanner.ScanForTarget(tp)
 		if err != nil {
