@@ -50,7 +50,6 @@ def main():
 
 
     results.print()
-    
     if not results.ok():
         exit(1)
 

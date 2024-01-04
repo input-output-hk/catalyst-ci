@@ -134,10 +134,11 @@ CHECK:
 #  * bins : The list of binaries `cargo-modules` docs to build.
 BUILD:
     COMMAND
+    ARG cov_report=""
     ARG libs=""
     ARG bins=""
 
-    RUN /scripts/std_build.sh "$libs" "$bins"
+    RUN /scripts/std_build.py --cov_report=$cov_report --libs=$libs --bins=$bins
 
 # Run unit tests and generates test and coverage report artifacts
 UNIT_TEST:
