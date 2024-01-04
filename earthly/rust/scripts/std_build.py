@@ -18,7 +18,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="Rust build processing."
     )
-    parser.add_argument("--cov_report", help="Lcov report file.")
+    parser.add_argument("--cov_report", help="The output coverage report file path.")
     parser.add_argument("--libs", help="The list of lib crates `cargo-modules` docs to build separated by comma.")
     parser.add_argument("--bins", help="The list of binaries `cargo-modules` docs to build.")
     args = parser.parse_args()

@@ -130,6 +130,7 @@ CHECK:
 
 # Step we do during the `build` CI phase for all Rust programs
 # Parameters:
+#  * cov_report: The output coverage report file path.
 #  * libs : The list of lib crates `cargo-modules` docs to build.
 #  * bins : The list of binaries `cargo-modules` docs to build.
 BUILD:
