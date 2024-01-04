@@ -12,8 +12,8 @@ The simulation can be done in 2 ways
 
 1. Running a command line `simulate`.
 This will run Earthly command on every targets that match the given input targets.
-The targets will run concurrently using `goroutines` and preview the outcomes.
-2. Running a command line `generate`.
+The targets will run sequentially, then preview the outcomes.
+1. Running a command line `generate`.
 This will create an Earthfile that has a main target called `simulate`.
 Inside the main `simulate` target will contains all the targets that match the given input targets.
 In order to test it, `earthly +simulate` can be run directly.
