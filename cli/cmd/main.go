@@ -13,8 +13,6 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
-	"strings"
-	"sync"
 	"text/template"
 	"time"
 
@@ -245,35 +243,21 @@ func (c *simulateCmd) Run() error {
 	parser := parsers.NewEarthlyParser()
 	scanner := scanners.NewFileScanner([]string{c.Path}, parser, afero.NewOsFs())
 
-	fmt.Println("Targets: ", c.Targets)
 	// Loop through target patterns.
-	for _, tp := range strings.Fields(c.Targets[0]) {
-		fmt.Println(">>>>>>> Detecting", tp, "target")
-		pathToEarthMap, err := scanner.ScanForTarget(tp)
+	for _, tp := range c.Targets {
+		err := processTargets(scanner, tp, func(target string) {
+			fmt.Println(">>> Running target", target)
+			runEarthlyTarget(target)
+		})
 		if err != nil {
 			return err
 		}
-		for _, e := range pathToEarthMap {
-			var wg sync.WaitGroup
-			// Loop through filtered targets.
-			for _, tg := range e.Targets {
-				target := filepath.Join(filepath.Dir(e.Earthfile.Path), "+"+tg)
-				fmt.Println(">>> Running target", target)
-				wg.Add(1)
-				go runEarthlyTarget(&wg, target)
-			}
-			// Wait for all goroutines to finish.
-			wg.Wait()
-		}
-
-		fmt.Println("Command executed successfully.")
 	}
 	return nil
 }
 
-// Run Earthly with target.
-func runEarthlyTarget(wg *sync.WaitGroup, earthlyCmd string) {
-	defer wg.Done()
+// Run Earthly with target and print out logs.
+func runEarthlyTarget(earthlyCmd string) {
 	command := "earthly"
 
 	// Create the command.
@@ -301,22 +285,10 @@ type generateCmd struct {
 // Generate Earthfile with given targets.
 // All targets associated with the given targets will be listed inside.
 func (c *generateCmd) Run() error {
-	// Directory path and file name.
-	fileName := "Earthfile"
-
-	// Create the directory.
-	err := os.MkdirAll(c.Directory, os.ModePerm)
+	writer, err := createFile(c.Directory, "Earthfile")
 	if err != nil {
 		return err
 	}
-
-	filePath := filepath.Join(c.Directory, fileName)
-	file, err := os.Create(filePath)
-	if err != nil {
-		return err
-	}
-
-	writer := bufio.NewWriter(file)
 	// Write down Earthly version and main target.
 	setup := fmt.Sprintf("VERSION --global-cache %s \nsimulate:\n", c.Version)
 	_, err = writer.WriteString(setup)
@@ -326,28 +298,60 @@ func (c *generateCmd) Run() error {
 
 	parser := parsers.NewEarthlyParser()
 	scanner := scanners.NewFileScanner([]string{c.Path}, parser, afero.NewOsFs())
-	// Loop through target patterns.
 	for _, tp := range c.Targets {
-		fmt.Println(">>>>>>> Detecting", tp, "target")
-		pathToEarthMap, err := scanner.ScanForTarget(tp)
+		err = processTargets(scanner, tp, func(target string) {
+			data := fmt.Sprintf("\t BUILD %s\n", target)
+			fmt.Println(">>> Target with Path", data)
+			_, err = writer.WriteString(data)
+			if err != nil {
+				fmt.Println("Error writing to file:", err)
+			}
+		})
 		if err != nil {
 			return err
-		}
-		for _, e := range pathToEarthMap {
-			for _, tg := range e.Targets {
-				target := filepath.Join(filepath.Dir(e.Earthfile.Path), "+"+tg)
-				// Build a target with local directory
-				data := fmt.Sprintf("\t BUILD %s\n", target)
-				fmt.Println(">>> Target with Path", data)
-				_, err = writer.WriteString(data)
-				if err != nil {
-					return err
-				}
-			}
 		}
 		err = writer.Flush()
 		if err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+// Create file with given file name and directory.
+func createFile(directory string, fileName string) (*bufio.Writer, error) {
+	// Create directory
+	err := os.MkdirAll(directory, os.ModePerm)
+	if err != nil {
+		return nil, err
+	}
+
+	filePath := filepath.Join(directory, fileName)
+	file, err := os.Create(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	writer := bufio.NewWriter(file)
+
+	return writer, nil
+}
+
+// Scans for targets using the given target pattern
+// then called the callback for each target.
+func processTargets(scanner *scanners.FileScanner, targetPattern string, callback func(target string)) error {
+	fmt.Println(">>>>>>> Detecting", targetPattern, "target")
+	pathToEarthMap, err := scanner.ScanForTarget(targetPattern)
+	if err != nil {
+		return err
+	}
+
+	// Loop through filtered targets.
+	for _, e := range pathToEarthMap {
+		for _, tg := range e.Targets {
+			// Create target path.
+			target := filepath.Join(filepath.Dir(e.Earthfile.Path), "+"+tg)
+			callback(target)
 		}
 	}
 	return nil
