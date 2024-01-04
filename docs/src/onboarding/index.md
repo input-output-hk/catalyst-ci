@@ -45,21 +45,46 @@ process to reconcile them.
 This reduces the friction of onboarding while simultaneously establishing a separation of concerns in a complex mono-repo
 environment.
 
+For instance, in the check phase of the CI, both check and check-*will be executed.
+The wildcard* serves as a regular search term, representing one or more other characters.
+The output may resemble the following:
+
 During a single run, the CI will go through multiple phases of discovery.
 In each of these discovery phases, a custom CLI provided by the `catalyst-ci` repository is executed.
 The CLI is responsible for recursively scanning the repository for `Earthfile`s and filtering them by target.
-For example, during the `check` phase of the CI, the CLI will return a list of `Earthfile`s that contain the `check` target.
+The CLI will return a list of Earthfile path and a map where key is the Earthfile path and the value is a list of filtered target.
+For example, in the check phase of the CI, `check` and `check-*` will be executed.
+The wildcard `*` serves as a regular search term, representing one or more other characters.
+The output may looks like the following:
+**Map:**
 
-The discovery phase will then return a list of `Earthfile`s matching the given criteria.
-This list is fed into a [matrix job](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs) that multiplexes
-executing the targets from each of the discovered `Earthfile`s.
-By running targets in parallel, we maximize network throughput and create an easier to digest view of the CI status.
-For example, by doing this, every individual target gets its own dedicated job and logs that can be easily seen from the GitHub
-Actions UI.
+```json
+{
+  "/home/work/test": ["check-test1", "check-test2", "check-test3"],
+  "/home/work/test2": ["check"]
+}
+```
+
+**Path:**
+
+```json
+["/home/work/test", "home/work/test2"]
+```
+
+This list of `path` is fed into a [matrix job](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs) that
+multiplexes executing the filtered targets from each of the discovered `Earthfile`s.
+The filtered targets will be retrieved from the map according to which Earthfile is currently running.
+For example, running `/home/work/test` will run the targets `check-test1` `check-test2` and `check-test3` sequentially.
+This will make the logs easily seen from the GitHub Actions UI.
+
+Executing each discovered Earthfile in parallel will maximize network throughput
+and create a more easily digestible view of the CI status.
+For example, by doing this, every individual Earthfile gets its own dedicated job and logs.
+This can be easily seen from the GitHub Actions UI.
 
 ### Execution
 
-After each discovery phase, a list of targets will be executed by the CI in parallel.
+After each discovery phase, a list of targets will be executed by the CI.
 Execution is handled by Earthly and usually occurs on a remote Earthly runner that maximizes the benefits of caching.
 The exact steps that get executed by the target is defined by the developer.
 While most targets generally have a clearly defined scope, the overall goal is to enable adaptability by offloading the logic to the
