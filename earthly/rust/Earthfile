@@ -130,26 +130,18 @@ CHECK:
 
 # Step we do during the `build` CI phase for all Rust programs
 # Parameters:
+#  * target: Rust target value.
 #  * cov_report: The output coverage report file path.
 #  * libs : The list of lib crates `cargo-modules` docs to build.
 #  * bins : The list of binaries `cargo-modules` docs to build.
 BUILD:
     COMMAND
+    ARG target=""
     ARG cov_report=""
     ARG libs=""
     ARG bins=""
 
-    RUN /scripts/std_build.py --cov_report=$cov_report --libs=$libs --bins=$bins
-
-# Run unit tests and generates test and coverage report artifacts
-UNIT_TEST:
-    COMMAND
-    # remove artifacts that may affect the coverage results
-    RUN cargo llvm-cov clean --workspace
-    # run unit tests and display test result and test coverage
-    RUN cargo llvm-cov nextest --release --bins --lib --workspace --locked -P ci
-    # generate lcov report
-    RUN cargo llvm-cov report --release --output-path coverage-report.info
+    RUN /scripts/std_build.py --target=$target --cov_report=$cov_report --libs=$libs --bins=$bins
 
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:

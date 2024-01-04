@@ -34,8 +34,6 @@ def main():
     results.add(cli.run(f"cargo build {target_flag} --release --workspace --locked", name="Build all code in the workspace"))
     # Check the code passes all clippy lint checks.
     results.add(cli.run(f"cargo lint {target_flag}", name="Clippy Lints in the workspace check"))
-    # Check if all Self contained tests pass (Test that need no external resources).
-    results.add(cli.run(f"cargo testunit {target_flag}", name="Self contained Unit tests all pass check"))
     # Check we can generate all the documentation.
     results.add(cli.run(f"cargo docs {target_flag}", name="Documentation can be generated OK check"))
     # Check if all documentation tests pass.
@@ -48,6 +46,14 @@ def main():
         # Remove artifacts that may affect the coverage results
         res = cli.run("cargo llvm-cov clean --workspace", name="Remove artifacts that may affect the coverage results")
         results.add(res)
+        # Run unit tests and generates test and coverage report artifacts
+        if res.ok():
+            res = cli.run(f"cargo llvm-cov nextest {target_flag} --release --bins --lib --workspace --locked -P ci",
+                name="Run unit tests and display test result and test coverage")
+            if not res.ok():
+                print(f"[yellow]You can locally run tests by running: [/yellow] \n [red bold]cargo testunit {target_flag}[/red bold]")
+            results.add(res)
+    
         # Save coverage report to file if it is provided
         if res.ok():
             res = cli.run(f"cargo llvm-cov report --release {target_flag} --output-path {args.cov_report}",
