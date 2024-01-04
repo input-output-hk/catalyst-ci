@@ -2,7 +2,7 @@
 VERSION --global-cache 0.7
 
 # cspell: words rustup rustc automake autotools xutils miri nextest kani
-# cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT 
+# cspell: words TARGETPLATFORM TARGETOS TARGETVARIANT 
 # cspell: words USERPLATFORM USEROS USERARCH USERVARIANT 
 # cspell: words ripgrep colordiff rustfmt stdcfgs toolset toolsets readelf
 
@@ -36,8 +36,8 @@ build-hosted:
 
     DO ../../earthly/rust+SMOKE_TEST --bin=dbviz
 
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/dbviz dbviz
+    SAVE ARTIFACT target/doc doc
+    SAVE ARTIFACT target/release/dbviz dbviz
 
 # build-all-hosts - A developers test which runs build with all supported host tooling.  
 # Needs qemu or rosetta to run.

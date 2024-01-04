@@ -155,9 +155,9 @@ SMOKE_TEST:
     COMMAND
     ARG --required bin
 
-    RUN ldd target/$TARGETARCH/release/$bin
-    RUN readelf -p .comment target/$TARGETARCH/release/$bin
-    RUN strip -v target/$TARGETARCH/release/$bin
+    RUN ldd target/release/$bin
+    RUN readelf -p .comment target/release/$bin
+    RUN strip -v target/release/$bin
 
     # ALL executables MUST have `--help` as an option.
-    RUN target/$TARGETARCH/release/$bin --help
+    RUN target/release/$bin --help

@@ -1,6 +1,6 @@
 VERSION --global-cache 0.7
 
-# cspell: words TARGETARCH USERARCH toolsets rustfmt nextest
+# cspell: words USERARCH toolsets rustfmt nextest
 
 # Set up our target toolchains, and copy our files.
 builder:
@@ -32,8 +32,8 @@ build-hosted:
 
     DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/foo foo
+    SAVE ARTIFACT target/doc doc
+    SAVE ARTIFACT target/release/foo foo
     SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
     SAVE ARTIFACT coverage-report.info coverage-report.info
 
