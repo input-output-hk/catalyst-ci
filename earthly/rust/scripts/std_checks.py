@@ -16,6 +16,10 @@ import os
 # Individual targets can add extra `check` steps, but these checks must always
 # pass.
 
+# This is set up so that ALL checks are run and it will fail if any fail.
+# This improves visibility into all issues that need to be corrected for `check`
+# to pass without needing to iterate excessively.
+
 def main():
     # Force color output in CI
     rich.reconfigure(color_system="256")
@@ -32,7 +36,7 @@ def main():
     if not res.ok():
         print("[yellow]You can locally fix format errors by running: [/yellow] \n [red bold]cargo +nightly fmtfix [/red bold]")
 
-    # Check config files
+    # Check config files.
     results.add(vendor_files_check.colordiff_check(f"{os.environ.get('CARGO_HOME')}/config.toml", ".cargo/config.toml"))
     results.add(vendor_files_check.colordiff_check("/stdcfgs/rustfmt.toml", "rustfmt.toml"))
     results.add(vendor_files_check.colordiff_check("/stdcfgs/nextest.toml", ".config/nextest.toml"))
