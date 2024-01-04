@@ -307,13 +307,13 @@ func (c *generateCmd) Run() error {
 	// Create the directory.
 	err := os.MkdirAll(c.Directory, os.ModePerm)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	filePath := filepath.Join(c.Directory, fileName)
 	file, err := os.Create(filePath)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	writer := bufio.NewWriter(file)
@@ -321,7 +321,7 @@ func (c *generateCmd) Run() error {
 	setup := fmt.Sprintf("VERSION --global-cache %s \nsimulate:\n", c.Version)
 	_, err = writer.WriteString(setup)
 	if err != nil {
-		return nil
+		return err
 	}
 
 	parser := parsers.NewEarthlyParser()
@@ -341,13 +341,13 @@ func (c *generateCmd) Run() error {
 				fmt.Println(">>> Target with Path", data)
 				_, err = writer.WriteString(data)
 				if err != nil {
-					return nil
+					return err
 				}
 			}
 		}
 		err = writer.Flush()
 		if err != nil {
-			return nil
+			return err
 		}
 	}
 	return nil
