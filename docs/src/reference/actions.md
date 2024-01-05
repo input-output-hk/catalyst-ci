@@ -28,7 +28,7 @@ It performs the necessary steps to setup the local GitHub runner to perform CI t
 This includes:
 
 * Installing Earthly
-* Installing the custom CI CLI
+* Installing the custom CI CLI or build the CI locally if the flag is set
 * Configuring access to AWS
 * Authenticating with container registries
 * Configuring the Earthly remote runner
@@ -41,9 +41,10 @@ Using these actions individually should be avoided unless absolutely necessary.
 ### Discover
 
 The `discover` action is another common action that shows up in many workflows.
-It performs the "discovery" mechanism of finding Earthfiles with specific targets.
-For example, the `check` workflow uses this action to discover all Earthfiles that have a `check` target.
-The custom CI CLI **must** be installed (see the above section) in order for this action to work.
+It performs the "discovery" mechanism of finding Earthfiles with filtered targets from specific targets.
+For example, the check workflow, which run `check` and `check-*`,
+uses this action to discover all Earthfiles that match `check` and `check-*` targets.
+The custom CI CLI **must** be installed or locally build (see the above section) in order for this action to work.
 
 This action is useful when creating custom workflows which extend the existing Catalyst CI process.
 It can be used to create similar logic for discovering and acting upon specific Earthly targets contained in a repository.
