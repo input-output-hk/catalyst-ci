@@ -58,3 +58,4 @@ uniseg
 webkitallowfullscreen
 WORKDIR
 xerrors
+zstd

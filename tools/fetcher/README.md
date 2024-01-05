@@ -30,7 +30,7 @@ fetcher --bucket "artifacts-bucket" artifact -e "dev" -f "fund10" -t "vit" -v "1
 ```
 
 In either case, you can omit the version (`-v`) flag and the CLI will download the "default" (unversioned) artifact.
-This is offered to support backwards compatability when using unversioned artifacts.
+This is offered to support backwards compatibility when using unversioned artifacts.
 
 ### Archives
 
