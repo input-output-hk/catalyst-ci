@@ -245,7 +245,7 @@ func (c *simulateCmd) Run() error {
 
 	// Loop through target patterns.
 	for _, tp := range c.Targets {
-		err := processTargets(scanner, tp, func(target string) {
+		err := processTargets(scanner, tp, "", func(target string) {
 			fmt.Println(">>> Running target", target)
 			runEarthlyTarget(target)
 		})
@@ -276,16 +276,17 @@ func runEarthlyTarget(earthlyCmd string) {
 }
 
 type generateCmd struct {
-	Path      string   `                      help:"directory path to be iterated to search for targets within the Earthfile"               arg:"" type:"path"`
-	Targets   []string `short:"t"             help:"Earthly targets pattern"                                               default:"check,check-*,build,test,test-*"`
-	Version   string   `short:"v"             help:"Earthly version"                    default:"0.7"`
-	Directory string   `short:"d"             help:"Directory to create a Earthfile"    default:"generate"`
+	Path    string   `                      help:"directory path to be iterated to search for targets within the Earthfile"               arg:"" type:"path"`
+	Targets []string `short:"t"             help:"Earthly targets pattern"                                               default:"check,check-*,build,test,test-*"`
+	Version string   `short:"v"             help:"Earthly version"                    default:"0.7"`
 }
 
 // Generate Earthfile with given targets.
 // All targets associated with the given targets will be listed inside.
 func (c *generateCmd) Run() error {
-	writer, err := createFile(c.Directory, "Earthfile")
+	directory := "generate"
+	// Create a directory generate with an Earthfile.
+	writer, err := createFile(directory, "Earthfile")
 	if err != nil {
 		return err
 	}
@@ -299,7 +300,7 @@ func (c *generateCmd) Run() error {
 	parser := parsers.NewEarthlyParser()
 	scanner := scanners.NewFileScanner([]string{c.Path}, parser, afero.NewOsFs())
 	for _, tp := range c.Targets {
-		err = processTargets(scanner, tp, func(target string) {
+		err = processTargets(scanner, tp, directory, func(target string) {
 			data := fmt.Sprintf("\t BUILD %s\n", target)
 			fmt.Println(">>> Target with Path", data)
 			_, err = writer.WriteString(data)
@@ -339,9 +340,14 @@ func createFile(directory string, fileName string) (*bufio.Writer, error) {
 
 // Scans for targets using the given target pattern
 // then called the callback for each target.
-func processTargets(scanner *scanners.FileScanner, targetPattern string, callback func(target string)) error {
+func processTargets(scanner *scanners.FileScanner, targetPattern string, directory string, callback func(target string)) error {
 	fmt.Println(">>>>>>> Detecting", targetPattern, "target")
 	pathToEarthMap, err := scanner.ScanForTarget(targetPattern)
+	if err != nil {
+		return err
+	}
+
+	curDir, err := os.Getwd()
 	if err != nil {
 		return err
 	}
@@ -349,8 +355,17 @@ func processTargets(scanner *scanners.FileScanner, targetPattern string, callbac
 	// Loop through filtered targets.
 	for _, e := range pathToEarthMap {
 		for _, tg := range e.Targets {
-			// Create target path.
-			target := filepath.Join(filepath.Dir(e.Earthfile.Path), "+"+tg)
+			// Get relative target path.
+			relativePath, err := filepath.Rel(curDir, e.Earthfile.Path)
+			if err != nil {
+				return err
+			}
+
+			target := filepath.Join(filepath.Dir(relativePath), "+"+tg)
+			// If the directory is specified, navigate out from that directory.
+			if directory != "" {
+				target = filepath.Join("../" + target)
+			}
 			callback(target)
 		}
 	}
