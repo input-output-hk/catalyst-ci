@@ -17,16 +17,16 @@ It assumes you've configured the appropriate credentials in your environment to 
 
 To fetch a specific Jormungandr genesis file:
 
-```
+```shell
 # Fetch v1.0.0 of the genesis file from the fund10 dev environment
-$ fetcher --bucket "artifacts-bucket" artifact -e "dev" -f "fund10" -t "genesis" -v "1.0.0" ./block0.bin
+fetcher --bucket "artifacts-bucket" artifact -e "dev" -f "fund10" -t "genesis" -v "1.0.0" ./block0.bin
 ```
 
 To fetch a specific vit-ss database file:
 
-```
+```shell
 # Fetch v1.0.0 of the vit-ss database from the fund10 dev environment
-$ fetcher --bucket "artifacts-bucket" artifact -e "dev" -f "fund10" -t "vit" -v "1.0.0" ./block0.bin
+fetcher --bucket "artifacts-bucket" artifact -e "dev" -f "fund10" -t "vit" -v "1.0.0" ./block0.bin
 ```
 
 In either case, you can omit the version (`-v`) flag and the CLI will download the "default" (unversioned) artifact.
@@ -36,8 +36,9 @@ This is offered to support backwards compatability when using unversioned artifa
 
 To fetch a specific Jormungandr archive:
 
-```
-$ fetcher --bucket "archives-bucket" archive -e "dev" -i "f41c4470-03dd-4d3f-a325-6f784259b9c5" ./artifact.tar.zstd
+```shell
+# Fetches an archive with the ID of f41c4470-03dd-4d3f-a325-6f784259b9c5
+fetcher --bucket "archives-bucket" archive -e "dev" -i "f41c4470-03dd-4d3f-a325-6f784259b9c5" ./artifact.tar.zstd
 ```
 
-Artifact IDs can be found using the archiver API (i.e., https://archiver.dev.projectcatalyst.io/api/v1/archives/).
+Artifact IDs can be found using the archiver API (i.e., [the dev API](https://archiver.dev.projectcatalyst.io/api/v1/archives/)).
