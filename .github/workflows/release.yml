@@ -151,7 +151,11 @@ jobs:
           path: artifacts
       - name: Collect artifacts
         id: collect
-        run: echo "artifacts=$(find artifacts -type f -name '*.tar.gz')" >> $GITHUB_OUTPUT
+        run: |
+          ARTIFACT_PATHS=$(find artifacts -type f -name '*.tar.gz')
+          echo "artifacts<<EOF" >> $GITHUB_OUTPUT
+          echo "$ARTIFACT_PATHS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:
