@@ -10,12 +10,13 @@ The following document provides an overview and usage guide for simulating Earth
 
 The simulation can be done in 2 ways
 
-1. Running a command line `simulate`.
+1. Running a command line `simulate`:
 This will run Earthly command on every targets that match the given input targets.
 The targets will run sequentially, then preview the outcomes.
-1. Running a command line `generate`.
-This will create an Earthfile that has a main target called `simulate`.
-Inside the main `simulate` target will contains all the targets that match the given input targets.
+2. Running a command line `generate`:
+This will create an Earthfile, which is set to be created at the `generate/` folder inside the current directory.
+Inside the Earthfile, it contains a main target called `simulate`.
+This main `simulate` target will contains all the targets that match the given input targets.
 In order to test it, `earthly +simulate` can be run directly.
 
 ## Setup
@@ -95,8 +96,6 @@ The generateCmd struct is designed to be used with a command-line interface (CLI
 If the flag is not set, the default pipeline will be run `check check-* build test test-*`
 * `Version`: An Earthly version that need to be specify at the top of Earthfile.
 The default version is 0.7
-* `Directory`: A directory where the Earthfile will be place in.
-The default directory is `generate/`
 
 ### Default value
 
@@ -110,7 +109,7 @@ ci generate .
 The ci will create an Earthfile in `generate/` folder of the current directory.
 The version of the Earthly will be set to 0.7
 The targets will be listed under the `simulate` target.
-eg. `BUILD /User/work/test/+target`
+eg. `BUILD ../test/+target`
 
 ### Customize targets workflow
 
@@ -118,16 +117,15 @@ Customization can be done by specifying flags.
 
 * Adding target flag `-t "<target>" -t "<target2>"`
 * Adding version flag `-v <version>`
-* Adding directory flag `-d <directory>`
 
 ``` bash
-ci generate . -t "test-*" -t "check-*" -v 0.6 -d ../
+ci generate . -t "test-*" -t "check-*" -v 0.6
 ```
 
+The ci will create an Earthfile in `generate/` folder of the current directory.
 The command above will iterate through the current directory.
 Find the target that match `test-*` and `check-*`.
 Set the version of Earthly to 0.6.
-Then create Earthfile to the `../` directory.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Warning
