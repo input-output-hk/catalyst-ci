@@ -73,7 +73,7 @@ func (c *imagesCmd) Run() error {
 type scanCmd struct {
 	JSONOutput bool     `short:"j" long:"json"   help:"Output in JSON format"`
 	Paths      []string `                        help:"paths to scan for Earthfiles"                                             arg:"" type:"path"`
-	Targets    []string `short:"t"               help:"filter by Earthfiles that include this targets pattern"                                               default:""`
+	Targets    []string `short:"t"               help:"filter by Earthfiles that include these target patterns"                                               default:""`
 }
 
 func (c *scanCmd) Run() error {

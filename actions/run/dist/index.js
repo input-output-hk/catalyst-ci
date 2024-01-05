@@ -2906,15 +2906,14 @@ async function run() {
         args.push(...targetFlags.split(' '));
     }
     core.info(`Filtered targets >> ${targets}`);
-    const targetsArr = targets.split(' ');
-    for (const tg of targetsArr) {
+    targets.split(' ').map(tg => {
         // Get the filtered targets associated with the pattern target and earthfile.
         core.info(`Pushing target ${tg}`);
         targetsArgs.push(`${earthfile}+${tg}`);
-    }
+    });
     // Running each target command in different process.
     for (const t of targetsArgs) {
-        core.info(`Target: ${t}`);
+        core.info(`Running target: ${t}`);
         const argsSpawn = [...args];
         // Artifact is set
         if (artifact) {

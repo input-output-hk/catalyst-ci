@@ -126,6 +126,7 @@ jobs:
         id: get_target
         run: |
           targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
+          echo "Found targets: $targets"
           targets_with_space=$(echo $targets | tr '\n' ' ')
           echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
