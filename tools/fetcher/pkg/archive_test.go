@@ -21,7 +21,7 @@ var _ = Describe("Archive", func() {
 				}
 			})
 
-			It("should use the correct key and ID", func() {
+			It("should use the correct key", func() {
 				fetcher := pkg.NewArchiveFetcher("test", store)
 				_, err := fetcher.Fetch("id")
 				Expect(err).ToNot(HaveOccurred())
