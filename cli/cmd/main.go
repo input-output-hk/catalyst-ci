@@ -352,20 +352,18 @@ func processTargets(scanner *scanners.FileScanner, targetPattern string, directo
 		return err
 	}
 
+	filePath := filepath.Join(curDir, directory)
+
 	// Loop through filtered targets.
 	for _, e := range pathToEarthMap {
 		for _, tg := range e.Targets {
 			// Get relative target path.
-			relativePath, err := filepath.Rel(curDir, e.Earthfile.Path)
+			relativePath, err := filepath.Rel(filePath, e.Earthfile.Path)
 			if err != nil {
 				return err
 			}
 
 			target := filepath.Join(filepath.Dir(relativePath), "+"+tg)
-			// If the directory is specified, navigate out from that directory.
-			if directory != "" {
-				target = filepath.Join("../" + target)
-			}
 			callback(target)
 		}
 	}
