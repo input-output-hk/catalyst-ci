@@ -18,7 +18,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Rust build processing."
     )
-    parser.add_argument("--target", default="", help="Rust target value.")
+    parser.add_argument("--target", default="", help="Rust target value (cargo --target flag).")
+    parser.add_argument("--package", default="", help="Rust package value (cargo --package flag).")
     parser.add_argument("--cov_report", default="", help="The output coverage report file path.")
     parser.add_argument("--libs", default="", help="The list of lib crates `cargo-modules` docs to build separated by comma.")
     parser.add_argument("--bins", default="", help="The list of binaries `cargo-modules` docs to build.")
@@ -26,20 +27,22 @@ def main():
 
     results = cli.Results("Rust builds")
 
-    target_flag = ""
+    build_flags = ""
     if args.target != "":
-        target_flag = f"--target={args.target}"
+        build_flags += f" --target={args.target} "
+    if args.package != "":
+        build_flags = f" --package={args.package} "
 
     # Build the code.
-    results.add(cli.run(f"cargo build {target_flag} --release --workspace --locked", name="Build all code in the workspace"))
+    results.add(cli.run(f"cargo build {build_flags} --release --workspace --locked", name="Build all code in the workspace"))
     # Check the code passes all clippy lint checks.
-    results.add(cli.run(f"cargo lint {target_flag}", name="Clippy Lints in the workspace check"))
+    results.add(cli.run(f"cargo lint {build_flags}", name="Clippy Lints in the workspace check"))
     # Check we can generate all the documentation.
-    results.add(cli.run(f"cargo docs {target_flag}", name="Documentation can be generated OK check"))
+    results.add(cli.run(f"cargo docs {build_flags}", name="Documentation can be generated OK check"))
     # Check if all documentation tests pass.
-    results.add(cli.run(f"cargo testdocs {target_flag}", name="Documentation tests all pass check"))
+    results.add(cli.run(f"cargo testdocs {build_flags}", name="Documentation tests all pass check"))
     # Check if any benchmarks defined run (We don;t validate the results.)
-    results.add(cli.run(f"cargo bench --all-targets {target_flag}", name="Benchmarks all run to completion check"))
+    results.add(cli.run(f"cargo bench --all-targets {build_flags}", name="Benchmarks all run to completion check"))
 
     # Save coverage report to file if it is provided
     if args.cov_report != "":
@@ -48,15 +51,15 @@ def main():
         results.add(res)
         # Run unit tests and generates test and coverage report artifacts
         if res.ok():
-            res = cli.run(f"cargo llvm-cov nextest {target_flag} --release --bins --lib --workspace --locked -P ci",
+            res = cli.run(f"cargo llvm-cov nextest {build_flags} --release --bins --lib --workspace --locked -P ci",
                 name="Run unit tests and display test result and test coverage")
             if not res.ok():
-                print(f"[yellow]You can locally run tests by running: [/yellow] \n [red bold]cargo testunit {target_flag}[/red bold]")
+                print(f"[yellow]You can locally run tests by running: [/yellow] \n [red bold]cargo testunit {build_flags}[/red bold]")
             results.add(res)
     
         # Save coverage report to file if it is provided
         if res.ok():
-            res = cli.run(f"cargo llvm-cov report --release {target_flag} --output-path {args.cov_report}",
+            res = cli.run(f"cargo llvm-cov report --release {build_flags} --output-path {args.cov_report}",
                 name=f"Generate lcov report to {args.cov_report}")
             results.add(res)
 
