@@ -23,14 +23,14 @@ var _ = Describe("Artifact", func() {
 			})
 
 			It("should use the correct key", func() {
-				fetcher := pkg.NewArtifactFetcher("env", "fundx", store)
+				fetcher := pkg.NewArtifactFetcher("env", "fund", store)
 				_, err := fetcher.Fetch("genesis", "1.0.0")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(usedKey).To(Equal("env/fundx/block0.bin-1.0.0"))
+				Expect(usedKey).To(Equal("env/fund/block0.bin-1.0.0"))
 			})
 
 			It("should return the artifact", func() {
-				fetcher := pkg.NewArtifactFetcher("env", "fundx", store)
+				fetcher := pkg.NewArtifactFetcher("env", "fund", store)
 				artifact, err := fetcher.Fetch("genesis", "1.0.0")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(artifact).To(Equal([]byte("artifact")))
@@ -38,10 +38,10 @@ var _ = Describe("Artifact", func() {
 
 			When("not specifying a version", func() {
 				It("should use the correct key", func() {
-					fetcher := pkg.NewArtifactFetcher("env", "fundx", store)
+					fetcher := pkg.NewArtifactFetcher("env", "fund", store)
 					_, err := fetcher.Fetch("genesis", "")
 					Expect(err).ToNot(HaveOccurred())
-					Expect(usedKey).To(Equal("env/fundx/block0.bin"))
+					Expect(usedKey).To(Equal("env/fund/block0.bin"))
 				})
 			})
 		})
