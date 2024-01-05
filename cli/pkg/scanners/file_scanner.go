@@ -74,7 +74,7 @@ func (f *FileScanner) ScanForTarget(target string) (map[string]pkg.EarthTargets,
 
 // Get the regex of the given target
 // if target ends with -* , return a wildcard regex
-// else, return the given target regex
+// else, return the given target regex.
 func getTargetRegex(target string) string {
 	// If target ends with -*
 	if strings.HasSuffix(target, "-*") {
