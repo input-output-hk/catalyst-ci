@@ -130,8 +130,8 @@ CHECK:
 
 # Step we do during the `build` CI phase for all Rust programs
 # Parameters:
-#  * target: Rust target value (cargo --target flag).
-#  * package: Rust package value (cargo --package flag).
+#  * target: Pass rust --target flag (cargo --target flag).
+#  * package: Pass rust --package flag (cargo --package flag).
 #  * cov_report: The output coverage report file path.
 #  * libs : The list of lib crates `cargo-modules` docs to build.
 #  * bins : The list of binaries `cargo-modules` docs to build.

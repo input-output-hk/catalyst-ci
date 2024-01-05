@@ -18,8 +18,8 @@ def main():
     parser = argparse.ArgumentParser(
         description="Rust build processing."
     )
-    parser.add_argument("--target", default="", help="Rust target value (cargo --target flag).")
-    parser.add_argument("--package", default="", help="Rust package value (cargo --package flag).")
+    parser.add_argument("--target", default="", help="Pass rust --target flag (cargo --target flag).")
+    parser.add_argument("--package", default="", help="Pass rust --package flag (cargo --package flag).")
     parser.add_argument("--cov_report", default="", help="The output coverage report file path.")
     parser.add_argument("--libs", default="", help="The list of lib crates `cargo-modules` docs to build separated by comma.")
     parser.add_argument("--bins", default="", help="The list of binaries `cargo-modules` docs to build.")
@@ -34,7 +34,7 @@ def main():
         build_flags = f" --package={args.package} "
 
     # Build the code.
-    results.add(cli.run(f"cargo build {build_flags} --release --workspace --locked", name="Build all code in the workspace"))
+    results.add(cli.run(f"cargo build {build_flags} --release --locked", name="Build all code in the workspace"))
     # Check the code passes all clippy lint checks.
     results.add(cli.run(f"cargo lint {build_flags}", name="Clippy Lints in the workspace check"))
     # Check we can generate all the documentation.
@@ -47,11 +47,11 @@ def main():
     # Save coverage report to file if it is provided
     if args.cov_report != "":
         # Remove artifacts that may affect the coverage results
-        res = cli.run("cargo llvm-cov clean --workspace", name="Remove artifacts that may affect the coverage results")
+        res = cli.run("cargo llvm-cov clean", name="Remove artifacts that may affect the coverage results")
         results.add(res)
         # Run unit tests and generates test and coverage report artifacts
         if res.ok():
-            res = cli.run(f"cargo llvm-cov nextest {build_flags} --release --bins --lib --workspace --locked -P ci",
+            res = cli.run(f"cargo llvm-cov nextest {build_flags} --release --bins --lib --locked -P ci",
                 name="Run unit tests and display test result and test coverage")
             if not res.ok():
                 print(f"[yellow]You can locally run tests by running: [/yellow] \n [red bold]cargo testunit {build_flags}[/red bold]")
