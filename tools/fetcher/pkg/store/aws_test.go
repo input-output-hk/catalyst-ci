@@ -1,5 +1,7 @@
 package store_test
 
+// cspell: words iface onsi gomega
+
 import (
 	"bytes"
 	"fmt"

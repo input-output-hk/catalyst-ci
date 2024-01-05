@@ -1,5 +1,7 @@
 package store
 
+// cspell: words iface
+
 import (
 	"fmt"
 	"io"

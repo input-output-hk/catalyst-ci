@@ -21,10 +21,12 @@ golangci
 GOLANGCI
 golines
 golint
+gomega
 GOMODCACHE
 gopls
 gosec
 graphviz
+jormungandr
 Kroki
 kubeconfig
 ldflags
