@@ -236,7 +236,7 @@ func (c *tagsCmd) Run() error {
 
 type simulateCmd struct {
 	Path    string   `                      help:"directory path to be iterated to search for targets within the Earthfile"               arg:"" type:"path"`
-	Targets []string `short:"t"               help:"Earthly targets pattern"                                               default:"check check-* build test test-*"`
+	Targets []string `short:"t"               help:"Earthly targets pattern"                                               default:"check,check-*,build,test,test-*"`
 }
 
 func (c *simulateCmd) Run() error {
