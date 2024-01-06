@@ -21,11 +21,9 @@ def main():
     parser.add_argument("--target", default="", help="Pass rust --target flag (cargo --target flag).")
     parser.add_argument("--package", default="", help="Pass rust --package flag (cargo --package flag).")
     parser.add_argument("--cov_report", default="", help="The output coverage report file path.")
-    parser.add_argument("--libs", default="", help="The list of lib crates `cargo-modules` docs to build separated by comma.")
-    parser.add_argument("--bins", default="", help="The list of binaries `cargo-modules` docs to build.")
     args = parser.parse_args()
 
-    results = cli.Results("Rust builds")
+    results = cli.Results("Rust build")
 
     build_flags = ""
     if args.target != "":
@@ -37,10 +35,8 @@ def main():
     results.add(cli.run(f"cargo build {build_flags} --release --locked", name="Build all code in the workspace"))
     # Check the code passes all clippy lint checks.
     results.add(cli.run(f"cargo lint {build_flags}", name="Clippy Lints in the workspace check"))
-    # Check we can generate all the documentation.
-    results.add(cli.run(f"cargo docs {build_flags}", name="Documentation can be generated OK check"))
     # Check if all documentation tests pass.
-    results.add(cli.run(f"cargo testdocs {build_flags}", name="Documentation tests all pass check"))
+    results.add(cli.run(f"cargo +nightly testdocs {build_flags}", name="Documentation tests all pass check"))
     # Check if any benchmarks defined run (We don;t validate the results.)
     results.add(cli.run(f"cargo bench --all-targets {build_flags}", name="Benchmarks all run to completion check"))
 
@@ -62,45 +58,6 @@ def main():
             res = cli.run(f"cargo llvm-cov report --release {build_flags} --output-path {args.cov_report}",
                 name=f"Generate lcov report to {args.cov_report}")
             results.add(res)
-
-    # Generate dependency graphs
-    results.add(cli.run(f"cargo depgraph --workspace-only --dedup-transitive-deps > target/{args.target}/doc/workspace.dot",
-            name="Workspace dependency graphs generation"))
-    results.add(cli.run(f"cargo depgraph --dedup-transitive-deps > target/{args.target}/doc/full.dot",
-            name="Full dependency graphs generation"))
-    results.add(cli.run(f"cargo depgraph --all-deps --dedup-transitive-deps > target/{args.target}/doc/all.dot",
-            name="All dependency graphs generation"))
-
-    for lib in filter(lambda lib: lib != "", args.libs.split(", ")):
-        results.add(cli.run('NO_COLOR=1 ' \
-                'cargo modules generate tree --orphans --types --traits --tests --all-features ' \
-                f'--package "{lib}" --lib > "target/{args.target}/doc/{lib}.lib.modules.tree"',
-
-                name=f"Generate Module Trees for {lib}")
-                )
-
-        results.add(cli.run('NO_COLOR=1 ' \
-                'cargo modules generate graph --all-features --modules ' \
-                f'--package "{lib}" --lib > "target/{args.target}/doc/{lib}.lib.modules.dot"',
-
-                name=f"Generate Module Graphs for {lib}")
-                )
-
-    for bin in filter(lambda bin: bin != "", args.bins.split(", ")):
-        package, bin = bin.split('/')
-        results.add(cli.run('NO_COLOR=1 ' \
-                'cargo modules generate tree --orphans --types --traits --tests --all-features ' \
-                f'--package "{package}" --bin "{bin}" > "target/{args.target}/doc/{package}.{bin}.bin.modules.tree"',
-
-                name=f"Generate Module Trees for {package}/{bin}")
-                )
-
-        results.add(cli.run('NO_COLOR=1 ' \
-                'cargo modules generate graph --all-features --modules ' \
-                f'--package "{package}" --bin "{bin}" > "target/{args.target}/doc/{package}.{bin}.bin.modules.dot"',
-
-                name=f"Generate Module Graphs for {package}/{bin}")
-                )
 
     results.print()
     if not results.ok():

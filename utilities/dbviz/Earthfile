@@ -38,6 +38,7 @@ build:
     FROM +builder
  
     DO ../../earthly/rust+BUILD
+    DO ../../earthly/rust+DOCS
 
     DO ../../earthly/rust+SMOKE_TEST --bin=dbviz
 
