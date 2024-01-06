@@ -7,7 +7,7 @@ import argparse
 import rich
 
 # This script is run inside the `build` stage.
-# Runs all documenation build process.
+# Runs all documentation build process.
 
 def main():
     # Force color output in CI
