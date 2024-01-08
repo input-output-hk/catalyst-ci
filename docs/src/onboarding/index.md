@@ -52,7 +52,7 @@ The CLI is responsible for recursively scanning the repository for `Earthfile`s 
 The CLI will return a list of Earthfile path and a map where key is the Earthfile path and the value is a list of filtered target.
 For example, in the check phase of the CI, `check` and `check-*` will be executed.
 The wildcard `*` serves as a regular search term, representing one or more other characters.
-The output pf the check phase may looks like the following:
+The output of the check phase may looks like the following:
 **Map:**
 
 ```json
@@ -153,6 +153,12 @@ Two patterns `target` or `target-*` can be used according to your usage and pref
 * In case of `target`, it will scan for targets that match the exact target name (ie., `target`)
 * In case of `target-*`, it will scan for targets that start with `target-` and are followed by any number of digits or characters
 (The wildcard `*` serves as a regular search term, representing one or more other characters.)
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
+      Wildcard (`target-*`) is only compatible with targets that do not produce any artifacts or images.
+      The current design is only supported in the `check` and `test` stages.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 The examples are provided below:
 

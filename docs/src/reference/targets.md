@@ -188,6 +188,10 @@ In this case, it makes sense to create a release target that produces the binary
     Targets can be written in 2 patterns `target` and `target-*`.
     The wildcard `*` serves as a regular search term, representing one or more other characters.
     Specifically, one or more numbers or lowercase characters.
-    The `target-*` target pattern is currently use in `check` and `test` stages.
-    Since, multiple `check` and `test` can be specified in a single Earthfile.
+<!-- markdownlint-enable max-one-sentence-per-line -->
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
+      Wildcard (`target-*`) is only compatible with targets that do not produce any artifacts or images.
+      The current design is only supported in the `check` and `test` stages.
 <!-- markdownlint-enable max-one-sentence-per-line -->
