@@ -4,8 +4,11 @@ VERSION --global-cache 0.7
 # cspell: words livedocs sitedocs
 
 # check-markdown can be done remotely.
-check-markdown: 
+check-markdown:
+    LOCALLY
+
     DO ./earthly/mdlint+CHECK
+
 
 # markdown-check-fix perform markdown check with fix in this repo.
 markdown-check-fix:
@@ -15,6 +18,8 @@ markdown-check-fix:
 
 # check-spelling Check spelling in this repo inside a container.
 check-spelling:
+    LOCALLY
+
     DO ./earthly/cspell+CHECK
 
 # check-bash - test all bash files lint properly according to shellcheck.
