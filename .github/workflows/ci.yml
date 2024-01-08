@@ -188,7 +188,7 @@ jobs:
       earthly_runner_address: ${{ secrets.earthly_runner_address }}
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   deploy:
-    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@feat/targets-scanner
+    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@master
     if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && inputs.deployment_images != ''
     needs: [publish]
     with:

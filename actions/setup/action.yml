@@ -60,42 +60,42 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: Install Earthly
-      uses: earthly/actions-setup@v1
-      if: ${{ inputs.earthly_skip_install != 'true' }}
-      with:
-        version: ${{ inputs.earthly_version }}
-    - name: Install CI CLI
-      uses: input-output-hk/catalyst-ci/actions/install@feat/targets-scanner
-      if: ${{ inputs.cli_skip_install != 'true' }}
-      with:
-        version: ${{ inputs.cli_version }}
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
-      with:
-        role-to-assume: ${{ inputs.aws_role_arn }}
-        aws-region: ${{ inputs.aws_region }}
-    - name: Login to Docker Hub
-      uses: docker/login-action@v3
-      if: ${{ inputs.dockerhub_username != '' && inputs.dockerhub_token != '' && inputs.configure_registries == 'true' }}
-      with:
-        username: ${{ inputs.dockerhub_username }}
-        password: ${{ inputs.dockerhub_token }}
-    - name: Login to ECR
-      uses: docker/login-action@v3
-      if: ${{ inputs.aws_role_arn != '' && inputs.aws_ecr_registry != '' && inputs.configure_registries == 'true' }}
-      with:
-        registry: ${{ inputs.aws_ecr_registry }}
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
-      if: ${{ inputs.configure_registries == 'true' }}
-      with:
-        registry: ghcr.io
-        username: ${{ github.actor }}
-        password: ${{ inputs.github_token }}
-    - name: Setup Remote Runner
-      uses: input-output-hk/catalyst-ci/actions/configure-runner@feat/targets-scanner
-      if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
-      with:
-        secret: ${{ inputs.earthly_runner_secret }}
+  - name: Install Earthly
+    uses: earthly/actions-setup@v1
+    if: ${{ inputs.earthly_skip_install != 'true' }}
+    with:
+      version: ${{ inputs.earthly_version }}
+  - name: Install CI CLI
+    uses: input-output-hk/catalyst-ci/actions/install@master
+    if: ${{ inputs.cli_skip_install != 'true' }}
+    with:
+      version: ${{ inputs.cli_version }}
+  - name: Configure AWS Credentials
+    uses: aws-actions/configure-aws-credentials@v4
+    if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
+    with:
+      role-to-assume: ${{ inputs.aws_role_arn }}
+      aws-region: ${{ inputs.aws_region }}
+  - name: Login to Docker Hub
+    uses: docker/login-action@v3
+    if: ${{ inputs.dockerhub_username != '' && inputs.dockerhub_token != '' && inputs.configure_registries == 'true' }}
+    with:
+      username: ${{ inputs.dockerhub_username }}
+      password: ${{ inputs.dockerhub_token }}
+  - name: Login to ECR
+    uses: docker/login-action@v3
+    if: ${{ inputs.aws_role_arn != '' && inputs.aws_ecr_registry != '' && inputs.configure_registries == 'true' }}
+    with:
+      registry: ${{ inputs.aws_ecr_registry }}
+  - name: Login to GitHub Container Registry
+    uses: docker/login-action@v3
+    if: ${{ inputs.configure_registries == 'true' }}
+    with:
+      registry: ghcr.io
+      username: ${{ github.actor }}
+      password: ${{ inputs.github_token }}
+  - name: Setup Remote Runner
+    uses: input-output-hk/catalyst-ci/actions/configure-runner@master
+    if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
+    with:
+      secret: ${{ inputs.earthly_runner_secret }}
