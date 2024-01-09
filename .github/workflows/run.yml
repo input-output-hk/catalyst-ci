@@ -66,13 +66,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+        uses: input-output-hk/catalyst-ci/actions/setup@fdcDeprecation
         with:
           cli_version: ${{ inputs.ci_cli_version }}
           configure_registries: "false"
           earthly_skip_install: "true"
       - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@master
+        uses: input-output-hk/catalyst-ci/actions/discover@fdcDeprecation
         id: discover
         with:
           targets: ${{ inputs.target }}
@@ -117,7 +117,7 @@ jobs:
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Run
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-ci/actions/run@fdcDeprecation
         id: build
         with:
           privileged: ${{ inputs.privileged }}
