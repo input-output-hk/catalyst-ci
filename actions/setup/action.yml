@@ -66,7 +66,7 @@ runs:
     with:
       version: ${{ inputs.earthly_version }}
   - name: Install CI CLI
-    uses: input-output-hk/catalyst-ci/actions/install@master
+    uses: input-output-hk/catalyst-ci/actions/install@fdcDeprecation
     if: ${{ inputs.cli_skip_install != 'true' }}
     with:
       version: ${{ inputs.cli_version }}
