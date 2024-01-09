@@ -27,4 +27,4 @@ ADD_BASH_SCRIPTS:
 ADD_PYTHON_SCRIPTS:
     FUNCTION
 
-    COPY --dir +python-scripts/python /scripts/python    
+    COPY --dir +python-scripts/python /scripts/python
