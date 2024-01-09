@@ -22,7 +22,7 @@ During every run, the CI will automatically discover and execute a select number
 Each of these targets serves a single purpose and together they are responsible for executing the entire release process.
 
 The CI process is designed to be modular and reusable across a variety of different requirements.
-By default, if a specific target the CI executes is not found in the discovery phase, it simply passes and moves on to the next one.
+By default, if a specific target is not found in the discovery phase, it simply passes and moves on to the next one.
 This allows slowly building out a repository and only implementing the targets that make sense at that time.
 
 The discovery and execution nature of the CI allows developers to contractually define the outputs of the particular subproject they
@@ -32,7 +32,8 @@ reserved target names to interact with the CI.
 This promotes self-service and establishes a clear boundary of ownership whereby developers only need to be concerned about
 maintaining a single file in their subproject.
 
-The CI process is well-documented and troubleshooting unexpected errors only requires knowledge of Earthly and GitHub Actions.
+The CI process is well-documented and troubleshooting unexpected errors only requires knowledge of **Earthly**
+and **GitHub Actions**.
 All of the code is contained in a single [open-source repository](https://github.com/input-output-hk/catalyst-ci) and contributions
 are welcome.
 The remainder of the overview section will focus on discussing some of these concepts in more detail.
@@ -48,18 +49,38 @@ environment.
 During a single run, the CI will go through multiple phases of discovery.
 In each of these discovery phases, a custom CLI provided by the `catalyst-ci` repository is executed.
 The CLI is responsible for recursively scanning the repository for `Earthfile`s and filtering them by target.
-For example, during the `check` phase of the CI, the CLI will return a list of `Earthfile`s that contain the `check` target.
+The CLI will return a list of Earthfile path and a map where key is the Earthfile path and the value is a list of filtered target.
+For example, in the check phase of the CI, `check` and `check-*` will be executed.
+The wildcard `*` serves as a regular search term, representing one or more other characters.
+The output of the check phase may looks like the following:
+**Map:**
 
-The discovery phase will then return a list of `Earthfile`s matching the given criteria.
-This list is fed into a [matrix job](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs) that multiplexes
-executing the targets from each of the discovered `Earthfile`s.
-By running targets in parallel, we maximize network throughput and create an easier to digest view of the CI status.
-For example, by doing this, every individual target gets its own dedicated job and logs that can be easily seen from the GitHub
-Actions UI.
+```json
+{
+  "/home/work/test": ["check-test1", "check-test2", "check-test3"],
+  "/home/work/test2": ["check"]
+}
+```
+
+**Path:**
+
+```json
+["/home/work/test", "home/work/test2"]
+```
+
+This list of `path` is fed into a [matrix job](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs) that
+multiplexes executing the filtered targets from each of the discovered `Earthfile`s.
+The filtered targets will be retrieved from the map according to which Earthfile is currently running.
+For example, from the above example, running `/home/work/test` will run the targets `check-test1`, `check-test2`, and `check-test3`.
+
+Executing each discovered Earthfile in parallel will maximize network throughput
+and create a more easily digestible view of the CI status.
+For example, by doing this, every individual Earthfile gets its own dedicated job and logs.
+This can be easily seen from the GitHub Actions UI.
 
 ### Execution
 
-After each discovery phase, a list of targets will be executed by the CI in parallel.
+After each discovery phase, a list of targets will be executed by the CI.
 Execution is handled by Earthly and usually occurs on a remote Earthly runner that maximizes the benefits of caching.
 The exact steps that get executed by the target is defined by the developer.
 While most targets generally have a clearly defined scope, the overall goal is to enable adaptability by offloading the logic to the
@@ -127,9 +148,51 @@ However, as a project grows, it can begin incorporating more stages without havi
 Now that we've covered how the CI process works at a conceptual level, how can we use it practically?
 As a developer, the main interface you need to be most concerned with is the `Earthfile`.
 Each "stage" discussed in the previous section can be directly correlated to an Earthly target.
-For example, the `check` stage will search for and execute a `check` target.
-In your `Earthfile`, you'll be responsible for defining these targets and their associated logic within the context of your
-subproject.
+Two patterns `target` or `target-*` can be used according to your usage and preferences.
+
+* In case of `target`, it will scan for targets that match the exact target name (ie., `target`)
+* In case of `target-*`, it will scan for targets that start with `target-` and are followed by any number of digits or characters
+(The wildcard `*` serves as a regular search term, representing one or more other characters.)
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
+      Wildcard (`target-*`) is only compatible with targets that do not produce any artifacts or images.
+      The current design is only supported in the `check` and `test` stages.
+<!-- markdownlint-enable max-one-sentence-per-line -->
+
+The examples are provided below:
+
+* In the CI's `check` phase, if `check` is used, the following output will be returned:
+**Map:**
+
+```json
+{
+  "/home/work/test": ["check"],
+  "/home/work/test2": ["check"]
+}
+```
+
+**Path:**
+
+```json
+["/home/work/test", "home/work/test2"]
+```
+
+* If the `check-*` is used, the following output will be returned
+**Map:**
+
+```json
+{
+  "/home/work/test": ["check-test1", "check-test2", "check-test3"],
+  "/home/work/test2": ["check-test1"]
+}
+```
+
+**Path:**
+
+```json
+["/home/work/test", "home/work/test2"]
+```
 
 If you're contributing a new subproject with deliverables, you'll need to include an initial `Earthfile` as part of the
 contribution.

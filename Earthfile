@@ -3,6 +3,7 @@ VERSION --global-cache 0.7
 
 # cspell: words livedocs sitedocs
 
+
 # check-markdown can be done remotely.
 check-markdown: 
     DO ./earthly/mdlint+CHECK
@@ -22,19 +23,6 @@ check-bash:
     FROM alpine:3.18
 
     DO ./earthly/bash+SHELLCHECK --src=.
-
-
-## -----------------------------------------------------------------------------
-##
-## Standard CI targets.
-##
-## These targets are discovered and executed automatically by CI.
-
-# check run all checks.
-check:
-    BUILD +check-spelling
-    BUILD +check-markdown
-    BUILD +check-bash
 
 # Internal: Reference to our repo root documentation used by docs builder.
 repo-docs:

@@ -40,6 +40,8 @@
         ".markdownlint.jsonc",
         ".markdownlint-cli2.jsonc",
         ".envrc",
-        "cspell.json"
+        "cspell.json",
+        "**/**/go.mod",
+        "**/**/go.sum",
     ]
 }

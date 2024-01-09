@@ -15,24 +15,25 @@ This section is dedicated to explaining what these targets are, how they work, a
 
 ### Summary
 
-The `check` target is responsible for validating that a given subproject is healthy and up to the appropriate standards.
+The `check` or `check-*` target is responsible for validating that given subproject is healthy and up to the appropriate standards.
 This target should be used by all subprojects to improve the upkeep of code.
 No additional tasks are performed before or after running the target.
 
 ### How it Works
 
-The `check` target is the **first target run** in the CI pipeline and **must pass** before any other targets are run.
-The CI will call the `check` target and fail if it returns a non-zero exit code.
+The `check` and `check-*` targets are the **first target run** in the CI pipeline
+and **must pass** before any other targets are run.
+The CI will call the `check` and `check-*` targets and fail if it returns a non-zero exit code.
 
 ### Usage
 
-It's important to avoid adding any steps that may have flaky results to the `check` target.
+It's important to avoid adding any steps that may have flaky results to the `check` and `check-*` target.
 Reducing the runtime of the `check` phase by avoiding any lengthy processes is also advisable.
 This includes things like complex integrations tests or E2E tests that should have their own dedicated workflows.
-The goal of the `check` target is to "fail fast" and avoid running a lengthy CI pipeline if there are immediate problems with the
-code.
+The goal of the `check` and `check-*` targets are to "fail fast" and avoid running a lengthy CI pipeline
+if there are immediate problems with the code.
 
-Some typical tasks that would be appropriate for the `check` target are as follows:
+Some typical tasks that would be appropriate for the `check` or `check-*` target are as follows:
 
 1. Validating code format
 2. Linting code
@@ -93,7 +94,7 @@ In smaller repos, this target should be skipped.
 
 ### Summary
 
-The `test` target is responsible for running tests to validate things are working as expected.
+The `test` and `test-*` targets are responsible for running tests to validate things are working as expected.
 The target is intended to be versatile, and can be used to run several different formats of testing.
 For example:
 
@@ -103,14 +104,14 @@ For example:
 
 ### How it Works
 
-The `test` target is the **fourth target run** in the CI pipeline and **must pass** before any other targets are run.
-The CI will call the `test` target and fail if it returns a non-zero exit code.
+The `test` and `test-*` targets are the **fourth target run** in the CI pipeline and **must pass** before any other targets are run.
+The CI will call the `test` and `test-*` targets and fail if it returns a non-zero exit code.
 
 ### Usage
 
-The `test` target is intended to be versatile.
-In many cases, separate `Earthfile`s that are outside of the scope of a single subproject are created to hold a `test` target which
-runs integration tests.
+The `test` and `test-*` targets is intended to be versatile.
+In many cases, separate `Earthfile`s that are outside of the scope of a single subproject
+are created to hold `test` or `test-*` targets which runs integration tests.
 At the same time, individual subprojects may utilize this target to run their own unit tests.
 
 The only requirement is that the target should *only* be used to run tests.
@@ -122,7 +123,7 @@ This target is the final target that is run (and must pass) before artifacts are
 
 The `publish` target is responsible for building and publishing a container image to image registries.
 This target should be used when a subproject needs to produce and publish a container image.
-The CI will execute this target after the `test` target, assuming it passes.
+The CI will execute this target after the `test` phase, assuming it passes.
 
 ### How it Works
 
@@ -181,3 +182,16 @@ For example, making the target save the local source code is redundant since Git
 new release is created.
 However, a consumer may want to be able to download precompiled versions of a binary (without relying on a container).
 In this case, it makes sense to create a release target that produces the binary as an artifact.
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Note
+    Targets can be written in 2 patterns `target` and `target-*`.
+    The wildcard `*` serves as a regular search term, representing one or more other characters.
+    Specifically, one or more numbers or lowercase characters.
+<!-- markdownlint-enable max-one-sentence-per-line -->
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
+      Wildcard (`target-*`) is only compatible with targets that do not produce any artifacts or images.
+      The current design is only supported in the `check` and `test` stages.
+<!-- markdownlint-enable max-one-sentence-per-line -->
