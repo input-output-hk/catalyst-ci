@@ -44,7 +44,7 @@ repo-config:
 
     SAVE ARTIFACT /repo repo
 
-# eidt-docs - Target to assist in editing docs.
+# edit-docs - Target to assist in editing docs.
 edit-docs:
     LOCALLY
 

@@ -3,7 +3,7 @@
     adr:
         author: Steven Johnson
         created: 09-Jan-2024
-        status:  accepted
+        status:  draft
         extends:
             - 0005-rust
     tags:
@@ -21,7 +21,7 @@ This ADR is deliberately limited to the initial bring up phase of our projects, 
 
 ## Decision
 
-Rust will not use `cargo.lock` when building libraries.  
+Rust will [not][Why have Cargo.lock in Version Control] use `cargo.lock` when consuming  libraries.
 It will ONLY respect it for building binaries.
 
 As we are in the initial stages of a number of projects, it is easier to iterate without
@@ -41,5 +41,7 @@ This should make it a little easier to iterate with less issues caused by out of
 ## More Information
 
 * [Cargo/toml vs Cargo.lock]
+* [Why have Cargo.lock in Version Control]
 
 [Cargo/toml vs Cargo.lock]: https://doc.rust-lang.org/cargo/guide/cargo-toml-vs-cargo-lock.html
+[Why have Cargo.lock in Version Control]: https://doc.rust-lang.org/cargo/faq.html#why-have-cargolock-in-version-control
