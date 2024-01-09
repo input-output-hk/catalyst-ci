@@ -18,6 +18,12 @@ type Earthfile struct {
 	Version        *spec.Version        `json:"version,omitempty"`
 }
 
+// Earthfile and its filtered targets.
+type EarthTargets struct {
+	Earthfile Earthfile
+	Targets   []string
+}
+
 func (e Earthfile) GetImages(target string) ([]string, error) {
 	commands, err := e.GetCommands(target, "SAVE IMAGE")
 	if err != nil {
@@ -72,7 +78,6 @@ func (e Earthfile) GetTarget(target string) (*spec.Target, error) {
 			return &t, nil
 		}
 	}
-
 	return nil, fmt.Errorf("target %s not found in %s", target, e.Path)
 }
 

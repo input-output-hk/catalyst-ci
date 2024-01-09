@@ -9,6 +9,10 @@ inputs:
     description: The version of the Catalyst-CI CLI to install
     required: false
     default: latest
+  local:
+    description: Build and use the local version of the Catalyst-CI CLI
+    required: false
+    default: 'false'
 runs:
   using: node20
   main: dist/index.js
