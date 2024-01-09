@@ -3,7 +3,6 @@ VERSION --global-cache --use-function-keyword 0.7
 
 # Internal: builder creates a container we can use to execute shellcheck
 builder:
-    FUNCTION
     FROM alpine:3.18
 
     RUN apk add --no-cache \
@@ -19,14 +18,14 @@ builder:
     # Will only copy the symlink and not what it references, so we need to
     # manually copy what it references.  This enables the script to work
     # both in-repo and in-ci here.
-    RUN ../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
 
 # shellcheck - Check all shell files recursively in the src with shellcheck.
 SHELLCHECK:
     FUNCTION
     ARG --required src
 
-    FROM +builder
+    FROM +builder 
 
     COPY --dir $src /src
 
