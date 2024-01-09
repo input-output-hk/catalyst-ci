@@ -24,7 +24,10 @@ builder:
 SHELLCHECK:
     FUNCTION
     ARG --required src
+
     FROM +builder
+
     COPY --dir $src /src
+
     RUN ./check-all.sh /src
 
