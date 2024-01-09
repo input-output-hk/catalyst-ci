@@ -108,11 +108,3 @@ test-3:
 #   * applies seed data.
 test-4:
     DO +INTEGRATION_TEST_RUN --compose="./tests/docker-compose-svc.yml" --seed_data="data" --test_script=./tests/test1.sh
-
-# test the event db database schema. Invokes all tests.
-#   CI target : true
-test:
-    BUILD +test-1
-    BUILD +test-2
-    BUILD +test-3
-    BUILD +test-4

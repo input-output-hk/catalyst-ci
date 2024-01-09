@@ -86,7 +86,7 @@ jobs:
         id: build
         with:
           earthfile: ${{ inputs.earthfile }}
-          target: ${{ inputs.target }}
+          targets: ${{ inputs.target }}
           runner_address: ${{ secrets.earthly_runner_address }}
           artifact: "true"
       - name: Publish docs

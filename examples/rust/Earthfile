@@ -8,7 +8,7 @@ builder:
 
     COPY --dir .cargo .config crates .
     COPY Cargo.lock Cargo.toml .
-    COPY clippy.toml deny.toml rustfmt.toml .
+    COPY clippy.toml deny.toml rustfmt.toml rust-toolchain.toml .
 
 ## -----------------------------------------------------------------------------
 ##
@@ -25,7 +25,7 @@ check:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:
+all-hosts-check:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check
 
 # Run build using the most efficient host tooling
@@ -44,5 +44,5 @@ build:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:
+all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build

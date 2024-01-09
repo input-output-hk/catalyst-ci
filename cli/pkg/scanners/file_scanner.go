@@ -3,8 +3,11 @@ package scanners
 // cspell: words afero
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
+	"strings"
 
 	"github.com/input-output-hk/catalyst-ci/cli/pkg"
 	"github.com/spf13/afero"
@@ -28,21 +31,60 @@ func (f *FileScanner) Scan() ([]pkg.Earthfile, error) {
 	return earthfiles, nil
 }
 
-func (f *FileScanner) ScanForTarget(target string) ([]pkg.Earthfile, error) {
-	earthfiles, err := f.scan(func(e pkg.Earthfile) (bool, error) {
+// This function return a map.
+// Key is the path to the Earthfile.
+// Value is struct containing Earthfile and list of filtered target
+// If no match found, return [].
+// eg. map[/test/Earthfile]: {Earthfile, [filteredTargets]}.
+func (f *FileScanner) ScanForTarget(target string) (map[string]pkg.EarthTargets, error) {
+	regexPattern := getTargetRegex(target)
+	r, err := regexp.Compile(regexPattern)
+
+	if err != nil {
+		return nil, err
+	}
+
+	pathToEarthTargets := make(map[string]pkg.EarthTargets)
+
+	_, err = f.scan(func(e pkg.Earthfile) (bool, error) {
+		var targets []string
 		for _, t := range e.Targets {
-			if t.Name == target {
-				return true, nil
+			// Matched target is added to a list.
+			if r.MatchString(t.Name) {
+				targets = append(targets, t.Name)
 			}
 		}
-
+		// If there are filtered targets, add to a map.
+		if len(targets) != 0 {
+			pathToEarthTargets[e.Path] = pkg.EarthTargets{
+				Earthfile: e,
+				Targets:   targets,
+			}
+			return true, nil
+		}
 		return false, nil
 	})
 
 	if err != nil {
 		return nil, err
 	}
-	return earthfiles, nil
+
+	return pathToEarthTargets, nil
+}
+
+// Get the regex of the given target
+// if target ends with -* , return a wildcard regex
+// else, return the given target regex.
+func getTargetRegex(target string) string {
+	// If target ends with -*
+	if strings.HasSuffix(target, "-*") {
+		// Should start with given target
+		// followed by hyphen and followed by one or more lowercase letters or numbers
+		return fmt.Sprintf("^%s-(?:[a-z0-9]+)?$", regexp.QuoteMeta(target[:len(target)-2]))
+	}
+
+	// Match the exact target
+	return fmt.Sprintf("^%s$", regexp.QuoteMeta(target))
 }
 
 func (f *FileScanner) scan(
