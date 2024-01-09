@@ -32,7 +32,6 @@ def main():
     # Build the code.
     results.add(cli.run("cargo build " \
                         f"{build_flags} " \
-                        "--locked " \
                         "--release ",
                     name="Build all code in the workspace"))
     # Check the code passes all clippy lint checks.
@@ -60,7 +59,6 @@ def main():
                         "--release " \
                         "--bins " \
                         "--lib " \
-                        "--locked " \
                         "-P ci ",
                     name="Run unit tests and display test result and test coverage")
             if not res.ok():
