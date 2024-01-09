@@ -8,7 +8,9 @@ builder:
 
     COPY --dir .cargo .config crates .
     COPY Cargo.lock Cargo.toml .
-    COPY clippy.toml deny.toml rustfmt.toml rust-toolchain.toml .
+    COPY clippy.toml deny.toml rustfmt.toml .
+
+    DO ./../../earthly/rust+SETUP
 
 ## -----------------------------------------------------------------------------
 ##
@@ -33,7 +35,7 @@ all-hosts-check:
 build:
     FROM +builder
 
-    DO ./../../earthly/rust+BUILD --cov_report="coverage-report.info" --libs="bar" --bins="foo/foo"
+    DO ./../../earthly/rust+BUILD --cov_report="coverage-report.info" --libs="bar" --bins="foo/foo" --with_bench="true"
 
     DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 

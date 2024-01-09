@@ -97,6 +97,28 @@ rust-base:
 rust-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
 
+# Common Rust setup.
+# Parameters:
+#  * toolchain : The `rust-toolchain` toml file.
+SETUP:
+    COMMAND
+    ARG toolchain=./rust-toolchain.toml
+
+    # Copy our toolchain dependency.
+    COPY $toolchain ./rust-toolchain.toml
+    ENV default_rust_channel=$(rg -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)
+
+    # Check that `default_rust_channel` and $RUST_VERSION from the rust-base container are exactly the same.
+    # This ensures CI Rust version and local rust version are properly aligned and prevents version skew.
+    RUN /scripts/verify_toolchain.sh $default_rust_channel $RUST_VERSION
+
+    # Install pinned Rustup from `rust-toolchain.toml`
+    # Plus nightly latest so we can use it for docs, lints, etc.
+    RUN rustup default $default_rust_channel && \
+        rustup show && \
+        cargo --version && \
+        cargo +nightly --version
+
 # Steps we do during the `check` CI phase for all Rust programs
 CHECK:
     COMMAND
@@ -112,14 +134,16 @@ CHECK:
 #  * cov_report: The output coverage report file path.
 #  * libs : The list of lib crates `cargo-modules` docs to build.
 #  * bins : The list of binaries `cargo-modules` docs to build.
+#  * with_bench: Run benchmarks.
 BUILD:
     COMMAND
     ARG target=""
     ARG cov_report=""
     ARG libs=""
     ARG bins=""
+    ARG with_bench="false"
 
-    RUN /scripts/std_build.py --target=$target --cov_report=$cov_report
+    RUN /scripts/std_build.py --target=$target --cov_report=$cov_report --with_bench=$with_bench
     RUN /scripts/std_docs.py --libs=$libs --bins=$bins
 
 # Check if the build executable, isn't a busted mess.

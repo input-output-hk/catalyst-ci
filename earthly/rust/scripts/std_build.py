@@ -20,18 +20,18 @@ def main():
     )
     parser.add_argument("--target", default="", help="Pass rust --target flag (cargo --target flag).")
     parser.add_argument("--cov_report", default="", help="The output coverage report file path.")
-    parser.add_argument("--with_bench", action="store_true", help="Running benchmarks")
+    parser.add_argument("--with_bench", default="false", help="Running benchmarks")
     args = parser.parse_args()
 
     results = cli.Results("Rust build")
 
-    build_flags = ""
+    target_flag = ""
     if args.target != "":
-        build_flags += f" --target={args.target} "
+        target_flag += f" --target={args.target} "
 
     # Build the code.
     results.add(cli.run("cargo build " \
-                        f"{build_flags} " \
+                        f"{target_flag} " \
                         "--release ",
                     name="Build all code in the workspace"))
     # Check the code passes all clippy lint checks.
@@ -44,39 +44,41 @@ def main():
     # Check if all Self contained tests pass (Test that need no external resources).
     if args.cov_report == "":
         results.add(cli.run("cargo testunit" \
-                            f"{build_flags} ",
+                            f"{target_flag} ",
                         name="Self contained Unit tests all pass check"))
     
     # Save coverage report to file if it is provided
     else:
         # Remove artifacts that may affect the coverage results
-        res = cli.run("cargo llvm-cov clean", name="Remove artifacts that may affect the coverage results")
+        res = cli.run("cargo llvm-cov clean",
+                name="Remove artifacts that may affect the coverage results")
         results.add(res)
         # Run unit tests and generates test and coverage report artifacts
         if res.ok():
             res = cli.run("cargo llvm-cov nextest " \
-                        f"{build_flags} " \
+                        f"{target_flag} " \
                         "--release " \
                         "--bins " \
                         "--lib " \
                         "-P ci ",
-                    name="Run unit tests and display test result and test coverage")
+                    name="Self contained Unit tests and collect coverage")
             if not res.ok():
-                print(f"[yellow]You can locally run tests by running: [/yellow] \n [red bold]cargo testunit {build_flags}[/red bold]")
+                print(f"[yellow]You can locally run tests by running: [/yellow] \n [red bold]cargo testunit {target_flag}[/red bold]")
             results.add(res)
     
         # Save coverage report to file if it is provided
         if res.ok():
             res = cli.run("cargo llvm-cov report " \
-                        f"{build_flags} " \
+                        f"{target_flag} " \
                         "--release " \
                         f"--output-path {args.cov_report} ",
                     name=f"Generate lcov report to {args.cov_report}")
             results.add(res)
 
     # Check if any benchmarks defined run (We don;t validate the results.)
-    if args.with_bench:
-        results.add(cli.run(f"cargo bench --all-targets {build_flags}", name="Benchmarks all run to completion check"))
+    if args.with_bench == "true":
+        results.add(cli.run(f"cargo bench --all-targets {target_flag}",
+                name="Benchmarks all run to completion check"))
 
     results.print()
     if not results.ok():
