@@ -13,19 +13,19 @@ builder:
     DO ./../../earthly/rust+SETUP
 
 # Test rust build container - Use best architecture host tools.
-check-hosted:
+hosted-check:
     FROM +builder
 
     DO ./../../earthly/rust+CHECK
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-check-all-hosts:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +check-hosted
+all-hosts-check:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-check
 
 
 # Build the service.
-build-hosted:
+hosted-build:
     FROM +builder
 
     DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
@@ -37,8 +37,8 @@ build-hosted:
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
-build-all-hosts:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
+all-hosts-build:    
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-build
 
 test-hosted:
     FROM +builder
@@ -64,9 +64,9 @@ check:
     ARG USERARCH
 
     IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +check-hosted
+        BUILD --platform=linux/arm64 +hosted-check
     ELSE
-        BUILD --platform=linux/amd64 +check-hosted
+        BUILD --platform=linux/amd64 +hosted-check
     END
 
 # Run build using the most efficient host tooling
@@ -79,9 +79,9 @@ build:
     ARG USERARCH
 
     IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +build-hosted
+        BUILD --platform=linux/arm64 +hosted-build
     ELSE
-        BUILD --platform=linux/amd64 +build-hosted
+        BUILD --platform=linux/amd64 +hosted-build
     END
 
 test:
