@@ -128,5 +128,5 @@ fmtfix = "fmt -- -v"
 quiet = false          # whether cargo output is quiet
 verbose = false         # whether cargo provides verbose output
 color = 'always'       # whether cargo colorizes output use `CARGO_TERM_COLOR="off"` to disable.
-progress.when = 'auto' # whether cargo shows progress bar
+progress.when = 'never' # whether cargo shows progress bar
 progress.width = 80    # width of progress bar
