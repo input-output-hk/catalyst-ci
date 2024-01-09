@@ -15,7 +15,7 @@ require (
 
 require (
 	github.com/antlr/antlr4/runtime/Go/antlr/v4 v4.0.0-20230219212500-1f9a474cc2dc // indirect
-	github.com/earthly/earthly/ast 95fef7ce99cb58a9d5966e7953409cbe13f24d41 // indirect
+	github.com/earthly/earthly/ast v0.7.23-95fef7ce99cb58a9d5966e7953409cbe13f24d41 // indirect
 	github.com/go-logr/logr v1.2.4 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20230315185526-52ccab3ef572 // indirect
 	github.com/google/go-cmp v0.5.9 // indirect
