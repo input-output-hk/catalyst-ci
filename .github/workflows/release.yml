@@ -68,6 +68,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       json: ${{ steps.check.outputs.json }}
+      paths: ${{ steps.check.outputs.paths }}
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
@@ -84,24 +85,34 @@ jobs:
       - name: Check for empty output
         id: check
         run: |
-          output=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
+          json=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
+          paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
           if [ "$output" == "null" ]; then
             echo "json=[]" >> $GITHUB_OUTPUT
+            echo "paths=[]" >> $GITHUB_OUTPUT
           else
-            echo "json=$output" >> $GITHUB_OUTPUT
+            echo "json=$json" >> $GITHUB_OUTPUT
+            echo "paths=$paths" >> $GITHUB_OUTPUT
           fi
 
   run:
     runs-on: ubuntu-latest
     needs: [discover]
-    if: needs.discover.outputs.json != '[]'
+    if: needs.discover.outputs.paths != '[]'
     strategy:
       fail-fast: false
       matrix:
         platform:
           - linux/amd64
-        earthfile: ${{ fromJson(needs.discover.outputs.json) }}
+        earthfile: ${{ fromJson(needs.discover.outputs.paths) }}
     steps:
+      - name: Get filtered targets
+        id: get_target
+        run: |
+          targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
+          echo "Found targets: $targets"
+          targets_with_space=$(echo $targets | tr '\n' ' ')
+          echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
@@ -118,7 +129,7 @@ jobs:
         id: build
         with:
           earthfile: ${{ matrix.earthfile }}
-          target: ${{ inputs.target }}
+          targets: ${{ steps.get_target.outputs.targets }}
           platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.earthly_runner_address }}
           artifact: "true"
@@ -151,7 +162,11 @@ jobs:
           path: artifacts
       - name: Collect artifacts
         id: collect
-        run: echo "artifacts=$(find artifacts -type f -name '*.tar.gz')" >> $GITHUB_OUTPUT
+        run: |
+          ARTIFACT_PATHS=$(find artifacts -type f -name '*.tar.gz')
+          echo "artifacts<<EOF" >> $GITHUB_OUTPUT
+          echo "$ARTIFACT_PATHS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
       - name: Create release
         uses: softprops/action-gh-release@v1
         with:

@@ -11,11 +11,12 @@ export async function run(): Promise<void> {
   const privileged = core.getBooleanInput('privileged')
   const runnerAddress = core.getInput('runner_address')
   const runnerPort = core.getInput('runner_port')
-  const target = core.getInput('target')
   const targetFlags = core.getInput('target_flags')
+  const targets = core.getInput('targets')
 
   const command = 'earthly'
   const args: string[] = []
+  const targetsArgs: string[] = []
 
   if (privileged) {
     args.push('-P')
@@ -33,29 +34,42 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
-  if (artifact) {
-    args.push('--artifact', `${earthfile}+${target}/`, `${artifactPath}`)
-  } else {
-    args.push(`${earthfile}+${target}`)
-  }
-
   if (targetFlags) {
     args.push(...targetFlags.split(' '))
   }
 
-  core.info(`Running command: ${command} ${args.join(' ')}`)
-  const output = await spawnCommand(command, args)
+  core.info(`Filtered targets >> ${targets}`)
 
-  const imageOutput = parseImage(output)
-  if (imageOutput) {
-    core.info(`Found image: ${imageOutput}`)
-    core.setOutput('image', imageOutput)
-  }
+  targets.split(' ').map(tg => {
+    // Get the filtered targets associated with the pattern target and earthfile.
+    core.info(`Pushing target ${tg}`)
+    targetsArgs.push(`${earthfile}+${tg}`)
+  })
 
-  const artifactOutput = path.join(earthfile, parseArtifact(output))
-  if (artifactOutput !== earthfile) {
-    core.info(`Found artifact: ${artifactOutput}`)
-    core.setOutput('artifact', artifactOutput)
+  // Running each target command in different process.
+  for (const t of targetsArgs) {
+    core.info(`Running target: ${t}`)
+    const argsSpawn = [...args]
+    // Artifact is set
+    if (artifact) {
+      core.info(`Pushing target ${t} with artifact tag`)
+      argsSpawn.push('--artifact', `${t}/`, `${artifactPath}`)
+    } else {
+      argsSpawn.push(t)
+    }
+    core.info(`Running command: ${command} ${argsSpawn.join(' ')}`)
+    const output = await spawnCommand(command, argsSpawn)
+    const imageOutput = parseImage(output)
+    if (imageOutput) {
+      core.info(`Found image: ${imageOutput}`)
+      core.setOutput('image', imageOutput)
+    }
+
+    const artifactOutput = path.join(earthfile, parseArtifact(output))
+    if (artifactOutput !== earthfile) {
+      core.info(`Found artifact: ${artifactOutput}`)
+      core.setOutput('artifact', artifactOutput)
+    }
   }
 }
 
