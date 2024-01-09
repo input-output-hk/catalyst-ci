@@ -95,7 +95,7 @@ runs:
       username: ${{ github.actor }}
       password: ${{ inputs.github_token }}
   - name: Setup Remote Runner
-    uses: input-output-hk/catalyst-ci/actions/configure-runner@master
+    uses: input-output-hk/catalyst-ci/actions/configure-runner@fdcDeprecation
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}
