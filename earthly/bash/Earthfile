@@ -23,10 +23,9 @@ builder:
 # shellcheck - Check all shell files recursively in the src with shellcheck.
 SHELLCHECK:
     FUNCTION
-
     ARG --required src
 
-    FROM +builder 
+    FROM +builder
 
     COPY --dir $src /src
 
