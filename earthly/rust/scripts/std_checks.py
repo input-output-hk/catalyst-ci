@@ -31,7 +31,8 @@ def main():
     results = cli.Results("Rust checks")
 
     # Check if the rust src is properly formatted.
-    res = cli.run("cargo +nightly fmtchk", name="Rust Code Format Check")
+    res = cli.run("cargo +nightly fmtchk ",
+            name="Rust Code Format Check")
     results.add(res)
     if not res.ok():
         print("[yellow]You can locally fix format errors by running: [/yellow] \n [red bold]cargo +nightly fmtfix [/red bold]")

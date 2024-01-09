@@ -110,9 +110,9 @@ incremental = false
 codegen-units = 16
 
 [alias]
-lint = "clippy --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
-lintfix = "clippy --all-targets --fix --allow-dirty -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
-lintrestrict = "clippy -- -D warnings -D clippy::pedantic -D clippy::restriction -D clippy::missing_docs_in_private_items"
+lint = "clippy --release --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
+lintfix = "clippy --release --all-targets --fix --allow-dirty -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
+lintrestrict = "clippy --release -- -D warnings -D clippy::pedantic -D clippy::restriction -D clippy::missing_docs_in_private_items"
 lint-vscode = "clippy --message-format=json-diagnostic-rendered-ansi --all-targets -- -D warnings -D clippy::pedantic -D clippy::unwrap_used -D clippy::expect_used -D clippy::exit -D clippy::get_unwrap -D clippy::index_refutable_slice -D clippy::indexing_slicing -D clippy::match_on_vec_items -D clippy::match_wild_err_arm -D clippy::missing_panics_doc -D clippy::panic -D clippy::string_slice -D clippy::unchecked_duration_subtraction -D clippy::unreachable -D clippy::missing_docs_in_private_items"
 
 docs = "doc -r --all-features --no-deps --bins --document-private-items --examples --locked"
@@ -126,7 +126,7 @@ fmtfix = "fmt -- -v"
 
 [term]
 quiet = false          # whether cargo output is quiet
-verbose = true         # whether cargo provides verbose output
+verbose = false         # whether cargo provides verbose output
 color = 'always'       # whether cargo colorizes output use `CARGO_TERM_COLOR="off"` to disable.
 progress.when = 'auto' # whether cargo shows progress bar
 progress.width = 80    # width of progress bar

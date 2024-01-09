@@ -33,8 +33,7 @@ check-all-hosts:
 build:
     FROM +builder
 
-    DO ./../../earthly/rust+BUILD --cov_report="coverage-report.info"
-    DO ./../../earthly/rust+DOCS --libs="bar" --bins="foo/foo"
+    DO ./../../earthly/rust+BUILD --cov_report="coverage-report.info" --libs="bar" --bins="foo/foo"
 
     DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
