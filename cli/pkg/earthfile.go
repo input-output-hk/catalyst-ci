@@ -14,7 +14,7 @@ type Earthfile struct {
 	Path           string               `json:"path,omitempty"`
 	SourceLocation *spec.SourceLocation `json:"sourceLocation,omitempty"`
 	Targets        []spec.Target        `json:"targets,omitempty"`
-	Functions   []spec.UserCommand   `json:"Functions,omitempty"`
+	Functions      []spec.Function      `json:"Functions,omitempty"`
 	Version        *spec.Version        `json:"version,omitempty"`
 }
 
