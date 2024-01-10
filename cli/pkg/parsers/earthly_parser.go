@@ -24,7 +24,7 @@ func (e EarthlyParser) Parse(path string) (pkg.Earthfile, error) {
 		Path:           path,
 		SourceLocation: ef.SourceLocation,
 		Targets:        ef.Targets,
-		UserCommands:   ef.UserCommands,
+		Functions:   ef.Functions,
 		Version:        ef.Version,
 	}, nil
 }
