@@ -55,6 +55,9 @@ LINT:
     ENV GOLANGCI_LINT_CACHE=/cache/golangci-lint
     ENV GOCACHE=/cache/go-build
 
+    RUN go get ./...
+
+    RUN golangci-lint cache clean && go clean -modcache -cache -i
     RUN golangci-lint run \
         --timeout 5m \
         -E errchkjson \
