@@ -153,6 +153,7 @@ jobs:
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   docs:
     uses: ./.github/workflows/pages.yml
+    if: inputs.publish_docs == true
     needs: [build, check, package, test]
     with:
       aws_role_arn: ${{ inputs.aws_role_arn }}
@@ -165,7 +166,6 @@ jobs:
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   release:
     uses: ./.github/workflows/release.yml
-    if: inputs.publish_docs == true
     needs: [build, check, package, test]
     with:
       aws_role_arn: ${{ inputs.aws_role_arn }}
