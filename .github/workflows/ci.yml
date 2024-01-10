@@ -51,6 +51,13 @@ on:
         required: false
         type: boolean
         default: false
+      publish_docs:
+        description: |
+          When set to true, the workflow will publish documentation to GitHub
+          pages.
+        required: false
+        type: boolean
+        default: true
       skip_publish_on_default:
         description: |
           If set to true, images will not be published when the workflow is
@@ -158,6 +165,7 @@ jobs:
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   release:
     uses: ./.github/workflows/release.yml
+    if: inputs.publish_docs == true
     needs: [build, check, package, test]
     with:
       aws_role_arn: ${{ inputs.aws_role_arn }}
