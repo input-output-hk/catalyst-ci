@@ -24,6 +24,12 @@ type EarthTargets struct {
 	Targets   []string
 }
 
+type Function struct {
+	Name           string          `json:"name"`
+	Recipe         Block           `json:"recipe"`
+	SourceLocation *SourceLocation `json:"sourceLocation,omitempty"`
+}
+	
 func (e Earthfile) GetImages(target string) ([]string, error) {
 	commands, err := e.GetCommands(target, "SAVE IMAGE")
 	if err != nil {
