@@ -2921,7 +2921,7 @@ async function run() {
             argsSpawn.push(t);
         }
         if (targetFlags) {
-            args.push(...targetFlags.split(' '));
+            argsSpawn.push(...targetFlags.split(' '));
         }
         core.info(`Running command: ${command} ${argsSpawn.join(' ')}`);
         const output = await spawnCommand(command, argsSpawn);
