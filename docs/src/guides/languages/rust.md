@@ -103,9 +103,9 @@ Here is the list of steps (look at `./earthly/rust/scripts/std_checks.py`):
 
 1. `cargo fmtchk` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/cargo_config.toml`)Checking Rust Code Format.
-1. Checking configuration files for consistency.
-2. `cargo machete` - Checking for Unused Dependencies.
-3. `cargo deny check` - Checking for Supply Chain Issues.
+2. Checking configuration files for consistency.
+3. `cargo machete` - Checking for Unused Dependencies.
+4. `cargo deny check` - Checking for Supply Chain Issues.
 
 As it was mentioned above it validates configuration files as
 `.cargo/config.toml`, `rustfmt.toml`, `.config/nextest.toml`, `clippy.toml`, `deny.toml`
@@ -167,16 +167,16 @@ here is the list of steps (look at `./earthly/rust/scripts/std_build.py` and `./
 2. `cargo lint` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)
 Checking all Clippy Lints in the workspace.
-1. `cargo docs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+3. `cargo docs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation can be generated OK.
-1. `cargo testunit` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+4. `cargo testunit` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Self contained Unit tests all pass.
-1. `cargo testdocs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+5. `cargo testdocs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation tests all pass.
-1. `cargo bench` - Checking Benchmarks all run to completion.
-2. `cargo depgraph` - Generating dependency graph based on the Rust code.
+6. `cargo bench` - Checking Benchmarks all run to completion.
+7. `cargo depgraph` - Generating dependency graph based on the Rust code.
 Generated artifacts are `doc/workspace.dot`, `doc/full.dot`, `doc/all.dot` files.
-1. `cargo modules` - Generating modules trees and graphs based on the Rust code.
+8. `cargo modules` - Generating modules trees and graphs based on the Rust code.
 Generated artifacts are `doc/$crate.$bin.bin.modules.tree`, `doc/$crate.$bin.bin.modules.dot`
 for the specified `--bins="crate1/bin1"` argument
 and `target/doc/$crate.lib.modules.tree`, `target/doc/$crate.lib.modules.dot`
