@@ -32,8 +32,8 @@ describe('Run Action', () => {
         runnerAddress: '',
         runnerPort: '',
         targets: 'target',
-        command: [['--flag1', 'test', '-f2', 'test2', './earthfile+target']],
         targetFlags: '--flag1 test -f2 test2',
+        command: [['./earthfile+target', '--flag1', 'test', '-f2', 'test2']],
         imageOutput: '',
         artifactOutput: ''
       },
@@ -48,8 +48,8 @@ describe('Run Action', () => {
         runnerAddress: '',
         runnerPort: '',
         targets: 'target',
-        command: [['--test', '--artifact', './earthfile+target/', 'out']],
         targetFlags: '',
+        command: [['--test', '--artifact', './earthfile+target/', 'out']],
         imageOutput: '',
         artifactOutput: 'earthfile/out'
       },
@@ -64,10 +64,10 @@ describe('Run Action', () => {
         runnerAddress: 'localhost',
         runnerPort: '8372',
         targets: 'target',
+        targetFlags: '',
         command: [
           ['--buildkit-host', 'tcp://localhost:8372', './earthfile+target']
         ],
-        targetFlags: '',
         imageOutput: '',
         artifactOutput: ''
       },
@@ -82,6 +82,7 @@ describe('Run Action', () => {
         runnerAddress: '',
         runnerPort: '',
         targets: 'target',
+        targetFlags: '',
         command: [
           [
             '-P',
@@ -94,7 +95,6 @@ describe('Run Action', () => {
             './earthfile+target'
           ]
         ],
-        targetFlags: '',
         imageOutput: 'image1:tag1',
         artifactOutput: ''
       },
@@ -109,11 +109,11 @@ describe('Run Action', () => {
         runnerAddress: '',
         runnerPort: '',
         targets: 'target target-test',
+        targetFlags: '',
         command: [
           ['-P', '--platform', 'linux/amd64', './targets/earthfile+target'],
           ['-P', '--platform', 'linux/amd64', './targets/earthfile+target-test']
         ],
-        targetFlags: '',
         imageOutput: '',
         artifactOutput: ''
       }
@@ -130,8 +130,8 @@ describe('Run Action', () => {
         runnerAddress,
         runnerPort,
         targets,
-        command,
         targetFlags,
+        command,
         imageOutput,
         artifactOutput
       }) => {
