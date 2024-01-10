@@ -159,7 +159,7 @@ and separated in this list with `/` symbol.
 To perform `cargo llvm-cov` test coverage and produce a report it is needed to pass a `cov_report` argument,
 if last is not provided regular test running will be performed.
 Also it is possible to specify a target for a `cargo build` process via `target`.
-To enable becnhmark running it is needed to pass `with_bench="true"` argument.
+To enable benchmark running it is needed to pass `with_bench="true"` argument.
 Under this build process we perform different steps of compiling and validating of our Rust project,
 here is the list of steps (look at `./earthly/rust/scripts/std_build.py` and `./earthly/rust/scripts/std_docs.py`):
 
