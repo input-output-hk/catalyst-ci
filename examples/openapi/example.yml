@@ -1,10 +1,5 @@
 openapi: "3.0.2"
 info:
-  title: Example API
-  description: An example of OpenAPI
-  version: "1.0"
-  contact:
-    name: Catalyst-ci
 servers:
 - url: 'https://api.example.com'
 
