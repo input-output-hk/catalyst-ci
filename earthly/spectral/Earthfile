@@ -1,0 +1,17 @@
+VERSION --global-cache 0.7 
+
+BUILD_SPECTRAL:
+    COMMAND
+
+    ARG dir = .
+    ARG src = .
+    ARG rule_set=.spectral.yml
+
+    FROM stoplight/spectral
+    WORKDIR /work
+    COPY $src .
+
+    RUN spectral \
+        lint \
+        $dir \
+        --ruleset $rule_set
