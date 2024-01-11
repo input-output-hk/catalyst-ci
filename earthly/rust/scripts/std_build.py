@@ -30,9 +30,9 @@ def main():
         target_flag += f" --target={args.target} "
 
     # Build the code.
-    results.add(cli.run("cargo build " \
-                        f"{target_flag} " \
-                        "--release ",
+    results.add(cli.run("cargo build "
+                        + f"{target_flag} "
+                        + "--release ",
                     name="Build all code in the workspace"))
     # Check the code passes all clippy lint checks.
     results.add(cli.run("cargo lint",
@@ -43,8 +43,8 @@ def main():
 
     # Check if all Self contained tests pass (Test that need no external resources).
     if args.cov_report == "":
-        results.add(cli.run("cargo testunit" \
-                            f"{target_flag} ",
+        results.add(cli.run("cargo testunit"
+                            + f"{target_flag} ",
                         name="Self contained Unit tests all pass check"))
     
     # Save coverage report to file if it is provided
@@ -55,12 +55,12 @@ def main():
         results.add(res)
         # Run unit tests and generates test and coverage report artifacts
         if res.ok():
-            res = cli.run("cargo llvm-cov nextest " \
-                        f"{target_flag} " \
-                        "--release " \
-                        "--bins " \
-                        "--lib " \
-                        "-P ci ",
+            res = cli.run("cargo llvm-cov nextest "
+                        + f"{target_flag} "
+                        + "--release "
+                        + "--bins "
+                        + "--lib "
+                        + "-P ci ",
                     name="Self contained Unit tests and collect coverage")
             if not res.ok():
                 print(f"[yellow]You can locally run tests by running: [/yellow] \n [red bold]cargo testunit {target_flag}[/red bold]")
@@ -68,10 +68,10 @@ def main():
     
         # Save coverage report to file if it is provided
         if res.ok():
-            res = cli.run("cargo llvm-cov report " \
-                        f"{target_flag} " \
-                        "--release " \
-                        f"--output-path {args.cov_report} ",
+            res = cli.run("cargo llvm-cov report "
+                        + f"{target_flag} "
+                        + "--release "
+                        + f"--output-path {args.cov_report} ",
                     name=f"Generate lcov report to {args.cov_report}")
             results.add(res)
 

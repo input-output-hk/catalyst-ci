@@ -27,42 +27,42 @@ def main():
                 name="Documentation build"))
 
     # Generate dependency graphs
-    results.add(cli.run("cargo depgraph " \
-                        "--workspace-only " \
-                        "--dedup-transitive-deps " \
-                        "> target/doc/workspace.dot ",
+    results.add(cli.run("cargo depgraph "
+                        + "--workspace-only "
+                        + "--dedup-transitive-deps "
+                        + "> target/doc/workspace.dot ",
                 name="Workspace dependency graphs generation"))
-    results.add(cli.run("cargo depgraph " \
-                        "--dedup-transitive-deps " \
-                        "> target/doc/full.dot ",
+    results.add(cli.run("cargo depgraph "
+                        + "--dedup-transitive-deps "
+                        + "> target/doc/full.dot ",
                 name="Full dependency graphs generation"))
-    results.add(cli.run("cargo depgraph " \
-                        "--all-deps " \
-                        "--dedup-transitive-deps " \
-                        "> target/doc/all.dot ",
+    results.add(cli.run("cargo depgraph "
+                        + "--all-deps "
+                        + "--dedup-transitive-deps "
+                        + "> target/doc/all.dot ",
                 name="All dependency graphs generation"))
 
     for lib in filter(lambda lib: lib != "", args.libs.split(", ")):
-        results.add(cli.run("NO_COLOR=1 " \
-                        "cargo modules generate tree --orphans --types --traits --tests --all-features " \
-                        f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.tree' ",
+        results.add(cli.run("NO_COLOR=1 "
+                        + "cargo modules generate tree --orphans --types --traits --tests --all-features "
+                        + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.tree' ",
                 name=f"Generate Module Trees for {lib}"))
 
-        results.add(cli.run("NO_COLOR=1 " \
-                        "cargo modules generate graph --all-features --modules " \
-                        f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.dot' ",
+        results.add(cli.run("NO_COLOR=1 "
+                        + "cargo modules generate graph --all-features --modules "
+                        + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.dot' ",
                 name=f"Generate Module Graphs for {lib}"))
 
     for bin in filter(lambda bin: bin != "", args.bins.split(", ")):
         package, bin = bin.split('/')
-        results.add(cli.run("NO_COLOR=1 " \
-                        "cargo modules generate tree --orphans --types --traits --tests --all-features " \
-                        f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.tree' ",
+        results.add(cli.run("NO_COLOR=1 "
+                        + "cargo modules generate tree --orphans --types --traits --tests --all-features "
+                        + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.tree' ",
                 name=f"Generate Module Trees for {package}/{bin}"))
 
-        results.add(cli.run("NO_COLOR=1 " \
-                        "cargo modules generate graph --all-features --modules " \
-                        f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.dot' ",
+        results.add(cli.run("NO_COLOR=1 "
+                        + "cargo modules generate graph --all-features --modules "
+                        + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.dot' ",
                 name=f"Generate Module Graphs for {package}/{bin}"))
 
     results.print()
