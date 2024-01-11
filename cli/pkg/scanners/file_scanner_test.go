@@ -113,6 +113,7 @@ var _ = Describe("FileScanner", func() {
 			},
 			Entry("scanning 'docker', target in file is 'docker'", "docker", "docker"),
 			Entry("scanning 'docker-*', target in file is 'docker-test'", "docker-*", "docker-test"),
+			Entry("scanning 'docker-*', target in file is 'docker-test-test2'", "docker-*", "docker-test-test2"),
 		)
 		DescribeTable("when Earthfile contain no target",
 			func(target string) {
