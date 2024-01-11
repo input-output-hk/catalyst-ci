@@ -11,6 +11,98 @@ import rich
 # This improves visibility into all issues that need to be corrected for `build`
 # to pass without needing to iterate excessively.
 
+def cargo_build(results: cli.Results, flags: str):
+    results.add(cli.run("cargo build "
+                        + f"{flags} "
+                        + "--release ",
+                    name="Build all code in the workspace"))
+
+def cargo_clippy(results: cli.Results):
+    results.add(cli.run("cargo lint ",
+                    name="Clippy Lints in the workspace check"))
+
+def cargo_doctest(results: cli.Results, flags: str):
+    results.add(cli.run("cargo testdocs "
+                        + f"{flags} ",
+                    name="Documentation tests all pass check"))
+
+def cargo_nextest(results: cli.Results, flags: str):
+    results.add(cli.run("cargo testunit "
+                        + f"{flags} ",
+                    name="Self contained Unit tests all pass check"))
+
+def cargo_llvm_cov(results: cli.Results, flags: str, cov_report: str):
+    # Remove artifacts that may affect the coverage results
+    res = cli.run("cargo llvm-cov clean",
+                name="Remove artifacts that may affect the coverage results")
+    results.add(res)
+    # Run unit tests and generates test and coverage report artifacts
+    if res.ok():
+        res = cli.run("cargo testcov "
+                    + f"{flags} ",
+                name="Self contained Unit tests and collect coverage")
+        results.add(res)
+    # Save coverage report to file if it is provided
+    if res.ok():
+        res = cli.run("cargo llvm-cov report "
+                    + f"{flags} "
+                    + "--release "
+                    + f"--output-path {cov_report} ",
+                name=f"Generate lcov report to {cov_report}")
+        results.add(res)
+
+def cargo_bench(results: cli.Results, flags: str):
+    results.add(cli.run("cargo bench "
+                        + f"{flags} "
+                        + "--all-targets ",
+                    name="Benchmarks all run to completion check"))
+
+def cargo_doc(results: cli.Results, flags: str):
+    results.add(cli.run("cargo +nightly docs "
+                + f"{flags} ",
+            name="Documentation build"))
+
+def cargo_depgraph(results: cli.Results):
+    results.add(cli.run("cargo depgraph "
+                        + "--workspace-only "
+                        + "--dedup-transitive-deps "
+                        + "> target/doc/workspace.dot ",
+                name="Workspace dependency graphs generation"))
+    results.add(cli.run("cargo depgraph "
+                        + "--dedup-transitive-deps "
+                        + "> target/doc/full.dot ",
+                name="Full dependency graphs generation"))
+    results.add(cli.run("cargo depgraph "
+                        + "--all-deps "
+                        + "--dedup-transitive-deps "
+                        + "> target/doc/all.dot ",
+                name="All dependency graphs generation"))
+
+def cargo_modules_lib(results: cli.Results, lib: str):
+    # Generate tree
+    results.add(cli.run("NO_COLOR=1 "
+                        + "cargo modules generate tree --orphans --types --traits --tests --all-features "
+                        + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.tree' ",
+                    name=f"Generate Module Trees for {lib}"))
+    # Generate graph
+    results.add(cli.run("NO_COLOR=1 "
+                        + "cargo modules generate graph --all-features --modules "
+                        + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.dot' ",
+                    name=f"Generate Module Graphs for {lib}"))
+
+def cargo_modules_bin(results: cli.Results, package: str, bin: str):
+    # Generate tree
+    results.add(cli.run("NO_COLOR=1 "
+                        + "cargo modules generate tree --orphans --types --traits --tests --all-features "
+                        + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.tree' ",
+                    name=f"Generate Module Trees for {package}/{bin}"))
+    # Generate graph
+    results.add(cli.run("NO_COLOR=1 "
+                        + "cargo modules generate graph --all-features --modules "
+                        + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.dot' ",
+                    name=f"Generate Module Graphs for {package}/{bin}"))
+
+
 def main():
     # Force color output in CI
     rich.reconfigure(color_system="256")
@@ -18,67 +110,49 @@ def main():
     parser = argparse.ArgumentParser(
         description="Rust build processing."
     )
-    parser.add_argument("--target", default="", help="Pass rust --target flag (cargo --target flag).")
+    parser.add_argument("--build_flags", default="", help="")
+    parser.add_argument("--doctest_flags", default="", help="")
+    parser.add_argument("--test_flags", default="", help="")
+    parser.add_argument("--bench_flags", default="", help="")
     parser.add_argument("--cov_report", default="", help="The output coverage report file path.")
-    parser.add_argument("--with_bench", default="false", help="Running benchmarks")
+    parser.add_argument("--with_test", action='store_true', help="Running self contained Unit tests flag")
+    parser.add_argument("--with_bench", action='store_true', help="Running benchmarks flag")
+    parser.add_argument("--libs", default="", help="The list of lib crates `cargo-modules` docs to build separated by comma.")
+    parser.add_argument("--bins", default="", help="The list of binaries `cargo-modules` docs to build.")
     args = parser.parse_args()
 
     results = cli.Results("Rust build")
 
-    target_flag = ""
-    if args.target != "":
-        target_flag += f" --target={args.target} "
-
     # Build the code.
-    results.add(cli.run("cargo build "
-                        + f"{target_flag} "
-                        + "--release ",
-                    name="Build all code in the workspace"))
+    cargo_build(results, args.build_flags)
     # Check the code passes all clippy lint checks.
-    results.add(cli.run("cargo lint",
-                    name="Clippy Lints in the workspace check"))
+    cargo_clippy(results)
     # Check if all documentation tests pass.
-    results.add(cli.run("cargo +nightly testdocs ",
-                    name="Documentation tests all pass check"))
-
+    cargo_doctest(results, args.doctest_flags)
     # Check if all Self contained tests pass (Test that need no external resources).
-    if args.cov_report == "":
-        results.add(cli.run("cargo testunit"
-                            + f"{target_flag} ",
-                        name="Self contained Unit tests all pass check"))
-    
-    # Save coverage report to file if it is provided
-    else:
-        # Remove artifacts that may affect the coverage results
-        res = cli.run("cargo llvm-cov clean",
-                name="Remove artifacts that may affect the coverage results")
-        results.add(res)
-        # Run unit tests and generates test and coverage report artifacts
-        if res.ok():
-            res = cli.run("cargo llvm-cov nextest "
-                        + f"{target_flag} "
-                        + "--release "
-                        + "--bins "
-                        + "--lib "
-                        + "-P ci ",
-                    name="Self contained Unit tests and collect coverage")
-            if not res.ok():
-                print(f"[yellow]You can locally run tests by running: [/yellow] \n [red bold]cargo testunit {target_flag}[/red bold]")
-            results.add(res)
-    
-        # Save coverage report to file if it is provided
-        if res.ok():
-            res = cli.run("cargo llvm-cov report "
-                        + f"{target_flag} "
-                        + "--release "
-                        + f"--output-path {args.cov_report} ",
-                    name=f"Generate lcov report to {args.cov_report}")
-            results.add(res)
+    if args.with_test:
+        if args.cov_report == "":
+            # Without coverage report
+            cargo_nextest(results, args.test_flags)
+        else:
+            # With coverage report
+            cargo_llvm_cov(results, args.test_flags, args.cov_report)
 
-    # Check if any benchmarks defined run (We don;t validate the results.)
-    if args.with_bench == "true":
-        results.add(cli.run(f"cargo bench --all-targets {target_flag}",
-                name="Benchmarks all run to completion check"))
+    # Check if any benchmarks defined run (We don't validate the results.)
+    if args.with_bench:
+        cargo_bench(results, args.bench_flags)
+
+    # Generate all the documentation.
+    cargo_doc(results, "")
+    # Generate dependency graphs
+    cargo_depgraph(results)
+
+    for lib in filter(lambda lib: lib != "", args.libs.split(", ")):
+        cargo_modules_lib(results, lib)
+
+    for bin in filter(lambda bin: bin != "", args.bins.split(", ")):
+        package, bin = bin.split('/')
+        cargo_modules_bin(results, package, bin)
 
     results.print()
     if not results.ok():

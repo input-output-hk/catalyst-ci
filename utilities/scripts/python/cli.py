@@ -127,7 +127,7 @@ class Result:
             f"[bold cyan]{self.get_name():<{name_width}}[/bold cyan] : {self.duration()} : {self.status()}"
         )
         if verbose or (self.rc != 0 and verbose_errors):
-            print(f"[italic]{indent(self.get_command(), '  $ ','  . ' )}[/italic]")
+            print(f"[italic bright_red]{indent(self.get_command(), '  $ ', '  . ')}[/italic bright_red]")
             print(Text(indent(self.out, '  > ', '  . ')))
 
 

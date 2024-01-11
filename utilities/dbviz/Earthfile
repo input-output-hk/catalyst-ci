@@ -39,8 +39,7 @@ all-hosts-check:
 build:
     FROM +builder
  
-    DO ../../earthly/rust+BUILD
-
+    RUN /scripts/std_build.py   --with_test
     DO ../../earthly/rust+SMOKE_TEST --bin=dbviz
 
     SAVE ARTIFACT target/doc doc
