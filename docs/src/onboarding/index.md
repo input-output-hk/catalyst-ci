@@ -57,7 +57,7 @@ The output of the check phase may looks like the following:
 
 ```json
 {
-  "/home/work/test": ["check-test1", "check-test2", "check-test3"],
+  "/home/work/test": ["check-test1", "check-test2", "check-test3", "check-test-test4"],
   "/home/work/test2": ["check"]
 }
 ```
@@ -71,7 +71,8 @@ The output of the check phase may looks like the following:
 This list of `path` is fed into a [matrix job](https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs) that
 multiplexes executing the filtered targets from each of the discovered `Earthfile`s.
 The filtered targets will be retrieved from the map according to which Earthfile is currently running.
-For example, from the above example, running `/home/work/test` will run the targets `check-test1`, `check-test2`, and `check-test3`.
+For example, from the above example, running `/home/work/test` will run the targets `check-test1`, `check-test2`, `check-test3` and
+`check-test-test4`.
 
 Executing each discovered Earthfile in parallel will maximize network throughput
 and create a more easily digestible view of the CI status.
@@ -183,7 +184,7 @@ The examples are provided below:
 
 ```json
 {
-  "/home/work/test": ["check-test1", "check-test2", "check-test3"],
+  "/home/work/test": ["check-test1", "check-test2", "check-test3", "check-test-test4"],
   "/home/work/test2": ["check-test1"]
 }
 ```
