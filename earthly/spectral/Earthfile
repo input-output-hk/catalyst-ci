@@ -1,5 +1,7 @@
 VERSION --global-cache 0.7 
 
+# cspell: words ruleset
+
 BUILD_SPECTRAL:
     COMMAND
 
