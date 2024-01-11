@@ -2902,9 +2902,6 @@ async function run() {
     if (flags) {
         args.push(...flags.split(' '));
     }
-    if (targetFlags) {
-        args.push(...targetFlags.split(' '));
-    }
     core.info(`Filtered targets >> ${targets}`);
     targets.split(' ').map(tg => {
         // Get the filtered targets associated with the pattern target and earthfile.
@@ -2922,6 +2919,9 @@ async function run() {
         }
         else {
             argsSpawn.push(t);
+        }
+        if (targetFlags) {
+            argsSpawn.push(...targetFlags.split(' '));
         }
         core.info(`Running command: ${command} ${argsSpawn.join(' ')}`);
         const output = await spawnCommand(command, argsSpawn);

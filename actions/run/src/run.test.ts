@@ -33,7 +33,7 @@ describe('Run Action', () => {
         runnerPort: '',
         targets: 'target',
         targetFlags: '--flag1 test -f2 test2',
-        command: [['--flag1', 'test', '-f2', 'test2', './earthfile+target']],
+        command: [['./earthfile+target', '--flag1', 'test', '-f2', 'test2']],
         imageOutput: '',
         artifactOutput: ''
       },
