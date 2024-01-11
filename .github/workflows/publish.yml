@@ -88,13 +88,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+        uses: input-output-hk/catalyst-ci/actions/setup@feat/openapi-lint
         with:
           cli_version: ${{ inputs.ci_cli_version }}
           configure_registries: "false"
           earthly_skip_install: "true"
       - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@master
+        uses: input-output-hk/catalyst-ci/actions/discover@feat/openapi-lint
         id: discover
         with:
           targets: ${{ inputs.target }}
@@ -131,7 +131,7 @@ jobs:
           echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+        uses: input-output-hk/catalyst-ci/actions/setup@feat/openapi-lint
         with:
           aws_ecr_registry: ${{ inputs.aws_ecr_registry }}
           aws_role_arn: ${{ inputs.aws_role_arn }}
@@ -142,7 +142,7 @@ jobs:
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Build image
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-ci/actions/run@feat/openapi-lint
         id: build
         with:
           earthfile: ${{ matrix.earthfile }}
@@ -150,7 +150,7 @@ jobs:
           platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Push image
-        uses: input-output-hk/catalyst-ci/actions/push@master
+        uses: input-output-hk/catalyst-ci/actions/push@feat/openapi-lint
         if: github.ref == format('refs/heads/{0}', inputs.default_branch) && !inputs.skip_publish_on_default
         with:
           image: ${{ steps.build.outputs.image }}
@@ -164,7 +164,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: Push release image
-        uses: input-output-hk/catalyst-ci/actions/push@master
+        uses: input-output-hk/catalyst-ci/actions/push@feat/openapi-lint
         if: startsWith(github.ref, 'refs/tags/')
         with:
           image: ${{ steps.build.outputs.image }}

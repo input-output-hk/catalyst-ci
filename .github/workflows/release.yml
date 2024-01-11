@@ -72,13 +72,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+        uses: input-output-hk/catalyst-ci/actions/setup@feat/openapi-lint
         with:
           cli_version: ${{ inputs.ci_cli_version }}
           configure_registries: "false"
           earthly_skip_install: "true"
       - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@master
+        uses: input-output-hk/catalyst-ci/actions/discover@feat/openapi-lint
         id: discover
         with:
           targets: ${{ inputs.target }}
@@ -115,7 +115,7 @@ jobs:
           echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+        uses: input-output-hk/catalyst-ci/actions/setup@feat/openapi-lint
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
@@ -125,7 +125,7 @@ jobs:
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Build artifact
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-ci/actions/run@feat/openapi-lint
         id: build
         with:
           earthfile: ${{ matrix.earthfile }}
