@@ -1,12 +1,10 @@
 openapi: "3.0.2"
 info:
-  title: Awesome API
-  description: A very well-defined API
+  title: Example API
+  description: An example of OpenAPI
   version: "1.0"
   contact:
-    name: A-Team
-    email: a-team@goarmy.com
-    url: goarmy.com/apis/support
+    name: Catalyst-ci
 servers:
 - url: 'https://api.example.com'
 
