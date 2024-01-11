@@ -35,6 +35,7 @@ extra:
     Kubernetes: kubernetes
     arc42: arc42
     ADR: adr
+    Spelling: spell
 
 # Icons associated with the tags
 theme:
@@ -55,3 +56,4 @@ theme:
       kubernetes: simple/kubernetes
       arc42: material/pencil-ruler
       adr: material/arrow-decision-auto
+      spell: fontawesome/solid/spell-check

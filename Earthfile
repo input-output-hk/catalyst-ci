@@ -44,6 +44,12 @@ repo-config:
 
     SAVE ARTIFACT /repo repo
 
+# edit-docs - Target to assist in editing docs.
+edit-docs:
+    LOCALLY
+
+    RUN ./earthly/docs/dev/local.py cat-ci-docs:latest
+
 # check-lint-openapi - OpenAPI linting from a given directory
 check-lint-openapi: 
     DO ./earthly/spectral+BUILD_SPECTRAL --dir="./examples/openapi/**/*.yml"
