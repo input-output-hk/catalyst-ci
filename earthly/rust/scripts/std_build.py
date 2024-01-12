@@ -57,9 +57,8 @@ def cargo_bench(results: cli.Results, flags: str):
                         + "--all-targets ",
                     name="Benchmarks all run to completion check"))
 
-def cargo_doc(results: cli.Results, flags: str):
-    results.add(cli.run("cargo +nightly docs "
-                + f"{flags} ",
+def cargo_doc(results: cli.Results):
+    results.add(cli.run("cargo +nightly docs ",
             name="Documentation build"))
 
 def cargo_depgraph(results: cli.Results):
@@ -115,8 +114,8 @@ def main():
     parser.add_argument("--test_flags", default="", help="")
     parser.add_argument("--bench_flags", default="", help="")
     parser.add_argument("--cov_report", default="", help="The output coverage report file path.")
-    parser.add_argument("--with_test", action='store_true', help="Running self contained Unit tests flag")
-    parser.add_argument("--with_bench", action='store_true', help="Running benchmarks flag")
+    parser.add_argument("--with_test", action='store_true', help="Running tests flag.")
+    parser.add_argument("--with_bench", action='store_true', help="Running benchmarks flag.")
     parser.add_argument("--libs", default="", help="The list of lib crates `cargo-modules` docs to build separated by comma.")
     parser.add_argument("--bins", default="", help="The list of binaries `cargo-modules` docs to build.")
     args = parser.parse_args()
@@ -127,10 +126,10 @@ def main():
     cargo_build(results, args.build_flags)
     # Check the code passes all clippy lint checks.
     cargo_clippy(results)
-    # Check if all documentation tests pass.
-    cargo_doctest(results, args.doctest_flags)
     # Check if all Self contained tests pass (Test that need no external resources).
     if args.with_test:
+        # Check if all documentation tests pass.
+        cargo_doctest(results, args.doctest_flags)
         if args.cov_report == "":
             # Without coverage report
             cargo_nextest(results, args.test_flags)
@@ -143,7 +142,7 @@ def main():
         cargo_bench(results, args.bench_flags)
 
     # Generate all the documentation.
-    cargo_doc(results, "")
+    cargo_doc(results)
     # Generate dependency graphs
     cargo_depgraph(results)
 

@@ -1,4 +1,4 @@
-VERSION --global-cache 0.7
+VERSION --try --global-cache 0.7
 
 # cspell: words USERARCH toolsets rustfmt nextest
 
@@ -35,17 +35,21 @@ all-hosts-check:
 build:
     FROM +builder
 
-    RUN /scripts/std_build.py   --build_flags="" \
-                                --with_test \
-                                --cov_report="coverage-report.info" \
-                                --libs="bar" \
-                                --bins="foo/foo"
-    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
+    TRY
+        RUN /scripts/std_build.py   --build_flags="" \
+                                    --with_test \
+                                    --cov_report="coverage-report.info" \
+                                    --libs="bar" \
+                                    --bins="foo/foo"
+    FINALLY
+        SAVE ARTIFACT target/nextest/ci/junit.xml example.junit-report.xml AS LOCAL
+        SAVE ARTIFACT coverage-report.info example.coverage-report.info AS LOCAL
+    END
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/foo foo
-    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
-    SAVE ARTIFACT coverage-report.info coverage-report.info
+
+    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
