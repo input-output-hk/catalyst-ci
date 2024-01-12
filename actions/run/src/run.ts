@@ -34,10 +34,6 @@ export async function run(): Promise<void> {
     args.push(...flags.split(' '))
   }
 
-  if (targetFlags) {
-    args.push(...targetFlags.split(' '))
-  }
-
   core.info(`Filtered targets >> ${targets}`)
 
   targets.split(' ').map(tg => {
@@ -57,6 +53,11 @@ export async function run(): Promise<void> {
     } else {
       argsSpawn.push(t)
     }
+
+    if (targetFlags) {
+      argsSpawn.push(...targetFlags.split(' '))
+    }
+
     core.info(`Running command: ${command} ${argsSpawn.join(' ')}`)
     const output = await spawnCommand(command, argsSpawn)
     const imageOutput = parseImage(output)

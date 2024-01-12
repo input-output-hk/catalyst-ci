@@ -43,3 +43,9 @@ repo-config:
     COPY --dir .sqlfluff .
 
     SAVE ARTIFACT /repo repo
+
+# edit-docs - Target to assist in editing docs.
+edit-docs:
+    LOCALLY
+
+    DO ./earthly/docs/dev/local.py cat-ci-docs:latest
