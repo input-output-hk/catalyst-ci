@@ -105,6 +105,6 @@ test-3:
 #   * PostgreSQL server runs as a separate service
 #   * drops and initialise db
 #   * applies migrations
-#   * applies seed data.
+#   * applies seed data
 test-4:
     DO +INTEGRATION_TEST_RUN --compose="./tests/docker-compose-svc.yml" --seed_data="data" --test_script=./tests/test1.sh
