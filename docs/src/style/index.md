@@ -170,7 +170,3 @@ Functions are distinct from targets, which represent specific build outputs. Whe
 it executes a series of commands and may accept parameters, enabling a modular and flexible approach to defining build logic. 
 Functions can be utilized to encapsulate common tasks, making it easier to maintain and scale complex build processes. 
 The use of functions in Earthly contributes to a more modular and organized build system, enhancing code readability and maintainability.
-
-
-
-
