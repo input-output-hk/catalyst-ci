@@ -16,11 +16,13 @@ BUILD_SPECTRAL:
     WORKDIR /work
     COPY $src .
     
+    COPY ./earthly/spectral/minify-json.sh minify-json.sh 
+
     # Make the command executable
-    RUN chmod +x ./earthly/spectral/minify-json.sh
+    RUN chmod +x ./minify-json.sh
 
     # If file type is json, minify the JSON
-    RUN ./earthly/spectral/minify-json.sh
+    RUN ./minify-json.sh
 
     RUN spectral \
         lint \
