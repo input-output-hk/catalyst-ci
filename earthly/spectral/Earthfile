@@ -5,15 +5,24 @@ VERSION --global-cache 0.7
 BUILD_SPECTRAL:
     COMMAND
 
+    # Specify what file type to lint 
+    ARG file_type = "json"
     ARG dir = .
     ARG src = .
+    # Rule set for spectral
     ARG rule_set=.spectral.yml
 
     FROM stoplight/spectral
     WORKDIR /work
     COPY $src .
+    
+    # Make the command executable
+    RUN chmod +x ./earthly/spectral/minify-json.sh
+
+    # If file type is json, minify the JSON
+    RUN ./earthly/spectral/minify-json.sh
 
     RUN spectral \
         lint \
-        $dir \
+        $dir/"**/*.{yml,json}" \
         --ruleset $rule_set
