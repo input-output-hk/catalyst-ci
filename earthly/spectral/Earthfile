@@ -6,8 +6,8 @@ BUILD_SPECTRAL:
     COMMAND
 
     # Specify what file type to lint 
-    ARG file_type = "json"
-    ARG dir = .
+    ARG FILE_TYPE = "json"
+    ARG DIR = .
     ARG src = .
     # Rule set for spectral
     ARG rule_set=.spectral.yml
@@ -24,5 +24,5 @@ BUILD_SPECTRAL:
 
     RUN spectral \
         lint \
-        $dir/"**/*.{yml,json}" \
+        $DIR/"**/*.{yml,json}" \
         --ruleset $rule_set
