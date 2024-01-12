@@ -48,4 +48,4 @@ repo-config:
 edit-docs:
     LOCALLY
 
-    DO ./earthly/docs/dev/local.py cat-ci-docs:latest
+    RUN ./earthly/docs/dev/local.py cat-ci-docs:latest
