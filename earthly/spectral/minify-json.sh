@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Minify all JSON in the directory if the file type is json
 # Check if FILE_TYPE and DIR are not empty

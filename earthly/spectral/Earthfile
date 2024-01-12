@@ -20,7 +20,7 @@ BUILD_SPECTRAL:
     RUN chmod +x ./earthly/spectral/minify-json.sh
 
     # If file type is json, minify the JSON
-    RUN ./minify-json.sh
+    RUN ./earthly/spectral/minify-json.sh
 
     RUN spectral \
         lint \
