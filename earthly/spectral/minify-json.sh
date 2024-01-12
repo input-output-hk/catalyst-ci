@@ -1,7 +1,9 @@
+#!/usr/bin/env bash
+
 # Minify all JSON in the directory if the file type is json
-if [[ "${file_type}" == "json" ]]; then 
+if [[ ${file_type} == "json" ]]; then 
     # Loop through each JSON file in the directory
-    for json_file in "${dir}"/*.json; do 
+    for json_file in ${dir}/*.json; do 
         # Check if the file is a regular file
         if [[ -f "${json_file}" ]]; then 
             # Minify the JSON file using jq and overwrite the original file
