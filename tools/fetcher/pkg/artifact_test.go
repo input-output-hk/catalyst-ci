@@ -26,7 +26,7 @@ var _ = Describe("Artifact", func() {
 				fetcher := pkg.NewArtifactFetcher("env", "fund", store)
 				_, err := fetcher.Fetch("genesis", "1.0.0")
 				Expect(err).ToNot(HaveOccurred())
-				Expect(usedKey).To(Equal("env/fund/block0.bin-1.0.0"))
+				Expect(usedKey).To(Equal("env/fund/block0-fund-1.0.0.bin"))
 			})
 
 			It("should return the artifact", func() {
