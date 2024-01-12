@@ -158,15 +158,20 @@ Each subproject has an authoritative `build` target that *all* targets use when 
 
 ### Use Functions instead as User Defined Commands (UDCs) is Deprecated in Earthly 0.8
 
-Functions used to be called UDCs (User Defined Commands). Earthly 0.7 still uses COMMAND for declaring functions, 
+Functions used to be called UDCs (User Defined Commands).
+Earthly 0.7 still uses COMMAND for declaring functions,
 but the keyword is deprecated and will be replaced by FUNCTION in Earthly 0.8.
 
-The primary purpose of functions in Earthly is to enhance the flexibility and reusability of build logic. 
-Functions serve as a powerful replacement for User-Defined Commands (UDCs), 
+The primary purpose of functions in Earthly is to enhance the flexibility and reusability of build logic.
+Functions serve as a powerful replacement for User-Defined Commands (UDCs),
 offering a more comprehensive approach to reducing boilerplate and promoting the reuse of common workflows.
 
-In Earthly, functions provide a way to define reusable and parameterized blocks of build logic within a build file. 
-Functions are distinct from targets, which represent specific build outputs. When a function is invoked within a build script, 
-it executes a series of commands and may accept parameters, enabling a modular and flexible approach to defining build logic. 
-Functions can be utilized to encapsulate common tasks, making it easier to maintain and scale complex build processes. 
-The use of functions in Earthly contributes to a more modular and organized build system, enhancing code readability and maintainability.
+In Earthly, functions provide a way to define reusable and parameterized blocks of build logic within a build file.
+Functions are distinct from targets, which represent specific build outputs. 
+When a function is invoked within a build script,
+it executes a series of commands and may accept parameters,
+enabling a modular and flexible approach to defining build logic.
+Functions can be utilized to encapsulate common tasks,
+making it easier to maintain and scale complex build processes.
+The use of functions in Earthly contributes to a more modular and organized build system,
+enhancing code readability and maintainability.
