@@ -156,13 +156,21 @@ This can be through inheriting from it or by directly copying artifacts.
 The main point is that a subproject should not have multiple builds scattered in various places.
 Each subproject has an authoritative `build` target that *all* targets use when fetching build artifacts.
 
-### Prefer User Defined Commands (UDCs)
+### Use Functions instead as User Defined Commands (UDCs) is Deprecated in Earthly 0.8
 
-The primary purpose of a UDC is to reduce boilerplate and promote reusing common workflows.
-Many build patterns tend to be repetitive.
-For example, copying a package lockfile and installing dependencies is very common.
+Functions used to be called UDCs (User Defined Commands). Earthly 0.7 still uses COMMAND for declaring functions, 
+but the keyword is deprecated and will be replaced by FUNCTION in Earthly 0.8.
 
-In these cases, a UDC should be preferred.
-The `catalyst-ci` repository provides a number of UDCs in the `earthly` subdirectory.
-These should be used prior to writing a new one.
-If a common use case is not covered in this subdirectory, a PR should be opened to add it.
+The primary purpose of functions in Earthly is to enhance the flexibility and reusability of build logic. 
+Functions serve as a powerful replacement for User-Defined Commands (UDCs), 
+offering a more comprehensive approach to reducing boilerplate and promoting the reuse of common workflows.
+
+In Earthly, functions provide a way to define reusable and parameterized blocks of build logic within a build file. 
+Functions are distinct from targets, which represent specific build outputs. When a function is invoked within a build script, 
+it executes a series of commands and may accept parameters, enabling a modular and flexible approach to defining build logic. 
+Functions can be utilized to encapsulate common tasks, making it easier to maintain and scale complex build processes. 
+The use of functions in Earthly contributes to a more modular and organized build system, enhancing code readability and maintainability.
+
+
+
+
