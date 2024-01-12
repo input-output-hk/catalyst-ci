@@ -167,7 +167,7 @@ Functions serve as a powerful replacement for User-Defined Commands (UDCs),
 offering a more comprehensive approach to reducing boilerplate and promoting the reuse of common workflows.
 
 In Earthly, functions provide a way to define reusable and parameterized blocks of build logic within a build file.
-Functions are distinct from targets, which represent specific build outputs. 
+Functions are distinct from targets, which represent specific build outputs.
 When a function is invoked within a build script,
 it executes a series of commands and may accept parameters,
 enabling a modular and flexible approach to defining build logic.
