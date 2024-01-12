@@ -119,33 +119,6 @@ SETUP:
         cargo --version && \
         cargo +nightly --version
 
-# Steps we do during the `check` CI phase for all Rust programs
-CHECK:
-    COMMAND
-
-    # This is set up so that ALL checks are run and it will fail if any fail.
-    # This improves visibility into all issues that need to be corrected for `check`
-    # to pass without needing to iterate excessively.
-    RUN /scripts/std_checks.py
-
-# Step we do during the `build` CI phase for all Rust programs.
-# Parameters:
-#  * target: Pass rust --target flag (cargo --target flag).
-#  * cov_report: The output coverage report file path.
-#  * libs : The list of lib crates `cargo-modules` docs to build.
-#  * bins : The list of binaries `cargo-modules` docs to build.
-#  * with_bench: Run benchmarks.
-BUILD:
-    COMMAND
-    ARG target=""
-    ARG cov_report=""
-    ARG libs=""
-    ARG bins=""
-    ARG with_bench="false"
-
-    RUN /scripts/std_build.py --target=$target --cov_report=$cov_report --with_bench=$with_bench
-    RUN /scripts/std_docs.py --libs=$libs --bins=$bins
-
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:
     COMMAND

@@ -85,7 +85,7 @@ By default `toolchain` setup to `rust-toolchain.toml`.
 check:
     FROM +builder
 
-    DO ./../../earthly/rust+CHECK
+    RUN /scripts/std_checks.py
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -95,8 +95,8 @@ all-hosts-check:
 
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
 The `check` target which actually performs all checks and validation
-with the help of `+CHECK` UDC target.
-The `+CHECK` UDC target performs static checks of the Rust project as
+with the help of `std_checks.py` script.
+This script performs static checks of the Rust project as
 `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
 find unused dependencies and any supply chain issues with dependencies.
 Here is the list of steps (look at `./earthly/rust/scripts/std_checks.py`):
@@ -128,14 +128,21 @@ The same approach we will see for the another targets of this guide.
 build:
     FROM +builder
 
-    DO ./../../earthly/rust+BUILD --cov_report="coverage-report.info" --libs="bar" --bins="foo/foo" --with_bench="true"
-
-    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
+    TRY
+        RUN /scripts/std_build.py   --build_flags="" \
+                                    --with_test \
+                                    --cov_report="coverage-report.info" \
+                                    --libs="bar" \
+                                    --bins="foo/foo"
+    FINALLY
+        SAVE ARTIFACT target/nextest/ci/junit.xml example.junit-report.xml AS LOCAL
+        SAVE ARTIFACT coverage-report.info example.coverage-report.info AS LOCAL
+    END
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/foo foo
-    SAVE ARTIFACT target/nextest/ci/junit.xml junit-report.xml
-    SAVE ARTIFACT coverage-report.info coverage-report.info
+
+    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -148,18 +155,48 @@ Obviously it inherits `builder` target environment and than performs build of th
 Important to note that in this particular example we are dealing with the executable Rust project,
 so it produces binary as a final artifact.
 Another case of the building Rust library we will consider later.
-Actual build process is done with `+BUILD` UDC target.
-The `+BUILD` UDC have few arguments `libs` and `bins`,
-they should be specified to properly generate `cargo-modules` docs (see description below).
-The `libs` argument takes a list of library crate's names in your Rust project, e.g.
+Actual build process is done with the `std_build.py` script.
+Here is the full list of configuration of this script:
+
+```bash
+ usage: std_build.py [-h] [--build_flags BUILD_FLAGS]
+                     [--doctest_flags DOCTEST_FLAGS] [--test_flags TEST_FLAGS]
+                     [--bench_flags BENCH_FLAGS] [--with_test]
+                     [--cov_report COV_REPORT] [--with_bench] [--libs LIBS]
+                     [--bins BINS]
+
+ Rust build processing.
+
+ options:
+   -h, --help            show this help message and exit
+   --build_flags BUILD_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo build` command.
+   --doctest_flags DOCTEST_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo testdocs` command.
+   --test_flags TEST_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo testunit` command.
+   --bench_flags BENCH_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo bench` command.
+   --with_test           Flag to indicate whether to run tests (including unit
+                         tests and doc tests).
+   --cov_report COV_REPORT
+                         The output coverage report file path. If omitted,
+                         coverage will not be run.
+   --with_bench          Flag to indicate whether to run benchmarks.
+   --libs LIBS           The list of lib crates `cargo-modules` docs to build
+                         separated by comma.
+   --bins BINS           The list of binaries `cargo-modules` docs to build.
+```
+
+Note that the `libs` argument takes a list of library crate's names in your Rust project, e.g.
 `--libs="crate1 crate2"`.
 The `bins` argument takes a list of binary crate's names and binary names in your Rust project, e.g.
 `--bins="crate1/bin1 crate1/bin2 crate2/bin1"`, note that each binary name correspond to each crate
 and separated in this list with `/` symbol.
-To perform `cargo llvm-cov` test coverage and produce a report it is needed to pass a `cov_report` argument,
-if last is not provided regular test running will be performed.
-Also it is possible to specify a target for a `cargo build` process via `target`.
-To enable benchmark running it is needed to pass `with_bench="true"` argument.
 Under this build process we perform different steps of compiling and validating of our Rust project,
 here is the list of steps (look at `./earthly/rust/scripts/std_build.py` and `./earthly/rust/scripts/std_docs.py`):
 
@@ -173,10 +210,12 @@ look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation can be gener
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Self contained Unit tests all pass.
 5. `cargo testdocs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation tests all pass.
-6. `cargo bench` - Checking Benchmarks all run to completion.
-7. `cargo depgraph` - Generating dependency graph based on the Rust code.
+6. `cargo testcov` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+look at `./earthly/rust/stdcfgs/config.toml`)Checking Self contained Unit tests all pass and collect coverage.
+7. `cargo bench` - Checking Benchmarks all run to completion.
+8. `cargo depgraph` - Generating dependency graph based on the Rust code.
 Generated artifacts are `doc/workspace.dot`, `doc/full.dot`, `doc/all.dot` files.
-8. `cargo modules` - Generating modules trees and graphs based on the Rust code.
+9. `cargo modules` - Generating modules trees and graphs based on the Rust code.
 Generated artifacts are `doc/$crate.$bin.bin.modules.tree`, `doc/$crate.$bin.bin.modules.dot`
 for the specified `--bins="crate1/bin1"` argument
 and `target/doc/$crate.lib.modules.tree`, `target/doc/$crate.lib.modules.dot`

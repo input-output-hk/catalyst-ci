@@ -23,7 +23,7 @@ builder:
 check:
     FROM +builder
 
-    DO ./../../earthly/rust+CHECK
+    RUN /scripts/std_checks.py
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -35,6 +35,7 @@ all-hosts-check:
 build:
     FROM +builder
 
+    RUN /scripts/std_build.py --help
     TRY
         RUN /scripts/std_build.py   --build_flags="" \
                                     --with_test \
@@ -42,8 +43,8 @@ build:
                                     --libs="bar" \
                                     --bins="foo/foo"
     FINALLY
-        SAVE ARTIFACT target/nextest/ci/junit.xml example.junit-report.xml AS LOCAL
-        SAVE ARTIFACT coverage-report.info example.coverage-report.info AS LOCAL
+        SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL example.junit-report.xml
+        SAVE ARTIFACT coverage-report.info AS LOCAL example.coverage-report.info
     END
 
     SAVE ARTIFACT target/doc doc
