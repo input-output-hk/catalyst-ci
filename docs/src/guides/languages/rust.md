@@ -241,6 +241,14 @@ please follow this [guide](./../../onboarding/index.md).
 It is pretty strait forward for this builder process,
 because as a part of `+build` target we already creating a docker image.
 
+## Rust `nightly` channel
+
+Be aware that we are running some tools in the `nightly` channel, such as `cargo fmt` and `cargo docs`.
+It is highly likely that the `nightly` toolchain version on the CI machines differs from what you have locally.
+Unfortunately, Rust tooling does not have the capability to preserve and maintain consistency between
+`stable` and `nightly` toolchains simultaneously.
+In our builds, we only preserve the `stable` toolchain version (`rust-toolchain.toml` file).
+
 ## Conclusion
 
 You can see the final `Earthfile` [here](https://github.com/input-output-hk/catalyst-ci/blob/master/examples/rust/Earthfile)
