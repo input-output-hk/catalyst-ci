@@ -27,7 +27,7 @@ BUILD_SPECTRAL:
     COPY $src .
 
     COPY +spectral-base/minify-json.sh minify-json.sh
-
+    RUN ls
     # If file type is json, minify the JSON
     RUN ./minify-json.sh
 
