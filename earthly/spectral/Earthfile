@@ -2,6 +2,15 @@ VERSION --global-cache 0.7
 
 # cspell: words ruleset
 
+spectral-base:
+    FROM busybox
+    COPY . .
+    RUN ls
+    # COPY ./earthly/spectral/minify-json.sh minify-json.sh
+    RUN chmod +x ./minify-json.sh
+    RUN ls
+    SAVE ARTIFACT minify-json.sh
+
 BUILD_SPECTRAL:
     COMMAND
 
@@ -15,11 +24,9 @@ BUILD_SPECTRAL:
     FROM stoplight/spectral
     WORKDIR /work
     COPY $src .
-    
-    COPY ./earthly/spectral/minify-json.sh minify-json.sh 
 
-    # Make the command executable
-    RUN chmod +x ./minify-json.sh
+    RUN ls    
+    COPY +spectral-base/minify-json.sh minify-json.sh
 
     # If file type is json, minify the JSON
     RUN ./minify-json.sh
