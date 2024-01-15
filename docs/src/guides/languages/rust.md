@@ -222,7 +222,7 @@ Generated artifacts are `doc/$crate.$bin.bin.modules.tree`, `doc/$crate.$bin.bin
 for the specified `--bins="crate1/bin1"` argument
 and `target/doc/$crate.lib.modules.tree`, `target/doc/$crate.lib.modules.dot`
 for the specified `--libs="crate1"` argument.
-10. Running smoke tests on provided binary names (`--bins` argument). 
+10. Running smoke tests on provided binary names (`--bins` argument).
 
 Final step is to provide desired artifacts: docs and binary.
 
