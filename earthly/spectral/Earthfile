@@ -4,9 +4,8 @@ VERSION --global-cache 0.7
 
 spectral-base:
     FROM stoplight/spectral
-    RUN ls
-    COPY . .
     # COPY ./earthly/spectral/minify-json.sh minify-json.sh
+    COPY . .
     RUN chmod +x ./minify-json.sh
     SAVE ARTIFACT minify-json.sh
 
@@ -23,7 +22,7 @@ BUILD_SPECTRAL:
     # FROM +spectral-base   
     # RUN echo $dir
     # RUN ls 
-    WORKDIR /work
+    # WORKDIR /work
     COPY $src .
     COPY $dir .
 
