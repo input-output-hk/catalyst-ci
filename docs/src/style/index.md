@@ -156,7 +156,12 @@ This can be through inheriting from it or by directly copying artifacts.
 The main point is that a subproject should not have multiple builds scattered in various places.
 Each subproject has an authoritative `build` target that *all* targets use when fetching build artifacts.
 
-### Use Functions instead as User Defined Commands (UDCs) is Deprecated in Earthly 0.8
+### Earthly User Defined Commands (UDCs) Deprecation Starting from Earthly 0.8
+
+Please be advised that Earthly's File Descriptor Cache (FDC) is deprecated, effective upon updating to Earthly 0.8.
+Update your configurations accordingly to ensure a seamless transition and refer to the documentation for guidance.
+
+### Use Functions instead of User Defined Commands (UDCs) in Earthly 0.8
 
 Functions used to be called UDCs (User Defined Commands).
 Earthly 0.7 still uses COMMAND for declaring functions,
