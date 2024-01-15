@@ -2,20 +2,34 @@
 	"openapi": "3.0.2",
 	"info": {
 		"title": "Example API",
-		"description": "An example of OpenAPI",
+		"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 		"version": "1.0",
 		"contact": { "name": "Catalyst-ci" }
 	},
-	"servers": [{ "url": "https://api.example.com" }],
+	"servers": [
+		{
+			"url": "https://api.example.com",
+			"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae."
+		}
+	],
+	"tags": [
+		{
+			"name": "user",
+			"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae."
+		}
+	],
 	"paths": {
 		"/users": {
 			"get": {
+				"tags": ["user"],
+				"operationId": "get-users",
+				"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 				"summary": "Get a list of users",
 				"responses": {
 					"200": {
 						"headers": {
 							"RateLimit-Limit": {
-								"description": "The number of allowed requests in the current period.",
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 								"schema": {
 									"type": "integer",
 									"format": "int32",
@@ -24,7 +38,7 @@
 								}
 							},
 							"RateLimit-Reset": {
-								"description": "The number of seconds left in the current period.",
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 								"schema": {
 									"type": "integer",
 									"format": "int32",
@@ -33,7 +47,7 @@
 								}
 							}
 						},
-						"description": "Successful response",
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -43,10 +57,134 @@
 								}
 							}
 						}
+					},
+					"400": {
+						"headers": {
+							"RateLimit-Limit": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"RateLimit-Reset": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							}
+						},
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+						"content": {
+							"application/json": {
+								"example": { "message": "Invalid request payload" }
+							}
+						}
+					},
+					"401": {
+						"headers": {
+							"RateLimit-Limit": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"RateLimit-Reset": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							}
+						},
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+						"content": {
+							"application/json": {
+								"example": { "message": "Invalid request payload" }
+							}
+						}
+					},
+					"429": {
+						"headers": {
+							"RateLimit-Limit": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"RateLimit-Reset": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"Retry-After": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							}
+						},
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+						"content": {
+							"application/json": {
+								"example": { "message": "Invalid request payload" }
+							}
+						}
+					},
+					"500": {
+						"headers": {
+							"RateLimit-Limit": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"RateLimit-Reset": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							}
+						},
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+						"content": {
+							"application/json": {
+								"example": { "message": "Invalid request payload" }
+							}
+						}
 					}
 				}
 			},
 			"post": {
+				"tags": ["user"],
+				"operationId": "create-user",
+				"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 				"summary": "Create a new user",
 				"requestBody": {
 					"content": {
@@ -59,7 +197,7 @@
 					"201": {
 						"headers": {
 							"RateLimit-Limit": {
-								"description": "The number of allowed requests in the current period.",
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 								"schema": {
 									"type": "integer",
 									"format": "int32",
@@ -68,7 +206,7 @@
 								}
 							},
 							"RateLimit-Reset": {
-								"description": "The number of seconds left in the current period.",
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 								"schema": {
 									"type": "integer",
 									"format": "int32",
@@ -77,7 +215,7 @@
 								}
 							}
 						},
-						"description": "User created successfully",
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 						"content": {
 							"application/json": {
 								"schema": { "$ref": "#/components/schemas/User" }
@@ -87,7 +225,7 @@
 					"400": {
 						"headers": {
 							"RateLimit-Limit": {
-								"description": "The number of allowed requests in the current period.",
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 								"schema": {
 									"type": "integer",
 									"format": "int32",
@@ -96,7 +234,7 @@
 								}
 							},
 							"RateLimit-Reset": {
-								"description": "The number of seconds left in the current period.",
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 								"schema": {
 									"type": "integer",
 									"format": "int32",
@@ -105,7 +243,100 @@
 								}
 							}
 						},
-						"description": "Bad request",
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+						"content": {
+							"application/json": {
+								"example": { "message": "Invalid request payload" }
+							}
+						}
+					},
+					"401": {
+						"headers": {
+							"RateLimit-Limit": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"RateLimit-Reset": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							}
+						},
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+						"content": {
+							"application/json": {
+								"example": { "message": "Invalid request payload" }
+							}
+						}
+					},
+					"429": {
+						"headers": {
+							"RateLimit-Limit": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"RateLimit-Reset": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"Retry-After": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							}
+						},
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+						"content": {
+							"application/json": {
+								"example": { "message": "Invalid request payload" }
+							}
+						}
+					},
+					"500": {
+						"headers": {
+							"RateLimit-Limit": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							},
+							"RateLimit-Reset": {
+								"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
+								"schema": {
+									"type": "integer",
+									"format": "int32",
+									"minimum": 1,
+									"maximum": 1000
+								}
+							}
+						},
+						"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 						"content": {
 							"application/json": {
 								"example": { "message": "Invalid request payload" }
@@ -119,6 +350,7 @@
 	"components": {
 		"schemas": {
 			"User": {
+				"description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce ac dictum tellus, auctor pellentesque arcu. Sed non facilisis est, a rutrum nisi. Duis bibendum at nisl iaculis ullamcorper. Vestibulum eu euismod mi. Proin consectetur diam sapien, in rhoncus sapien rhoncus vitae.",
 				"type": "object",
 				"properties": {
 					"id": {
@@ -136,14 +368,19 @@
 					},
 					"email": { "type": "string", "format": "email", "maxLength": 20 },
 					"roles": {
-						"type": "array",
-						"maxItems": 2,
-						"items": { "type": "string", "format": "text", "maxLength": 255 },
+						"type": "string",
 						"enum": ["user", "admin"]
 					}
 				}
 			}
+		},
+		"securitySchemes": {
+			"apiKey": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "X-API-Key"
+			}
 		}
 	},
-	"security": [{ "api_key": [] }]
+	"security": [{ "apiKey": ["test"] }]
 }
