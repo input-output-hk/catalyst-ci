@@ -11,6 +11,6 @@ extends:
 - 'https://unpkg.com/@stoplight/spectral-documentation/dist/ruleset.mjs'
 - 'https://unpkg.com/@stoplight/spectral-owasp-ruleset/dist/ruleset.mjs'
 
-# Ignoring rules
-rules:
-  docs-tags: off
+# Ignoring rules example
+# rules:
+#   docs-tags: off
