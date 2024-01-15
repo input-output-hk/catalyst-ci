@@ -24,18 +24,6 @@ check-bash:
 
     DO ./earthly/bash+SHELLCHECK --src=.
 
-## -----------------------------------------------------------------------------
-##
-## Standard CI targets.
-##
-## These targets are discovered and executed automatically by CI.
-
-# check run all checks.
-check:
-    BUILD +check-spelling
-    BUILD +check-markdown
-    BUILD +check-bash
-
 # Internal: Reference to our repo root documentation used by docs builder.
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
