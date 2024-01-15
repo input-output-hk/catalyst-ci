@@ -20,9 +20,9 @@ BUILD_SPECTRAL:
     # Rule set for spectral
     ARG rule_set=.spectral.yml
 
-    FROM +spectral-base   
-    RUN echo $dir
-    RUN ls 
+    # FROM +spectral-base   
+    # RUN echo $dir
+    # RUN ls 
     WORKDIR /work
     COPY $src .
     COPY $dir .

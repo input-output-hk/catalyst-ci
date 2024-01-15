@@ -52,4 +52,5 @@ edit-docs:
 
 # check-lint-openapi - OpenAPI linting from a given directory
 check-lint-openapi: 
+    FROM ./earthly/spectral+spectral-base
     DO ./earthly/spectral+BUILD_SPECTRAL --dir="./examples/openapi" --file_type="json"
