@@ -131,6 +131,7 @@ build:
     TRY
         RUN /scripts/std_build.py   --build_flags="" \
                                     --with_test \
+                                    --with_bench \
                                     --cov_report="coverage-report.info" \
                                     --libs="bar" \
                                     --bins="foo/foo"
