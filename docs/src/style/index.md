@@ -12,6 +12,11 @@ In most circumstances, the standards provided by this style guide should *not* b
 If an exception must me made, the rationale should be included in the respective PR.
 Any `Earthfile` which does not adhere to this style guide will be rejected if no further justification is made.
 
+### Earthly User Defined Commands (UDCs) deprecated starting from Earthly 0.8
+
+!!! Warning
+Please be advised that Earthly's File Descriptor Cache (FDC) is deprecated, effective upon updating to Earthly 0.8.
+
 ## Organization
 
 ### Adhere to a consistent structure
@@ -156,27 +161,14 @@ This can be through inheriting from it or by directly copying artifacts.
 The main point is that a subproject should not have multiple builds scattered in various places.
 Each subproject has an authoritative `build` target that *all* targets use when fetching build artifacts.
 
-### Earthly User Defined Commands (UDCs) Deprecation Starting from Earthly 0.8
+### Prefer FUNCTION
 
-Please be advised that Earthly's File Descriptor Cache (FDC) is deprecated, effective upon updating to Earthly 0.8.
-Update your configurations accordingly to ensure a seamless transition and refer to the documentation for guidance.
-
-### Use Functions instead of User Defined Commands (UDCs) in Earthly 0.8
-
-Functions used to be called UDCs (User Defined Commands).
-Earthly 0.7 still uses COMMAND for declaring functions,
-but the keyword is deprecated and will be replaced by FUNCTION in Earthly 0.8.
-
-The primary purpose of functions in Earthly is to enhance the flexibility and reusability of build logic.
-Functions serve as a powerful replacement for User-Defined Commands (UDCs),
-offering a more comprehensive approach to reducing boilerplate and promoting the reuse of common workflows.
-
-In Earthly, functions provide a way to define reusable and parameterized blocks of build logic within a build file.
-Functions are distinct from targets, which represent specific build outputs.
-When a function is invoked within a build script,
-it executes a series of commands and may accept parameters,
-enabling a modular and flexible approach to defining build logic.
-Functions can be utilized to encapsulate common tasks,
-making it easier to maintain and scale complex build processes.
+The primary purpose of a UDC is to reduce boilerplate and promote reusing common workflows.
+Many build patterns tend to be repetitive.
+For example, copying a package lockfile and installing dependencies is very common.
+In these cases, a FUNCTION should be preferred.
+The catalyst-ci repository provides a number of FUNCTIONs in the earthly subdirectory.
+These should be used prior to writing a new one.
+If a common use case is not covered in this subdirectory, a PR should be opened to add it.
 The use of functions in Earthly contributes to a more modular and organized build system,
 enhancing code readability and maintainability.
