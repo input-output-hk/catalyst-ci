@@ -1,7 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION --global-cache 0.7
 
-# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf depgraph lcov psycopg
+# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset depgraph lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
@@ -118,15 +118,3 @@ SETUP:
         rustup show && \
         cargo --version && \
         cargo +nightly --version
-
-# Check if the build executable, isn't a busted mess.
-SMOKE_TEST:
-    COMMAND
-    ARG --required bin
-
-    RUN ldd target/release/$bin
-    RUN readelf -p .comment target/release/$bin
-    RUN strip -v target/release/$bin
-
-    # ALL executables MUST have `--help` as an option.
-    RUN target/release/$bin --help

@@ -190,7 +190,8 @@ Here is the full list of configuration of this script:
    --with_bench          Flag to indicate whether to run benchmarks.
    --libs LIBS           The list of lib crates `cargo-modules` docs to build
                          separated by comma.
-   --bins BINS           The list of binaries `cargo-modules` docs to build.
+   --bins BINS           The list of binaries `cargo-modules` docs to build and
+                         made a smoke tests on them.   .
 ```
 
 Note that the `libs` argument takes a list of library crate's names in your Rust project, e.g.
@@ -220,12 +221,8 @@ Generated artifacts are `doc/workspace.dot`, `doc/full.dot`, `doc/all.dot` files
 Generated artifacts are `doc/$crate.$bin.bin.modules.tree`, `doc/$crate.$bin.bin.modules.dot`
 for the specified `--bins="crate1/bin1"` argument
 and `target/doc/$crate.lib.modules.tree`, `target/doc/$crate.lib.modules.dot`
-for the specified `--libs="crate1"` argument of the `+BUILD` UDC.
-
-Next steps is mandatory if you are going to produce a binary as an artifact,
-for Rust libraries the are not mandatory and could be omitted.
-The `+SMOKE_TEST` UDC target checks that produced binary with the specified name (`--bin` argument)
-is executable, isn't a busted mess.
+for the specified `--libs="crate1"` argument.
+10. Running smoke tests on provided binary names (`--bins` argument). 
 
 Final step is to provide desired artifacts: docs and binary.
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cspell: words lcov testdocs nextest testunit depgraph testcov
+# cspell: words lcov testdocs nextest testunit depgraph testcov readelf
 
 import python.cli as cli
 import argparse
@@ -101,6 +101,25 @@ def cargo_modules_bin(results: cli.Results, package: str, bin: str):
                         + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.dot' ",
                     name=f"Generate Module Graphs for {package}/{bin}"))
 
+# ALL executables MUST have `--help` as an option.
+def help_check(results: cli.Results, bin: str):
+    results.add(cli.run(f"target/release/{bin} --help",
+                    name=f"Executable '{bin}' MUST have `--help` as an option."))
+
+def ldd(results: cli.Results, bin: str):
+    results.add(cli.run(f"ldd target/release/{bin}",
+                    name=f"ldd for '{bin}'",
+                    verbose=True))
+
+def readelf(results: cli.Results, bin: str):
+    results.add(cli.run(f"readelf -p .comment target/release/{bin}",
+                    name=f"readelf for '{bin}'",
+                    verbose=True))
+
+def strip(results: cli.Results, bin: str):
+    results.add(cli.run(f"strip -v target/release/{bin}",
+                    name=f"strip for '{bin}'",
+                    verbose=True))
 
 def main():
     # Force color output in CI
@@ -117,11 +136,13 @@ def main():
     parser.add_argument("--cov_report", default="", help="The output coverage report file path. If omitted, coverage will not be run.")
     parser.add_argument("--with_bench", action='store_true', help="Flag to indicate whether to run benchmarks.")
     parser.add_argument("--libs", default="", help="The list of lib crates `cargo-modules` docs to build separated by comma.")
-    parser.add_argument("--bins", default="", help="The list of binaries `cargo-modules` docs to build.")
+    parser.add_argument("--bins", default="", help="The list of binaries `cargo-modules` docs to build and made a smoke tests on them.")
     args = parser.parse_args()
 
-    results = cli.Results("Rust build")
+    libs = filter(lambda lib: lib != "", args.libs.split(", "))
+    bins = list(filter(lambda bin: bin != "", args.bins.split(", ")))
 
+    results = cli.Results("Rust build")
     # Build the code.
     cargo_build(results, args.build_flags)
     # Check the code passes all clippy lint checks.
@@ -146,16 +167,31 @@ def main():
     # Generate dependency graphs
     cargo_depgraph(results)
 
-    for lib in filter(lambda lib: lib != "", args.libs.split(", ")):
+    for lib in libs:
         cargo_modules_lib(results, lib)
 
-    for bin in filter(lambda bin: bin != "", args.bins.split(", ")):
-        package, bin = bin.split('/')
-        cargo_modules_bin(results, package, bin)
+    for bin in bins:
+        package, bin_name = bin.split('/')
+        cargo_modules_bin(results, package, bin_name)
 
     results.print()
     if not results.ok():
         exit(1)
+
+    # Check if the build executable, isn't a busted mess.
+    results = cli.Results("Smoke test")
+
+    for bin in bins:
+        _, bin_name = bin.split('/')
+        help_check(results, bin_name)
+        ldd(results, bin_name)
+        readelf(results, bin_name)
+        strip(results, bin_name)
+
+    results.print()
+    if not results.ok():
+        exit(1)
+
 
 if __name__ == "__main__":
     main()
