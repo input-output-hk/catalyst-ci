@@ -84,4 +84,4 @@ mdlint-test:
 
     ARG src=$(echo ${PWD}/../../)
 
-    RUN +MDLINT_LOCALLY --src=${src}
+    DO +MDLINT_LOCALLY --src=${src}
