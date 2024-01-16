@@ -12,7 +12,7 @@ In most circumstances, the standards provided by this style guide should *not* b
 If an exception must me made, the rationale should be included in the respective PR.
 Any `Earthfile` which does not adhere to this style guide will be rejected if no further justification is made.
 
-### Earthly User Defined Commands (Functions) deprecated starting from Earthly 0.8
+### Earthly User Defined Commands (UDCs) deprecated starting from Earthly 0.8
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Warning
@@ -165,7 +165,7 @@ Each subproject has an authoritative `build` target that *all* targets use when 
 
 ### Prefer FUNCTION
 
-The primary purpose of a Function is to reduce boilerplate and promote reusing common workflows.
+The primary purpose of a UDC is to reduce boilerplate and promote reusing common workflows.
 Many build patterns tend to be repetitive.
 For example, copying a package lockfile and installing dependencies is very common.
 In these cases, a FUNCTION should be preferred.

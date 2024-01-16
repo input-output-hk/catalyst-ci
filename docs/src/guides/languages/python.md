@@ -62,7 +62,7 @@ so it is mandatory to have `pyproject.toml` and `poetry.lock` files in the root 
 The fist step of the `builder` target is prepare a Python environment
 with poetry via `+python-base` target.
 Next step is to copy source code of the project and finally finalize the build
-with some poetry project setup which is done with `+BUILDER` Function target.
+with some poetry project setup which is done with `+BUILDER` UDC target.
 
 ### Running checks
 

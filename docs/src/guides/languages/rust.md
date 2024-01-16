@@ -69,8 +69,8 @@ The fist step of the `builder` target is to prepare a Rust environment via `+rus
 Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
 any other irrelevant stuff should omitted.
-And finally finalize the build with `+SETUP` Function target.
-The `+SETUP` Function target requires `rust-toolchain.toml` file,
+And finally finalize the build with `+SETUP` UDC target.
+The `+SETUP` UDC target requires `rust-toolchain.toml` file,
 with the specified `channel` option in it.
 This `rust-toolchain.toml` file could be specified
 via the `toolchain` argument of the `+SETUP` target like this
@@ -113,8 +113,8 @@ check:
 
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
 The `hosted-check` target which actually performs all checks and validation
-with the help of `+CHECK` Function target.
-The `+CHECK` Function target performs static checks of the Rust project as
+with the help of `+CHECK` UDC target.
+The `+CHECK` UDC target performs static checks of the Rust project as
 `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
 find unused dependencies and any supply chain issues with dependencies.
 Here is the list of steps (look at `./earthly/rust/scripts/std_checks.sh`):
@@ -181,8 +181,8 @@ Obviously it inherits `builder` target environment and than performs build of th
 Important to note that in this particular example we are dealing with the executable Rust project,
 so it produces binary as a final artifact.
 Another case of the building Rust library we will consider later.
-Actual build process is done with `+BUILD` Function target.
-The `+BUILD` Function have few arguments `libs` and `bins`,
+Actual build process is done with `+BUILD` UDC target.
+The `+BUILD` UDC have few arguments `libs` and `bins`,
 they should be specified to properly generate `cargo-modules` docs (see description below).
 The `libs` argument takes a list of library crate's names in your Rust project, e.g.
 `--libs="crate1 crate2"`.
@@ -209,11 +209,11 @@ Generated artifacts are `doc/workspace.dot`, `doc/full.dot`, `doc/all.dot` files
 Generated artifacts are `doc/$crate.$bin.bin.modules.tree`, `doc/$crate.$bin.bin.modules.dot`
 for the specified `--bins="crate1/bin1"` argument
 and `target/doc/$crate.lib.modules.tree`, `target/doc/$crate.lib.modules.dot`
-for the specified `--libs="crate1"` argument of the `+BUILD` Function.
+for the specified `--libs="crate1"` argument of the `+BUILD` UDC.
 
 Next steps is mandatory if you are going to produce a binary as an artifact,
 for Rust libraries the are not mandatory and could be omitted.
-The `+SMOKE_TEST` Function target checks that produced binary with the specified name (`--bin` argument)
+The `+SMOKE_TEST` UDC target checks that produced binary with the specified name (`--bin` argument)
 is executable, isn't a busted mess.
 
 Final step is to provide desired artifacts: docs and binary.

@@ -4,14 +4,14 @@ icon: simple/markdown
 
 # Markdown Check
 
-This Earthly Target and Function enables uniform linting of Markdown files to maintain consistency and quality.
+This Earthly Target and UDC enables uniform linting of Markdown files to maintain consistency and quality.
 
-This Function is **NOT** intended to be used inside container builds.
+This UDC is **NOT** intended to be used inside container builds.
 Its sole purpose is to enforce uniform style rules for all markdown files in a repository.
 It makes no assumptions about which files may or may not end up inside a container or are part of a build.
 This is *INTENTIONAL*.
 
-IF this Function is used inside a container build, it is **NOT** a bug if it does not do the correct thing.
+IF this UDC is used inside a container build, it is **NOT** a bug if it does not do the correct thing.
 
 ## Introduction
 
@@ -83,7 +83,7 @@ markdown-check-fix:
     DO github.com/input-output-hk/catalyst-ci/earthly/mdlint:<tag>+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 ```
 
-In this use case, the Function is run Locally, so that the markdown in the repo can be directly checked.
+In this use case, the UDC is run Locally, so that the markdown in the repo can be directly checked.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Note
@@ -105,4 +105,4 @@ For more example, please refer to this [doc](https://github.com/DavidAnson/markd
 mdlint-cli2 is integrated into VSCode and may be integrated into other Editors.
 
 The editor integration should pick up both the `.markdownlint.jsonc` and `.markdownlint-cli2.jsonc` configuration files.
-It will then behave exactly the same as the Earthly Function.
+It will then behave exactly the same as the Earthly UDC.

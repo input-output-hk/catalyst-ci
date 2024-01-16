@@ -142,4 +142,4 @@ For these files/paths, exclude them from the spell check by adding their filenam
 
 `cspell` is integrated into VSCode and may be integrated into other Editors.
 
-The editor integration should pick up the `cspell.json` configuration file and behave exactly the same as the Earthly Function.
+The editor integration should pick up the `cspell.json` configuration file and behave exactly the same as the Earthly UDC.
