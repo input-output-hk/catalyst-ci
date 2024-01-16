@@ -26,7 +26,6 @@
 		"/users": {
 			"get": {
 				"tags": ["user"],
-				"operationId": "getUsers",
 				"summary": "Get a list of users",
 				"description": "Retrieves a list of users from the system.",
 				"responses": {
