@@ -66,7 +66,7 @@ runs:
     with:
       version: ${{ inputs.earthly_version }}
   - name: Install CI CLI
-    uses: input-output-hk/catalyst-ci/actions/install@fdcDeprecation
+    uses: input-output-hk/catalyst-ci/actions/install@master
     if: ${{ inputs.cli_skip_install != 'true' }}
     with:
       version: ${{ inputs.cli_version }}
@@ -95,7 +95,7 @@ runs:
       username: ${{ github.actor }}
       password: ${{ inputs.github_token }}
   - name: Setup Remote Runner
-    uses: input-output-hk/catalyst-ci/actions/configure-runner@fdcDeprecation
+    uses: input-output-hk/catalyst-ci/actions/configure-runner@master
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}

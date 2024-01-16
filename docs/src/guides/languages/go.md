@@ -56,7 +56,7 @@ deps:
     # Any build dependencies should also be captured in this target.
     RUN apk add --no-cache gcc musl-dev
 
-    # This UDC automatically copies the go.mod and go.sum files and runs
+    # This Function automatically copies the go.mod and go.sum files and runs
     # `go mod download` to install the dependencies.
     DO ../../earthly/go+DEPS --ginkgo="false"
 ```
@@ -75,11 +75,11 @@ This target is also going to build responsible for installing external build dep
 These are dependencies that are not specific to a language and usually get installed system-wide.
 In our case, since we're building a static binary, we need `gcc` and `musl`.
 
-Finally, the actual logic we will be using is encapsulate in a UDC.
+Finally, the actual logic we will be using is encapsulate in a Function.
 This is a very common pattern, as an `Earthfile` can get repetitive across a repository.
-In our case, we use the `go+DEPS` UDC that will automatically copy our `go.mod` and `go.sum` files and then execute
+In our case, we use the `go+DEPS` Function that will automatically copy our `go.mod` and `go.sum` files and then execute
 `go mod download`.
-The UDC will also establish a cache for the Go tooling.
+The Function will also establish a cache for the Go tooling.
 This means that, even if our source code changes, we'll see a substantial speed boost when compiling because the cache is preserved
 across Earthly runs.
 
@@ -96,10 +96,10 @@ check:
     # This target checks the overall health of the source code.
     FROM +src
 
-    # This UDC validates the code is formatted according to Go standards.
+    # This Function validates the code is formatted according to Go standards.
     DO ../../earthly/go+FMT --src="go.mod go.sum cmd"
 
-    # This UDC runs golangci-lint to check for common errors.
+    # This Function runs golangci-lint to check for common errors.
     DO ../../earthly/go+LINT --src="go.mod go.sum cmd"
 ```
 
@@ -111,8 +111,8 @@ Any future targets which need access to the source code will inherit from this t
 
 Now that the source code is available, we can begin performing static checks.
 These checks are intended to verify the code is healthy and conforms to a certain standard.
-As we did in the previous section, here we rely on UDCs again to perform these checks.
-These two UDCs will validate the code formatting is correct and also perform a series of lints to validate code quality.
+As we did in the previous section, here we rely on Functions again to perform these checks.
+These two Functions will validate the code formatting is correct and also perform a series of lints to validate code quality.
 
 Note that these checks are fast (compared to later steps) and perform quick feedback on code quality.
 Since this is the first target run in CI, we want to fail the CI as quickly as possible if we can easily find code quality issues.

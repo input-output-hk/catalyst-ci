@@ -52,7 +52,7 @@ src:
 
 The first step of building process it preparing a source files.
 It is mandatory to have a `src` directory with all documentation md files in it and `mkdocs.yml` file.
-This directory and file will be picked during the execution of `+SRC` UDC target.
+This directory and file will be picked during the execution of `+SRC` Function target.
 Also it is possible to replace defined `includes`, `macros` and `overrides` dirs
 to customize some docs appearance and configuration.
 
@@ -78,7 +78,7 @@ docs:
     DO ../earthly/docs+BUILD
 ```
 
-To build a docs artifact which will be used later just invoke `+BUILD` UDC target
+To build a docs artifact which will be used later just invoke `+BUILD` Function target
 on the already prepared docs environment `+src` target which we have discussed before.
 
 ```Earthfile
@@ -93,7 +93,7 @@ local:
 ```
 
 To finally build a docker image which is pretty strait forward process,
-you should firstly invoke `+PACKAGE` UDC target which will prepare an environment for future docs image,
+you should firstly invoke `+PACKAGE` Function target which will prepare an environment for future docs image,
 next step is to copy builded artifact from the previous step to `/usr/share/nginx/html` folder.
 And the last step is to save a docker image with the specified name, tag and registry if it is needed.
 
