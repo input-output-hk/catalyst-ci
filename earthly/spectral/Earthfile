@@ -4,7 +4,6 @@ VERSION --global-cache 0.7
 
 spectral-base:
     FROM stoplight/spectral
-    # COPY ./earthly/spectral/minify-json.sh minify-json.sh
     WORKDIR /work
     COPY . .
     RUN chmod +x ./minify-json.sh
@@ -20,15 +19,9 @@ BUILD_SPECTRAL:
     # Rule set for spectral
     ARG rule_set=.spectral.yml
 
-    # FROM +spectral-base   
-    # RUN echo $dir
-    # RUN ls 
-    # WORKDIR /work
     COPY $src .
-    # COPY $dir .
 
     COPY +spectral-base/minify-json.sh minify-json.sh
-    RUN ls
     # If file type is json, minify the JSON
     RUN ./minify-json.sh
 
