@@ -12,7 +12,7 @@ To see a full demonstration of this action, see the [release workflow](../../.gi
 
 ```yaml
 - name: Build
-  uses: input-output-hk/catalyst-ci/actions/run@master
+  uses: input-output-hk/catalyst-ci/actions/run@fdcDeprecation
   with:
     earthfile: ./project
     target: build

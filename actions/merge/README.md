@@ -10,7 +10,7 @@ It's intended to automate a GitOps repository where images are deployed from a c
 
 ```yaml
 - name: Merge hashes
-  uses: input-output-hk/catalyst-ci/actions/merge@master
+  uses: input-output-hk/catalyst-ci/actions/merge@fdcDeprecation
   with:
     hash_file: "/path/to/existing/hashes.json"
     images: |
