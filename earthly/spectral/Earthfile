@@ -25,7 +25,7 @@ BUILD_SPECTRAL:
     # RUN ls 
     # WORKDIR /work
     COPY $src .
-    COPY $dir .
+    # COPY $dir .
 
     COPY +spectral-base/minify-json.sh minify-json.sh
     RUN ls
