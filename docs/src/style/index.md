@@ -14,9 +14,10 @@ Any `Earthfile` which does not adhere to this style guide will be rejected if no
 
 ### Earthly User Defined Commands (UDCs) deprecated starting from Earthly 0.8
 
-### Warning
-
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
 Please be advised that Earthly's File Descriptor Cache (FDC) is deprecated, effective upon updating to Earthly 0.8.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 ## Organization
 
