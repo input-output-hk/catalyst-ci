@@ -40,9 +40,18 @@ ensures accurate analysis for each file type in a folder, avoiding errors.
 ## Example
 
 The example of using the linter can be found in [link](/Earthfile).
-The target `check-lint-openapi` is used for linting OpenAPI JSON file.
+The target `check-lint-openapi` is currently used for linting OpenAPI JSON file.
 The current rules set that is being used are:
 
 * [OWASP TOP 10](https://apistylebook.stoplight.io/docs/owasp-top-10)
 * [Spectral Documentation](https://github.com/stoplightio/spectral-documentation)
 * [OpenAPI](https://docs.stoplight.io/docs/spectral/4dec24461f3af-open-api-rules#openapi-rules)
+
+The example of OpenAPI documentation can be found in [link](/examples/openapi/example.json).
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
+    Please note that this OpenAPI documentation provided
+    in this repository is used for example purposes only.
+<!-- markdownlint-enable max-one-sentence-per-line -->
+For more information about OpenAPI Specification, please visit the
+official [documentation](https://swagger.io/specification/#components-object).
