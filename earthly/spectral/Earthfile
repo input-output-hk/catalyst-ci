@@ -5,6 +5,7 @@ VERSION --global-cache 0.7
 spectral-base:
     FROM stoplight/spectral
     # COPY ./earthly/spectral/minify-json.sh minify-json.sh
+    WORKDIR /work
     COPY . .
     RUN chmod +x ./minify-json.sh
     SAVE ARTIFACT minify-json.sh
