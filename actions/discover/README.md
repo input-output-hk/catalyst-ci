@@ -18,10 +18,10 @@ discover:
       json: ${{ steps.discover.outputs.json }
   steps:
     - name: Install CLI
-      uses: input-output-hk/catalyst-ci/actions/install@fdcDeprecation
+      uses: input-output-hk/catalyst-ci/actions/install@master
     # We discover all Earthfiles that contain a target named "target"
     - name: Discover Earthly files
-      uses: input-output-hk/catalyst-ci/actions/discover@fdcDeprecation
+      uses: input-output-hk/catalyst-ci/actions/discover@master
       id: discover
       with:
         targets: target  # You can list more than one target here
