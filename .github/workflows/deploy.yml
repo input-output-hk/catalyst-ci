@@ -37,7 +37,7 @@ jobs:
             repository: ${{ inputs.deployment_repo }}
             token: ${{ secrets.token }}
         - name: Merge hashes
-          uses: input-output-hk/catalyst-ci/actions/merge@fdcDeprecation
+          uses: input-output-hk/catalyst-ci/actions/merge@fix/ci
           with:
             hash_file: "src/kube/environments/${{ inputs.environment }}/hashes.json"
             images: ${{ inputs.images }}
