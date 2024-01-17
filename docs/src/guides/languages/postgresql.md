@@ -62,7 +62,7 @@ builder:
 
 The first target we are going to consider will be responsible to prepare a PostgreSQL environment (Earthly `+postgres-base` target),
 migrations, migrations configuration and seed data (`COPY --dir ./migrations ./data ./refinery.toml .`),
-doing some final build step (Earthly `+BUILDER` UDC target).
+doing some final build step (Earthly `+BUILDER` Function).
 
 In the next steps we are going to inheriting from this `+builder` target which contains all necessary data,
 dependencies, environment to properly run PostgreSQL database.
@@ -92,8 +92,8 @@ These checks are intended to verify the code is healthy and well formatted to a 
 and done with the help of the `sqlfluff` tool which is already configured during the `+postgres-base` target.
 
 To apply and fix some formatting issues you can run `+format` target which will picks up directory
-where your Earthly file lies in as a source dir for formatting and run `+FORMAT` UDC target.
-Under the hood `+FORMAT` UDC target runs `sqlfluff-image` docker image,
+where your Earthly file lies in as a source dir for formatting and run `+FORMAT` Function.
+Under the hood `+FORMAT` Function runs `sqlfluff-image` docker image,
 which contains the same configuration and setup which is applied during the `+check`.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
@@ -118,7 +118,7 @@ With the `*.sql` files validation out of the way, we can finally build our Postg
 Since we need migration and seed data files,
 we'll inherit from the `builder` target.
 The actual image build process is pretty straight-forward
-and fully defined under the `+BUILD` UDC target.
+and fully defined under the `+BUILD` Function.
 The only thing it is needed to specify is a few arguments:
 
 * `tag` - the tag of the image, default value `latest`.
