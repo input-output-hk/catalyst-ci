@@ -17,4 +17,4 @@ CHECK:
 
     COPY $src .
     
-    RUN cspell-cli lint . --dot
+    RUN cspell-cli lint .
