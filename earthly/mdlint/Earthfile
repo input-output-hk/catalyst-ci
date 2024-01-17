@@ -14,7 +14,7 @@ MDLINT_LOCALLY:
     # in the `next` branch of `markdownlint`.
     # Container is built by:
     #   https://github.com/DavidAnson/markdownlint-cli2/blob/next/docker/Dockerfile-rules
-    COMMAND
+    FUNCTION
 
     # Directory we need to run lint checks against.
     ARG --required src
@@ -53,7 +53,7 @@ CHECK:
     # in the `next` branch of `markdownlint`.
     # Container is built by:
     #   https://github.com/DavidAnson/markdownlint-cli2/blob/next/docker/Dockerfile-rules
-    COMMAND
+    FUNCTION
 
     ARG src = .
 

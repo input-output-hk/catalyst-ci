@@ -59,7 +59,7 @@ postgres-base:
 #   seed - OPTIONAL - Location of Seed data directory - DEFAULT: ./seed
 #   refinery_toml - OPTIONAL - Location of refinery,toml which configures migrations. DEFAULT: ./refinery.toml
 BUILDER:
-    COMMAND
+    FUNCTION
 
     ARG migrations=./migrations
     ARG seed=./seed
@@ -88,7 +88,7 @@ BUILDER:
 #    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+BUILD --image_name=<name>
 #    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+DOCS
 DOCS:
-    COMMAND
+    FUNCTION
 
     ARG diagrams=./diagrams.json
     ARG migrations=./migrations
@@ -109,7 +109,7 @@ DOCS:
 
 # Linter checks for sql files
 CHECK:
-    COMMAND
+    FUNCTION
 
     RUN /scripts/std_checks.sh
 
@@ -118,7 +118,7 @@ CHECK:
 # Can not do it LOCALLY as the command will change ownership of the fixed files
 # if run within docker.
 FORMAT:
-    COMMAND
+    FUNCTION
 
     # Can not run format LOCALLY as it changes permissions of files to root:root
     RUN --no-cache printf "%s\n%s\n%s\n" \
@@ -143,7 +143,7 @@ integration-test:
 
 
 INTEGRATION_TEST_SETUP:
-    COMMAND
+    FUNCTION
 
     FROM +integration-test
 
@@ -156,7 +156,7 @@ INTEGRATION_TEST_SETUP:
 # Arguments:
 #  * image_name: The name of the image (required).
 BUILD:
-    COMMAND
+    FUNCTION
     ARG --required image_name
 
     USER postgres:postgres

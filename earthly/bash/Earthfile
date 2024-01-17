@@ -22,7 +22,7 @@ builder:
 
 # shellcheck - Check all shell files recursively in the src with shellcheck.
 SHELLCHECK:
-    COMMAND
+    FUNCTION
     ARG --required src
 
     FROM +builder

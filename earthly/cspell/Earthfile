@@ -4,7 +4,7 @@ VERSION --global-cache --use-function-keyword 0.7
 CHECK:
     # Spell checking all docs and code is done with cspell
     # See: cspell.org
-    COMMAND
+    FUNCTION
 
     # Where we want to run the `lint` from. Use `.` to check the whole repo.
     ARG src=.
