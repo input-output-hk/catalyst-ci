@@ -12,7 +12,7 @@ The CLI is required by a select few actions in order to perform certain operatio
 
 ```yaml
 - name: Install CLI
-  uses: input-output-hk/catalyst-ci/actions/install@UDCmigration
+  uses: input-output-hk/catalyst-ci/actions/install@@feat/udcmigration
   with:
     version: latest  # Or select a specific version
 - name: Run CLI
