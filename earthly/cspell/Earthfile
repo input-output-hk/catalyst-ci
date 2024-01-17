@@ -1,5 +1,5 @@
 # cspell UDCs and Containers.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION --global-cache --use-function-keyword 0.7 
 
 CHECK:
     # Spell checking all docs and code is done with cspell
@@ -17,4 +17,4 @@ CHECK:
 
     COPY $src .
     
-    DO cspell-cli lint . --dot
+    RUN cspell-cli lint . --dot
