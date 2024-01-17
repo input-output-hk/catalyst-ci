@@ -69,8 +69,8 @@ The fist step of the `builder` target is to prepare a Rust environment via `+rus
 Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
 any other irrelevant stuff should omitted.
-And finally finalize the build with `+SETUP` Function target.
-The `+SETUP` Function target requires `rust-toolchain.toml` file,
+And finally finalize the build with `+SETUP` Function.
+The `+SETUP` Function requires `rust-toolchain.toml` file,
 with the specified `channel` option in it.
 This `rust-toolchain.toml` file could be specified
 via the `toolchain` argument of the `+SETUP` target like this
@@ -113,8 +113,8 @@ check:
 
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
 The `hosted-check` target which actually performs all checks and validation
-with the help of `+CHECK` Function target.
-The `+CHECK` Function target performs static checks of the Rust project as
+with the help of `+CHECK` Function.
+The `+CHECK` Function performs static checks of the Rust project as
 `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
 find unused dependencies and any supply chain issues with dependencies.
 Here is the list of steps (look at `./earthly/rust/scripts/std_checks.sh`):
@@ -181,7 +181,7 @@ Obviously it inherits `builder` target environment and than performs build of th
 Important to note that in this particular example we are dealing with the executable Rust project,
 so it produces binary as a final artifact.
 Another case of the building Rust library we will consider later.
-Actual build process is done with `+BUILD` Function target.
+Actual build process is done with `+BUILD` Function.
 The `+BUILD` Function have few arguments `libs` and `bins`,
 they should be specified to properly generate `cargo-modules` docs (see description below).
 The `libs` argument takes a list of library crate's names in your Rust project, e.g.
@@ -213,7 +213,7 @@ for the specified `--libs="crate1"` argument of the `+BUILD` Function.
 
 Next steps is mandatory if you are going to produce a binary as an artifact,
 for Rust libraries the are not mandatory and could be omitted.
-The `+SMOKE_TEST` Function target checks that produced binary with the specified name (`--bin` argument)
+The `+SMOKE_TEST` Function checks that produced binary with the specified name (`--bin` argument)
 is executable, isn't a busted mess.
 
 Final step is to provide desired artifacts: docs and binary.
