@@ -66,13 +66,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@fix/ci
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           cli_version: ${{ inputs.ci_cli_version }}
           configure_registries: "false"
           earthly_skip_install: "true"
       - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@fix/ci
+        uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
         with:
           targets: ${{ inputs.target }}
@@ -107,7 +107,7 @@ jobs:
           echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@fix/ci
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
@@ -117,7 +117,7 @@ jobs:
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Run
-        uses: input-output-hk/catalyst-ci/actions/run@fix/ci
+        uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
         with:
           privileged: ${{ inputs.privileged }}
