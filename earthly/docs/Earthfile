@@ -1,4 +1,4 @@
-VERSION --global-cache --use-function-keyword 0.7
+VERSION --global-cache  0.7
 
 # cspell: words libgcc freetype lcms openjpeg etag
 
@@ -64,7 +64,7 @@ common:
 
 # Common src setup
 SRC:
-    FUNCTION
+    COMMAND
 
     FROM +deps
 
@@ -81,7 +81,7 @@ SRC:
 # Build the docs - We always do this in a `docs` target.  
 # The only target that needs customizing is the `src` target.
 BUILD:
-    FUNCTION
+    COMMAND
 
     RUN /scripts/build.sh
 
@@ -95,7 +95,7 @@ BUILD:
 # We do however build a docs package which is used for locally serving the docs
 # which assists in documentation writing.
 PACKAGE:
-    FUNCTION
+    COMMAND
 
     # Use the official Nginx base image
     FROM nginx:alpine3.18-slim

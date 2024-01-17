@@ -1,4 +1,4 @@
-VERSION --global-cache --use-function-keyword 0.7
+VERSION --global-cache  0.7
 
 # cspell: words psql
 
@@ -7,7 +7,7 @@ VERSION --global-cache --use-function-keyword 0.7
 builder:
     DO ./../../earthly/postgresql+BUILDER
 
-    # MUST Manually copy the .sqlfluff config used in the repo because the FUNCTION
+    # MUST Manually copy the .sqlfluff config used in the repo because the COMMAND
     # above can not be passed a reference to a local target as an argument.
     COPY ./../../+repo-config/repo/.sqlfluff .
 
@@ -43,7 +43,7 @@ all-tests:
 
 # Internal Function to run an specific integration test script.
 INTEGRATION_TEST_RUN:
-    FUNCTION 
+    COMMAND 
 
     ARG seed_data
     ARG test_script

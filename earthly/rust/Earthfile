@@ -1,5 +1,5 @@
 # Common Rust UDCs and Builders.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION --global-cache  0.7
 
 # cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf depgraph lcov
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
@@ -96,7 +96,7 @@ rust-base-all-hosts:
 # Parameters:
 #  * toolchain : The `rust-toolchain` toml file.
 SETUP:
-    FUNCTION
+    COMMAND
     ARG toolchain=./rust-toolchain.toml
 
     # Copy our toolchain dependency.
@@ -116,7 +116,7 @@ SETUP:
 
 # Steps we do during the `check` CI phase for all Rust programs
 CHECK:
-    FUNCTION
+    COMMAND
 
     # This is set up so that ALL checks are run and it will fail if any fail.
     # This improves visibility into all issues that need to be corrected for `check`
@@ -128,7 +128,7 @@ CHECK:
 #  * libs : The list of lib crates `cargo-modules` docs to build.
 #  * bins : The list of binaries `cargo-modules` docs to build.
 BUILD:
-    FUNCTION
+    COMMAND
     ARG libs=""
     ARG bins=""
 
@@ -136,7 +136,7 @@ BUILD:
 
 # Run unit tests and generates test and coverage report artifacts
 UNIT_TEST:
-    FUNCTION
+    COMMAND
     # remove artifacts that may affect the coverage results
     RUN cargo llvm-cov clean --workspace
     # run unit tests and display test result and test coverage
@@ -146,7 +146,7 @@ UNIT_TEST:
 
 # Check if the build executable, isn't a busted mess.
 SMOKE_TEST:
-    FUNCTION
+    COMMAND
     ARG --required bin
 
     RUN ldd target/$TARGETARCH/release/$bin
