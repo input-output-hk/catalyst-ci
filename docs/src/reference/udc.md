@@ -35,4 +35,4 @@ Please feel encouraged to contribute Functions to the repository.
 If you're seeing the same logic being re-used across multiple Earthfiles in a  
 repository, this is a good candidate for refactoring into a Function.  
 Additionally, for SMEs who are aware of language best practices, encoding those  
-into a Function will help increase the overall health ofthe CI process.
+into a Function will help increase the overall health of the CI process.
