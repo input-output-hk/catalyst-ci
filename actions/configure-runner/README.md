@@ -14,7 +14,7 @@ Earthly to consume them correctly.
 
 ```yaml
 - name: Setup Remote Runner
-  uses: input-output-hk/catalyst-ci/actions/configure-runner@fdcDeprecation
+  uses: input-output-hk/catalyst-ci/actions/configure-runner@UDCmigration
   with:
     path: /path/to/store/certs  # Optional, defaults to /tmp/certs
     secret: ${{ secrets.EARTHLY_RUNNER_SECRET }} # The full name of the secret in AWS SM
