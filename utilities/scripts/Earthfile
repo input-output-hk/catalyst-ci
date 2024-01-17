@@ -19,12 +19,12 @@ python-scripts:
 
 # UDC to add our common bash scripts to a container image.
 ADD_BASH_SCRIPTS:
-    FUNCTION
+    COMMAND
 
     COPY --dir +bash-scripts/include /scripts/include
 
 # UDC to add our common bash scripts to a container image.
 ADD_PYTHON_SCRIPTS:
-    FUNCTION
+    COMMAND
 
     COPY --dir +python-scripts/python /scripts/python
