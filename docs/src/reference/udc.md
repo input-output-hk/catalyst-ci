@@ -2,11 +2,12 @@
 
 ## Overview
 
-The Catalyst CI repository provides a number of Earthly 
-[Functions] (https://docs.earthly.dev/docs/guides/functions).
+The Catalyst CI repository provides a number of Earthly  
+[Functions](https://docs.earthly.dev/docs/guides/functions).
 You can think of a Function as a reusable snippet of Earthly code that serves the same purpose as functions in a common programming
 language.
 Functions are helpful for several reasons:
+
 1. They keep Earthfiles DRY
 2. They can encapsulate complex logic into a simple contractual interface
 3. They enforce standardization and prevent solving the same problem in multiple different ways
@@ -30,8 +31,8 @@ The passing of an argument is optional, as some Functions do not require any inp
 
 ## Contributing
 
-Please feel encouraged to contribute Functions to the repository.
-If you're seeing the same logic being re-used across multiple Earthfiles in a 
-repository, this is a good candidate for refactoring into a Function.
+Please feel encouraged to contribute Functions to the repository.  
+If you're seeing the same logic being re-used across multiple Earthfiles in a  
+repository, this is a good candidate for refactoring into a Function.  
 Additionally, for SMEs who are aware of language best practices, encoding those 
 into a Function will help increase the overall health ofthe CI process.
