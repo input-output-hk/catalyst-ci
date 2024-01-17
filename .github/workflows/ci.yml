@@ -196,7 +196,7 @@ jobs:
       earthly_runner_address: ${{ secrets.earthly_runner_address }}
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
   deploy:
-    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@@feat/udcmigration
+    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@@feat/udc-migration
     if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch) && inputs.deployment_images != ''
     needs: [publish]
     with:

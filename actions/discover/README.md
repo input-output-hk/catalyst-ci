@@ -18,10 +18,10 @@ discover:
       json: ${{ steps.discover.outputs.json }
   steps:
     - name: Install CLI
-      uses: input-output-hk/catalyst-ci/actions/install@@feat/udcmigration
+      uses: input-output-hk/catalyst-ci/actions/install@@feat/udc-migration
     # We discover all Earthfiles that contain a target named "target"
     - name: Discover Earthly files
-      uses: input-output-hk/catalyst-ci/actions/discover@@feat/udcmigration
+      uses: input-output-hk/catalyst-ci/actions/discover@@feat/udc-migration
       id: discover
       with:
         targets: target  # You can list more than one target here

@@ -13,7 +13,7 @@ To see a full demonstration of this action, see the [publish workflow](../../.gi
 
 ```yaml
 - name: Push image
-  uses: input-output-hk/catalyst-ci/actions/push@@feat/udcmigration
+  uses: input-output-hk/catalyst-ci/actions/push@@feat/udc-migration
   with:
       image: my_image:latest
       registries: |
