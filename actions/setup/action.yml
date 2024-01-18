@@ -76,7 +76,7 @@ runs:
     with:
       artifact: "true"
       artifact_path: "/usr/local/bin"
-      earthfile: ../../cli
+      earthfile: ./cli
       targets: release
   - name: Configure AWS Credentials
     uses: aws-actions/configure-aws-credentials@v4
