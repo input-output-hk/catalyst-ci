@@ -57,6 +57,9 @@ inputs:
     description: Github token used to login to GHCR (defaults to runner token)
     required: false
     default: ${{ github.token }}
+  runner_address:
+    description: The address of the remote runner to use
+    required: false
 runs:
   using: composite
   steps:
@@ -77,6 +80,9 @@ runs:
       artifact: "true"
       artifact_path: "./usr/local/bin/ci"
       earthfile: ./cli
+      runner_address: ${{ inputs.runner_address }}
+      privileged: 'true'
+
       targets: release
   - name: Configure AWS Credentials
     uses: aws-actions/configure-aws-credentials@v4
