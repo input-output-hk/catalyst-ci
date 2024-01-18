@@ -62,14 +62,22 @@ runs:
   steps:
   - name: Install Earthly
     uses: earthly/actions-setup@v1
-    if: ${{ inputs.earthly_skip_install != 'true' }}
+    if: ${{ inputs.earthly_skip_install == 'false' }}
     with:
       version: ${{ inputs.earthly_version }}
-  - name: Install CI CLI
+  - name: Install CI CLI From Version
     uses: input-output-hk/catalyst-ci/actions/install@master
-    if: ${{ inputs.cli_skip_install != 'true' }}
+    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
     with:
       version: ${{ inputs.cli_version }}
+  - name: Build CI CLI
+    uses: input-output-hk/catalyst-ci/actions/run@master
+    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
+    with:
+      artifact: "true"
+      artifact_path: "/usr/local/bin"
+      earthfile: ../../cli
+      targets: release
   - name: Configure AWS Credentials
     uses: aws-actions/configure-aws-credentials@v4
     if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
