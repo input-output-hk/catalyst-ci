@@ -1,10 +1,9 @@
 import * as core from '@actions/core'
 import { spawn } from 'child_process'
 import * as path from 'path'
-import { getExecOutput } from '@actions/exec'
 
 export async function run(): Promise<void> {
-  const artifact = core.getBooleanInput('artifact')
+  const artifact = core.getInput('artifact')
   const artifactPath = core.getInput('artifact_path')
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
@@ -23,7 +22,6 @@ export async function run(): Promise<void> {
     args.push('-P')
   }
 
-  core.info(`>>>>> ${runnerAddress}`)
   if (runnerAddress) {
     args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`)
   }
@@ -35,9 +33,6 @@ export async function run(): Promise<void> {
   if (flags) {
     args.push(...flags.split(' '))
   }
-
-  const { stdout } = await getExecOutput('ls')
-  core.info(stdout)
 
   core.info(`Filtered targets >> ${targets}`)
 
@@ -52,9 +47,9 @@ export async function run(): Promise<void> {
     core.info(`Running target: ${t}`)
     const argsSpawn = [...args]
     // Artifact is set
-    if (artifact) {
+    if (artifact.trim() != '') {
       core.info(`Pushing target ${t} with artifact tag`)
-      argsSpawn.push('--artifact', `${t}`, `${artifactPath}`)
+      argsSpawn.push('--artifact', `${t}/${artifact}`, `${artifactPath}`)
     } else {
       argsSpawn.push(t)
     }
