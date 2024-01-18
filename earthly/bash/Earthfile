@@ -1,5 +1,5 @@
 # cspell UDCs and Containers.
-VERSION --global-cache 0.7
+VERSION --global-cache --use-function-keyword 0.7
 
 # Internal: builder creates a container we can use to execute shellcheck
 builder:
@@ -22,7 +22,7 @@ builder:
 
 # shellcheck - Check all shell files recursively in the src with shellcheck.
 SHELLCHECK:
-    COMMAND
+    FUNCTION
     ARG --required src
 
     FROM +builder
@@ -30,3 +30,4 @@ SHELLCHECK:
     COPY --dir $src /src
 
     RUN ./check-all.sh /src
+

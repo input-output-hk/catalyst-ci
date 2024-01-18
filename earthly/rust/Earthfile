@@ -1,5 +1,5 @@
 # Common Rust UDCs and Builders.
-VERSION --global-cache 0.7
+VERSION --global-cache --use-function-keyword 0.7
 
 # cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset depgraph lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
@@ -101,7 +101,7 @@ rust-base-all-hosts:
 # Parameters:
 #  * toolchain : The `rust-toolchain` toml file.
 SETUP:
-    COMMAND
+    FUNCTION
     ARG toolchain=./rust-toolchain.toml
 
     # Copy our toolchain dependency.

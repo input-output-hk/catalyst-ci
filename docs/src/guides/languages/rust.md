@@ -69,8 +69,8 @@ The fist step of the `builder` target is to prepare a Rust environment via `+rus
 Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
 any other irrelevant stuff should omitted.
-And finally finalize the build with `+SETUP` UDC target.
-The `+SETUP` UDC target requires `rust-toolchain.toml` file,
+And finally finalize the build with `+SETUP` Function.
+The `+SETUP` Function requires `rust-toolchain.toml` file,
 with the specified `channel` option in it.
 This `rust-toolchain.toml` file could be specified
 via the `toolchain` argument of the `+SETUP` target like this

@@ -1,7 +1,7 @@
-VERSION --global-cache 0.7
+VERSION --global-cache --use-function-keyword 0.7 
 
 DEPS:
-    COMMAND
+    FUNCTION
 
     ARG ginkgo="true"
 
@@ -24,7 +24,7 @@ DEPS:
     SAVE ARTIFACT go.sum AS LOCAL go.sum
 
 FMT:
-    COMMAND
+    FUNCTION
 
     # latest linux/amd64
     FROM cytopia/gofmt@sha256:ae76abdbc96780819ce175f7ba4bf1fec98e9f708eb680d0b949d1737a959983
@@ -39,7 +39,7 @@ FMT:
     RUN gofmt -l . | grep . && exit 1 || exit 0
 
 LINT:
-    COMMAND
+    FUNCTION
 
     # v1.54-alpine
     FROM golangci/golangci-lint@sha256:a8423cab177c2863b863ee6d9f00c58f101cadd6120e195b2bb59fdfa189c1ae
@@ -54,6 +54,8 @@ LINT:
     CACHE --sharing shared /cache
     ENV GOLANGCI_LINT_CACHE=/cache/golangci-lint
     ENV GOCACHE=/cache/go-build
+
+    RUN go get ./...
 
     RUN golangci-lint run \
         --timeout 5m \

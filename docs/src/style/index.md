@@ -12,6 +12,13 @@ In most circumstances, the standards provided by this style guide should *not* b
 If an exception must me made, the rationale should be included in the respective PR.
 Any `Earthfile` which does not adhere to this style guide will be rejected if no further justification is made.
 
+### Earthly User Defined Commands (Functions) deprecated starting from Earthly 0.8
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
+Please be advised that Earthly's File Descriptor Cache (FDC) is deprecated, effective upon updating to Earthly 0.8.
+<!-- markdownlint-enable max-one-sentence-per-line -->
+
 ## Organization
 
 ### Adhere to a consistent structure
@@ -156,13 +163,14 @@ This can be through inheriting from it or by directly copying artifacts.
 The main point is that a subproject should not have multiple builds scattered in various places.
 Each subproject has an authoritative `build` target that *all* targets use when fetching build artifacts.
 
-### Prefer User Defined Commands (UDCs)
+### Prefer FUNCTION
 
-The primary purpose of a UDC is to reduce boilerplate and promote reusing common workflows.
+The primary purpose of a Function is to reduce boilerplate and promote reusing common workflows.
 Many build patterns tend to be repetitive.
 For example, copying a package lockfile and installing dependencies is very common.
-
-In these cases, a UDC should be preferred.
-The `catalyst-ci` repository provides a number of UDCs in the `earthly` subdirectory.
+In these cases, a FUNCTION should be preferred.
+The catalyst-ci repository provides a number of FUNCTIONs in the earthly subdirectory.
 These should be used prior to writing a new one.
 If a common use case is not covered in this subdirectory, a PR should be opened to add it.
+The use of functions in Earthly contributes to a more modular and organized build system,
+enhancing code readability and maintainability.
