@@ -107,5 +107,4 @@ runs:
       artifact_name: 'ci'
       artifact_path: '/usr/local/bin/'
       earthfile: ./cli
-      # runner_address: ${{ inputs.runner_address }}
       targets: release
