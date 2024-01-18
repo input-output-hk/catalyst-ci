@@ -103,7 +103,8 @@ runs:
     uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
-      artifact: 'ci'
+      artifact: 'true'
+      artifact_name: 'ci'
       artifact_path: '/usr/local/bin/'
       earthfile: ./cli
       # runner_address: ${{ inputs.runner_address }}
