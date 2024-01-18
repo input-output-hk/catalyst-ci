@@ -23,6 +23,7 @@ export async function run(): Promise<void> {
     args.push('-P')
   }
 
+  core.info(`>>>>> ${runnerAddress}`)
   if (runnerAddress) {
     args.push('--buildkit-host', `tcp://${runnerAddress}:${runnerPort}`)
   }
