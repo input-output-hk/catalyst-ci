@@ -75,7 +75,7 @@ runs:
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
       artifact: "true"
-      artifact_path: "/usr/local/bin"
+      artifact_path: "./usr/local/bin/ci"
       earthfile: ./cli
       targets: release
   - name: Configure AWS Credentials
