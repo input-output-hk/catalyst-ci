@@ -1,7 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset readelf depgraph lcov
+# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset depgraph lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
@@ -34,10 +34,13 @@ rust-base:
 
     # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
-     RUN apk add --no-cache \
+    RUN apk add --no-cache \
             musl-dev \
             mold \
             clang \
+            py3-pip \
+            py3-rich \
+            py3-psycopg \
             ripgrep \
             bash \
             colordiff \
@@ -70,7 +73,8 @@ rust-base:
         cargo install cargo-deny    --version=0.14.3 && \
         cargo install cargo-modules --version=0.10.2 && \
         cargo install cargo-depgraph --version=1.5.0 && \
-        cargo install cargo-llvm-cov --version=0.5.39
+        cargo install cargo-llvm-cov --version=0.5.39 && \
+        cargo install --git https://github.com/bytecodealliance/wasmtime --tag v16.0.0 verify-component-adapter
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
 
@@ -78,6 +82,7 @@ rust-base:
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
     DO ../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
 
     # Standardized Rust configs.
     # Build will refuse to proceed if the projects rust configs do not match these.
@@ -113,45 +118,3 @@ SETUP:
         rustup show && \
         cargo --version && \
         cargo +nightly --version
-
-# Steps we do during the `check` CI phase for all Rust programs
-CHECK:
-    FUNCTION
-
-    # This is set up so that ALL checks are run and it will fail if any fail.
-    # This improves visibility into all issues that need to be corrected for `check`
-    # to pass without needing to iterate excessively.
-    RUN /scripts/std_checks.sh
-
-# Step we do during the `build` CI phase for all Rust programs
-# Parameters:
-#  * libs : The list of lib crates `cargo-modules` docs to build.
-#  * bins : The list of binaries `cargo-modules` docs to build.
-BUILD:
-    FUNCTION
-    ARG libs=""
-    ARG bins=""
-
-    RUN /scripts/std_build.sh "$libs" "$bins"
-
-# Run unit tests and generates test and coverage report artifacts
-UNIT_TEST:
-    FUNCTION
-    # remove artifacts that may affect the coverage results
-    RUN cargo llvm-cov clean --workspace
-    # run unit tests and display test result and test coverage
-    RUN cargo llvm-cov nextest --release --bins --lib --workspace --locked -P ci
-    # generate lcov report
-    RUN cargo llvm-cov report --release --output-path coverage-report.info
-
-# Check if the build executable, isn't a busted mess.
-SMOKE_TEST:
-    FUNCTION
-    ARG --required bin
-
-    RUN ldd target/$TARGETARCH/release/$bin
-    RUN readelf -p .comment target/$TARGETARCH/release/$bin
-    RUN strip -v target/$TARGETARCH/release/$bin
-
-    # ALL executables MUST have `--help` as an option.
-    RUN target/$TARGETARCH/release/$bin --help
