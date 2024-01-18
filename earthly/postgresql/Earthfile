@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
-VERSION --global-cache 0.7
+VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words colordiff nushell psycopg dbviz
+# cspell: words colordiff psycopg dbviz
 
 postgres-base:
     FROM postgres:16.0-alpine3.18
@@ -38,9 +38,6 @@ postgres-base:
     COPY ../../utilities/dbviz+build/dbviz /bin
     RUN dbviz --help
 
-    # Get nushell
-    COPY ../../utilities/nushell+nushell-build/nu /bin
-
     # Copy our set SQL files
     COPY --dir sql /sql
 
@@ -59,7 +56,7 @@ postgres-base:
 #   seed - OPTIONAL - Location of Seed data directory - DEFAULT: ./seed
 #   refinery_toml - OPTIONAL - Location of refinery,toml which configures migrations. DEFAULT: ./refinery.toml
 BUILDER:
-    COMMAND
+    FUNCTION
 
     ARG migrations=./migrations
     ARG seed=./seed
@@ -88,7 +85,7 @@ BUILDER:
 #    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+BUILD --image_name=<name>
 #    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+DOCS
 DOCS:
-    COMMAND
+    FUNCTION
 
     ARG diagrams=./diagrams.json
     ARG migrations=./migrations
@@ -109,7 +106,7 @@ DOCS:
 
 # Linter checks for sql files
 CHECK:
-    COMMAND
+    FUNCTION
 
     RUN /scripts/std_checks.sh
 
@@ -118,7 +115,7 @@ CHECK:
 # Can not do it LOCALLY as the command will change ownership of the fixed files
 # if run within docker.
 FORMAT:
-    COMMAND
+    FUNCTION
 
     # Can not run format LOCALLY as it changes permissions of files to root:root
     RUN --no-cache printf "%s\n%s\n%s\n" \
@@ -134,16 +131,13 @@ integration-test:
             bash \
             postgresql15-client # We use PostgreSQL 16, but v15 clients will work OK with it.
 
-    # Get nushell
-    COPY ../../utilities/nushell+nushell-build/nu /bin
-
     COPY +postgres-base/scripts /scripts
 
     WORKDIR /test
 
 
 INTEGRATION_TEST_SETUP:
-    COMMAND
+    FUNCTION
 
     FROM +integration-test
 
@@ -156,7 +150,7 @@ INTEGRATION_TEST_SETUP:
 # Arguments:
 #  * image_name: The name of the image (required).
 BUILD:
-    COMMAND
+    FUNCTION
     ARG --required image_name
 
     USER postgres:postgres

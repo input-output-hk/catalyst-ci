@@ -9,7 +9,7 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
-<!-- cspell: words USERARCH TARGETARCH toolsets fmtchk stdcfgs rustfmt nextest testunit testdocs depgraph -->
+<!-- cspell: words USERARCH TARGETARCH toolsets fmtchk stdcfgs rustfmt nextest testunit testdocs depgraph testcov -->
 
 ## Introduction
 
@@ -69,8 +69,8 @@ The fist step of the `builder` target is to prepare a Rust environment via `+rus
 Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
 any other irrelevant stuff should omitted.
-And finally finalize the build with `+SETUP` UDC target.
-The `+SETUP` UDC target requires `rust-toolchain.toml` file,
+And finally finalize the build with `+SETUP` Function.
+The `+SETUP` Function requires `rust-toolchain.toml` file,
 with the specified `channel` option in it.
 This `rust-toolchain.toml` file could be specified
 via the `toolchain` argument of the `+SETUP` target like this
@@ -80,47 +80,29 @@ By default `toolchain` setup to `rust-toolchain.toml`.
 ### Running checks
 
 ```Earthfile
-# Test rust build container - Use best architecture host tools.
-hosted-check:
-    FROM +builder
-
-    DO ./../../earthly/rust+CHECK
-
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-all-hosts-check:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +hosted-check
-
-## Standard CI targets.
-##
-## These targets are discovered and executed automatically by CI.
-
 # Run check using the most efficient host tooling
 # CI Automated Entry point.
 check:
-    FROM busybox
-    # This is necessary to pick the correct architecture build to suit the native machine.
-    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
-    # All target implementation of this should follow this pattern.
-    ARG USERARCH
+    FROM +builder
 
-    IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +hosted-check
-    ELSE
-        BUILD --platform=linux/amd64 +hosted-check
-    END
+    RUN /scripts/std_checks.py
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+all-hosts-check:
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +check
 ```
 
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
-The `hosted-check` target which actually performs all checks and validation
-with the help of `+CHECK` UDC target.
-The `+CHECK` UDC target performs static checks of the Rust project as
+The `check` target which actually performs all checks and validation
+with the help of `std_checks.py` script.
+This script performs static checks of the Rust project as
 `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
 find unused dependencies and any supply chain issues with dependencies.
-Here is the list of steps (look at `./earthly/rust/scripts/std_checks.sh`):
+Here is the list of steps (look at `./earthly/rust/scripts/std_checks.py`):
 
 1. `cargo fmtchk` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
-look at `./earthly/rust/stdcfgs/config.toml`)Checking Rust Code Format.
+look at `./earthly/rust/stdcfgs/cargo_config.toml`)Checking Rust Code Format.
 2. Checking configuration files for consistency.
 3. `cargo machete` - Checking for Unused Dependencies.
 4. `cargo deny check` - Checking for Supply Chain Issues.
@@ -131,8 +113,8 @@ to be the same as defined in `earthly/rust/stdcfgs` directory of the `catalyst-c
 So when you are going to setup a new Rust project copy these configuration files
 described above to the appropriate location of your Rust project.
 
-Another targets as `all-hosts-check` and `check` (running on CI) just invoke `hosted-check`
-with the specified `--platform`.
+Another target as `all-hosts-check` just invokes `check` with the specified `--platform`.
+It is needed for the local development to double check that everything is works for different platforms.
 It is important to define a `linux` target platform with a proper cpu architecture
 for the Rust project when you are building it inside Docker
 and check the build process with different scenarios.
@@ -141,56 +123,84 @@ The same approach we will see for the another targets of this guide.
 ### Build
 
 ```Earthfile
-# Build the service.
-hosted-build:
-    FROM +builder
-
-    DO ./../../earthly/rust+BUILD --libs="bar" --bins="foo/foo"
-
-    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
-
-    SAVE ARTIFACT target/$TARGETARCH/doc doc
-    SAVE ARTIFACT target/$TARGETARCH/release/foo foo
-
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
-# Only used to validate tooling is working across host toolsets.
-all-hosts-build:    
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +build-hosted
-
 # Run build using the most efficient host tooling
 # CI Automated Entry point.
 build:
-    FROM busybox
-    # This is necessary to pick the correct architecture build to suit the native machine.
-    # It primarily ensures that Darwin/Arm builds work as expected without needing x86 emulation.
-    # All target implementation of this should follow this pattern.
-    ARG USERARCH
+    FROM +builder
 
-    IF [ "$USERARCH" == "arm64" ]
-        BUILD --platform=linux/arm64 +hosted-build
-    ELSE
-        BUILD --platform=linux/amd64 +hosted-build
+    TRY
+        RUN /scripts/std_build.py   --build_flags="" \
+                                    --with_test \
+                                    --with_bench \
+                                    --cov_report="coverage-report.info" \
+                                    --libs="bar" \
+                                    --bins="foo/foo"
+    FINALLY
+        SAVE ARTIFACT target/nextest/ci/junit.xml example.junit-report.xml AS LOCAL
+        SAVE ARTIFACT coverage-report.info example.coverage-report.info AS LOCAL
     END
+
+    SAVE ARTIFACT target/doc doc
+    SAVE ARTIFACT target/release/foo foo
+
+    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
+
+# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# Only used to validate tooling is working across host toolsets.
+all-hosts-build:
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 ```
 
-After successful performing checks of the Rust project we can finally build artifacts.
-As it was discussed in the previous section, actual job is done with `hosted-build` target,
-other targets needs to configure different platform running options.
-So we will focus on `hosted-build` target.
+After successful performing checks of the Rust project we can finally `build` artifacts.
 Obviously it inherits `builder` target environment and than performs build of the binary.
 Important to note that in this particular example we are dealing with the executable Rust project,
 so it produces binary as a final artifact.
 Another case of the building Rust library we will consider later.
-Actual build process is done with `+BUILD` UDC target.
-The `+BUILD` UDC have few arguments `libs` and `bins`,
-they should be specified to properly generate `cargo-modules` docs (see description below).
-The `libs` argument takes a list of library crate's names in your Rust project, e.g.
+Actual build process is done with the `std_build.py` script.
+Here is the full list of configuration of this script:
+
+```bash
+ usage: std_build.py [-h] [--build_flags BUILD_FLAGS]
+                     [--doctest_flags DOCTEST_FLAGS] [--test_flags TEST_FLAGS]
+                     [--bench_flags BENCH_FLAGS] [--with_test]
+                     [--cov_report COV_REPORT] [--with_bench] [--libs LIBS]
+                     [--bins BINS]
+
+ Rust build processing.
+
+ options:
+   -h, --help            show this help message and exit
+   --build_flags BUILD_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo build` command.
+   --doctest_flags DOCTEST_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo testdocs` command.
+   --test_flags TEST_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo testunit` command.
+   --bench_flags BENCH_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo bench` command.
+   --with_test           Flag to indicate whether to run tests (including unit
+                         tests and doc tests).
+   --cov_report COV_REPORT
+                         The output coverage report file path. If omitted,
+                         coverage will not be run.
+   --with_bench          Flag to indicate whether to run benchmarks.
+   --libs LIBS           The list of lib crates `cargo-modules` docs to build
+                         separated by comma.
+   --bins BINS           The list of binaries `cargo-modules` docs to build and
+                         made a smoke tests on them.   .
+```
+
+Note that the `libs` argument takes a list of library crate's names in your Rust project, e.g.
 `--libs="crate1 crate2"`.
 The `bins` argument takes a list of binary crate's names and binary names in your Rust project, e.g.
 `--bins="crate1/bin1 crate1/bin2 crate2/bin1"`, note that each binary name correspond to each crate
 and separated in this list with `/` symbol.
 Under this build process we perform different steps of compiling and validating of our Rust project,
-here is the list of steps (look at `./earthly/rust/scripts/std_build.sh`):
+here is the list of steps (look at `./earthly/rust/scripts/std_build.py` and `./earthly/rust/scripts/std_docs.py`):
 
 1. `cargo build` - Building all code in the workspace.
 2. `cargo lint` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
@@ -202,19 +212,17 @@ look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation can be gener
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Self contained Unit tests all pass.
 5. `cargo testdocs` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
 look at `./earthly/rust/stdcfgs/config.toml`)Checking Documentation tests all pass.
-6. `cargo bench` - Checking Benchmarks all run to completion.
-7. `cargo depgraph` - Generating dependency graph based on the Rust code.
+6. `cargo testcov` ([cargo alias](https://doc.rust-lang.org/cargo/reference/config.html#alias),
+look at `./earthly/rust/stdcfgs/config.toml`)Checking Self contained Unit tests all pass and collect coverage.
+7. `cargo bench` - Checking Benchmarks all run to completion.
+8. `cargo depgraph` - Generating dependency graph based on the Rust code.
 Generated artifacts are `doc/workspace.dot`, `doc/full.dot`, `doc/all.dot` files.
-8. `cargo modules` - Generating modules trees and graphs based on the Rust code.
+9. `cargo modules` - Generating modules trees and graphs based on the Rust code.
 Generated artifacts are `doc/$crate.$bin.bin.modules.tree`, `doc/$crate.$bin.bin.modules.dot`
 for the specified `--bins="crate1/bin1"` argument
 and `target/doc/$crate.lib.modules.tree`, `target/doc/$crate.lib.modules.dot`
-for the specified `--libs="crate1"` argument of the `+BUILD` UDC.
-
-Next steps is mandatory if you are going to produce a binary as an artifact,
-for Rust libraries the are not mandatory and could be omitted.
-The `+SMOKE_TEST` UDC target checks that produced binary with the specified name (`--bin` argument)
-is executable, isn't a busted mess.
+for the specified `--libs="crate1"` argument.
+10. Running smoke tests on provided binary names (`--bins` argument).
 
 Final step is to provide desired artifacts: docs and binary.
 
@@ -230,6 +238,14 @@ To prepare a release artifact and publish it to some external container registri
 please follow this [guide](./../../onboarding/index.md).
 It is pretty strait forward for this builder process,
 because as a part of `+build` target we already creating a docker image.
+
+## Rust `nightly` channel
+
+Be aware that we are running some tools in the `nightly` channel, such as `cargo fmt` and `cargo docs`.
+It is highly likely that the `nightly` toolchain version on the CI machines differs from what you have locally.
+Unfortunately, Rust tooling does not have the capability to preserve and maintain consistency between
+`stable` and `nightly` toolchains simultaneously.
+In our builds, we only preserve the `stable` toolchain version (`rust-toolchain.toml` file).
 
 ## Conclusion
 

@@ -1,4 +1,4 @@
-VERSION --global-cache 0.7 
+VERSION --global-cache --use-function-keyword 0.7
 
 # cspell: words ruleset
 
@@ -10,7 +10,7 @@ spectral-base:
     SAVE ARTIFACT minify-json.sh
 
 BUILD_SPECTRAL:
-    COMMAND
+    FUNCTION
 
     # Specify what file type to lint 
     ARG file_type = "json"

@@ -1,5 +1,5 @@
 # Earthfile containing common scripts for easy reference
-VERSION --global-cache 0.7
+VERSION --global-cache --use-function-keyword 0.7
 
 # Internal: bash-scripts : Common bash scripts.
 bash-scripts:
@@ -19,12 +19,12 @@ python-scripts:
 
 # UDC to add our common bash scripts to a container image.
 ADD_BASH_SCRIPTS:
-    COMMAND
+    FUNCTION
 
     COPY --dir +bash-scripts/include /scripts/include
 
 # UDC to add our common bash scripts to a container image.
 ADD_PYTHON_SCRIPTS:
-    COMMAND
+    FUNCTION
 
-    COPY --dir +python-scripts/python /scripts/python    
+    COPY --dir +python-scripts/python /scripts/python
