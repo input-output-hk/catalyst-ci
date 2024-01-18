@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import { spawn } from 'child_process'
 import * as path from 'path'
+import { getExecOutput } from '@actions/exec'
 
 export async function run(): Promise<void> {
   const artifact = core.getBooleanInput('artifact')
@@ -33,6 +34,9 @@ export async function run(): Promise<void> {
   if (flags) {
     args.push(...flags.split(' '))
   }
+
+  const { stdout } = await getExecOutput('ls')
+  core.info(stdout)
 
   core.info(`Filtered targets >> ${targets}`)
 
