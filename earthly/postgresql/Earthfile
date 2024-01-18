@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words colordiff nushell psycopg dbviz
+# cspell: words colordiff psycopg dbviz
 
 postgres-base:
     FROM postgres:16.0-alpine3.18
@@ -37,9 +37,6 @@ postgres-base:
     # Get dbviz
     COPY ../../utilities/dbviz+build/dbviz /bin
     RUN dbviz --help
-
-    # Get nushell
-    COPY ../../utilities/nushell+nushell-build/nu /bin
 
     # Copy our set SQL files
     COPY --dir sql /sql
@@ -133,9 +130,6 @@ integration-test:
     RUN apk add --no-cache \
             bash \
             postgresql15-client # We use PostgreSQL 16, but v15 clients will work OK with it.
-
-    # Get nushell
-    COPY ../../utilities/nushell+nushell-build/nu /bin
 
     COPY +postgres-base/scripts /scripts
 
