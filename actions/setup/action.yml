@@ -104,12 +104,12 @@ runs:
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}
-  - name: Build CI CLI
-    uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
-    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    with:
-      artifact: "true"
-      artifact_path: "/usr/local/bin/"
-      earthfile: ./cli
-      runner_address: ${{ inputs.runner_address }}
-      targets: release
+  # - name: Build CI CLI
+  #   uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
+  #   if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
+  #   with:
+  #     artifact: "true"
+  #     artifact_path: "/usr/local/bin/"
+  #     earthfile: ./cli
+  #     runner_address: ${{ inputs.runner_address }}
+  #     targets: release
