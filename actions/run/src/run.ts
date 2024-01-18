@@ -50,7 +50,8 @@ export async function run(): Promise<void> {
     // Artifact is set
     if (artifact) {
       core.info(`Pushing target ${t} with artifact tag`)
-      const targetWithArtifact = artifactName.trim() == '' ? `${t}` : `${t}/${artifactName}`
+      const targetWithArtifact =
+        artifactName.trim() == '' ? `${t}` : `${t}/${artifactName}`
       argsSpawn.push('--artifact', `${targetWithArtifact}`, `${artifactPath}`)
     } else {
       argsSpawn.push(t)
