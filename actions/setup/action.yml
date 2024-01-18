@@ -74,15 +74,7 @@ runs:
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
     with:
       version: ${{ inputs.cli_version }}
-  - name: Build CI CLI
-    uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
-    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    with:
-      artifact: "true"
-      artifact_path: "/usr/local/bin/"
-      earthfile: ./cli
-      runner_address: ${{ inputs.runner_address }}
-      targets: release
+
   - name: Configure AWS Credentials
     uses: aws-actions/configure-aws-credentials@v4
     if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
@@ -112,3 +104,12 @@ runs:
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}
+  - name: Build CI CLI
+    uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
+    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
+    with:
+      artifact: "true"
+      artifact_path: "/usr/local/bin/"
+      earthfile: ./cli
+      runner_address: ${{ inputs.runner_address }}
+      targets: release
