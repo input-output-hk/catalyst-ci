@@ -1,5 +1,7 @@
 package pkg
 
+// cspell: words cuelang
+
 import (
 	"encoding/json"
 	"fmt"

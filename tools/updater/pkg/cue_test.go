@@ -1,5 +1,7 @@
 package pkg_test
 
+// cspell: words cuelang cuecontext
+
 import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"

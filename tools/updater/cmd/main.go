@@ -1,6 +1,6 @@
 package main
 
-// cspell: words alecthomas afero sess tfstate
+// cspell: words cuelang cuecontext existingfile Timoni nolint
 
 import (
 	"os"

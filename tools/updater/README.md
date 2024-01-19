@@ -16,7 +16,7 @@ Assuming you have a `bundle.cue` file like this:
 ```cue
 bundle: {
     apiVersion: "v1alpha1"
-    name:       "mybundle"
+    name:       "bundle"
     instances: {
         instance: {
             module: {
