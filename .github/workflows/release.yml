@@ -75,7 +75,6 @@ jobs:
         uses: input-output-hk/catalyst-ci/actions/setup@fix/ci-cli-build
         with:
           configure_registries: "false"
-          earthly_skip_install: "true"
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
           cli_version: ${{ inputs.ci_cli_version }}
