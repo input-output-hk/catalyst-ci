@@ -1,6 +1,6 @@
 package main
 
-// cspell: words cuelang cuecontext existingfile Timoni nolint
+// cspell: words alecthomas cuelang cuecontext cuectx existingfile Timoni nolint
 
 import (
 	"os"
