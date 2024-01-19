@@ -2877,7 +2877,7 @@ var external_path_ = __nccwpck_require__(17);
 
 
 async function run() {
-    const artifact = core.getBooleanInput('artifact');
+    const artifactSaveLocal = core.getBooleanInput('artifact_save_local');
     const artifactName = core.getInput('artifact_name');
     const artifactPath = core.getInput('artifact_path');
     const earthfile = core.getInput('earthfile');
@@ -2913,11 +2913,12 @@ async function run() {
     for (const t of targetsArgs) {
         core.info(`Running target: ${t}`);
         const argsSpawn = [...args];
-        // Artifact is set
-        if (artifact) {
+        if (artifactSaveLocal) {
+            argsSpawn.push('--artifact', `${t}`, `${artifactPath}`);
+        }
+        else if (artifactName.trim() !== '') {
             core.info(`Pushing target ${t} with artifact tag`);
-            const targetWithArtifact = artifactName.trim() === '' ? `${t}` : `${t}/${artifactName}`;
-            argsSpawn.push('--artifact', `${targetWithArtifact}`, `${artifactPath}`);
+            argsSpawn.push('--artifact', `${t}/${artifactName}`, `${artifactPath}`);
         }
         else {
             argsSpawn.push(t);

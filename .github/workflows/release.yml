@@ -132,7 +132,7 @@ jobs:
           targets: ${{ steps.get_target.outputs.targets }}
           platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.earthly_runner_address }}
-          artifact: "true"
+          artifact_save_local: "true"
       - name: Generate artifact name
         if: startsWith(github.ref, 'refs/tags/') || inputs.force_artifact
         id: artifact

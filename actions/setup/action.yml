@@ -65,6 +65,7 @@ runs:
     if: ${{ inputs.earthly_skip_install == 'false' }}
     with:
       version: ${{ inputs.earthly_version }}
+  # CI CLI is set to a version, install that version
   - name: Install CI CLI From Version
     uses: input-output-hk/catalyst-ci/actions/install@fix/ci-cli-build
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
@@ -99,11 +100,11 @@ runs:
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}
+  # CI CLI is set to 'local', run release to create ci artifact
   - name: Build CI CLI
     uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
-      artifact: 'true'
       artifact_name: 'ci'
       artifact_path: '/usr/local/bin/'
       earthfile: ./cli
