@@ -141,6 +141,7 @@ jobs:
           dockerhub_username: ${{ secrets.dockerhub_username }}
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+          runner_address: ${{ secrets.earthly_runner_address }}
       - name: Build image
         uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
         id: build
