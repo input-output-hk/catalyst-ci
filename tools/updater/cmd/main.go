@@ -38,7 +38,7 @@ func main() {
 	src, err := format.Node(node)
 	ctx.FatalIfErrorf(err)
 
-	if err := os.WriteFile(cli.BundleFile, src, 0644); err != nil {
+	if err := os.WriteFile(cli.BundleFile, src, 0644); err != nil { //nolint:gosec
 		ctx.Fatalf("failed to write file %q: %v", cli.BundleFile, err)
 	}
 

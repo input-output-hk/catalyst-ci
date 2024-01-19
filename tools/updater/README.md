@@ -15,20 +15,20 @@ Assuming you have a `bundle.cue` file like this:
 
 ```cue
 bundle: {
-	apiVersion: "v1alpha1"
-	name:       "mybundle"
-	instances: {
-		instance: {
-			module: {
-				url:     "oci://332405224602.dkr.ecr.eu-central-1.amazonaws.com/instance-deployment"
-				version: "0.0.1"
-			}
-			namespace: "default"
-			values: {
-				server: image: tag: "ed2951cf049e779bba8d97413653bb06d4c28144"
-			}
-		}
-	}
+    apiVersion: "v1alpha1"
+    name:       "mybundle"
+    instances: {
+        instance: {
+            module: {
+                url:     "oci://332405224602.dkr.ecr.eu-central-1.amazonaws.com/instance-deployment"
+                version: "0.0.1"
+            }
+            namespace: "default"
+            values: {
+                server: image: tag: "ed2951cf049e779bba8d97413653bb06d4c28144"
+            }
+        }
+    }
 }
 ```
 
