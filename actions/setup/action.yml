@@ -57,7 +57,7 @@ inputs:
     description: Github token used to login to GHCR (defaults to runner token)
     required: false
     default: ${{ github.token }}
-  earthly_runner_address:
+  runner_address:
     description: |
       The address of the Earthly runner that will be used to build the
       Earthly files.
