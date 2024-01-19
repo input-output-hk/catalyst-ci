@@ -21,6 +21,7 @@ def toml_diff_strict_check(vendor_file_path: str, provided_file_path: str):
     with open(vendor_file_path, "rb") as vendor_file, open(
         provided_file_path, "rb"
     ) as provided_file:
+
         def procedure() -> exec_manager.ProcedureResult:
             vendor_obj = tomllib.load(vendor_file)
             provided_obj = tomllib.load(provided_file)
@@ -33,19 +34,21 @@ def toml_diff_strict_check(vendor_file_path: str, provided_file_path: str):
 
             return exec_manager.ProcedureResult(
                 rc,
-                f"Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
+                f"Strict Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
                 out,
             )
 
         return exec_manager.procedure_run(
             procedure,
-            f"Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
+            f"Strict Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
         )
+
 
 def toml_diff_non_strict_check(vendor_file_path: str, provided_file_path: str):
     with open(vendor_file_path, "rb") as vendor_file, open(
         provided_file_path, "rb"
     ) as provided_file:
+
         def procedure() -> exec_manager.ProcedureResult:
             vendor_obj = tomllib.load(vendor_file)
             provided_obj = tomllib.load(provided_file)
@@ -56,15 +59,14 @@ def toml_diff_non_strict_check(vendor_file_path: str, provided_file_path: str):
 
             return exec_manager.ProcedureResult(
                 rc,
-                f"Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
+                f"non Strict Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
                 out,
             )
 
         return exec_manager.procedure_run(
             procedure,
-            f"Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
+            f"non Strict Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
         )
-
 
 
 def __compare_dicts__(expected, provided):
