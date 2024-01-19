@@ -1,7 +1,6 @@
 import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
-import { exec } from '@actions/exec'
 
 const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
@@ -18,27 +17,6 @@ export async function run(
   try {
     const token = core.getInput('token')
     const version = core.getInput('version')
-    const local = core.getInput('local')
-
-    // Local flag is tagged as true
-    if (local === 'true') {
-      core.info('Building ci locally')
-      // go into cli folder
-      // build the ci and move to /usr/local/bin/ci
-      await exec(
-        'go',
-        [
-          'build',
-          '-ldflags=-extldflags=-static',
-          '-o',
-          '/usr/local/bin/ci',
-          'cmd/main.go'
-        ],
-        { cwd: 'cli/' }
-      )
-
-      return
-    }
 
     if (version !== 'latest' && !isSemVer(version)) {
       core.setFailed('Invalid version')
