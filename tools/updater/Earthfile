@@ -1,0 +1,55 @@
+VERSION 0.7
+FROM golang:1.20-alpine3.18
+
+# cspell: words onsi ldflags extldflags
+
+fmt:
+    DO ../../earthly/go+FMT --src="go.mod go.sum cmd pkg"
+
+lint:
+    DO ../../earthly/go+LINT --src="go.mod go.sum cmd pkg"
+
+deps:
+    WORKDIR /work
+
+    RUN apk add --no-cache gcc musl-dev
+    DO ../../earthly/go+DEPS
+
+src:
+    FROM +deps
+
+    COPY --dir cmd pkg .
+
+check:
+    FROM +src
+
+    BUILD +fmt
+    BUILD +lint
+
+build:
+    FROM +src
+
+    ENV CGO_ENABLED=0
+    RUN go build -ldflags="-extldflags=-static" -o bin/updater cmd/main.go
+
+    SAVE ARTIFACT bin/updater updater
+
+test:
+    FROM +build
+
+    RUN ginkgo ./...
+
+release:
+    FROM +build
+
+    SAVE ARTIFACT bin/updater updater
+
+publish:
+    FROM debian:bookworm-slim
+    WORKDIR /workspace
+    ARG tag=latest
+
+    COPY +build/updater /usr/local/bin/updater
+
+    ENTRYPOINT ["/usr/local/bin/updater"]
+    SAVE IMAGE --push ci-updater:${tag}
