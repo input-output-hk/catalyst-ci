@@ -57,6 +57,11 @@ inputs:
     description: Github token used to login to GHCR (defaults to runner token)
     required: false
     default: ${{ github.token }}
+  earthly_runner_address:
+    description: |
+      The address of the Earthly runner that will be used to build the
+      Earthly files.
+    required: false
 runs:
   using: composite
   steps:
@@ -101,6 +106,7 @@ runs:
     with:
       secret: ${{ inputs.earthly_runner_secret }}
   # CI CLI is set to 'local', run release to create ci artifact
+  # use buildkit-host tag
   - name: Build CI CLI
     uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
@@ -109,3 +115,4 @@ runs:
       artifact_path: '/usr/local/bin/'
       earthfile: ./cli
       targets: release
+      runner_address: ${{ inputs.earthly_runner_address }}
