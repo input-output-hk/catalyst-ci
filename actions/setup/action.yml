@@ -115,4 +115,4 @@ runs:
       artifact_path: '/usr/local/bin/'
       earthfile: ./cli
       targets: release
-      runner_address: ${{ inputs.earthly_runner_address }}
+      runner_address: ${{ inputs.runner_address }}
