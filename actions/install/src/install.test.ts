@@ -18,7 +18,6 @@ jest.mock('@actions/github', () => ({
   getOctokit: jest.fn()
 }))
 
-
 describe('Setup Action', () => {
   const token = 'token'
   const version = '1.0.0'
