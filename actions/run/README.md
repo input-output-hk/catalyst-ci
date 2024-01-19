@@ -4,7 +4,7 @@
 
 This Github Action will run a given target from a given Earthfile.
 It takes a number of inputs which can augment the way in which the Earthly CLI is being called.
-Notably, the action will automatically parse any produced artifacts or images from the target and return them as an action output.
+Notably, the action can be set to parse any produced artifacts or images from the target and return them as an action output.
 
 To see a full demonstration of this action, see the [release workflow](../../.github/workflows/release.yml).
 
@@ -14,7 +14,7 @@ To see a full demonstration of this action, see the [release workflow](../../.gi
 - name: Build
   uses: input-output-hk/catalyst-ci/actions/run@master
   with:
-    earthfile: ./project
+    earthfile: ./**project**
     target: build
     runner_address: tcp://runner:8372
 ```
@@ -23,7 +23,8 @@ To see a full demonstration of this action, see the [release workflow](../../.gi
 
 | Name           | Description                                                            | Required | Default   |
 | -------------- | ---------------------------------------------------------------------- | -------- | --------- |
-| artifact       | If true, forces artifacts to be saved locally                          | No       | `"false"` |
+| artifact_save_local       | If true, forces artifacts to be saved locally                          | No       | `"false"` |
+| artifact_name  | Name of the artifact        | No       | `""`     |
 | artifact_path  | The path (relative to earthfile) where artifacts will be placed        | No       | `out`     |
 | earthfile      | The path to the Earthfile containing the target to ru                  | True     | N/A       |
 | flags          | Additional flags to pass to the Earthly CLI                            | No       | `""`      |
