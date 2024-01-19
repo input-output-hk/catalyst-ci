@@ -1,0 +1,321 @@
+{
+	"openapi": "3.0.2",
+	"info": {
+		"title": "Example API",
+		"description": "This OpenAPI specification defines an example API with various endpoints for managing user data. It provides detailed information about the API, including contact information and version details.",
+		"version": "1.0",
+		"contact": {
+			"name": "Catalyst-ci",
+			"url": "https://www.example.com/support",
+			"email": "support@example.com"
+		}
+	},
+	"servers": [
+		{
+			"url": "https://api.example.com",
+			"description": "The primary server for this API, hosted at https://api.example.com. It serves as the main entry point for accessing the provided endpoints."
+		}
+	],
+	"tags": [
+		{
+			"name": "user",
+			"description": "Endpoints related to user management, including retrieving user lists and creating new users."
+		}
+	],
+	"paths": {
+		"/users": {
+			"get": {
+				"tags": ["user"],
+				"operationId": "getUsers",
+				"summary": "Get a list of users",
+				"description": "Retrieves a list of users from the system.",
+				"responses": {
+					"200": {
+						"description": "Successfully retrieved user data. The response includes a list of users with pagination support.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							}
+						},
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"maxItems": 1000,
+									"items": {
+										"$ref": "#/components/schemas/User"
+									}
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request. Check the request payload.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							}
+						},
+						"content": {
+							"application/json": {
+								"example": {
+									"message": "Invalid request payload"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized. The request requires user authentication.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							}
+						},
+						"content": {
+							"application/json": {
+								"example": {
+									"message": "Invalid request payload"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Rate limit exceeded. Too many requests within a specific time frame.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							},
+							"Retry-After": {
+								"$ref": "#/components/headers/Retry-After"
+							}
+						},
+						"content": {
+							"application/json": {
+								"example": {
+									"message": "Invalid request payload"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error. Contact system administrator if the issue persists.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							}
+						},
+						"content": {
+							"application/json": {
+								"example": {
+									"message": "Invalid request payload"
+								}
+							}
+						}
+					}
+				}
+			},
+			"post": {
+				"tags": ["user"],
+				"operationId": "createUser",
+				"summary": "Create a new user",
+				"description": "Creates a new user with the provided information. Requires valid user data in the request payload.",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/User"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "User created successfully. Returns the created user details.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							}
+						},
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Invalid request. Check the request payload.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							}
+						},
+						"content": {
+							"application/json": {
+								"example": {
+									"message": "Invalid request payload"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Unauthorized. The request requires user authentication.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							}
+						},
+						"content": {
+							"application/json": {
+								"example": {
+									"message": "Invalid request payload"
+								}
+							}
+						}
+					},
+					"429": {
+						"description": "Rate limit exceeded. Too many requests within a specific time frame.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							},
+							"Retry-After": {
+								"$ref": "#/components/headers/Retry-After"
+							}
+						},
+						"content": {
+							"application/json": {
+								"example": {
+									"message": "Invalid request payload"
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal server error. Contact system administrator if the issue persists.",
+						"headers": {
+							"RateLimit-Limit": {
+								"$ref": "#/components/headers/RateLimit-Limit"
+							},
+							"RateLimit-Reset": {
+								"$ref": "#/components/headers/RateLimit-Reset"
+							}
+						},
+						"content": {
+							"application/json": {
+								"example": {
+									"message": "Invalid request payload"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"User": {
+				"description": "Represents a user in the system with details such as user ID, username, password, email, and roles.",
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "integer",
+						"format": "int64",
+						"minimum": 0,
+						"maximum": 10000000
+					},
+					"username": {
+						"type": "string",
+						"format": "text",
+						"maxLength": 10
+					},
+					"password": {
+						"type": "string",
+						"format": "password",
+						"minLength": 8,
+						"maxLength": 50
+					},
+					"email": {
+						"type": "string",
+						"format": "email",
+						"maxLength": 20
+					},
+					"roles": {
+						"type": "string",
+						"enum": ["user", "admin"]
+					}
+				}
+			}
+		},
+		"securitySchemes": {
+			"apiKey": {
+				"type": "apiKey",
+				"in": "header",
+				"name": "X-API-Key"
+			}
+		},
+		"headers": {
+			"RateLimit-Limit": {
+				"description": "Maximum number of requests allowed within a specific time frame.",
+				"schema": {
+					"type": "integer",
+					"format": "int32",
+					"minimum": 1,
+					"maximum": 1000
+				}
+			},
+			"RateLimit-Reset": {
+				"description": "Time in seconds until the rate limit resets.",
+				"schema": {
+					"type": "integer",
+					"format": "int32",
+					"minimum": 1,
+					"maximum": 1000
+				}
+			},
+			"Retry-After": {
+				"description": "Time in seconds the client should wait before making another request.",
+				"schema": {
+					"type": "integer",
+					"format": "int32",
+					"minimum": 1,
+					"maximum": 1000
+				}
+			}
+		}
+	},
+	"security": [
+		{
+    "apiKey": ["your-api-key"]
+		}
+	]
+}
