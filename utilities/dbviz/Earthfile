@@ -12,7 +12,7 @@ builder:
 
     COPY --dir .cargo .config src .
     COPY Cargo.lock Cargo.toml .
-    COPY clippy.toml deny.toml rustfmt.toml .
+    COPY clippy.toml deny.toml rustfmt.toml rust-toolchain.toml .
 
     DO ./../../earthly/rust+SETUP
 

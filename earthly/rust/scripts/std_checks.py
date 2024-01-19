@@ -41,27 +41,40 @@ def main():
 
     # Check config files.
     results.add(
-        vendor_files_check.colordiff_check(
+        vendor_files_check.toml_diff_strict_check(
             f"{os.environ.get('CARGO_HOME')}/config.toml", ".cargo/config.toml"
         )
     )
     results.add(
-        vendor_files_check.colordiff_check("/stdcfgs/rustfmt.toml", "rustfmt.toml")
+        vendor_files_check.toml_diff_non_strict_check(
+            "/stdcfgs/rust-toolchain.toml", "rust-toolchain.toml"
+        )
     )
     results.add(
-        vendor_files_check.colordiff_check(
+        vendor_files_check.toml_diff_non_strict_check(
+            "/stdcfgs/rustfmt.toml", "rustfmt.toml"
+        )
+    )
+    results.add(
+        vendor_files_check.toml_diff_non_strict_check(
             "/stdcfgs/nextest.toml", ".config/nextest.toml"
         )
     )
     results.add(
-        vendor_files_check.colordiff_check("/stdcfgs/clippy.toml", "clippy.toml")
+        vendor_files_check.toml_diff_non_strict_check(
+            "/stdcfgs/clippy.toml", "clippy.toml"
+        )
     )
-    results.add(vendor_files_check.colordiff_check("/stdcfgs/deny.toml", "deny.toml"))
+    results.add(
+        vendor_files_check.toml_diff_non_strict_check("/stdcfgs/deny.toml", "deny.toml")
+    )
 
     # Check if we have unused dependencies declared in our Cargo.toml files.
     results.add(exec_manager.cli_run("cargo machete", name="Unused Dependencies Check"))
     # Check if we have any supply chain issues with dependencies.
-    results.add(exec_manager.cli_run("cargo deny check", name="Supply Chain Issues Check"))
+    results.add(
+        exec_manager.cli_run("cargo deny check", name="Supply Chain Issues Check")
+    )
 
     results.print()
     if not results.ok():

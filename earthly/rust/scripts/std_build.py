@@ -80,7 +80,9 @@ def cargo_bench(results: exec_manager.Results, flags: str):
 
 
 def cargo_doc(results: exec_manager.Results):
-    results.add(exec_manager.cli_run("cargo +nightly docs ", name="Documentation build"))
+    results.add(
+        exec_manager.cli_run("cargo +nightly docs ", name="Documentation build")
+    )
 
 
 def cargo_depgraph(results: exec_manager.Results):
