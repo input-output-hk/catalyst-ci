@@ -2914,7 +2914,7 @@ async function run() {
         core.info(`Running target: ${t}`);
         const argsSpawn = [...args];
         if (artifactSaveLocal) {
-            argsSpawn.push('--artifact', `${t}`, `${artifactPath}`);
+            argsSpawn.push('--artifact', `${t}/`, `${artifactPath}`);
         }
         else if (artifactName.trim() !== '') {
             core.info(`Pushing target ${t} with artifact tag`);

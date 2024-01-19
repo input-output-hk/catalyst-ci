@@ -49,7 +49,7 @@ export async function run(): Promise<void> {
     const argsSpawn = [...args]
 
     if (artifactSaveLocal) {
-      argsSpawn.push('--artifact', `${t}`, `${artifactPath}`)
+      argsSpawn.push('--artifact', `${t}/`, `${artifactPath}`)
     } else if (artifactName.trim() !== '') {
       core.info(`Pushing target ${t} with artifact tag`)
       argsSpawn.push('--artifact', `${t}/${artifactName}`, `${artifactPath}`)
