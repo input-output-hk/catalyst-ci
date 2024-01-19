@@ -13,10 +13,10 @@ import time
 def status_for_rc(rc: int) -> str:
     """
     Returns a status emoji based on the given RC (return code) value.
-    
+
     Parameters:
         rc (int): The return code to evaluate.
-    
+
     Returns:
         str: The corresponding status emoji (":white_check_mark:" for rc == 0, ":x:" otherwise).
     """
@@ -45,7 +45,8 @@ def format_execution_time(execution_time: float):
 
     return f"{execution_time:.4f} {unit}"
 
-def indent(text:str, first: str, rest: str) -> str:
+
+def indent(text: str, first: str, rest: str) -> str:
     """
     Indent the given text using the specified indentation strings.
 
@@ -57,7 +58,15 @@ def indent(text:str, first: str, rest: str) -> str:
     Returns:
         str: The indented text.
     """
-    return first + textwrap.indent(text, rest)[len(first):]
+    return first + textwrap.indent(text, rest)[len(first) :]
+
+
+@dataclass
+class ProcedureResult:
+    rc: int
+    cmd: str
+    out: str
+
 
 @dataclass
 class Result:
@@ -127,16 +136,37 @@ class Result:
             f"[bold cyan]{self.get_name():<{name_width}}[/bold cyan] : {self.duration()} : {self.status()}"
         )
         if verbose or (self.rc != 0 and verbose_errors):
-            print(f"[italic bright_red]{indent(self.get_command(), '  $ ', '  . ')}[/italic bright_red]")
-            print(Text(indent(self.out, '  > ', '  . ')))
+            print(
+                f"[italic bright_red]{indent(self.get_command(), '  $ ', '  . ')}[/italic bright_red]"
+            )
+            print(Text(indent(self.out, "  > ", "  . ")))
 
 
-def run(
+def cli_run(
     command: str,
     name: Optional[str] = None,
     log: bool = True,
-    input: Optional[str] = None,
     timeout=None,
+    verbose=False,
+) -> Result:
+    def procedure() -> ProcedureResult:
+        result = subprocess.run(
+            command,
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True,
+            timeout=timeout,
+        )
+        return ProcedureResult(result.returncode, command, result.stdout)
+
+    return procedure_run(procedure, name, log, verbose)
+
+
+def procedure_run(
+    procedure,
+    name: Optional[str] = None,
+    log: bool = True,
     verbose=False,
 ) -> Result:
     """
@@ -164,19 +194,11 @@ def run(
     """
     start_time = time.perf_counter()
 
-    result = subprocess.run(
-        command,
-        shell=True,
-        input=input,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        text=True,
-        timeout=timeout,
-    )
+    result = procedure()
 
     execution_time = time.perf_counter() - start_time
 
-    res = Result(result.returncode, command, result.stdout, execution_time, name)
+    res = Result(result.rc, result.cmd, result.out, execution_time, name)
 
     if log:
         res.print(verbose_errors=True, verbose=verbose)
@@ -188,10 +210,10 @@ class Results:
     def __init__(self, title: str) -> None:
         """
         Initializes a new instance of the class.
-        
+
         Args:
             title (str): The title of the instance.
-        
+
         Returns:
             None
         """
@@ -238,7 +260,7 @@ class Results:
         )
 
         print(table)
-        
+
     def ok(self) -> bool:
         """
         Check if all results in the list are ok.
