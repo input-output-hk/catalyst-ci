@@ -31,6 +31,49 @@ def main():
 
     results = exec_manager.Results("Rust checks")
 
+    # Check config files.
+    # Looking for 'Cargo.toml' files
+    # for root, _, files in os.walk("./"):
+    #     for file_name in files:
+    #         if file_name == "Cargo.toml":
+    #             cargo_toml_path = f"{root}/{file_name}"
+    #             res = vendor_files_check.toml_diff_non_strict_check(
+    #                 "/stdcfgs/cargo_manifest/workspace.toml", "Cargo.toml"
+    #             )
+
+    results.add(
+        vendor_files_check.toml_diff_check(
+            "/stdcfgs/cargo_manifest/workspace.toml",
+            "Cargo.toml",
+            strict=False,
+        )
+    )
+
+    results.add(
+        vendor_files_check.toml_diff_check(
+            f"{os.environ.get('CARGO_HOME')}/config.toml", ".cargo/config.toml"
+        )
+    )
+    results.add(
+        vendor_files_check.toml_diff_check(
+            "/stdcfgs/rust-toolchain.toml",
+            "rust-toolchain.toml",
+            strict=False,
+        )
+    )
+    results.add(
+        vendor_files_check.toml_diff_check("/stdcfgs/rustfmt.toml", "rustfmt.toml")
+    )
+    results.add(
+        vendor_files_check.toml_diff_check(
+            "/stdcfgs/nextest.toml", ".config/nextest.toml"
+        )
+    )
+    results.add(
+        vendor_files_check.toml_diff_check("/stdcfgs/clippy.toml", "clippy.toml")
+    )
+    results.add(vendor_files_check.toml_diff_check("/stdcfgs/deny.toml", "deny.toml"))
+
     # Check if the rust src is properly formatted.
     res = exec_manager.cli_run("cargo +nightly fmtchk ", name="Rust Code Format Check")
     results.add(res)
@@ -38,36 +81,6 @@ def main():
         print(
             "[yellow]You can locally fix format errors by running: [/yellow] \n [red bold]cargo +nightly fmtfix [/red bold]"
         )
-
-    # Check config files.
-    results.add(
-        vendor_files_check.toml_diff_strict_check(
-            f"{os.environ.get('CARGO_HOME')}/config.toml", ".cargo/config.toml"
-        )
-    )
-    results.add(
-        vendor_files_check.toml_diff_non_strict_check(
-            "/stdcfgs/rust-toolchain.toml", "rust-toolchain.toml"
-        )
-    )
-    results.add(
-        vendor_files_check.toml_diff_non_strict_check(
-            "/stdcfgs/rustfmt.toml", "rustfmt.toml"
-        )
-    )
-    results.add(
-        vendor_files_check.toml_diff_non_strict_check(
-            "/stdcfgs/nextest.toml", ".config/nextest.toml"
-        )
-    )
-    results.add(
-        vendor_files_check.toml_diff_non_strict_check(
-            "/stdcfgs/clippy.toml", "clippy.toml"
-        )
-    )
-    results.add(
-        vendor_files_check.toml_diff_non_strict_check("/stdcfgs/deny.toml", "deny.toml")
-    )
 
     # Check if we have unused dependencies declared in our Cargo.toml files.
     results.add(exec_manager.cli_run("cargo machete", name="Unused Dependencies Check"))
