@@ -6,6 +6,7 @@
 import python.exec_manager as exec_manager
 import tomllib
 import time
+from dataclasses import dataclass
 
 
 def colordiff_check(
@@ -17,7 +18,9 @@ def colordiff_check(
     )
 
 
-def toml_diff_strict_check(vendor_file_path: str, provided_file_path: str):
+def toml_diff_check(
+    vendor_file_path: str, provided_file_path: str, strict: bool = True
+):
     with open(vendor_file_path, "rb") as vendor_file, open(
         provided_file_path, "rb"
     ) as provided_file:
@@ -26,87 +29,101 @@ def toml_diff_strict_check(vendor_file_path: str, provided_file_path: str):
             vendor_obj = tomllib.load(vendor_file)
             provided_obj = tomllib.load(provided_file)
 
-            diff1 = __compare_dicts__(vendor_obj, provided_obj)
-            out = __print_diff__(diff1, vendor_file_path, provided_file_path)
-            diff2 = __compare_dicts__(provided_obj, vendor_obj)
-            out += __print_diff__(diff2, provided_file_path, vendor_file_path, False)
-            rc = 1 if diff1 or diff2 else 0
-
-            return exec_manager.ProcedureResult(
-                rc,
-                f"Strict Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
-                out,
+            diff = (
+                __strict_diff__(vendor_obj, provided_obj)
+                if strict
+                else __inclusion_diff__(vendor_obj, provided_obj)
             )
-
-        return exec_manager.procedure_run(
-            procedure,
-            f"Strict Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
-        )
-
-
-def toml_diff_non_strict_check(vendor_file_path: str, provided_file_path: str):
-    with open(vendor_file_path, "rb") as vendor_file, open(
-        provided_file_path, "rb"
-    ) as provided_file:
-
-        def procedure() -> exec_manager.ProcedureResult:
-            vendor_obj = tomllib.load(vendor_file)
-            provided_obj = tomllib.load(provided_file)
-
-            diff = __compare_dicts__(vendor_obj, provided_obj)
-            out = __print_diff__(diff, vendor_file_path, provided_file_path)
+            out = __str_diff__(diff, vendor_file_path, provided_file_path)
             rc = 1 if diff else 0
 
             return exec_manager.ProcedureResult(
                 rc,
-                f"non Strict Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
+                f"{'String' if strict else 'Non Strict'} Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
                 out,
             )
 
         return exec_manager.procedure_run(
             procedure,
-            f"non Strict Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
+            f"{'String' if strict else 'Non Strict'} Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
         )
 
 
-def __compare_dicts__(expected, provided):
+@dataclass
+class DiffEntry:
     """
-    Compare two dictionaries recursively and return the differences.
-    It is not a strict comparison,
-    it checks if is the `provided` contains the same values from the `expected`,
-    so `provided` could have an extra one which are not present in `expected`.
+    A data class representing an entry in a difference collection.
+    Attributes:
+    val: any
+        The value of the entry.
+    add_or_remove_flag: bool
+        A flag indicating whether the entry should be removed (False) or added (True).
+    """
+
+    val: any
+    add_or_remove_flag: bool
+
+
+def __inclusion_diff__(expected, provided):
+    """
+    Calculate an inclusion diff between the expected and provided inputs in a recursive manner.
+
+    Args:
+        expected: The expected input.
+        provided: The provided input.
+
     Returns:
-        dict: The differences.
+        A dictionary representing the difference between the expected and provided inputs.
     """
     diff = {}
-    if not isinstance(expected, dict) or not isinstance(provided, dict):
+    if not isinstance(expected, dict):
         if expected != provided:
-            return expected, provided
-        else:
-            return diff
+            return [DiffEntry(expected, True), DiffEntry(provided, False)]
     else:
         for key in expected:
             if key not in provided:
-                diff[key] = expected[key]
+                diff[key] = [DiffEntry(expected[key], True)]
             else:
-                res = __compare_dicts__(expected[key], provided[key])
+                res = __inclusion_diff__(expected[key], provided[key])
                 if res != {}:
                     diff[key] = res
     return diff
 
 
-def __add_color__(val: str, color: str):
+def __strict_diff__(expected, provided):
     """
-    Return a string with the specified color escape sequence added to it.
+    Calculate the strict diff between  the expected and provided inputs.
 
-    Parameters:
-        val (str): The input string.
-        color (str): The color to apply to the input string. Supported colors are
-            "red", "green", and "yellow".
+    Args:
+        expected: The expected input for the comparison.
+        provided: The actual input for the comparison.
 
     Returns:
-        str: The input string with the specified color escape sequence added to it.
+        dict: A dictionary representing the strict difference between the expected
+        and provided inputs.
     """
+
+    def change_flags(diff):
+        if isinstance(diff, DiffEntry):
+            diff.add_or_remove_flag = not diff.add_or_remove_flag
+        if isinstance(diff, list):
+            for val in diff:
+                change_flags(val)
+        if isinstance(diff, dict):
+            for key in diff:
+                change_flags(diff[key])
+
+    # Finds two inclusion diffs and concatenate the results
+    # Also it is important to update a result from the second inclussion diff result
+    # Because it's result has a "reverse" add_or_remove_flag meaning
+    incl1 = __inclusion_diff__(expected, provided)
+    incl2 = __inclusion_diff__(provided, expected)
+    change_flags(incl2)
+    incl1.update(incl2)
+    return incl1
+
+
+def __add_color__(val: str, color: str):
     if color == "red":
         return f"\033[91m{val}"
     if color == "green":
@@ -116,60 +133,50 @@ def __add_color__(val: str, color: str):
     return val
 
 
-def __print_diff__(
+def __str_diff__(
     diff: dict,
-    name1: str,
-    name2: str,
-    flag: bool = True,
+    obj_name_to_add: str,
+    obj_name_to_remove: str,
     ident: str = "",
     path: str = "",
 ):
     """
-    Generate a string representation of the differences.
-    Parameters:
-        diff (dict): The dictionary containing the differences.
-        name1 (str): The name of the first dictionary.
-        name2 (str): The name of the second dictionary.
-        flag (bool, optional): The flag indicating whether the differences are added or removed. Defaults to True.
+    Generates a string representation of the diff.
+
+    Args:
+        diff (dict): The dictionary representing the diff.
+        obj_name_to_add (str): The name of the object to add.
+        obj_name_to_remove (str): The name of the object to remove.
     Returns:
         str: The string representation of the differences.
     """
-    if path == "":
-        path += "\n------\n"
-        path += __add_color__(name1, "yellow")
-
     str_diff = ""
-    if not isinstance(diff, dict):
-        if isinstance(diff, tuple):
-            if isinstance(diff[0], dict):
-                str_diff += __print_diff__(
-                    diff[0], name1, name2, flag, ident + " ", path
-                )
-            else:
-                str_diff += f"{path}\n"
-                str_diff += (
-                    __add_color__(f"-{ident} {diff[0]}", "red")
-                    if flag
-                    else __add_color__(f"+{ident} {diff[0]}", "green")
-                )
+    if isinstance(diff, DiffEntry):
+        color = "green" if diff.add_or_remove_flag else "red"
+        minus_or_plus = "+" if diff.add_or_remove_flag else "-"
+        obj_name = obj_name_to_add if diff.add_or_remove_flag else obj_name_to_remove
 
-            str_diff += "\n" + __add_color__(name2, "yellow") + "\n"
-            str_diff += "\n" + (
-                __add_color__(f"+{ident} {diff[1]}", "green")
-                if flag
-                else __add_color__(f"-{ident} {diff[1]}", "red")
-            )
+        str_diff += "\n------\n"
+        str_diff += __add_color__(obj_name, "yellow")
+        str_diff += __add_color__(
+            f"\n {minus_or_plus}{ident} {diff.val}",
+            color,
+        )
 
-        else:
-            str_diff += f"{path}\n"
-            str_diff += (
-                __add_color__(f"-{ident} {diff}\n", "red")
-                if flag
-                else __add_color__(f"+{ident} {diff}\n", "green")
-            )
-    else:
+    if isinstance(diff, dict):
         for key in diff:
-            path += "\n" + __add_color__(f"{ident}  {key}", "red" if flag else "green")
-            str_diff += __print_diff__(diff[key], name1, name2, flag, ident + " ", path)
+            str_diff += __str_diff__(
+                diff[key],
+                obj_name_to_add,
+                obj_name_to_remove,
+                ident + " ",
+                path + "\n" + f"{ident}  {key}",
+            )
+
+    if isinstance(diff, list):
+        for val in diff:
+            str_diff += __str_diff__(
+                val, obj_name_to_add, obj_name_to_remove, ident, path
+            )
 
     return str_diff
