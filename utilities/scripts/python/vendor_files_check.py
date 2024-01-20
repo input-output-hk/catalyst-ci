@@ -125,11 +125,11 @@ def __strict_diff__(expected, provided):
 
 def __add_color__(val: str, color: str):
     if color == "red":
-        return f"\033[91m{val}\033[0m"
+        return f"[red]{val}[/red]"
     if color == "green":
-        return f"\033[92m{val}\033[0m"
+        return f"[green]{val}[/green]"
     if color == "yellow":
-        return f"\033[93m{val}\033[0m"
+        return f"[yellow]{val}[/yellow]"
     return val
 
 
@@ -157,10 +157,9 @@ def __str_diff__(
         obj_name = obj_name_to_add if diff.add_or_remove_flag else obj_name_to_remove
 
         str_diff += "\n------\n"
-        str_diff += __add_color__(obj_name, "yellow")
-        str_diff += __add_color__(
-            f"{path}\n {minus_or_plus}{ident} {diff.val}",
-            color,
+        str_diff += f"[yellow]{obj_name}[/yellow]"
+        str_diff += (
+            f"[{color}]" + f"{path}\n {minus_or_plus}{ident} {diff.val}" + f"[/{color}]"
         )
 
     if isinstance(diff, dict):
