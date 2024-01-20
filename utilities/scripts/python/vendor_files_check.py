@@ -73,8 +73,10 @@ def __compare_dicts__(expected, provided):
     """
     Compare two dictionaries recursively and return the differences.
     It is not a strict comparison,
-    it checks is the `provided` contains the same values from the `expected`,
+    it checks if is the `provided` contains the same values from the `expected`,
     so `provided` could have an extra one which are not present in `expected`.
+    Returns:
+        dict: The differences.
     """
     diff = {}
     if not isinstance(expected, dict) or not isinstance(provided, dict):
@@ -93,6 +95,27 @@ def __compare_dicts__(expected, provided):
     return diff
 
 
+def __add_color__(val: str, color: str):
+    """
+    Return a string with the specified color escape sequence added to it.
+
+    Parameters:
+        val (str): The input string.
+        color (str): The color to apply to the input string. Supported colors are
+            "red", "green", and "yellow".
+
+    Returns:
+        str: The input string with the specified color escape sequence added to it.
+    """
+    if color == "red":
+        return f"\033[91m{val}"
+    if color == "green":
+        return f"\033[92m{val}"
+    if color == "yellow":
+        return f"\033[93m{val}"
+    return val
+
+
 def __print_diff__(
     diff: dict,
     name1: str,
@@ -102,16 +125,18 @@ def __print_diff__(
     path: str = "",
 ):
     """
-    Generate a string representation of the differences in a dictionary.
+    Generate a string representation of the differences.
     Parameters:
         diff (dict): The dictionary containing the differences.
+        name1 (str): The name of the first dictionary.
+        name2 (str): The name of the second dictionary.
         flag (bool, optional): The flag indicating whether the differences are added or removed. Defaults to True.
     Returns:
         str: The string representation of the differences.
     """
     if path == "":
-        path += "\n------"
-        path += f"\n\033[93m{name1}"
+        path += "\n------\n"
+        path += __add_color__(name1, "yellow")
 
     str_diff = ""
     if not isinstance(diff, dict):
@@ -122,29 +147,29 @@ def __print_diff__(
                 )
             else:
                 str_diff += f"{path}\n"
-                if flag:
-                    str_diff += f"\033[91m-{ident} {diff[0]}"
-                else:
-                    str_diff += f"\033[92m+{ident} {diff[0]}"
+                str_diff += (
+                    __add_color__(f"-{ident} {diff[0]}", "red")
+                    if flag
+                    else __add_color__(f"+{ident} {diff[0]}", "green")
+                )
 
-            str_diff += f"\n\033[93m{name2}"
-            if flag:
-                str_diff += f"\n\033[92m+{ident} {diff[1]}"
-            else:
-                str_diff += f"\n\033[91m-{ident} {diff[1]}"
+            str_diff += "\n" + __add_color__(name2, "yellow") + "\n"
+            str_diff += "\n" + (
+                __add_color__(f"+{ident} {diff[1]}", "green")
+                if flag
+                else __add_color__(f"-{ident} {diff[1]}", "red")
+            )
 
         else:
             str_diff += f"{path}\n"
-            if flag:
-                str_diff += f"\033[91m-{ident} {diff}\n"
-            else:
-                str_diff += f"\033[92m+{ident} {diff}\n"
+            str_diff += (
+                __add_color__(f"-{ident} {diff}\n", "red")
+                if flag
+                else __add_color__(f"+{ident} {diff}\n", "green")
+            )
     else:
         for key in diff:
-            if flag:
-                path += f"\n\033[91m{ident}  {key}"
-            else:
-                path += f"\n\033[92m{ident}  {key}"
+            path += "\n" + __add_color__(f"{ident}  {key}", "red" if flag else "green")
             str_diff += __print_diff__(diff[key], name1, name2, flag, ident + " ", path)
 
     return str_diff
