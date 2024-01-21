@@ -61,3 +61,5 @@ webkitallowfullscreen
 WORKDIR
 xerrors
 zstd
+idents
+rustflags

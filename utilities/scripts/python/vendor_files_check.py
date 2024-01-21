@@ -24,7 +24,7 @@ def toml_diff_check(
     strict: bool = True,
     log: bool = True,
 ):
-    comand_name = (
+    command_name = (
         f"{'Strict' if strict else 'Non Strict'} Checking"
         + f"if Provided File {provided_file_path} == Vendored File {vendor_file_path}"
     )
@@ -46,13 +46,13 @@ def toml_diff_check(
 
             return exec_manager.ProcedureResult(
                 rc,
-                comand_name,
+                command_name,
                 out,
             )
 
         return exec_manager.procedure_run(
             procedure,
-            comand_name,
+            command_name,
             log=log,
         )
 
@@ -122,7 +122,7 @@ def __strict_diff__(expected, provided):
                 change_flags(diff[key])
 
     # Finds two inclusion diffs and concatenate the results
-    # Also it is important to update a result from the second inclussion diff result
+    # Also it is important to update a result from the second inclusion diff result
     # Because it's result has a "reverse" add_or_remove_flag meaning
     incl1 = __inclusion_diff__(expected, provided)
     incl2 = __inclusion_diff__(provided, expected)
