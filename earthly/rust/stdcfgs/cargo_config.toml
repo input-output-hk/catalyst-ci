@@ -1,7 +1,4 @@
 # Use MOLD linker where possible, but ONLY in CI applicable targets.
-# cspell: words nextest rustdocflags
-# cspell: words rustdoc lintfix testfast testdocs testci testunit
-# cspell: words fmtchk fmtfix testcov
 
 # Configure how Docker container targets build.
 

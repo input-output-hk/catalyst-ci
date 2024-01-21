@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words fmtchk fmtfix rustfmt stdcfgs nextest
+# cspell: words rustfmt stdcfgs
 
 # This script is run inside the `check` stage for rust projects to perform all
 # high level non-compilation checks.

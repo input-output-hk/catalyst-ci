@@ -1,10 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION --global-cache 0.7
 
-# cspell: words rustup rustc automake autotools xutils miri nextest kani
-# cspell: words TARGETPLATFORM TARGETOS TARGETVARIANT 
-# cspell: words USERPLATFORM USEROS USERARCH USERVARIANT 
-# cspell: words ripgrep colordiff rustfmt stdcfgs toolset toolsets
+# cspell: words rustfmt stdcfgs toolset toolsets
 
 # Internal: Set up our target toolchains, and copy our files.
 builder:

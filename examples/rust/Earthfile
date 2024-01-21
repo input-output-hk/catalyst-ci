@@ -1,6 +1,6 @@
 VERSION --try --global-cache 0.7
 
-# cspell: words USERARCH toolsets rustfmt nextest
+# cspell: words USERARCH toolsets rustfmt
 
 # Set up our target toolchains, and copy our files.
 builder:

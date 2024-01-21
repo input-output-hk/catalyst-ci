@@ -9,7 +9,7 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
-<!-- cspell: words USERARCH TARGETARCH toolsets fmtchk stdcfgs rustfmt nextest testunit testdocs depgraph testcov -->
+<!-- cspell: words toolsets stdcfgs rustfmt depgraph -->
 
 ## Introduction
 
