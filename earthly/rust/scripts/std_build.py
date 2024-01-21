@@ -15,22 +15,24 @@ import rich
 def cargo_build(results: exec_manager.Results, flags: str):
     results.add(
         exec_manager.cli_run(
-            "cargo build " + f"{flags} " + "--release ",
+            "cargo build " + "--release " + f"{flags} ",
             name="Build all code in the workspace",
         )
     )
 
 
-def cargo_clippy(results: exec_manager.Results):
+def cargo_lint(results: exec_manager.Results, flags: str):
     results.add(
-        exec_manager.cli_run("cargo lint ", name="Clippy Lints in the workspace check")
+        exec_manager.cli_run(
+            "cargo lint " + f"{flags}", name="Clippy Lints in the workspace check"
+        )
     )
 
 
 def cargo_doctest(results: exec_manager.Results, flags: str):
     results.add(
         exec_manager.cli_run(
-            "cargo testdocs " + f"{flags} ", name="Documentation tests all pass check"
+            "cargo +nightly testdocs " + f"{flags} ", name="Documentation tests all pass check"
         )
     )
 
@@ -201,6 +203,11 @@ def main():
         help="Additional command-line flags that can be passed to the `cargo build` command.",
     )
     parser.add_argument(
+        "--lint_flags",
+        default="",
+        help="Additional command-line flags that can be passed to the `cargo lint` command.",
+    )
+    parser.add_argument(
         "--doctest_flags",
         default="",
         help="Additional command-line flags that can be passed to the `cargo testdocs` command.",
@@ -249,7 +256,7 @@ def main():
     # Build the code.
     cargo_build(results, args.build_flags)
     # Check the code passes all clippy lint checks.
-    cargo_clippy(results)
+    cargo_lint(results, args.lint_flags)
     # Check if all Self contained tests pass (Test that need no external resources).
     if args.with_test:
         # Check if all documentation tests pass.

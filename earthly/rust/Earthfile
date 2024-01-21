@@ -5,6 +5,8 @@ VERSION --global-cache --use-function-keyword 0.7
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
+# Parameters:
+#  * toolchain : The `rust-toolchain` toml file.
 rust-base:
     ARG TARGETPLATFORM
     ARG TARGETOS
@@ -19,7 +21,7 @@ rust-base:
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
-    FROM rust:1.73-alpine3.18
+    FROM rust:1.74-alpine3.18
 
     RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
         echo "TARGETOS       = $TARGETOS"; \
@@ -98,8 +100,16 @@ rust-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
 
 # Common Rust setup.
+# Parameters:
+#  * toolchain : The `rust-toolchain` toml file.
 SETUP:
     FUNCTION
+    FROM +rust-base
+
+    ARG toolchain=./rust-toolchain.toml 
+
+    # Copy our toolchain dependency.
+    COPY $toolchain ./rust-toolchain.toml
 
     # Install pinned Rustup from `rust-toolchain.toml`
     # Plus nightly latest so we can use it for docs, lints, etc.

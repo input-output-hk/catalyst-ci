@@ -8,13 +8,11 @@ VERSION --global-cache 0.7
 
 # Internal: Set up our target toolchains, and copy our files.
 builder:
-    FROM ../../earthly/rust+rust-base
+    DO ./../../earthly/rust+SETUP
 
     COPY --dir .cargo .config src .
     COPY Cargo.lock Cargo.toml .
-    COPY clippy.toml deny.toml rustfmt.toml rust-toolchain.toml .
-
-    DO ./../../earthly/rust+SETUP
+    COPY clippy.toml deny.toml rustfmt.toml .
 
 ## -----------------------------------------------------------------------------
 ##
