@@ -32,7 +32,8 @@ def cargo_lint(results: exec_manager.Results, flags: str):
 def cargo_doctest(results: exec_manager.Results, flags: str):
     results.add(
         exec_manager.cli_run(
-            "cargo +nightly testdocs " + f"{flags} ", name="Documentation tests all pass check"
+            "cargo +nightly testdocs " + f"{flags} ",
+            name="Documentation tests all pass check",
         )
     )
 
@@ -223,19 +224,14 @@ def main():
         help="Additional command-line flags that can be passed to the `cargo bench` command.",
     )
     parser.add_argument(
-        "--with_test",
-        action="store_true",
-        help="Flag to indicate whether to run tests (including unit tests and doc tests).",
-    )
-    parser.add_argument(
         "--cov_report",
         default="",
         help="The output coverage report file path. If omitted, coverage will not be run.",
     )
     parser.add_argument(
-        "--with_bench",
+        "--with_docs",
         action="store_true",
-        help="Flag to indicate whether to run benchmarks.",
+        help="Flag to indicate whether to build docs (including graphs, trees etc.) or not.",
     )
     parser.add_argument(
         "--libs",
@@ -258,31 +254,30 @@ def main():
     # Check the code passes all clippy lint checks.
     cargo_lint(results, args.lint_flags)
     # Check if all Self contained tests pass (Test that need no external resources).
-    if args.with_test:
-        # Check if all documentation tests pass.
-        cargo_doctest(results, args.doctest_flags)
-        if args.cov_report == "":
-            # Without coverage report
-            cargo_nextest(results, args.test_flags)
-        else:
-            # With coverage report
-            cargo_llvm_cov(results, args.test_flags, args.cov_report)
+    # Check if all documentation tests pass.
+    cargo_doctest(results, args.doctest_flags)
+    if args.cov_report == "":
+        # Without coverage report
+        cargo_nextest(results, args.test_flags)
+    else:
+        # With coverage report
+        cargo_llvm_cov(results, args.test_flags, args.cov_report)
 
     # Check if any benchmarks defined run (We don't validate the results.)
-    if args.with_bench:
-        cargo_bench(results, args.bench_flags)
+    cargo_bench(results, args.bench_flags)
 
-    # Generate all the documentation.
-    cargo_doc(results)
-    # Generate dependency graphs
-    cargo_depgraph(results)
+     # Generate all the documentation.
+    if args.with_docs:
+        # Generate rust docs.
+        cargo_doc(results)
+        # Generate dependency graphs
+        cargo_depgraph(results)
 
-    for lib in libs:
-        cargo_modules_lib(results, lib)
-
-    for bin in bins:
-        package, bin_name = bin.split("/")
-        cargo_modules_bin(results, package, bin_name)
+        for lib in libs:
+            cargo_modules_lib(results, lib)
+        for bin in bins:
+            package, bin_name = bin.split("/")
+            cargo_modules_bin(results, package, bin_name)
 
     results.print()
     if not results.ok():

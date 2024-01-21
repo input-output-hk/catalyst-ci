@@ -34,10 +34,8 @@ build:
     FROM +builder
 
     TRY
-        RUN /scripts/std_build.py   --build_flags="" \
-                                    --with_test \
-                                    --with_bench \
-                                    --cov_report="coverage-report.info" \
+        RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
+                                    --with_docs \
                                     --libs="bar" \
                                     --bins="foo/foo"
     FINALLY
