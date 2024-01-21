@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cspell: words depgraph fmtchk fmtfix stdcfgs rustfmt stdcfgs
+# cspell: words rustfmt stdcfgs
 
 import python.exec_manager as exec_manager
 import python.vendor_files_check as vendor_files_check
