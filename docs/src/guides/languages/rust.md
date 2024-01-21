@@ -53,13 +53,11 @@ VERSION --global-cache 0.7
 
 # Set up our target toolchains, and copy our files.
 builder:
-    FROM ./../../earthly/rust+rust-base
+    DO ./../../earthly/rust+SETUP
 
     COPY --dir .cargo .config crates .
     COPY Cargo.lock Cargo.toml .
     COPY clippy.toml deny.toml rustfmt.toml .
-
-    DO ./../../earthly/rust+SETUP
 ```
 
 The first target `builder` is responsible for preparing an already configured Rust environment,
@@ -129,10 +127,8 @@ build:
     FROM +builder
 
     TRY
-        RUN /scripts/std_build.py   --build_flags="" \
-                                    --with_test \
-                                    --with_bench \
-                                    --cov_report="coverage-report.info" \
+        RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
+                                    --with_docs \
                                     --libs="bar" \
                                     --bins="foo/foo"
     FINALLY
@@ -173,6 +169,9 @@ Here is the full list of configuration of this script:
    --build_flags BUILD_FLAGS
                          Additional command-line flags that can be passed to
                          the `cargo build` command.
+   --lint_flags LINT_FLAGS
+                         Additional command-line flags that can be passed to
+                         the `cargo lint` command.
    --doctest_flags DOCTEST_FLAGS
                          Additional command-line flags that can be passed to
                          the `cargo testdocs` command.
@@ -182,16 +181,15 @@ Here is the full list of configuration of this script:
    --bench_flags BENCH_FLAGS
                          Additional command-line flags that can be passed to
                          the `cargo bench` command.
-   --with_test           Flag to indicate whether to run tests (including unit
-                         tests and doc tests).
    --cov_report COV_REPORT
                          The output coverage report file path. If omitted,
                          coverage will not be run.
-   --with_bench          Flag to indicate whether to run benchmarks.
+   --with_docs           Flag to indicate whether to build docs (including
+                         graphs, trees etc.) or not.
    --libs LIBS           The list of lib crates `cargo-modules` docs to build
                          separated by comma.
    --bins BINS           The list of binaries `cargo-modules` docs to build and
-                         made a smoke tests on them.   .
+                         made a smoke tests on them.
 ```
 
 Note that the `libs` argument takes a list of library crate's names in your Rust project, e.g.
