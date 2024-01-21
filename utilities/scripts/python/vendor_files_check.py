@@ -21,6 +21,10 @@ def colordiff_check(
 def toml_diff_check(
     vendor_file_path: str, provided_file_path: str, strict: bool = True
 ):
+    comand_name = (
+        f"{'Strict' if strict else 'Non Strict'} Checking"
+        + f"if Provided File {provided_file_path} == Vendored File {vendor_file_path}"
+    )
     with open(vendor_file_path, "rb") as vendor_file, open(
         provided_file_path, "rb"
     ) as provided_file:
@@ -39,13 +43,13 @@ def toml_diff_check(
 
             return exec_manager.ProcedureResult(
                 rc,
-                f"{'String' if strict else 'Non Strict'} Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
+                comand_name,
                 out,
             )
 
         return exec_manager.procedure_run(
             procedure,
-            f"{'String' if strict else 'Non Strict'} Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
+            comand_name,
         )
 
 
@@ -82,7 +86,7 @@ def __inclusion_diff__(expected, provided):
     else:
         for key in expected:
             if key not in provided:
-                diff[key] = [DiffEntry(expected[key], True)]
+                diff[key] = DiffEntry(expected[key], True)
             else:
                 res = __inclusion_diff__(expected[key], provided[key])
                 if res != {}:
@@ -125,11 +129,11 @@ def __strict_diff__(expected, provided):
 
 def __add_color__(val: str, color: str):
     if color == "red":
-        return f"[red]{val}[/red]"
+        return f"\033[91m{val}\033[0m"
     if color == "green":
-        return f"[green]{val}[/green]"
+        return f"\033[92m{val}\033[0m"
     if color == "yellow":
-        return f"[yellow]{val}[/yellow]"
+        return f"\033[93m{val}\033[0m"
     return val
 
 
@@ -157,10 +161,9 @@ def __str_diff__(
         obj_name = obj_name_to_add if diff.add_or_remove_flag else obj_name_to_remove
 
         str_diff += "\n------\n"
-        str_diff += f"[yellow]{obj_name}[/yellow]"
-        str_diff += (
-            f"[{color}]" + f"{path}\n {minus_or_plus}{ident} {diff.val}" + f"[/{color}]"
-        )
+        str_diff += __add_color__(obj_name, "yellow")
+        str_diff += f"{path}\n"
+        str_diff += __add_color__(f"{minus_or_plus}{ident} {diff.val}", color)
 
     if isinstance(diff, dict):
         for key in diff:

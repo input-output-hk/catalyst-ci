@@ -3,6 +3,7 @@
 import subprocess
 from typing import Optional
 from rich import print
+from rich.text import Text
 from rich.table import Table
 from dataclasses import dataclass
 import textwrap
@@ -138,7 +139,7 @@ class Result:
             print(
                 f"[italic bright_red]{indent(self.get_command(), '  $ ', '  . ')}[/italic bright_red]"
             )
-            print(indent(self.out, "  > ", "  . "))
+            print(Text(indent(self.out, "  > ", "  . ")))
 
 
 def cli_run(
