@@ -19,7 +19,10 @@ def colordiff_check(
 
 
 def toml_diff_check(
-    vendor_file_path: str, provided_file_path: str, strict: bool = True
+    vendor_file_path: str,
+    provided_file_path: str,
+    strict: bool = True,
+    log: bool = True,
 ):
     comand_name = (
         f"{'Strict' if strict else 'Non Strict'} Checking"
@@ -50,6 +53,7 @@ def toml_diff_check(
         return exec_manager.procedure_run(
             procedure,
             comand_name,
+            log=log,
         )
 
 

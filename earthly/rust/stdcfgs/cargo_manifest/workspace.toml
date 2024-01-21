@@ -1,13 +1,4 @@
-[workspace]
-resolver = "2"
-members = [
-    "crates/foo",
-    "crates/bar",
-]
-
 [workspace.package]
-version = "0.0.1"
-license = "MIT OR Apache-2.0"
 edition = "2021"
 
 [workspace.lints.rust]

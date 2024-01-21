@@ -33,21 +33,28 @@ def main():
 
     # Check config files.
     # Looking for 'Cargo.toml' files
-    # for root, _, files in os.walk("./"):
-    #     for file_name in files:
-    #         if file_name == "Cargo.toml":
-    #             cargo_toml_path = f"{root}/{file_name}"
-    #             res = vendor_files_check.toml_diff_non_strict_check(
-    #                 "/stdcfgs/cargo_manifest/workspace.toml", "Cargo.toml"
-    #             )
-
-    results.add(
-        vendor_files_check.toml_diff_check(
-            "/stdcfgs/cargo_manifest/workspace.toml",
-            "Cargo.toml",
-            strict=False,
-        )
-    )
+    for root, _, files in os.walk("./"):
+        for file_name in files:
+            if file_name == "Cargo.toml":
+                cargo_toml_path = f"{root}/{file_name}"
+                # it should fits one of the template
+                res1 = vendor_files_check.toml_diff_check(
+                    "/stdcfgs/cargo_manifest/workspace.toml",
+                    cargo_toml_path,
+                    strict=False,
+                    log=False,
+                )
+                res2 = vendor_files_check.toml_diff_check(
+                    "/stdcfgs/cargo_manifest/workspace_inherit.toml",
+                    cargo_toml_path,
+                    strict=False,
+                    log=False,
+                )
+                if not res1.ok() and not res2.ok():
+                    res1.print(verbose_errors=True)
+                    res2.print(verbose_errors=True)
+                    results.add(res1)
+                    results.add(res2)
 
     results.add(
         vendor_files_check.toml_diff_check(
