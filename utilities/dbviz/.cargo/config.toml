@@ -12,9 +12,6 @@ rustflags = [
     "-C", "target-feature=-crt-static"
 ]
 
-[target.wasm32-unknown-unknown]
-rustflags = ["--cap-lints", "warn"]
-
 [build]
 rustflags = []
 rustdocflags = [
