@@ -76,7 +76,7 @@ def cargo_llvm_cov(results: exec_manager.Results, flags: str, cov_report: str):
 def cargo_bench(results: exec_manager.Results, flags: str):
     results.add(
         exec_manager.cli_run(
-            "cargo bench " + f"{flags} " + "--all-targets ",
+            "cargo bench " + f"{flags} ",
             name="Benchmarks all run to completion check",
         )
     )
@@ -266,7 +266,7 @@ def main():
     # Check if any benchmarks defined run (We don't validate the results.)
     cargo_bench(results, args.bench_flags)
 
-     # Generate all the documentation.
+    # Generate all the documentation.
     if args.with_docs:
         # Generate rust docs.
         cargo_doc(results)
