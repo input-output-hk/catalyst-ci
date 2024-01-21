@@ -2,7 +2,7 @@
 
 # Configure how Docker container targets build.
 
-# If you want to customize these targets for a local build, then customize them in you:
+# If you want to customize these targets for a local build, then customize them in your:
 #  $CARGO_HOME/config.toml
 # NOT in the project itself.
 # These targets are ONLY the targets used by CI and inside docker builds.
@@ -24,9 +24,6 @@ rustflags = [
     "-C", "link-arg=-fuse-ld=/usr/bin/mold",
     "-C", "target-feature=-crt-static"
 ]
-
-[target.wasm32-unknown-unknown]
-rustflags = ["--cap-lints", "warn"]
 
 [build]
 rustflags = []
