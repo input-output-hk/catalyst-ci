@@ -40,7 +40,7 @@ def toml_diff_check(
             return exec_manager.ProcedureResult(
                 1 if diff.has_diff() else 0,
                 command_name,
-                diff.to_ansii_colored_string(),
+                diff.to_ascii_colored_string(),
             )
 
         return exec_manager.procedure_run(

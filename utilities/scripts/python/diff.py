@@ -33,13 +33,13 @@ class Diff:
     def has_diff(self) -> bool:
         return True if diff else False
 
-    def to_ansii_colored_string(
+    def to_ascii_colored_string(
         self,
         obj_name_to_add: str,
         obj_name_to_remove: str,
     ) -> str:
         """
-        Generates an ansii colored string representation of the diff.
+        Generates an ascii colored string representation of the diff.
 
         Args:
             obj_name_to_add (str): The name of the object to add.
