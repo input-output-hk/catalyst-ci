@@ -25,7 +25,7 @@ def toml_diff_check(
     log: bool = True,
 ):
     command_name = (
-        f"{'Strict' if strict else 'Non Strict'} Checking"
+        f"{'' if strict else 'Non '}Strict Checking"
         + f"if Provided File {provided_file_path} == Vendored File {vendor_file_path}"
     )
     with open(vendor_file_path, "rb") as vendor_file, open(
