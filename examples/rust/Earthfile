@@ -35,7 +35,6 @@ build:
 
     TRY
         RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
-                                    --with_docs \
                                     --libs="bar" \
                                     --bins="foo/foo"
     FINALLY

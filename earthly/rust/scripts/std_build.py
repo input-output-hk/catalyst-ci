@@ -229,9 +229,19 @@ def main():
         help="The output coverage report file path. If omitted, coverage will not be run.",
     )
     parser.add_argument(
-        "--with_docs",
+        "--disable_tests",
         action="store_true",
-        help="Flag to indicate whether to build docs (including graphs, trees etc.) or not.",
+        help="Flag to disable to run tests (including unit tests and doc tests).",
+    )
+    parser.add_argument(
+        "--disable_benches",
+        action="store_true",
+        help="Flag to disable to run benchmarks.",
+    )
+    parser.add_argument(
+        "--disable_docs",
+        action="store_true",
+        help="Flag to disable docs building (including graphs, trees etc.) or not.",
     )
     parser.add_argument(
         "--libs",
