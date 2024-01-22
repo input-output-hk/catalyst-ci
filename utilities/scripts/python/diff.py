@@ -31,7 +31,7 @@ class Diff:
             self.diff = __inclusion_diff__(expected, provided)
 
     def has_diff(self) -> bool:
-        return True if diff else False
+        return True if self.diff else False
 
     def to_ascii_colored_string(
         self,
