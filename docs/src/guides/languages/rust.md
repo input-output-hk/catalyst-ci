@@ -184,12 +184,15 @@ Here is the full list of configuration of this script:
    --cov_report COV_REPORT
                          The output coverage report file path. If omitted,
                          coverage will not be run.
-   --with_docs           Flag to indicate whether to build docs (including
-                         graphs, trees etc.) or not.
+   --disable_tests       Flag to disable to run tests (including unit tests and
+                         doc tests).
+   --disable_benches     Flag to disable to run benchmarks.
+   --disable_docs        Flag to disable docs building (including graphs, trees
+                         etc.) or not.
    --libs LIBS           The list of lib crates `cargo-modules` docs to build
                          separated by comma.
    --bins BINS           The list of binaries `cargo-modules` docs to build and
-                         made a smoke tests on them.
+                         make a smoke tests on them.
 ```
 
 Note that the `libs` argument takes a list of library crate's names in your Rust project, e.g.

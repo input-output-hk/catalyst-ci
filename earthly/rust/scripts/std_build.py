@@ -264,20 +264,22 @@ def main():
     # Check the code passes all clippy lint checks.
     cargo_lint(results, args.lint_flags)
     # Check if all Self contained tests pass (Test that need no external resources).
-    # Check if all documentation tests pass.
-    cargo_doctest(results, args.doctest_flags)
-    if args.cov_report == "":
-        # Without coverage report
-        cargo_nextest(results, args.test_flags)
-    else:
-        # With coverage report
-        cargo_llvm_cov(results, args.test_flags, args.cov_report)
+    if not args.disable_tests:
+        # Check if all documentation tests pass.
+        cargo_doctest(results, args.doctest_flags)
+        if args.cov_report == "":
+            # Without coverage report
+            cargo_nextest(results, args.test_flags)
+        else:
+            # With coverage report
+            argo_llvm_cov(results, args.test_flags, args.cov_report)
 
     # Check if any benchmarks defined run (We don't validate the results.)
-    cargo_bench(results, args.bench_flags)
+    if not args.disable_benches:
+        cargo_bench(results, args.bench_flags)
 
     # Generate all the documentation.
-    if args.with_docs:
+    if not args.disable_docs:
         # Generate rust docs.
         cargo_doc(results)
         # Generate dependency graphs
