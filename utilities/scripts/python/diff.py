@@ -26,9 +26,9 @@ class Diff:
 
     def __init__(self, expected: dict, provided: dict, strict: bool):
         if strict:
-            self.diff = __strict_diff__(expected, provided)
+            self.diff = _strict_diff_(expected, provided)
         else:
-            self.diff = __inclusion_diff__(expected, provided)
+            self.diff = _inclusion_diff_(expected, provided)
 
     def has_diff(self) -> bool:
         return True if self.diff else False
@@ -46,7 +46,7 @@ class Diff:
             obj_name_to_remove (str): The name of the object to remove.
         """
 
-        def __impl__(
+        def _impl_(
             diff: dict,
             obj_name_to_add: str,
             obj_name_to_remove: str,
@@ -62,13 +62,13 @@ class Diff:
                 )
 
                 result += "\n------\n"
-                result += __add_color__(obj_name, "yellow")
+                result += _add_color_(obj_name, "yellow")
                 result += f"{path}\n"
-                result += __add_color__(f"{minus_or_plus}{ident} {diff.val}", color)
+                result += _add_color_(f"{minus_or_plus}{ident} {diff.val}", color)
 
             if isinstance(diff, dict):
                 for key in diff:
-                    result += __impl__(
+                    result += _impl_(
                         diff[key],
                         obj_name_to_add,
                         obj_name_to_remove,
@@ -78,16 +78,16 @@ class Diff:
 
             if isinstance(diff, list):
                 for val in diff:
-                    result += __impl__(
+                    result += _impl_(
                         val, obj_name_to_add, obj_name_to_remove, ident, path
                     )
 
             return result
 
-        return __impl__(self.diff, obj_name_to_add, obj_name_to_remove)
+        return _impl_(self.diff, obj_name_to_add, obj_name_to_remove)
 
 
-def __inclusion_diff__(expected: dict, provided: dict) -> dict:
+def _inclusion_diff_(expected: dict, provided: dict) -> dict:
     """
     Calculate an inclusion diff between the expected and provided inputs in a recursive manner.
 
@@ -107,13 +107,13 @@ def __inclusion_diff__(expected: dict, provided: dict) -> dict:
             if key not in provided:
                 diff[key] = DiffEntry(expected[key], True)
             else:
-                res = __inclusion_diff__(expected[key], provided[key])
+                res = _inclusion_diff_(expected[key], provided[key])
                 if res != {}:
                     diff[key] = res
     return diff
 
 
-def __strict_diff__(expected: dict, provided: dict) -> dict:
+def _strict_diff_(expected: dict, provided: dict) -> dict:
     """
     Calculate the strict diff between  the expected and provided inputs.
 
@@ -139,14 +139,14 @@ def __strict_diff__(expected: dict, provided: dict) -> dict:
     # Finds two inclusion diffs and concatenate the results
     # Also it is important to update a result from the second inclusion diff result
     # Because it's result has a "reverse" add_or_remove_flag meaning
-    incl1 = __inclusion_diff__(expected, provided)
-    incl2 = __inclusion_diff__(provided, expected)
+    incl1 = _inclusion_diff_(expected, provided)
+    incl2 = _inclusion_diff_(provided, expected)
     change_flags(incl2)
     incl1.update(incl2)
     return incl1
 
 
-def __add_color__(val: str, color: str) -> str:
+def _add_color_(val: str, color: str) -> str:
     if color == "red":
         return f"\033[91m{val}\033[0m"
     if color == "green":

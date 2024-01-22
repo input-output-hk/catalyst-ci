@@ -251,7 +251,7 @@ def main():
     parser.add_argument(
         "--bins",
         default="",
-        help="The list of binaries `cargo-modules` docs to build and made a smoke tests on them.",
+        help="The list of binaries `cargo-modules` docs to build and make a smoke tests on them.",
     )
     args = parser.parse_args()
 
