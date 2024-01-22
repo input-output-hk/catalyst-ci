@@ -272,7 +272,7 @@ def main():
             cargo_nextest(results, args.test_flags)
         else:
             # With coverage report
-            argo_llvm_cov(results, args.test_flags, args.cov_report)
+            cargo_llvm_cov(results, args.test_flags, args.cov_report)
 
     # Check if any benchmarks defined run (We don't validate the results.)
     if not args.disable_benches:
