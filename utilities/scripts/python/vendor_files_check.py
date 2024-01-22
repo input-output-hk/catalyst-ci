@@ -23,7 +23,7 @@ def toml_diff_check(
     provided_file_path: str,
     strict: bool = True,
     log: bool = True,
-):
+) -> exec_manager.Result:
     command_name = (
         f"{'' if strict else 'Non '}Strict Checking"
         + f"if Provided File {provided_file_path} == Vendored File {vendor_file_path}"
