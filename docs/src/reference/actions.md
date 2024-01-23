@@ -42,10 +42,8 @@ Using these actions individually should be avoided unless absolutely necessary.
 Note that attempting to lock to a specific tag eventually breaks when a new version
 of the CLI that is not backwards compatible is released.
 This can be solved by
-building an artifact by calling `release` target.
-The result should be that the CI
-always builds a local version of the CLI when running, thus avoiding a dependency on a
-release.
+building an artifact by calling `release` target,
+thus avoiding a dependency on a release.
 By using Earthly (with a remote runner) the local build will be extremely
 efficient and shouldn't add too much time to the CI pipeline.
 
