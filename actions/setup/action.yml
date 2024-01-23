@@ -112,7 +112,7 @@ runs:
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
       artifact: 'true'
-      artifact_path: '/usr/local/bin/'
+      artifact_path: 'tmp'
       earthfile: ./cli
       targets: release
       runner_address: ${{ inputs.runner_address }}
@@ -120,4 +120,4 @@ runs:
     shell: bash
     id: test
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    run: "echo Testing \nls /usr/local/bin\n"
+    run: "echo Testing \nls tmp\n"
