@@ -1,3 +1,15 @@
+# Use MOLD linker where possible, but ONLY in CI applicable targets.
+
+# Configure how Docker container targets build.
+
+# If you want to customize these targets for a local build, then customize them in your:
+#  $CARGO_HOME/config.toml
+# NOT in the project itself.
+# These targets are ONLY the targets used by CI and inside docker builds.
+
+# DO NOT remove `"-C", "target-feature=+crt-static"` from the rustflags for these targets.
+
+# Should be the default to have fully static rust programs in CI
 [target.x86_64-unknown-linux-musl]
 linker = "clang"
 rustflags = [
@@ -5,6 +17,7 @@ rustflags = [
     "-C", "target-feature=-crt-static"
 ]
 
+# Should be the default to have fully static rust programs in CI
 [target.aarch64-unknown-linux-musl]
 linker = "clang"
 rustflags = [
