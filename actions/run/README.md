@@ -14,7 +14,7 @@ To see a full demonstration of this action, see the [release workflow](../../.gi
 - name: Build
   uses: input-output-hk/catalyst-ci/actions/run@master
   with:
-    earthfile: ./**project**
+    earthfile: ./project
     target: build
     runner_address: tcp://runner:8372
 ```
