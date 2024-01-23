@@ -56,7 +56,7 @@ builder:
     DO ./../../earthly/rust+SETUP
 
     COPY --dir .cargo .config crates .
-    COPY Cargo.lock Cargo.toml .
+    COPY Cargo.toml .
     COPY clippy.toml deny.toml rustfmt.toml .
 ```
 
