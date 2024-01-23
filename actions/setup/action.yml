@@ -108,6 +108,7 @@ runs:
   # CI CLI is set to 'local', run release to create ci artifact
   # use buildkit-host tag
   - name: Build CI CLI
+    id: build-artifact
     uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
@@ -120,4 +121,5 @@ runs:
     shell: bash
     id: test
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    run: "echo Testing \nls cli\n"
+    run: |
+      echo '${{ steps.build-artifact.outputs.artifact }}'
