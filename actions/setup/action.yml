@@ -121,4 +121,4 @@ runs:
     shell: bash
     id: test
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    run: "mv ${{ steps.build-artifact.outputs.artifact }} /usr/local/bin/ci\nls \nls /usr/local/bin/ci\n"
+    run: "mv ${{ steps.build-artifact.outputs.artifact }} /usr/local/bin/ci echo 'Current' ls echo 'local bin' ls /usr/local/bin\n"
