@@ -35,7 +35,7 @@ def toml_diff_check(
             vendor_obj = tomllib.load(vendor_file)
             provided_obj = tomllib.load(provided_file)
 
-            diff = Diff(vendor_obj, provided_obj, strict)
+            diff = Diff(vendor_obj, provided_obj, strict).get_diff()
 
             return exec_manager.ProcedureResult(
                 1 if diff.has_diff() else 0,
