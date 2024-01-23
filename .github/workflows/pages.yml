@@ -88,7 +88,7 @@ jobs:
           earthfile: ${{ inputs.earthfile }}
           targets: ${{ inputs.target }}
           runner_address: ${{ secrets.earthly_runner_address }}
-          artifact_save_local: "true"
+          artifact: "true"
       - name: Publish docs
         uses: JamesIves/github-pages-deploy-action@v4.4.3
         with:

@@ -22,8 +22,7 @@ describe('Run Action', () => {
   describe('when testing running the earthly command', () => {
     it.each([
       {
-        artifactSaveLocal: '',
-        artifactName: '',
+        artifact: '',
         artifactPath: '',
         earthfile: './earthfile',
         flags: '',
@@ -39,8 +38,7 @@ describe('Run Action', () => {
         artifactOutput: ''
       },
       {
-        artifactSaveLocal: 'true',
-        artifactName: '',
+        artifact: 'true',
         artifactPath: 'out',
         earthfile: './earthfile',
         flags: '--test',
@@ -56,8 +54,7 @@ describe('Run Action', () => {
         artifactOutput: 'earthfile/out'
       },
       {
-        artifactSaveLocal: '',
-        artifactName: '',
+        artifact: '',
         artifactPath: '',
         earthfile: './earthfile',
         flags: '',
@@ -75,8 +72,7 @@ describe('Run Action', () => {
         artifactOutput: ''
       },
       {
-        artifactSaveLocal: '',
-        artifactName: '',
+        artifact: '',
         artifactPath: '',
         earthfile: './earthfile',
         flags: '--flag1 test -f2 test2',
@@ -103,8 +99,7 @@ describe('Run Action', () => {
         artifactOutput: ''
       },
       {
-        artifactSaveLocal: '',
-        artifactName: '',
+        artifact: '',
         artifactPath: '',
         earthfile: './targets/earthfile',
         flags: '',
@@ -121,29 +116,11 @@ describe('Run Action', () => {
         ],
         imageOutput: '',
         artifactOutput: ''
-      },
-      {
-        artifactSaveLocal: '',
-        artifactName: 'test',
-        artifactPath: 'out',
-        earthfile: './earthfile',
-        flags: '',
-        platform: '',
-        privileged: '',
-        output: '',
-        runnerAddress: '',
-        runnerPort: '',
-        targets: 'target',
-        targetFlags: '',
-        command: [['--artifact', './earthfile+target/test', 'out']],
-        imageOutput: '',
-        artifactOutput: 'earthfile/out/test'
       }
     ])(
       `should execute the correct command`,
       async ({
-        artifactSaveLocal,
-        artifactName,
+        artifact,
         artifactPath,
         earthfile,
         flags,
@@ -162,8 +139,6 @@ describe('Run Action', () => {
         const getBooleanInputMock = core.getBooleanInput as jest.Mock
         getInputMock.mockImplementation((name: string) => {
           switch (name) {
-            case 'artifact_name':
-              return artifactName
             case 'artifact_path':
               return artifactPath
             case 'earthfile':
@@ -191,8 +166,8 @@ describe('Run Action', () => {
 
         getBooleanInputMock.mockImplementation((name: string) => {
           switch (name) {
-            case 'artifact_save_local':
-              return artifactSaveLocal === 'true'
+            case 'artifact':
+              return artifact === 'true'
             case 'privileged':
               return privileged === 'true'
             default:
@@ -217,7 +192,7 @@ describe('Run Action', () => {
           expect(core.setOutput).toHaveBeenCalledWith('image', imageOutput)
         }
 
-        if (artifactSaveLocal === 'true') {
+        if (artifact === 'true') {
           // eslint-disable-next-line jest/no-conditional-expect
           expect(core.setOutput).toHaveBeenCalledWith(
             'artifact',

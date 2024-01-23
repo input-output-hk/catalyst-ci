@@ -3,8 +3,7 @@ import { spawn } from 'child_process'
 import * as path from 'path'
 
 export async function run(): Promise<void> {
-  const artifactSaveLocal = core.getBooleanInput('artifact_save_local')
-  const artifactName = core.getInput('artifact_name')
+  const artifact = core.getBooleanInput('artifact')
   const artifactPath = core.getInput('artifact_path')
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
@@ -47,12 +46,12 @@ export async function run(): Promise<void> {
   for (const t of targetsArgs) {
     core.info(`Running target: ${t}`)
     const argsSpawn = [...args]
-
-    if (artifactSaveLocal) {
+    // Artifact is set
+    if (artifact) {
+      core.info(
+        `Running --artifact with target ${t}, output to ${artifactPath}`
+      )
       argsSpawn.push('--artifact', `${t}/`, `${artifactPath}`)
-    } else if (artifactName.trim() !== '') {
-      core.info(`Pushing target ${t} with artifact tag`)
-      argsSpawn.push('--artifact', `${t}/${artifactName}`, `${artifactPath}`)
     } else {
       argsSpawn.push(t)
     }

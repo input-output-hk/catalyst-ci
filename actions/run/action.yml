@@ -1,7 +1,7 @@
 name: "Run"
 description: "Runs an Earthly target"
 inputs:
-  artifact_save_local:
+  artifact:
     description: If true, forces artifacts to be saved locally
     required: false
     default: "false"
@@ -9,10 +9,6 @@ inputs:
     description: The path (relative to earthfile) where artifacts will be placed
     required: false
     default: out
-  artifact_name:
-    description: Name of the artifact
-    required: false
-    default: ""
   earthfile:
     description: The path to the Earthfile containing the target to run
     required: true
