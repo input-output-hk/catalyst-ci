@@ -120,4 +120,4 @@ runs:
     shell: bash
     id: test
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    run: "echo Testing \nls\n"
+    run: "echo Testing \nls cli\n"
