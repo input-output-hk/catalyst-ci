@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# cspell: words rustfmt stdcfgs
+# cspell: words stdcfgs
 
 # This script is run inside the `check` stage for rust projects to perform all
 # high level non-compilation checks.

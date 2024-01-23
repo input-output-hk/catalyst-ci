@@ -65,6 +65,7 @@ idents
 rustflags
 rustdoc
 rustdocflags
+rustfmt
 codegen
 lintfix
 testunit

@@ -9,7 +9,7 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
-<!-- cspell: words toolsets stdcfgs rustfmt depgraph -->
+<!-- cspell: words toolsets stdcfgs depgraph -->
 
 ## Introduction
 

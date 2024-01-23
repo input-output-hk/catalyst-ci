@@ -1,7 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION --global-cache 0.7
 
-# cspell: words rustfmt stdcfgs toolset toolsets
+# cspell: words stdcfgs toolset toolsets
 
 # Internal: Set up our target toolchains, and copy our files.
 builder:
