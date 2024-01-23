@@ -122,4 +122,4 @@ runs:
     id: test
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     run: |
-      echo '${{ steps.build-artifact.outputs.artifact }}'
+      mv '${{ steps.build-artifact.outputs.artifact }}' /usr/local/bin/ci
