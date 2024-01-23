@@ -108,7 +108,7 @@ runs:
   # CI CLI is set to 'local', run release to create ci artifact
   # use buildkit-host tag
   - name: Build CI CLI
-    id: build-artifact
+    id: build-ci-artifact
     uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
@@ -117,8 +117,7 @@ runs:
       earthfile: ./cli
       targets: release
       runner_address: ${{ inputs.runner_address }}
-  - name: Testing
+  - name: Move CI CLI
     shell: bash
-    id: test
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    run: "ls ${{ steps.build-artifact.outputs.artifact }}\nmv '${{ steps.build-artifact.outputs.artifact }}/ci' /usr/local/bin \necho 'Current'\nls\necho 'local bin' \nls /usr/local/bin/ci\n"
+    run: mv '${{ steps.build-ci-artifact.outputs.artifact }}/ci' /usr/local/bin
