@@ -134,7 +134,7 @@ class Diff:
                         diff[key] = res
             return diff
 
-        diff = impl(self.a, self.b) if not reverse else impl(self.a, self.b)
+        diff = impl(self.a, self.b) if not reverse else impl(self.b, self.a)
         return DiffResult(diff)
 
     def _strict_diff_(self) -> DiffResult:
@@ -157,6 +157,7 @@ class Diff:
         # Because it's result has a "reverse" add_or_remove_flag meaning
         incl_diff_1 = self._inclusion_diff_()
         incl_diff_2 = self._inclusion_diff_(True)
+        change_flags(incl_diff_2.diff)
         incl_diff_1.diff.update(incl_diff_2.diff)
 
         return incl_diff_1
