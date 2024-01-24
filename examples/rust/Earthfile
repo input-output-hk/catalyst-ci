@@ -1,16 +1,14 @@
 VERSION --try --global-cache 0.7
 
-# cspell: words USERARCH toolsets rustfmt nextest
+# cspell: words USERARCH toolsets
 
 # Set up our target toolchains, and copy our files.
 builder:
-    FROM ./../../earthly/rust+rust-base
+    DO ./../../earthly/rust+SETUP
 
     COPY --dir .cargo .config crates .
-    COPY Cargo.lock Cargo.toml .
+    COPY Cargo.toml .
     COPY clippy.toml deny.toml rustfmt.toml .
-
-    DO ./../../earthly/rust+SETUP
 
 ## -----------------------------------------------------------------------------
 ##
@@ -36,10 +34,7 @@ build:
     FROM +builder
 
     TRY
-        RUN /scripts/std_build.py   --build_flags="" \
-                                    --with_test \
-                                    --with_bench \
-                                    --cov_report="coverage-report.info" \
+        RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
                                     --libs="bar" \
                                     --bins="foo/foo"
     FINALLY

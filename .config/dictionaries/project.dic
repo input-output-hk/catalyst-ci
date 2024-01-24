@@ -61,3 +61,16 @@ webkitallowfullscreen
 WORKDIR
 xerrors
 zstd
+idents
+rustflags
+rustdoc
+rustdocflags
+rustfmt
+codegen
+lintfix
+testunit
+nextest
+testcov
+testdocs
+fmtchk
+fmtfix

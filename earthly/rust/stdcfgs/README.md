@@ -1,6 +1,6 @@
 # Rust Standardized Configuration
 
-<!-- cspell: words nextest rustfmt -->
+<!-- cspell: words -->
 
 We define RUST Global Cargo Configurations here.
 It is applied globally to all Rust Code built by Project Catalyst.

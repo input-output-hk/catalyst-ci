@@ -4,6 +4,9 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 
+[lints]
+workspace = true
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -11,10 +14,6 @@ clap = {version= "4.4.7", features = ["derive" ] }
 
 [dev-dependencies]
 criterion = { version = "0.5.1", features = ["html_reports"] }
-
-[[test]]
-name = "integration_test"
-harness = false
 
 [[bench]]
 name = "benchmark"
