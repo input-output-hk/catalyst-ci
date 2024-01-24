@@ -113,8 +113,8 @@ class Diff:
         Checks that 'a' has an inclusion of 'b'.
         Args:
             reverse (bool): An inclusion diff calculation flag.
-                If 'True' evaluates that 'a' as an inclussion of 'b'.
-                If 'False' evaluates that 'b' as an inclussion of 'a'.
+                If 'True' evaluates that 'a' as an inclusion of 'b'.
+                If 'False' evaluates that 'b' as an inclusion of 'a'.
         """
 
         def impl(expected: dict, provided: dict) -> dict:
