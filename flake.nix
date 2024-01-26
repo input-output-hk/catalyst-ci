@@ -50,6 +50,7 @@
             nodePackages.typescript
 
             # Python
+            ruff
             poetry
             python312
           ];
