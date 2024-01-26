@@ -20,9 +20,10 @@ var _ = Describe("Cue", func() {
 
 		When("the file exists", func() {
 			It("returns a cue.Value", func() {
-				afero.WriteFile(os, "foo.cue", []byte("foo: 1"), 0644)
-				ctx := cuecontext.New()
+				err := afero.WriteFile(os, "foo.cue", []byte("foo: 1"), 0644)
+				Expect(err).ToNot(HaveOccurred())
 
+				ctx := cuecontext.New()
 				v, err := pkg.ReadFile(ctx, "foo.cue", os)
 				Expect(err).ToNot(HaveOccurred())
 				Expect(v).ToNot(BeNil())
