@@ -2,7 +2,6 @@ import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
 
-const assetName = 'cli-linux-amd64.tar.gz'
 const repoOwner = 'input-output-hk'
 const repoName = 'catalyst-ci'
 
@@ -15,8 +14,11 @@ export async function run(
   }
 
   try {
+    const assetName = core.getInput('asset')
     const token = core.getInput('token')
     const version = core.getInput('version')
+
+    const assetFullName = `${assetName}-linux-amd64.tar.gz`
 
     if (version !== 'latest' && !isSemVer(version)) {
       core.setFailed('Invalid version')
@@ -41,7 +43,7 @@ export async function run(
       return
     }
 
-    const asset = targetRelease.assets.find(a => a.name === assetName)
+    const asset = targetRelease.assets.find(a => a.name === assetFullName)
     if (!asset) {
       core.setFailed(`Asset for version v${version} not found`)
       return
