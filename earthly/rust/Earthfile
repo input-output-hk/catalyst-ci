@@ -1,10 +1,12 @@
 # Common Rust UDCs and Builders.
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words rustup miri nextest ripgrep colordiff rustfmt stdcfgs toolset depgraph lcov psycopg
+# cspell: words rustup miri ripgrep colordiff stdcfgs toolset depgraph lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
+# Parameters:
+#  * toolchain : The `rust-toolchain` toml file.
 rust-base:
     ARG TARGETPLATFORM
     ARG TARGETOS
@@ -19,7 +21,7 @@ rust-base:
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
-    FROM rust:1.73-alpine3.18
+    FROM rust:1.75-alpine3.18
 
     RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
         echo "TARGETOS       = $TARGETOS"; \
@@ -102,19 +104,15 @@ rust-base-all-hosts:
 #  * toolchain : The `rust-toolchain` toml file.
 SETUP:
     FUNCTION
-    ARG toolchain=./rust-toolchain.toml
+    FROM +rust-base
+
+    ARG toolchain=./rust-toolchain.toml 
 
     # Copy our toolchain dependency.
     COPY $toolchain ./rust-toolchain.toml
-    ENV default_rust_channel=$(rg -oP 'channel\s*=\s*"\K[^"]+' rust-toolchain.toml)
-
-    # Check that `default_rust_channel` and $RUST_VERSION from the rust-base container are exactly the same.
-    # This ensures CI Rust version and local rust version are properly aligned and prevents version skew.
-    RUN /scripts/verify_toolchain.sh $default_rust_channel $RUST_VERSION
 
     # Install pinned Rustup from `rust-toolchain.toml`
     # Plus nightly latest so we can use it for docs, lints, etc.
-    RUN rustup default $default_rust_channel && \
-        rustup show && \
+    RUN rustup show && \
         cargo --version && \
         cargo +nightly --version

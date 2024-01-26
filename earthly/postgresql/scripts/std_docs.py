@@ -3,7 +3,7 @@
 # cspell: words dbmigrations dbviz dbhost dbuser dbuserpw Tsvg
 
 from typing import Optional
-import python.cli as cli
+import python.exec_manager as exec_manager
 import python.db_ops as db_ops
 import argparse
 import rich
@@ -223,7 +223,7 @@ class Migrations:
         comments: Optional[bool] = None,
         column_description_wrap: Optional[int] = None,
         table_description_wrap: Optional[int] = None,
-    ) -> cli.Result:
+    ) -> exec_manager.Result:
         if len(title) > 0:
             title = f' --title "{title}"'
 
@@ -256,7 +256,7 @@ class Migrations:
         else:
             table_description_wrap = ""
 
-        res = cli.run(
+        res = exec_manager.cli_run(
             f"dbviz -d {self.args.dbname}"
             + f" -h {self.args.dbhost}"
             + f" -u {self.args.dbuser}"
@@ -274,7 +274,7 @@ class Migrations:
         )
 
         # if res.ok:
-        #    cli.run(
+        #    exec_manager.cli_run(
         #        f"dot -Tsvg {filename}.dot -o {filename}",
         #        name=f"Render Schema Diagram to SVG: {name}",
         #        verbose=True,
@@ -282,7 +282,7 @@ class Migrations:
 
         return res
 
-    def full_schema_diagram(self) -> cli.Result:
+    def full_schema_diagram(self) -> exec_manager.Result:
         # Create a full Schema Diagram.
         return self.dbviz(
             "docs/full-schema.svg",
@@ -294,7 +294,7 @@ class Migrations:
             table_description_wrap=self.full_schema_table_description_wrap(),
         )
 
-    def migration_schema_diagram(self, ver: int) -> cli.Result:
+    def migration_schema_diagram(self, ver: int) -> exec_manager.Result:
         # Create a schema diagram for an individual migration.
         if ver in self.migrations:
             migration = self.migrations[ver]
@@ -303,7 +303,7 @@ class Migrations:
                 self.all_schema_included_tables(), self.all_schema_excluded_tables()
             )
             if include_tables is None:
-                return cli.Result(
+                return exec_manager.Result(
                     0,
                     "",
                     "",
@@ -316,8 +316,8 @@ class Migrations:
             title = f"{migration.migration_name}"
             if migration.title and len(migration.title) > 0:
                 title = migration.title
-                
-            comments=None
+
+            comments = None
             if migration.comments is not None:
                 comments = migration.comments
             else:
@@ -334,7 +334,7 @@ class Migrations:
                 table_description_wrap=migration.table_description_wrap,
             )
 
-    def create_diagrams(self, results: cli.Results) -> cli.Results:
+    def create_diagrams(self, results: exec_manager.Results) -> exec_manager.Results:
         # Create a full Schema Diagram first.
         res = self.full_schema_diagram()
         results.add(res)
@@ -343,7 +343,7 @@ class Migrations:
             res = self.migration_schema_diagram(ver)
             results.add(res)
 
-        # cli.run("ls -al docs", verbose=True)
+        # exec_manager.cli_run("ls -al docs", verbose=True)
 
         return results
 
@@ -398,7 +398,7 @@ def main():
 
     db = db_ops.DBOps(args)
 
-    results = cli.Results("Generate Database Documentation")
+    results = exec_manager.Results("Generate Database Documentation")
 
     # Init the DB.
     res = db.init_database()
@@ -418,7 +418,7 @@ def main():
         results.add(res)
 
     if res.ok():
-        cli.run("mkdir docs")  # Where we build the docs.
+        exec_manager.cli_run("mkdir docs")  # Where we build the docs.
 
         # Get all info about the migrations.
         migrations = Migrations(args)
@@ -426,7 +426,7 @@ def main():
 
     if results.ok():
         migrations.create_markdown_file("docs/migrations.md")
-        # cli.run("cat /tmp/migrations.md", verbose=True)
+        # exec_manager.cli_run("cat /tmp/migrations.md", verbose=True)
 
     results.print()
 

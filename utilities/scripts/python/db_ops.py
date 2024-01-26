@@ -9,7 +9,7 @@ import argparse
 import os
 import time
 from typing import Optional
-import python.cli as cli
+import python.exec_manager as exec_manager
 import tempfile
 import threading
 
@@ -85,10 +85,10 @@ class DBOps:
         """
         return f"postgres://{self.args.dbsuperuser}:{self.args.dbsuperuserpw}@{self.args.dbhost}:{self.args.dbport}/{self.args.dbnamesuperuser}"
 
-    def init_database(self) -> cli.Result:
+    def init_database(self) -> exec_manager.Result:
         """
         Initializes the database by creating a temporary password file, running the 'initdb' command,
-        and updating the 'pg_hba.conf' file. The function takes no parameters and returns a 'cli.Result' object.
+        and updating the 'pg_hba.conf' file. The function takes no parameters and returns a 'exec_manager.Result' object.
         """
 
         with tempfile.NamedTemporaryFile(delete=False) as pwfile:
@@ -96,7 +96,7 @@ class DBOps:
             pwfile.flush()
 
             # Initialize the database
-            res = cli.run(
+            res = exec_manager.cli_run(
                 f"initdb -D {self.args.dbpath}"
                 + f" --locale-provider=icu --icu-locale={self.args.dbcollation} --locale={self.args.dbcollation}"
                 + f" -A {self.args.dbauthmethod}"
@@ -127,7 +127,7 @@ class DBOps:
             None
         """
         # print("Starting Database")
-        cli.run(
+        exec_manager.cli_run(
             f'pg_ctl -D "{self.args.dbpath}" start',
             name="Starting Database",
             verbose=True,
@@ -158,17 +158,17 @@ class DBOps:
 
         return
 
-    def db_ready(self) -> cli.Result:
+    def db_ready(self) -> exec_manager.Result:
         """
         Check if the database is ready for use.
 
-        :return: A `cli.Result` object containing the result of the `pg_isready` command.
+        :return: A `exec_manager.Result` object containing the result of the `pg_isready` command.
         """
-        return cli.run(
+        return exec_manager.cli_run(
             f"pg_isready -d {self.superuser_connection()}", name="Database Ready"
         )
 
-    def wait_ready(self, timeout: Optional[int] = None) -> cli.Result:
+    def wait_ready(self, timeout: Optional[int] = None) -> exec_manager.Result:
         """
         Waits for the database to be ready within the specified timeout period.
 
@@ -176,7 +176,7 @@ class DBOps:
             timeout (Optional[int]): The maximum number of seconds to wait for the database to be ready. Defaults to None.
 
         Returns:
-            cli.Result: An object representing the result of the database readiness check.
+            exec_manager.Result: An object representing the result of the database readiness check.
         """
         start_time = time.perf_counter()
 
@@ -190,19 +190,19 @@ class DBOps:
 
         return res
 
-    def setup(self) -> cli.Result:
+    def setup(self) -> exec_manager.Result:
         """
         Setup the default User and Database.
-        
+
         WARNING: Will destroy all data in the DB
-        
+
         :return: The result of running the setup command.
-        :rtype: cli.Result
+        :rtype: exec_manager.Result
         """
         # Setup the default User and Database
         # WARNING: Will destroy all data in the DB
 
-        return cli.run(
+        return exec_manager.cli_run(
             f"psql -v ON_ERROR_STOP=on"
             + f" -d {self.superuser_connection()} "
             + f" -f {self.args.setupdbsql}"
@@ -211,17 +211,17 @@ class DBOps:
             + f' -v dbUser="{self.args.dbuser}"'
             + f' -v dbUserPw="{self.args.dbuserpw}"',
             name="Setup Database",
-            verbose=True
+            verbose=True,
         )
 
-    def migrate_schema(self) -> cli.Result:
+    def migrate_schema(self) -> exec_manager.Result:
         """
         Run schema migrations.
 
-        :return: A cli.Result object representing the result of running the migrations.
+        :return: A exec_manager.Result object representing the result of running the migrations.
         """
         # Run schema migrations
-        return cli.run(
+        return exec_manager.cli_run(
             f"DATABASE_URL={self.user_connection()}"
             + f" refinery migrate -e DATABASE_URL"
             + f" -c {self.args.dbrefinerytoml} "

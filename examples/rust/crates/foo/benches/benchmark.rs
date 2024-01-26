@@ -1,6 +1,11 @@
 //! Simple benchmark example
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
 
+#[test]
+fn test_fibonacci() {
+    assert_eq!(fibonacci(20), 6765);
+}
+
 ///
 fn fibonacci(n: u64) -> u64 {
     match n {
