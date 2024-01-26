@@ -71,10 +71,10 @@ jobs:
             CLEAN_EXCLUDE="/nothing"
           fi
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
-          echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV    
-          echo "CLEAN_EXCLUDE=$CLEAN_EXCLUDE" >> $GITHUB_ENV    
+          echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV
+          echo "CLEAN_EXCLUDE=$CLEAN_EXCLUDE" >> $GITHUB_ENV
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@fix/ci-cli-build
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
@@ -82,7 +82,7 @@ jobs:
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Build docs
-        uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
+        uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
         with:
           earthfile: ${{ inputs.earthfile }}

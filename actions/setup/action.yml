@@ -72,7 +72,7 @@ runs:
       version: ${{ inputs.earthly_version }}
   # CI CLI is set to a version, install that version
   - name: Install CI CLI From Version
-    uses: input-output-hk/catalyst-ci/actions/install@fix/ci-cli-build
+    uses: input-output-hk/catalyst-ci/actions/install@master
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
     with:
       version: ${{ inputs.cli_version }}
@@ -101,7 +101,7 @@ runs:
       username: ${{ github.actor }}
       password: ${{ inputs.github_token }}
   - name: Setup Remote Runner
-    uses: input-output-hk/catalyst-ci/actions/configure-runner@fix/ci-cli-build
+    uses: input-output-hk/catalyst-ci/actions/configure-runner@master
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}
@@ -109,7 +109,7 @@ runs:
   # use buildkit-host tag
   - name: Build CI CLI
     id: build-ci-artifact
-    uses: input-output-hk/catalyst-ci/actions/run@fix/ci-cli-build
+    uses: input-output-hk/catalyst-ci/actions/run@master
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
       artifact: 'true'
