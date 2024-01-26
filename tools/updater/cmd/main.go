@@ -10,6 +10,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"github.com/alecthomas/kong"
 	"github.com/input-output-hk/catalyst-ci/tools/updater/pkg"
+	ch "github.com/mheers/cue-helper/pkg/value"
 )
 
 var cli struct {
@@ -31,10 +32,10 @@ func main() {
 		ctx.Fatalf("path %q does not exist", cli.Path)
 	}
 
-	v, err = pkg.FillPathOverride(cuectx, v, cli.Path, cli.Value)
+	v, err = ch.Replace(v, cli.Path, cli.Value)
 	ctx.FatalIfErrorf(err)
 
-	node := v.Syntax(cue.Final(), cue.Concrete(true))
+	node := v.Syntax(cue.Final(), cue.Concrete(true), cue.Docs(true))
 	src, err := format.Node(node)
 	ctx.FatalIfErrorf(err)
 
