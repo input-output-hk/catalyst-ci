@@ -13719,7 +13719,6 @@ var github = __nccwpck_require__(5438);
 
 
 
-const assetName = 'cli-linux-amd64.tar.gz';
 const repoOwner = 'input-output-hk';
 const repoName = 'catalyst-ci';
 async function run(platform = process.platform) {
@@ -13728,8 +13727,10 @@ async function run(platform = process.platform) {
         return;
     }
     try {
+        const assetName = core.getInput('asset');
         const token = core.getInput('token');
         const version = core.getInput('version');
+        const assetFullName = `${assetName}-linux-amd64.tar.gz`;
         if (version !== 'latest' && !isSemVer(version)) {
             core.setFailed('Invalid version');
             return;
@@ -13750,7 +13751,7 @@ async function run(platform = process.platform) {
             core.setFailed(`Version ${version} not found`);
             return;
         }
-        const asset = targetRelease.assets.find(a => a.name === assetName);
+        const asset = targetRelease.assets.find(a => a.name === assetFullName);
         if (!asset) {
             core.setFailed(`Asset for version v${version} not found`);
             return;
