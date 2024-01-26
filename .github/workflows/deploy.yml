@@ -15,7 +15,7 @@ on:
         default: dev
       images:
         description: A newline separated list of image names to deploy
-        required: true
+        #required: true
         type: string
       tag:
         description: The image tag to deploy
@@ -36,18 +36,25 @@ jobs:
           with:
             repository: ${{ inputs.deployment_repo }}
             token: ${{ secrets.token }}
-        - name: Merge hashes
-          uses: input-output-hk/catalyst-ci/actions/merge@master
+        - name: Install updater CLI
+          uses: input-output-hk/catalyst-ci/actions/install@allow-multiple-install
           with:
-            hash_file: "src/kube/environments/${{ inputs.environment }}/hashes.json"
-            images: ${{ inputs.images }}
-            tag: ${{ inputs.tag }}
-        - name: Run diff
-          run: git --no-pager diff
-        - name: Commit and push
-          uses: EndBug/add-and-commit@v9
-          with:
-            author_name: catalyst-cibot
-            author_email: ci@projectcatalyst.io
-            message: "chore: updates ${{ github.event.repository.name }} deployments"
-            push: true
+            asset: updater
+        - name: Test
+          run: |
+            updater --help
+        # - name: Merge hashes
+        #   uses: input-output-hk/catalyst-ci/actions/merge@master
+        #   with:
+        #     hash_file: "src/kube/environments/${{ inputs.environment }}/hashes.json"
+        #     images: ${{ inputs.images }}
+        #     tag: ${{ inputs.tag }}
+        # - name: Run diff
+        #   run: git --no-pager diff
+        # - name: Commit and push
+        #   uses: EndBug/add-and-commit@v9
+        #   with:
+        #     author_name: catalyst-cibot
+        #     author_email: ci@projectcatalyst.io
+        #     message: "chore: updates ${{ github.event.repository.name }} deployments"
+        #     push: true
