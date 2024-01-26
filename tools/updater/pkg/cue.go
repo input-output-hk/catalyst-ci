@@ -1,17 +1,17 @@
 package pkg
 
-// cspell: words cuelang
+// cspell: words afero cuelang
 
 import (
 	"fmt"
-	"os"
 
 	"cuelang.org/go/cue"
+	"github.com/spf13/afero"
 )
 
 // ReadFile reads a CUE file and returns a cue.Value.
-func ReadFile(ctx *cue.Context, path string) (cue.Value, error) {
-	contents, err := os.ReadFile(path)
+func ReadFile(ctx *cue.Context, path string, os afero.Fs) (cue.Value, error) {
+	contents, err := afero.ReadFile(os, path)
 	if err != nil {
 		return cue.Value{}, fmt.Errorf("failed to read file %q: %w", path, err)
 	}

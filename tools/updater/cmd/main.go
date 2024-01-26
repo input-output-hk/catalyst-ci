@@ -1,6 +1,6 @@
 package main
 
-// cspell: words alecthomas cuelang cuecontext cuectx existingfile Timoni nolint
+// cspell: words afero alecthomas cuelang cuecontext cuectx existingfile Timoni nolint
 
 import (
 	"os"
@@ -11,6 +11,7 @@ import (
 	"github.com/alecthomas/kong"
 	"github.com/input-output-hk/catalyst-ci/tools/updater/pkg"
 	ch "github.com/mheers/cue-helper/pkg/value"
+	"github.com/spf13/afero"
 )
 
 var cli struct {
@@ -25,7 +26,7 @@ func main() {
 		kong.Description("A helper tool for modifying CUE files to override arbitrary values. Useful for updating Timoni bundles."))
 
 	cuectx := cuecontext.New()
-	v, err := pkg.ReadFile(cuectx, cli.BundleFile)
+	v, err := pkg.ReadFile(cuectx, cli.BundleFile, afero.NewOsFs())
 	ctx.FatalIfErrorf(err)
 
 	if !v.LookupPath(cue.ParsePath(cli.Path)).Exists() {
