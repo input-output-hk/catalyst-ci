@@ -1,68 +1,41 @@
 package pkg_test
 
-// cspell: words cuelang cuecontext
+// cspell: words afero cuelang cuecontext
 
 import (
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"github.com/input-output-hk/catalyst-ci/tools/updater/pkg"
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	"github.com/spf13/afero"
 )
 
 var _ = Describe("Cue", func() {
-	Describe("FillPathOverride", func() {
-		var path, str string
+	Describe("ReadFile", func() {
+		var os afero.Fs
 
-		When("given a nested CUE source", func() {
-			When("the path exists", func() {
-				BeforeEach(func() {
-					path = "bundles.instances.module.values.image.tag"
-					str = `
-					bundle: {
-						instances: {
-							module: {
-								values: {
-									image: tag: "test"
-								}
-							}
-						}
-					}
-				`
-				})
+		BeforeEach(func() {
+			os = afero.NewMemMapFs()
+		})
 
-				It("should override the value at the given path", func() {
-					ctx := cuecontext.New()
-					v := ctx.CompileString(str)
+		When("the file exists", func() {
+			It("returns a cue.Value", func() {
+				err := afero.WriteFile(os, "foo.cue", []byte("foo: 1"), 0644)
+				Expect(err).ToNot(HaveOccurred())
 
-					v, err := pkg.FillPathOverride(ctx, v, path, "test1")
-					Expect(err).ToNot(HaveOccurred())
-
-					result, err := v.LookupPath(cue.ParsePath(path)).String()
-					Expect(err).ToNot(HaveOccurred())
-					Expect(result).To(Equal("test1"))
-				})
+				ctx := cuecontext.New()
+				v, err := pkg.ReadFile(ctx, "foo.cue", os)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(v).ToNot(BeNil())
 			})
+		})
 
-			When("the path does not include structs", func() {
-				BeforeEach(func() {
-					path = "bundles.instances.module.values.image.tag"
-					str = `
-					bundles: {
-						instances: {
-							module: "test"
-						}
-					}
-				`
-				})
+		When("the file does not exist", func() {
+			It("returns an error", func() {
+				ctx := cuecontext.New()
 
-				It("should return an error", func() {
-					ctx := cuecontext.New()
-					v := ctx.CompileString(str)
-
-					_, err := pkg.FillPathOverride(ctx, v, path, "test1")
-					Expect(err).To(HaveOccurred())
-				})
+				_, err := pkg.ReadFile(ctx, "foo.cue", os)
+				Expect(err).To(HaveOccurred())
 			})
 		})
 	})
