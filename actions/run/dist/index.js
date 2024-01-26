@@ -2914,7 +2914,7 @@ async function run() {
         const argsSpawn = [...args];
         // Artifact is set
         if (artifact) {
-            core.info(`Pushing target ${t} with artifact tag`);
+            core.info(`Running --artifact with target ${t}, output to ${artifactPath}`);
             argsSpawn.push('--artifact', `${t}/`, `${artifactPath}`);
         }
         else {

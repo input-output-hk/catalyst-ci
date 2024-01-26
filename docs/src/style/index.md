@@ -12,11 +12,12 @@ In most circumstances, the standards provided by this style guide should *not* b
 If an exception must me made, the rationale should be included in the respective PR.
 Any `Earthfile` which does not adhere to this style guide will be rejected if no further justification is made.
 
-### Earthly User Defined Commands (Functions) deprecated starting from Earthly 0.8
-
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Warning
-Please be advised that Earthly's File Descriptor Cache (FDC) is deprecated, effective upon updating to Earthly 0.8.
+    UDC (User Defined Commands) will be renamed to FUNCTION in Earthly 0.8.
+    Earthly 0.7 still uses COMMAND for declaring functions, but
+    the keyword is deprecated and will be replaced by FUNCTION in
+    Earthly 0.8. Please refer to [link](https://docs.earthly.dev/docs/guides/functions) for more information.
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
 ## Organization

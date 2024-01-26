@@ -57,17 +57,23 @@ inputs:
     description: Github token used to login to GHCR (defaults to runner token)
     required: false
     default: ${{ github.token }}
+  runner_address:
+    description: |
+      The address of the Earthly runner that will be used to build the
+      Earthly files.
+    required: false
 runs:
   using: composite
   steps:
   - name: Install Earthly
     uses: earthly/actions-setup@v1
-    if: ${{ inputs.earthly_skip_install != 'true' }}
+    if: ${{ inputs.earthly_skip_install == 'false' }}
     with:
       version: ${{ inputs.earthly_version }}
-  - name: Install CI CLI
+  # CI CLI is set to a version, install that version
+  - name: Install CI CLI From Version
     uses: input-output-hk/catalyst-ci/actions/install@master
-    if: ${{ inputs.cli_skip_install != 'true' }}
+    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
     with:
       version: ${{ inputs.cli_version }}
   - name: Configure AWS Credentials
@@ -99,3 +105,19 @@ runs:
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}
+  # CI CLI is set to 'local', run release to create ci artifact
+  # use buildkit-host tag
+  - name: Build CI CLI
+    id: build-ci-artifact
+    uses: input-output-hk/catalyst-ci/actions/run@master
+    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
+    with:
+      artifact: 'true'
+      artifact_path: 'tmp'
+      earthfile: ./cli
+      targets: release
+      runner_address: ${{ inputs.runner_address }}
+  - name: Move CI CLI
+    shell: bash
+    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
+    run: mv '${{ steps.build-ci-artifact.outputs.artifact }}/ci' /usr/local/bin

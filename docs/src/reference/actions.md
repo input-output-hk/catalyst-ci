@@ -28,7 +28,8 @@ It performs the necessary steps to setup the local GitHub runner to perform CI t
 This includes:
 
 * Installing Earthly
-* Installing the custom CI CLI or build the CI locally if the flag is set
+* Installing the custom CI CLI from a given version or
+from an artifact generated in CI CLI `release` target
 * Configuring access to AWS
 * Authenticating with container registries
 * Configuring the Earthly remote runner
@@ -37,6 +38,14 @@ Most of these steps are configurable and can be individually disabled.
 When creating custom workflows, it's highly recommended to use this action to perform common set up tasks.
 This action uses the `configure-runner` and `install` actions underneath the hood.
 Using these actions individually should be avoided unless absolutely necessary.
+
+Note that attempting to lock to a specific tag eventually breaks when a new version
+of the CLI that is not backwards compatible is released.
+This can be solved by
+building an artifact by calling `release` target,
+thus avoiding a dependency on a release.
+By using Earthly (with a remote runner) the local build will be extremely
+efficient and shouldn't add too much time to the CI pipeline.
 
 ### Discover
 

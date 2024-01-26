@@ -2,7 +2,6 @@ import * as core from '@actions/core'
 import * as tc from '@actions/tool-cache'
 import * as github from '@actions/github'
 import { run } from './install'
-import { exec } from '@actions/exec'
 
 jest.mock('@actions/core', () => {
   return {
@@ -18,14 +17,10 @@ jest.mock('@actions/tool-cache', () => ({
 jest.mock('@actions/github', () => ({
   getOctokit: jest.fn()
 }))
-jest.mock('@actions/exec', () => ({
-  exec: jest.fn()
-}))
 
 describe('Setup Action', () => {
   const token = 'token'
   const version = '1.0.0'
-  const local = 'false'
 
   // actions core mocks
   const getInputMock = core.getInput as jest.Mock
@@ -52,36 +47,6 @@ describe('Setup Action', () => {
     describe('when the platform is linux', () => {
       const platform = 'linux'
 
-      describe('when local flag is set', () => {
-        beforeAll(() => {
-          getInputMock.mockImplementation((name: string) => {
-            switch (name) {
-              case 'token':
-                return token
-              case 'version':
-                return version
-              case 'local':
-                return 'true'
-              default:
-                throw new Error(`Unknown input ${name}`)
-            }
-          })
-        })
-        it('should call local ci build command', async () => {
-          await run(platform)
-          expect(exec).toHaveBeenCalledWith(
-            'go',
-            [
-              'build',
-              '-ldflags=-extldflags=-static',
-              '-o',
-              '/usr/local/bin/ci',
-              'cmd/main.go'
-            ],
-            { cwd: 'cli/' }
-          )
-        })
-      })
       describe('when the version is invalid', () => {
         beforeAll(() => {
           getInputMock.mockImplementation((name: string) => {
@@ -90,8 +55,6 @@ describe('Setup Action', () => {
                 return token
               case 'version':
                 return 'invalid'
-              case 'local':
-                return local
               default:
                 throw new Error(`Unknown input ${name}`)
             }
@@ -112,8 +75,6 @@ describe('Setup Action', () => {
                 return token
               case 'version':
                 return version
-              case 'local':
-                return local
               default:
                 throw new Error(`Unknown input ${name}`)
             }
@@ -242,8 +203,6 @@ describe('Setup Action', () => {
                       return token
                     case 'version':
                       return 'latest'
-                    case 'local':
-                      return local
                     default:
                       throw new Error(`Unknown input ${name}`)
                   }

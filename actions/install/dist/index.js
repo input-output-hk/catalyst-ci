@@ -13715,10 +13715,7 @@ var core = __nccwpck_require__(2186);
 var tool_cache = __nccwpck_require__(7784);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(5438);
-// EXTERNAL MODULE: ./node_modules/@actions/exec/lib/exec.js
-var exec = __nccwpck_require__(1514);
 ;// CONCATENATED MODULE: ./src/install.ts
-
 
 
 
@@ -13733,21 +13730,6 @@ async function run(platform = process.platform) {
     try {
         const token = core.getInput('token');
         const version = core.getInput('version');
-        const local = core.getInput('local');
-        // Local flag is tagged as true
-        if (local === 'true') {
-            core.info('Building ci locally');
-            // go into cli folder
-            // build the ci and move to /usr/local/bin/ci
-            await (0,exec.exec)('go', [
-                'build',
-                '-ldflags=-extldflags=-static',
-                '-o',
-                '/usr/local/bin/ci',
-                'cmd/main.go'
-            ], { cwd: 'cli/' });
-            return;
-        }
         if (version !== 'latest' && !isSemVer(version)) {
             core.setFailed('Invalid version');
             return;

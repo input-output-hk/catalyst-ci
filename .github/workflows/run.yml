@@ -68,9 +68,14 @@ jobs:
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
+          aws_role_arn: ${{ inputs.aws_role_arn }}
+          aws_region: ${{ inputs.aws_region }}
           cli_version: ${{ inputs.ci_cli_version }}
-          configure_registries: "false"
-          earthly_skip_install: "true"
+          dockerhub_token: ${{ secrets.dockerhub_token }}
+          dockerhub_username: ${{ secrets.dockerhub_username }}
+          earthly_version: ${{ inputs.earthly_version }}
+          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+          runner_address: ${{ secrets.earthly_runner_address }}
       - name: Discover Earthly files
         uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
@@ -116,6 +121,7 @@ jobs:
           dockerhub_username: ${{ secrets.dockerhub_username }}
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+          runner_address: ${{ secrets.earthly_runner_address }}
       - name: Run
         uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
