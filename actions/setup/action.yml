@@ -65,59 +65,57 @@ inputs:
 runs:
   using: composite
   steps:
-  - name: Install Earthly
-    uses: earthly/actions-setup@v1
-    if: ${{ inputs.earthly_skip_install == 'false' }}
-    with:
-      version: ${{ inputs.earthly_version }}
-  # CI CLI is set to a version, install that version
-  - name: Install CI CLI From Version
-    uses: input-output-hk/catalyst-ci/actions/install@master
-    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
-    with:
-      version: ${{ inputs.cli_version }}
-  - name: Configure AWS Credentials
-    uses: aws-actions/configure-aws-credentials@v4
-    if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
-    with:
-      role-to-assume: ${{ inputs.aws_role_arn }}
-      aws-region: ${{ inputs.aws_region }}
-  - name: Login to Docker Hub
-    uses: docker/login-action@v3
-    if: ${{ inputs.dockerhub_username != '' && inputs.dockerhub_token != '' && inputs.configure_registries == 'true' }}
-    with:
-      username: ${{ inputs.dockerhub_username }}
-      password: ${{ inputs.dockerhub_token }}
-  - name: Login to ECR
-    uses: docker/login-action@v3
-    if: ${{ inputs.aws_role_arn != '' && inputs.aws_ecr_registry != '' && inputs.configure_registries == 'true' }}
-    with:
-      registry: ${{ inputs.aws_ecr_registry }}
-  - name: Login to GitHub Container Registry
-    uses: docker/login-action@v3
-    if: ${{ inputs.configure_registries == 'true' }}
-    with:
-      registry: ghcr.io
-      username: ${{ github.actor }}
-      password: ${{ inputs.github_token }}
-  - name: Setup Remote Runner
-    uses: input-output-hk/catalyst-ci/actions/configure-runner@master
-    if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
-    with:
-      secret: ${{ inputs.earthly_runner_secret }}
-  # CI CLI is set to 'local', run release to create ci artifact
-  # use buildkit-host tag
-  - name: Build CI CLI
-    id: build-ci-artifact
-    uses: input-output-hk/catalyst-ci/actions/run@master
-    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    with:
-      artifact: 'true'
-      artifact_path: 'tmp'
-      earthfile: ./cli
-      targets: release
-      runner_address: ${{ inputs.runner_address }}
-  - name: Move CI CLI
-    shell: bash
-    if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
-    run: mv '${{ steps.build-ci-artifact.outputs.artifact }}/ci' /usr/local/bin
+    # Login to Docker Hub first as it increases our API rate limit
+    - name: Login to Docker Hub
+      uses: docker/login-action@v3
+      if: ${{ inputs.dockerhub_username != '' && inputs.dockerhub_token != '' }}
+      with:
+        username: ${{ inputs.dockerhub_username }}
+        password: ${{ inputs.dockerhub_token }}
+    - name: Install Earthly
+      uses: earthly/actions-setup@v1
+      if: ${{ inputs.earthly_skip_install == 'false' }}
+      with:
+        version: ${{ inputs.earthly_version }}
+    - name: Install CI CLI From Version
+      uses: input-output-hk/catalyst-ci/actions/install@master
+      if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
+      with:
+        version: ${{ inputs.cli_version }}
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
+      with:
+        role-to-assume: ${{ inputs.aws_role_arn }}
+        aws-region: ${{ inputs.aws_region }}
+    - name: Login to ECR
+      uses: docker/login-action@v3
+      if: ${{ inputs.aws_role_arn != '' && inputs.aws_ecr_registry != '' && inputs.configure_registries == 'true' }}
+      with:
+        registry: ${{ inputs.aws_ecr_registry }}
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v3
+      if: ${{ inputs.configure_registries == 'true' }}
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ inputs.github_token }}
+    - name: Setup Remote Runner
+      uses: input-output-hk/catalyst-ci/actions/configure-runner@master
+      if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
+      with:
+        secret: ${{ inputs.earthly_runner_secret }}
+    - name: Build CI CLI
+      id: build-ci-artifact
+      uses: input-output-hk/catalyst-ci/actions/run@master
+      if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
+      with:
+        artifact: "true"
+        artifact_path: "tmp"
+        earthfile: ./cli
+        targets: release
+        runner_address: ${{ inputs.runner_address }}
+    - name: Move CI CLI
+      shell: bash
+      if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
+      run: mv '${{ steps.build-ci-artifact.outputs.artifact }}/ci' /usr/local/bin
