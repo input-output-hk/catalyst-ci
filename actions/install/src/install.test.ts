@@ -51,6 +51,8 @@ describe('Setup Action', () => {
         beforeAll(() => {
           getInputMock.mockImplementation((name: string) => {
             switch (name) {
+              case 'asset':
+                return 'cli'
               case 'token':
                 return token
               case 'version':
@@ -71,6 +73,8 @@ describe('Setup Action', () => {
         beforeAll(() => {
           getInputMock.mockImplementation((name: string) => {
             switch (name) {
+              case 'asset':
+                return 'cli'
               case 'token':
                 return token
               case 'version':
@@ -103,7 +107,7 @@ describe('Setup Action', () => {
         })
 
         describe('when the version exists', () => {
-          describe('when the assets is not found', () => {
+          describe('when the asset is not found', () => {
             beforeAll(() => {
               getOctokitMock.mockReturnValue({
                 rest: {
@@ -199,6 +203,8 @@ describe('Setup Action', () => {
               beforeAll(() => {
                 getInputMock.mockImplementation((name: string) => {
                   switch (name) {
+                    case 'asset':
+                      return 'cli'
                     case 'token':
                       return token
                     case 'version':

@@ -1,6 +1,10 @@
 name: Install
 description: Installs the Catalyst-CI CLI
 inputs:
+  asset:
+    description: Which asset to install from the Catalyst-CI repository
+    required: false
+    default: cli
   token:
     description: Github token used to query API for available CLI releases
     required: false
