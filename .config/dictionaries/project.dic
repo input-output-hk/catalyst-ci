@@ -27,6 +27,7 @@ GOMODCACHE
 gopls
 gosec
 graphviz
+jorm
 jormungandr
 Kroki
 kubeconfig

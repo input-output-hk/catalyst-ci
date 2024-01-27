@@ -3,7 +3,7 @@
   description = "Catalyst CI";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     devenv.url = "github:cachix/devenv";
     mk-shell-bin.url = "github:rrbutani/nix-mk-shell-bin";
   };
@@ -50,6 +50,7 @@
             nodePackages.typescript
 
             # Python
+            ruff
             poetry
             python312
           ];
