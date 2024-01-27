@@ -14,13 +14,15 @@ class Scraper:
         client (ApiClient): The API client to use.
         metrics (list[Callable[[ApiClient], None]]):
             A list of metric scrape functions to call.
+        storage (str): A path to a directory to store cached data.
     """
 
     client: ApiClient
     metrics: Callable[[ApiClient], None]
+    storage: str
 
-    def __init__(self, api_url: str):
-        self.client = ApiClient(api_url)
+    def __init__(self, api_url: str, storage: str):
+        self.client = ApiClient(api_url, storage)
         self.metrics = []
 
     def register(self, metric: Callable[[ApiClient], None]):

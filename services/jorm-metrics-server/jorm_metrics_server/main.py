@@ -10,11 +10,18 @@ from aiohttp import web as aiohttp_web
 from loguru import logger
 from prometheus_async.aio import web
 
-from .metrics import unique_voters
+from .metrics import proposal_votes, unique_voters, vote_power_dist
 from .scraper import Scraper
 
+# Map of metric names to metric scrapers
+METRIC_MAP = {
+    "num_proposal_votes": proposal_votes.scrape,
+    "num_unique_voters": unique_voters.scrape,
+    "voting_power": vote_power_dist.scrape,
+}
 
-async def scrape(api_url: str, interval: int):
+
+async def scrape(api_url: str, interval: int, storage: str, metrics: str):
     """Scrape metrics from the Jormungandr API.
 
     Args:
@@ -23,8 +30,12 @@ async def scrape(api_url: str, interval: int):
     """
     logger.info("Starting scraping loop")
 
-    scraper = Scraper(api_url)
-    scraper.register(unique_voters.scrape)
+    scraper = Scraper(api_url, storage)
+    for metric in metrics.split(","):
+        if metric not in METRIC_MAP:
+            logger.warning(f"Unknown metric: {metric}")
+            continue
+        scraper.register(METRIC_MAP[metric])
 
     try:
         while True:
@@ -79,6 +90,18 @@ async def serve_metrics(address: str, port: int):
     envvar="INTERVAL",
 )
 @click.option(
+    "--storage",
+    help="A path to a directory where the metrics server will store a cache.",
+    default="/tmp/cache",
+    envvar="STORAGE",
+)
+@click.option(
+    "--metrics",
+    help="Comma-separated list of metrics to scrape.",
+    default="num_proposal_votes,num_unique_voters,voting_power",
+    envvar="METRICS",
+)
+@click.option(
     "--disable-json",
     is_flag=True,
     help="Disable outputting logs in JSON format.",
@@ -86,12 +109,21 @@ async def serve_metrics(address: str, port: int):
     envvar="DISABLE_JSON_LOGS",
 )
 async def main(
-    address: str, port: int, api_url: str, interval: int, disable_json: bool
+    address: str,
+    port: int,
+    api_url: str,
+    interval: int,
+    storage: str,
+    metrics: str,
+    disable_json: bool,
 ):
     logger.remove()
     logger.add(sys.stderr, serialize=not disable_json)
 
-    tasks = [scrape(api_url, interval), serve_metrics(address, port)]
+    tasks = [
+        scrape(api_url, interval, storage, metrics),
+        serve_metrics(address, port),
+    ]
 
     try:
         await asyncio.gather(*tasks)
