@@ -1,5 +1,7 @@
 """This module provides a client for interacting with the Jormungandr API."""
 
+# cspell: words aiohttp
+
 from typing import Any
 from urllib.parse import urljoin
 

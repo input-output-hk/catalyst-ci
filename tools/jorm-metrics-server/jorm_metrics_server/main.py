@@ -1,5 +1,7 @@
 """Jormungandr metrics server."""
 
+# cspell: words asyncclick aiohttp loguru
+
 import asyncio
 import sys
 

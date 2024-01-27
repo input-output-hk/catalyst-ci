@@ -43,5 +43,6 @@
         "cspell.json",
         "**/**/go.mod",
         "**/**/go.sum",
+        "**/**/pyproject.toml",
     ]
 }

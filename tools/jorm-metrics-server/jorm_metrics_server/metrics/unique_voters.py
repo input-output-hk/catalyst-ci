@@ -1,5 +1,7 @@
 """This module provides the number of unique voters (wallets)."""
 
+# cspell: words pydantic
+
 from prometheus_client import Gauge
 from pydantic import BaseModel
 
