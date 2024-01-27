@@ -25,7 +25,7 @@ deps:
 src:
     FROM +deps
 
-    COPY --dir jorm-metrics-server .
+    COPY --dir jorm_metrics_server .
 
 check:
     FROM +src
@@ -35,7 +35,7 @@ check:
     RUN poetry run ruff format --check .
 
 build:
-    FROM +deps
+    FROM +src
 
     COPY --dir jorm_metrics_server .
     RUN poetry install --only main
