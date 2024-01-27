@@ -10,7 +10,7 @@ bin/
 node_modules
 
 # Developer only files
-/.vscode
+.vscode
 
 # Built docs
 /earthly/docs/site
