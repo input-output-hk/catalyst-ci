@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel
 
-# cspell: words voteplan
+# cspell: words pydantic voteplan
 
 
 class ProposalProposer(BaseModel):
