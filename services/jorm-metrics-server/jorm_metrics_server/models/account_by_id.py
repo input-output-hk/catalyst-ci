@@ -11,7 +11,7 @@ class Delegation(BaseModel):
     """Information about delegation.
 
     Attributes:
-        pools (list[list[Any]]): The list of pools the account has delegated to.
+        pools (list[list[Any]]): The list of pools the account has delegated.
     """
 
     pools: list[list[Any]]
