@@ -1,6 +1,6 @@
 """This module provides a client for interacting with the Jormungandr API."""
 
-# cspell: words aiohttp
+# cspell: words aiohttp loguru pydantic
 
 import asyncio
 import os

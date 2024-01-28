@@ -1,3 +1,9 @@
+"""
+This module provides a model for the api/v1/votes/plan/account-votes endpoint.
+"""
+
+# cspell: words pydantic
+
 from pydantic import BaseModel
 
 

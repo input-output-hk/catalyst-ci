@@ -1,4 +1,8 @@
+"""This module provides a model for the /api/v0/proposals endpoint."""
+
 from pydantic import BaseModel
+
+# cspell: words voteplan
 
 
 class ProposalProposer(BaseModel):

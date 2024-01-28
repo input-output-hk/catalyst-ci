@@ -1,5 +1,7 @@
 """This module provides a model for the /api/v0/account/account_id endpoint."""
 
+# cspell: words pydantic
+
 from typing import Any
 
 from pydantic import BaseModel

@@ -1,3 +1,7 @@
+"""This module provides a model for representing an active voter."""
+
+# cspell: words pydantic
+
 from pydantic import BaseModel
 
 from .account_by_id import AccountByID

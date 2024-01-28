@@ -1,6 +1,8 @@
 """This module provides a model for the /api/v1/votes/plan/accounts-votes-count
 endpoint."""
 
+# cspell: words pydantic
+
 from pydantic import BaseModel
 
 
