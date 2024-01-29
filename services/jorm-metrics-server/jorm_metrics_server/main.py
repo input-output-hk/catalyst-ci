@@ -10,14 +10,14 @@ from aiohttp import web as aiohttp_web
 from loguru import logger
 from prometheus_async.aio import web
 
-from .metrics import proposal_votes, unique_voters, vote_power_dist
+from .metrics import proposal_votes, unique_voters, voting_power
 from .scraper import Scraper
 
 # Map of metric names to metric scrapers
 METRIC_MAP = {
     "num_proposal_votes": proposal_votes.scrape,
     "num_unique_voters": unique_voters.scrape,
-    "voting_power": vote_power_dist.scrape,
+    "voting_power": voting_power.scrape,
 }
 
 
