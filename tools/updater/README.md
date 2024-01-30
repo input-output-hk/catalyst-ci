@@ -142,15 +142,15 @@ $ updater scan . | updater update deployments -e dev /path/to/deployment-repo/bu
 
 The above command performs the following for each given override:
 
-- Constructs a path to the bundle file: `<root_path>/<environment>/<app>/bundle.cue`
-- Constructs a path to override: `bundle.instances.<instance>.values.<value>`
-- Overrides the constructed value path within the constructed file path with the override value
+* Constructs a path to the bundle file: `<root_path>/<environment>/<app>/bundle.cue`
+* Constructs a path to override: `bundle.instances.<instance>.values.<value>`
+* Overrides the constructed value path within the constructed file path with the override value
 
 Using the previous examples, it would perform the following:
 
-- Constructs a path to the bundle file: `/path/to/deployment-repo/bundles/dev/app1/bundle.cue`
-- Constructs a path to override: `bundle.instances.app1.values.server.image.tag`
-- Overrides the constructed value path with `v0.2.0`
+* Constructs a path to the bundle file: `/path/to/deployment-repo/bundles/dev/app1/bundle.cue`
+* Constructs a path to override: `bundle.instances.app1.values.server.image.tag`
+* Overrides the constructed value path with `v0.2.0`
 
 This setup allows updating arbitrary bundle files and their respective values by defining a single `deployment.yml` file at the root
 of a given application.
