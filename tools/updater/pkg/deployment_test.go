@@ -1,5 +1,7 @@
 package pkg_test
 
+// cspell: words afero
+
 import (
 	"fmt"
 

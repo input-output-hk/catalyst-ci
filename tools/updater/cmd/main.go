@@ -1,6 +1,6 @@
 package main
 
-// cspell: words afero alecthomas cuelang cuecontext cuectx existingfile mheers Timoni nolint
+// cspell: words afero alecthomas cuectx existingdir existingfile Timoni nolint
 
 import (
 	"encoding/json"

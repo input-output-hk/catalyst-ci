@@ -3,7 +3,7 @@
 > A helper tool for updating CUE files, especially [Timoni] bundle files.
 
 The `updater` CLI provides an interface for performing common deployment operations within Project Catalyst.
-It has various subcommands centered around supporting GitOps operations by updating CUE files, especialy [Timoni] bundle files.
+It has various subcommands centered around supporting GitOps operations by updating CUE files, especially [Timoni] bundle files.
 It can be used in tandem with a CI/CD provider to easily update CUE configuration files within an existing repository.
 
 ## Usage

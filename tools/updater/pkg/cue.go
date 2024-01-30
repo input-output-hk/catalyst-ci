@@ -1,6 +1,6 @@
 package pkg
 
-// cspell: words afero cuelang
+// cspell: words afero cuectx cuelang mheers
 
 import (
 	"fmt"
