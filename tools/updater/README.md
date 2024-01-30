@@ -37,7 +37,7 @@ foo: {
 
 ### Updating Timoni bundle files
 
-A common GitOps operation is to update specific values within a [Timoni bundle file](https://timoni.sh/bundle/).
+A common GitOps flow is to update specific values within a [Timoni bundle file](https://timoni.sh/bundle/).
 The `updater` CLI provides a specific subcommand for updating the `values` specified in a bundle.
 Given the following bundle file:
 
@@ -79,16 +79,16 @@ This approach is quite opinionated and requires some additional context.
 #### Deployment files
 
 Much like Catalyst CI, the `updater` CLI assumes a mono-repo setup for applications.
-Where Catalyst CI expects each application to contain a `Earthfile` describing how to build the application, the `updater` CLI
+Where Catalyst CI expects each application to contain an `Earthfile` describing how to build the application, the `updater` CLI
 expects each application to contain a `deployment.yml` file describing how to update the application's associated deployment.
 For example:
 
 - `/app1`
-   - `Earthfile`
-   - `deployment.yml`
+  - `Earthfile`
+  - `deployment.yml`
 - `/app2`
-   - `Earthfile`
-   - `deployment.yml`
+  - `Earthfile`
+  - `deployment.yml`
 
 Each deployment file contains a set of override operations that instruct the `updater` CLI on which Timoni bundle files to update.
 For example:
@@ -109,14 +109,14 @@ The `updater` CLI assumes a mono-repo deployment repository exists containing Ti
 An example structure would look like this:
 
 - `/bundles`
-   - `/dev`
-      - `/app1`
-         - `bundle.cue`
+  - `/dev`
+    - `/app1`
+      - `bundle.cue`
       - `/app2`
-         - `bundle.cue`
-   - `/staging`
-      - `/app1`
-         - `bundle.cue`
+        - `bundle.cue`
+  - `/staging`
+    - `/app1`
+        - `bundle.cue`
 
 The root directory (`/bundles`) has subdirectories for each environment and each environment has subdirectories for every
 application.
@@ -149,7 +149,7 @@ The above command performs the following for each given override:
 Using the previous examples, it would perform the following:
 
 - Constructs a path to the bundle file: `/path/to/deployment-repo/bundles/dev/app1/bundle.cue`
-- Constructs a path to override: `bundle.instances.app1.values.server.image.tag
+- Constructs a path to override: `bundle.instances.app1.values.server.image.tag`
 - Overrides the constructed value path with `v0.2.0`
 
 This setup allows updating arbitrary bundle files and their respective values by defining a single `deployment.yml` file at the root
@@ -177,6 +177,6 @@ $ updater scan -t "GIT_SHA=${{ github.sha }}" . | updater update deployments -e 
 ```
 
 Prior to updating the bundle files, the `updater` CLI will replace all occurrences of `GIT_SHA` with the current commit SHA.
-If you tag images using the commit SHA, this allows dynamically updating the image tag of the application deployment at runtime.
+This allows dynamically updating the image tag of the application deployment at runtime if you tag images using the commit SHA
 
 [timoni]: https://timoni.sh/
