@@ -1,0 +1,4 @@
+overrides:
+  - app: jormungandr
+    path: exporter.image.tag
+    value: GITHUB_SHA
