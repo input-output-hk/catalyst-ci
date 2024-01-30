@@ -37,7 +37,7 @@ jobs:
             repository: ${{ inputs.deployment_repo }}
             token: ${{ secrets.token }}
         - name: Install updater CLI
-          uses: input-output-hk/catalyst-ci/actions/install@allow-multiple-install
+          uses: input-output-hk/catalyst-ci/actions/install@master
           with:
             asset: updater
         - name: Test

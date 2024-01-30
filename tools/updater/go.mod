@@ -1,6 +1,8 @@
 module github.com/input-output-hk/catalyst-ci/tools/updater
 
-go 1.20
+go 1.21
+
+toolchain go1.21.5
 
 require (
 	cuelang.org/go v0.7.0
@@ -9,6 +11,7 @@ require (
 	github.com/onsi/ginkgo/v2 v2.9.2
 	github.com/onsi/gomega v1.27.5
 	github.com/spf13/afero v1.11.0
+	gopkg.in/yaml.v3 v3.0.1
 )
 
 require (
@@ -26,5 +29,4 @@ require (
 	golang.org/x/sys v0.15.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/tools v0.16.1 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
