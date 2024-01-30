@@ -172,7 +172,7 @@ overrides:
 When the CI/CD is performing an update, it can pass the value for this template literal like so (assuming GitHub Actions):
 
 ```terminal
-$ updater scan . | updater update deployments -e dev -t "GIT_SHA=${{ github.sha }}" /path/to/deployment-repo/bundles
+$ updater scan -t "GIT_SHA=${{ github.sha }}" . | updater update deployments -e dev /path/to/deployment-repo/bundles
 # Empty output
 ```
 
