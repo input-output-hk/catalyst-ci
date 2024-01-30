@@ -83,12 +83,12 @@ Where Catalyst CI expects each application to contain an `Earthfile` describing 
 expects each application to contain a `deployment.yml` file describing how to update the application's associated deployment.
 For example:
 
-- `/app1`
-  - `Earthfile`
-  - `deployment.yml`
-- `/app2`
-  - `Earthfile`
-  - `deployment.yml`
+* `/app1`
+  * `Earthfile`
+  * `deployment.yml`
+* `/app2`
+  * `Earthfile`
+  * `deployment.yml`
 
 Each deployment file contains a set of override operations that instruct the `updater` CLI on which Timoni bundle files to update.
 For example:
@@ -108,15 +108,15 @@ The exact purpose of each of these fields will become more clear later.
 The `updater` CLI assumes a mono-repo deployment repository exists containing Timoni bundle files for each environment.
 An example structure would look like this:
 
-- `/bundles`
-  - `/dev`
-    - `/app1`
-      - `bundle.cue`
-      - `/app2`
-        - `bundle.cue`
-  - `/staging`
-    - `/app1`
-        - `bundle.cue`
+* `/bundles`
+  * `/dev`
+    * `/app1`
+      * `bundle.cue`
+    * `/app2`
+      * `bundle.cue`
+  * `/staging`
+    * `/app1`
+      * `bundle.cue`
 
 The root directory (`/bundles`) has subdirectories for each environment and each environment has subdirectories for every
 application.
