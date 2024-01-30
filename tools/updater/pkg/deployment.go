@@ -18,9 +18,10 @@ type DeploymentFile struct {
 
 // OverrideConfig represents configuration for overriding a value in a CUE file.
 type OverrideConfig struct {
-	App   string `json:"app" yaml:"app"`
-	Path  string `json:"path" yaml:"path"`
-	Value string `json:"value" yaml:"value"`
+	App      string `json:"app" yaml:"app"`
+	Instance string `json:"instance" yaml:"instance"`
+	Path     string `json:"path" yaml:"path"`
+	Value    string `json:"value" yaml:"value"`
 }
 
 // ScanForDeploymentFiles scans a directory for deployment configuration files.
