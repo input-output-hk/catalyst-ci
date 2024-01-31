@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cspell: words lcov depgraph readelf
+# cspell: words lcov depgraph readelf sysroot
 
 import python.exec_manager as exec_manager
 import argparse
