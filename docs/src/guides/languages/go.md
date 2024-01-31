@@ -50,7 +50,7 @@ VERSION --global-cache 0.7
 
 deps:
     # This target is used to install external Go dependencies.
-    FROM golang:1.20-alpine3.18
+    FROM golang:1.21-alpine3.19
     WORKDIR /work
 
     # Any build dependencies should also be captured in this target.
@@ -192,7 +192,7 @@ publish-example:
     # This target is called by CI when publishing images. It should use the
     # `SAVE IMAGE` command to save the image which is then picked up by the CI.
     # Note that we start from a "fresh" base image.
-    FROM alpine:3.18
+    FROM alpine:3.19
     WORKDIR /app
     ARG tag=latest  # Prefer to use `latest` by default, the CI will override this.
 

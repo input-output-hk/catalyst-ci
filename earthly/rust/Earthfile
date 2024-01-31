@@ -21,7 +21,7 @@ rust-base:
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
-    FROM rust:1.75-alpine3.18
+    FROM rust:1.75-alpine3.19
 
     RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
         echo "TARGETOS       = $TARGETOS"; \

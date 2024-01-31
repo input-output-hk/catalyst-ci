@@ -4,7 +4,7 @@ VERSION --global-cache --use-function-keyword 0.7
 # cspell: words colordiff psycopg dbviz
 
 postgres-base:
-    FROM postgres:16.0-alpine3.18
+    FROM postgres:16.1-alpine3.19
 
     WORKDIR /root
 

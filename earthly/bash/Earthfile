@@ -3,7 +3,7 @@ VERSION --global-cache --use-function-keyword 0.7
 
 # Internal: builder creates a container we can use to execute shellcheck
 builder:
-    FROM alpine:3.18
+    FROM alpine:3.19
 
     RUN apk add --no-cache \
         bash \

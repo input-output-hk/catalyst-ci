@@ -56,7 +56,6 @@ deps:
 # Documentation files used across all documentation builds.
 common:
     FROM scratch
-    #FROM alpine:3.18
 
     COPY --dir common/includes common/macros common/overrides common/std-theme.yml /std
 
