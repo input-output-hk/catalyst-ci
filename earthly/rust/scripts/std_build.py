@@ -116,17 +116,17 @@ def cargo_depgraph(results: exec_manager.Results):
 
 COMMON_CARGO_MODULES_ORPHANS = (
     "NO_COLOR=1 "
-    + "cargo modules orphans --all-features"
-    + "--deny --cfg-test"
+    + "cargo modules orphans --all-features "
+    + "--deny --cfg-test "
 )
 COMMON_CARGO_MODULES_STRUCTURE = (
     "NO_COLOR=1 "
-    + "cargo modules structure --no-fns --all-features"
+    + "cargo modules structure --no-fns --all-features "
 )
 COMMON_CARGO_MODULES_DEPENDENCIES = (
     "NO_COLOR=1 "
-    + "cargo modules dependencies --all-features"
-    + "--no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses"
+    + "cargo modules dependencies --all-features "
+    + "--no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses "
 )
 
 def cargo_modules_lib(results: exec_manager.Results, lib: str):
