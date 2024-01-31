@@ -44,6 +44,10 @@ If we don't:
 * Difficult to ensure the necessary information is captured.
 * Difficult to iterate and be agile.
 
+## Scope
+
+This ADR applies to all projects which consume `Catalyst-CI` unless they define an ADR specific to that project.
+
 ## More Information
 
 * [arc42]
