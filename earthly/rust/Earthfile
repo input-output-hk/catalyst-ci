@@ -77,7 +77,7 @@ rust-base:
         cargo install cargo-depgraph --version=1.6.0 && \
         cargo install cargo-llvm-cov --version=0.6.4 && \
         cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter && \
-        cargo install --git https://github.com/bytecodealliance/wit-bindgen --rev 442f005 wit-bindgen 
+        cargo install --git https://github.com/bytecodealliance/wit-bindgen --rev 442f005 wit-bindgen-cli
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
 
