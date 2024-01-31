@@ -114,13 +114,35 @@ def cargo_depgraph(results: exec_manager.Results):
         )
     )
 
+COMMON_CARGO_MODULES_ORPHANS = (
+    "NO_COLOR=1 "
+    + "cargo modules orphans --all-features"
+    + "--deny --cfg-test"
+)
+COMMON_CARGO_MODULES_STRUCTURE = (
+    "NO_COLOR=1 "
+    + "cargo modules structure --no-fns --all-features"
+)
+COMMON_CARGO_MODULES_DEPENDENCIES = (
+    "NO_COLOR=1 "
+    + "cargo modules dependencies --all-features"
+    + "--no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses"
+)
 
 def cargo_modules_lib(results: exec_manager.Results, lib: str):
+    # Check if we have any Orphans.
+    results.add(
+        exec_manager.cli_run(
+            COMMON_CARGO_MODULES_ORPHANS
+            + f"--package '{lib}' --lib",
+            name=f"Checking Orphans for {lib}",            
+        )
+    )
+    
     # Generate tree
     results.add(
         exec_manager.cli_run(
-            "NO_COLOR=1 "
-            + "cargo modules generate tree --orphans --types --traits --tests --all-features "
+            COMMON_CARGO_MODULES_STRUCTURE
             + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.tree' ",
             name=f"Generate Module Trees for {lib}",
         )
@@ -128,8 +150,7 @@ def cargo_modules_lib(results: exec_manager.Results, lib: str):
     # Generate graph
     results.add(
         exec_manager.cli_run(
-            "NO_COLOR=1 "
-            + "cargo modules generate graph --all-features --modules "
+            COMMON_CARGO_MODULES_DEPENDENCIES
             + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.dot' ",
             name=f"Generate Module Graphs for {lib}",
         )
@@ -137,11 +158,19 @@ def cargo_modules_lib(results: exec_manager.Results, lib: str):
 
 
 def cargo_modules_bin(results: exec_manager.Results, package: str, bin: str):
+    # Check if we have any Orphans.
+    results.add(
+        exec_manager.cli_run(
+            COMMON_CARGO_MODULES_ORPHANS
+            + f"--package '{package}' --bin '{bin}'",
+            name=f"Checking Orphans for {package}/{bin}",            
+        )
+    )
+
     # Generate tree
     results.add(
         exec_manager.cli_run(
-            "NO_COLOR=1 "
-            + "cargo modules generate tree --orphans --types --traits --tests --all-features "
+            COMMON_CARGO_MODULES_STRUCTURE
             + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.tree' ",
             name=f"Generate Module Trees for {package}/{bin}",
         )
@@ -149,8 +178,7 @@ def cargo_modules_bin(results: exec_manager.Results, package: str, bin: str):
     # Generate graph
     results.add(
         exec_manager.cli_run(
-            "NO_COLOR=1 "
-            + "cargo modules generate graph --all-features --modules "
+            COMMON_CARGO_MODULES_DEPENDENCIES
             + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.dot' ",
             name=f"Generate Module Graphs for {package}/{bin}",
         )
