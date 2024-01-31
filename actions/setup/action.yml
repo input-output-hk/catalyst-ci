@@ -62,6 +62,14 @@ inputs:
       The address of the Earthly runner that will be used to build the
       Earthly files.
     required: false
+  updater_skip_install:
+    description: If "true", will skip installing the updater CLI
+    required: false
+    default: "true"
+  updater_version:
+    description: The version of the updater CLI to install
+    required: false
+    default: latest
 runs:
   using: composite
   steps:
@@ -77,11 +85,17 @@ runs:
       if: ${{ inputs.earthly_skip_install == 'false' }}
       with:
         version: ${{ inputs.earthly_version }}
-    - name: Install CI CLI From Version
+    - name: Install CI CLI
       uses: input-output-hk/catalyst-ci/actions/install@master
       if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
       with:
-        version: ${{ inputs.cli_version }}
+        version: ${{ inputs.updater_version }}
+    - name: Install updater CLI
+      uses: input-output-hk/catalyst-ci/actions/install@master
+      if: ${{ inputs.updater_skip_install == 'false' && inputs.updater_version != 'local' }}
+      with:
+        asset: updater
+        version: ${{ inputs.updater_version }}
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v4
       if: ${{ inputs.aws_region != '' && inputs.aws_role_arn != '' }}
@@ -119,3 +133,17 @@ runs:
       shell: bash
       if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
       run: mv '${{ steps.build-ci-artifact.outputs.artifact }}/ci' /usr/local/bin
+    - name: Build updater CLI
+      id: build-updater-artifact
+      uses: input-output-hk/catalyst-ci/actions/run@master
+      if: ${{ inputs.updater_skip_install == 'false' && inputs.updater_version == 'local' }}
+      with:
+        artifact: "true"
+        artifact_path: "tmp"
+        earthfile: ./tools/updater
+        targets: release
+        runner_address: ${{ inputs.runner_address }}
+    - name: Move updater CLI
+      shell: bash
+      if: ${{ inputs.updater_skip_install == 'false' && inputs.updater_version == 'local' }}
+      run: mv '${{ steps.build-updater-artifact.outputs.artifact }}/updater' /usr/local/bin

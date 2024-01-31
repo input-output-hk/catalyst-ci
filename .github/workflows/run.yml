@@ -66,7 +66,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+        uses: input-output-hk/catalyst-ci/actions/setup@adds-setup-updater
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
@@ -76,6 +76,11 @@ jobs:
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
           runner_address: ${{ secrets.earthly_runner_address }}
+          updater_skip_install: "false"
+          updater_version: "local"
+      - name: Test
+        run: |
+          updater --help
       - name: Discover Earthly files
         uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
