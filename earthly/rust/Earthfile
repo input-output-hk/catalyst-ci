@@ -1,7 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words rustup miri ripgrep colordiff stdcfgs toolset depgraph lcov psycopg
+# cspell: words rustup miri ripgrep colordiff stdcfgs toolset depgraph lcov psycopg bindgen
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
@@ -21,7 +21,7 @@ rust-base:
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
-    FROM rust:1.75-alpine3.18
+    FROM rust:1.75-alpine3.19
 
     RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
         echo "TARGETOS       = $TARGETOS"; \
@@ -69,14 +69,16 @@ rust-base:
     # Install tools we use commonly with `cargo`.
     # Note, we disable static compiles for tools, specifically, as its not required.
     # These tools are not artifacts and we do not use them in production.
-    RUN cargo install cargo-nextest --version=0.9.59 && \
+    RUN cargo install cargo-nextest --version=0.9.67 && \
         cargo install cargo-machete --version=0.6.0  && \
-        cargo install refinery_cli  --version=0.8.11 && \
-        cargo install cargo-deny    --version=0.14.3 && \
-        cargo install cargo-modules --version=0.10.2 && \
-        cargo install cargo-depgraph --version=1.5.0 && \
-        cargo install cargo-llvm-cov --version=0.5.39 && \
-        cargo install --git https://github.com/bytecodealliance/wasmtime --tag v16.0.0 verify-component-adapter
+        cargo install refinery_cli  --version=0.8.12 && \
+        cargo install cargo-deny    --version=0.14.10 && \
+        cargo install cargo-modules --version=0.13.5 && \
+        cargo install cargo-depgraph --version=1.6.0 && \
+        cargo install cargo-llvm-cov --version=0.6.4 && \
+        cargo install wasm-tools --version=1.0.57 && \
+        cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter && \
+        cargo install --git https://github.com/bytecodealliance/wit-bindgen --rev 442f005 wit-bindgen-cli
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
 

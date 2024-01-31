@@ -3,7 +3,7 @@
     adr:
         author: Steven Johnson
         created: 09-Jan-2024
-        status:  draft
+        status:  accepted
         extends:
             - 0005-rust
     tags:
@@ -37,6 +37,10 @@ We forget to introduce `cargo.lock` on our binaries when we approach release.
 ## Consequences
 
 This should make it a little easier to iterate with less issues caused by out of date `cargo.lock` files finding there way into CI.
+
+## Scope
+
+This ADR applies to all projects which consume `Catalyst-CI` unless they define an ADR specific to that project.
 
 ## More Information
 

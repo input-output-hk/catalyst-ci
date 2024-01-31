@@ -33,6 +33,10 @@ and considerations of the audience for the project the primary language of the p
 
 Having a uniform language for the project makes it easier for people to interact on a common basis.
 
+## Scope
+
+This ADR applies to all projects which consume `Catalyst-CI` unless they define an ADR specific to that project.
+
 ## More Information
 
 * [Why English is the Lingua Franca of Programming](https://ystudios.com/insights-passion/codelanguage)

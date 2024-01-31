@@ -20,7 +20,7 @@ check-spelling:
 
 # check-bash - test all bash files lint properly according to shellcheck.
 check-bash:
-    FROM alpine:3.18
+    FROM alpine:3.19
 
     DO ./earthly/bash+SHELLCHECK --src=.
 
@@ -28,7 +28,6 @@ check-bash:
 repo-docs:
     # Create artifacts of extra files we embed inside the documentation when its built.
     FROM scratch
-    #FROM alpine:3.18
 
     WORKDIR /repo
     COPY --dir *.md LICENSE-APACHE LICENSE-MIT .

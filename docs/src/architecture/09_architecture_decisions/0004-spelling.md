@@ -46,6 +46,10 @@ By using automation we ensure this consistency, regardless of a contributors pro
 
 `cspell`
 
+## Scope
+
+This ADR applies to all projects which consume `Catalyst-CI` unless they define an ADR specific to that project.
+
 ## More Information
 
 * [CSpell]
