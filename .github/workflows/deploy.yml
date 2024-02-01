@@ -96,6 +96,9 @@ jobs:
         with:
           repository: ${{ inputs.deployment_repo }}
           token: ${{ secrets.token }}
+      - name: Create deployment branch
+        run: |
+          git checkout -b "auto-deploy-${{ github.sha }}"
       - name: Update deployments
         run: |
           echo '${{ steps.discover.outputs.json }}' > /tmp/updates.json
@@ -107,10 +110,28 @@ jobs:
       - name: Run diff
         run: git --no-pager diff
       - name: Sign commit hash
+        id: sign
         run: |
           echo -n "${{ secrets.signing_key }}" | base64 --decode > /tmp/privkey
-          updater signing sign -k /tmp/privkey "${{ github.sha }}"
+          SIG=$(updater signing sign -k /tmp/privkey "${{ github.sha }}")
           rm /tmp/privkey
+
+          echo "signature=${SIG}" >> $GITHUB_OUTPUT
+      - name: Create PR
+        run: |
+          BODY="BEGIN-AUTO-DEPLOY-SIGNATURE:${{ steps.sign.outputs.signature }}:END-AUTO-DEPLOY-SIGNATURE"
+
+          git add .
+          git commit -m "chore: auto-deploy from ${{ github.event.repository.name }}"
+          git push origin "auto-deploy-${{ github.sha }}"
+          gh pr create --title "chore: auto-deploy from ${{ github.event.repository.name }}" --body "$BODY"
+        env:
+          GITHUB_TOKEN: ${{ secrets.token }}
+        # - name: Commit and push
+        #   uses: xxxxxxxxxxxxxxxxxxxxx@xx
+        #   with:
+        #     author_name: catalyst-cibot
+        #     author_email:
       # - name: Commit and push
         #   uses: EndBug/add-and-commit@v9
         #   with:
