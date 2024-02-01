@@ -127,7 +127,7 @@ jobs:
           git add .
           git commit -m "chore: auto-deploy from ${{ github.event.repository.name }}"
           git push origin "auto-deploy-${{ github.sha }}"
-          gh pr create --title "chore: auto-deploy from ${{ github.event.repository.name }}" --body "$BODY" --base setup-new-deploy
+          gh pr create --title "chore: auto-deploy from ${{ github.event.repository.name }}" --body "$BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
         # - name: Commit and push
