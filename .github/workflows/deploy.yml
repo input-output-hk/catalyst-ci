@@ -95,7 +95,7 @@ jobs:
         run: |
           updater update deployments \
             -e "${{ inputs.environment }}" \
-            -i "${{ steps.discover.outputs.json }}" \
+            -i '${{ steps.discover.outputs.json }}' \
             "${{inputs.deployment_root_path}}"
       - name: Run diff
         run: git --no-pager diff
