@@ -1,6 +1,10 @@
 on:
   push:
 
+permissions:
+  id-token: write
+  contents: write
+  packages: write
 
 jobs:
   test:
