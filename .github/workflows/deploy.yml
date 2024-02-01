@@ -124,6 +124,9 @@ jobs:
           BODY="BEGIN-AUTO-DEPLOY-SIGNATURE:${{ steps.sign.outputs.signature }}:END-AUTO-DEPLOY-SIGNATURE"
           COMMIT=$(git rev-parse HEAD)
 
+          echo "GIT COMMIT: $COMMIT"
+          echo "GITHUB COMMIT: ${{ github.sha }}"
+
           git config --global user.email "catalyst-cibot@projectcatalyst.io"
           git config --global user.name "catalyst-cibot"
 
