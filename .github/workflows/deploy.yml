@@ -113,30 +113,22 @@ jobs:
         id: sign
         run: |
           echo -n "${{ secrets.signing_key }}" | base64 --decode > /tmp/privkey
-          SIG=$(updater signing sign -k /tmp/privkey "${{ github.sha }}")
+          COMMIT=$(git rev-parse HEAD)
+          SIG=$(updater signing sign -k /tmp/privkey "$COMMIT")
           rm /tmp/privkey
 
           echo "signature=${SIG}" >> $GITHUB_OUTPUT
       - name: Create PR
         run: |
           BODY="BEGIN-AUTO-DEPLOY-SIGNATURE:${{ steps.sign.outputs.signature }}:END-AUTO-DEPLOY-SIGNATURE"
+          COMMIT=$(git rev-parse HEAD)
 
           git config --global user.email "catalyst-cibot@projectcatalyst.io"
           git config --global user.name "catalyst-cibot"
 
           git add .
           git commit -m "chore: auto-deploy from ${{ github.event.repository.name }}"
-          git push origin "auto-deploy-${{ github.sha }}"
+          git push origin "auto-deploy-$COMMIT"
           gh pr create --title "chore: auto-deploy from ${{ github.event.repository.name }}" --body "$BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
-        # - name: Commit and push
-        #   uses: xxxxxxxxxxxxxxxxxxxxx@xx
-        #   with:
-        #     author_name: catalyst-cibot
-        #     author_email:
-      # - name: Commit and push
-        #   uses: EndBug/add-and-commit@v9
-        #   with:
-        #     author_name: catalyst-cibot
-        #     author_email:
