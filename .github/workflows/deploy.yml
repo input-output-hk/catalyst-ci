@@ -103,6 +103,11 @@ jobs:
           cue fmt --simplify $(git diff --name-only)
       - name: Run diff
         run: git --no-pager diff
+      - name: Sign commit hash
+        run: |
+          echo "${{ secrets.DEPLOY_PRIV_KEY }}" > /tmp/privkey
+          updater signing sign -k /tmp/privkey "${{ github.sha }}"
+          rm /tmp/privkey
       # - name: Commit and push
         #   uses: EndBug/add-and-commit@v9
         #   with:
