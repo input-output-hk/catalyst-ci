@@ -1,0 +1,17 @@
+on:
+  push:
+
+
+jobs:
+  test:
+    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@setup-new-deploy
+    with:
+      aws_role_arn: arn:aws:iam::332405224602:role/ci
+      aws_region: eu-central-1
+      deployment_repo: input-output-hk/catalyst-world
+    secrets:
+      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+      token: ${{ SECRETS.CI_BOT_TOKEN }}

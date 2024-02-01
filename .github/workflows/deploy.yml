@@ -3,51 +3,122 @@
 on:
   workflow_call:
     inputs:
+      aws_role_arn:
+        description: |
+          The ARN of the AWS role that will be assumed by the workflow. Only
+          required when configuring a remote Earthly runner or AWS ECR.
+        required: false
+        type: string
+      aws_region:
+        description: |
+          The AWS region that will be used by the workflow. Only required when
+          configuring a remote Earthly runner or AWS ECR.
+        required: false
+        type: string
       deployment_repo:
         description: The URL of the repository containing deployment code
         required: false
         type: string
         default: input-output-hk/catalyst-world
+      deployment_root_path:
+        description: The root path to deployment files within the deployment repository
+        required: false
+        type: string
+        default: src/kubev2
+      earthly_version:
+        description: The version of Earthly to use.
+        required: false
+        type: string
+        default: latest
       environment:
         description: The target environment to deploy to
         required: false
         type: string
         default: dev
-      images:
-        description: A newline separated list of image names to deploy
-        required: true
-        type: string
-      tag:
-        description: The image tag to deploy
-        required: false
-        type: string
-        default: ${{ github.sha }}
     secrets:
+      dockerhub_username:
+        description: The token to use for logging into the DockerHub registry.
+        required: false
+      dockerhub_token:
+        description: The token to use for logging into the DockerHub registry.
+        required: false
+      earthly_runner_address:
+        description: |
+          The address of the Earthly runner that will be used to build the
+          Earthly files.
+        required: false
+      earthly_runner_secret:
+        description: |
+          The ID of the AWS secret holding Earthly remote runner credentials.
+          This secret must contain the runner address and the necessary TLS
+          certificates required to authenticate with it. If omitted, a remote
+          Earthly runner will not be configured.
+        required: false
       token:
         description: A Github token with access to the deployment repository.
         required: true
 
+
 jobs:
-  deploy:
-      runs-on: ubuntu-latest
-      steps:
-        - name: Checkout deployment repository
-          uses: actions/checkout@v4
-          with:
-            repository: ${{ inputs.deployment_repo }}
-            token: ${{ secrets.token }}
-        - name: Merge hashes
-          uses: input-output-hk/catalyst-ci/actions/merge@master
-          with:
-            hash_file: "src/kube/environments/${{ inputs.environment }}/hashes.json"
-            images: ${{ inputs.images }}
-            tag: ${{ inputs.tag }}
-        - name: Run diff
-          run: git --no-pager diff
-        - name: Commit and push
-          uses: EndBug/add-and-commit@v9
-          with:
-            author_name: catalyst-cibot
-            author_email: ci@projectcatalyst.io
-            message: "chore: updates ${{ github.event.repository.name }} deployments"
-            push: true
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.discover.outputs.json }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+          aws_role_arn: ${{ inputs.aws_role_arn }}
+          aws_region: ${{ inputs.aws_region }}
+          cli_skip_install: "true"
+          configure_registries: "false"
+          dockerhub_token: ${{ secrets.dockerhub_token }}
+          dockerhub_username: ${{ secrets.dockerhub_username }}
+          earthly_version: ${{ inputs.earthly_version }}
+          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+          runner_address: ${{ secrets.earthly_runner_address }}
+          updater_skip_install: "false"
+          updater_version: local
+      - name: Discover deployment files
+        id: discover
+        run: |
+          JSON=$(updater scan -t "GITHUB_SHA=${{ github.sha }}" .)
+          echo "${JSON}"
+          echo "json=${JSON}" >> $GITHUB_OUTPUT
+  deployment:
+    runs-on: ubuntu-latest
+    needs: discover
+    steps:
+      - name: Checkout deployment repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ inputs.deployment_repo }}
+          token: ${{ secrets.token }}
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+          aws_role_arn: ${{ inputs.aws_role_arn }}
+          aws_region: ${{ inputs.aws_region }}
+          cli_skip_install: "true"
+          configure_registries: "false"
+          dockerhub_token: ${{ secrets.dockerhub_token }}
+          dockerhub_username: ${{ secrets.dockerhub_username }}
+          earthly_version: ${{ inputs.earthly_version }}
+          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+          runner_address: ${{ secrets.earthly_runner_address }}
+          updater_skip_install: "false"
+          updater_version: local
+      - name: Apply updates
+        run: |
+          updater update deployments \
+            -e "${{ inputs.environment }}" \
+            -i "${{ needs.discover.outputs.json }}" \
+            "${{inputs.deployment_root_path}}"
+      - name: Run diff
+        run: git --no-pager diff
+      # - name: Commit and push
+      #   uses: EndBug/add-and-commit@v9
+      #   with:
+      #     author_name: catalyst-cibot
+      #     author_email:
