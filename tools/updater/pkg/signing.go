@@ -1,5 +1,7 @@
 package pkg
 
+// cspell: words hasher
+
 import (
 	"crypto"
 	"crypto/rand"
