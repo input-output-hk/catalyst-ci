@@ -93,9 +93,10 @@ jobs:
           token: ${{ secrets.token }}
       - name: Apply updates
         run: |
+          echo '${{ steps.discover.outputs.json }}' > /tmp/updates.json
           updater update deployments \
             -e "${{ inputs.environment }}" \
-            -i '${{ steps.discover.outputs.json }}' \
+            -i /tmp/updates.json \
             "${{inputs.deployment_root_path}}"
       - name: Run diff
         run: git --no-pager diff
