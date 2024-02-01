@@ -121,6 +121,9 @@ jobs:
         run: |
           BODY="BEGIN-AUTO-DEPLOY-SIGNATURE:${{ steps.sign.outputs.signature }}:END-AUTO-DEPLOY-SIGNATURE"
 
+          git config --global user.email "catalyst-cibot@projectcatalyst.io"
+          git config --global user.name "catalyst-cibot"
+
           git add .
           git commit -m "chore: auto-deploy from ${{ github.event.repository.name }}"
           git push origin "auto-deploy-${{ github.sha }}"
