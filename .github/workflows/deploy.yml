@@ -60,7 +60,7 @@ on:
 
 
 jobs:
-  discover:
+  deploy:
     runs-on: ubuntu-latest
     outputs:
       json: ${{ steps.discover.outputs.json }}
@@ -93,17 +93,14 @@ jobs:
         with:
           repository: ${{ inputs.deployment_repo }}
           token: ${{ secrets.token }}
-      - name: Apply updates
+      - name: Update deployments
         run: |
           echo '${{ steps.discover.outputs.json }}' > /tmp/updates.json
           updater update deployments \
             -e "${{ inputs.environment }}" \
             -i /tmp/updates.json \
             "${{inputs.deployment_root_path}}"
-      - name: Format changes
-        run: |
           cue fmt --simplify $(git diff --name-only)
-          cat $(git diff --name-only)
       - name: Run diff
         run: git --no-pager diff
       # - name: Commit and push
