@@ -80,6 +80,8 @@ jobs:
           runner_address: ${{ secrets.earthly_runner_address }}
           updater_skip_install: "false"
           updater_version: local
+      - name: Install CUE
+        uses: cue-lang/setup-cue@v1.0.0
       - name: Discover deployment files
         id: discover
         run: |
