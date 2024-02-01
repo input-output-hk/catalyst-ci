@@ -98,7 +98,8 @@ jobs:
           token: ${{ secrets.token }}
       - name: Create deployment branch
         run: |
-          git checkout -b "auto-deploy-${{ github.sha }}"
+          COMMIT=$(git rev-parse HEAD)
+          git checkout -b "auto-deploy-$COMMIT"
       - name: Update deployments
         run: |
           echo '${{ steps.discover.outputs.json }}' > /tmp/updates.json
