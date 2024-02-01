@@ -54,6 +54,9 @@ on:
           certificates required to authenticate with it. If omitted, a remote
           Earthly runner will not be configured.
         required: false
+      signing_key:
+        description: The private key to use for signing the deployment commit
+        required: true
       token:
         description: A Github token with access to the deployment repository.
         required: true
@@ -105,7 +108,7 @@ jobs:
         run: git --no-pager diff
       - name: Sign commit hash
         run: |
-          echo -n "${{ secrets.DEPLOY_PRIV_KEY }}" | base64 --decode > /tmp/privkey
+          echo -n "${{ secrets.signing_key }}" | base64 --decode > /tmp/privkey
           updater signing sign -k /tmp/privkey "${{ github.sha }}"
           rm /tmp/privkey
       # - name: Commit and push
