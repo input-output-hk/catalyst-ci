@@ -98,6 +98,10 @@ jobs:
             -e "${{ inputs.environment }}" \
             -i /tmp/updates.json \
             "${{inputs.deployment_root_path}}"
+      - name: Format changes
+        run: |
+          cue fmt --simplify $(git diff --name-only)
+          cat $(git diff --name-only)
       - name: Run diff
         run: git --no-pager diff
       # - name: Commit and push
