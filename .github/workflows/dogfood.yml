@@ -2,8 +2,8 @@ name: Dogfood
 
 on:
   push:
-    branches:  # TOOD: remove when done (disables dogfood while testing)
-      - foobar
+    # branches:  # TOOD: remove when done (disables dogfood while testing)
+    #   - foobar
 
 permissions:
   id-token: write
