@@ -98,8 +98,7 @@ jobs:
           token: ${{ secrets.token }}
       - name: Create deployment branch
         run: |
-          COMMIT=$(git rev-parse HEAD)
-          git checkout -b "auto-deploy-$COMMIT"
+          git checkout -b "auto-deploy-${{ github.sha }}"
       - name: Update deployments
         run: |
           echo '${{ steps.discover.outputs.json }}' > /tmp/updates.json
@@ -110,6 +109,14 @@ jobs:
           cue fmt --simplify $(git diff --name-only)
       - name: Run diff
         run: git --no-pager diff
+      - name: Commit changes
+        run: |
+          git config --global user.email "catalyst-cibot@projectcatalyst.io"
+          git config --global user.name "catalyst-cibot"
+
+          git add .
+          git commit -m "chore: auto-deploy from ${{ github.event.repository.name }}"
+          git push origin "auto-deploy-${{ github.sha }}"
       - name: Sign commit hash
         id: sign
         run: |
@@ -118,21 +125,12 @@ jobs:
           SIG=$(updater signing sign -k /tmp/privkey "$COMMIT")
           rm /tmp/privkey
 
+          echo "GIT COMMIT: $COMMIT"
+
           echo "signature=${SIG}" >> $GITHUB_OUTPUT
       - name: Create PR
         run: |
           BODY="BEGIN-AUTO-DEPLOY-SIGNATURE:${{ steps.sign.outputs.signature }}:END-AUTO-DEPLOY-SIGNATURE"
-          COMMIT=$(git rev-parse HEAD)
-
-          echo "GIT COMMIT: $COMMIT"
-          echo "GITHUB COMMIT: ${{ github.sha }}"
-
-          git config --global user.email "catalyst-cibot@projectcatalyst.io"
-          git config --global user.name "catalyst-cibot"
-
-          git add .
-          git commit -m "chore: auto-deploy from ${{ github.event.repository.name }}"
-          git push origin "auto-deploy-$COMMIT"
           gh pr create --title "chore: auto-deploy from ${{ github.event.repository.name }}" --body "$BODY"
         env:
           GITHUB_TOKEN: ${{ secrets.token }}
