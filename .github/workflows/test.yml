@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   test:
-    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@master
+    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@test-deploy
     with:
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
