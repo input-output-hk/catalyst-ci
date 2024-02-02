@@ -140,6 +140,6 @@ jobs:
       - name: Create PR
         run: |
           BODY="BEGIN-AUTO-DEPLOY-SIGNATURE:${{ steps.sign.outputs.signature }}:END-AUTO-DEPLOY-SIGNATURE"
-          gh pr create --title "chore: auto-deploy from ${{ github.event.repository.name }}" --body "$BODY"
+          gh pr create --title "chore: auto-deploy from ${{ github.event.repository.name }}" --body "$BODY" --base fix-deploy-workflow
         env:
           GITHUB_TOKEN: ${{ env.GLOBAL_CI_DEPLOY_TOKEN }}
