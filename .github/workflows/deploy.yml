@@ -35,6 +35,11 @@ on:
         required: false
         type: string
         default: dev
+      updater_version:
+        description: The version of the updater CLI to install
+        required: false
+        default: latest
+        type: string
     secrets:
       dockerhub_username:
         description: The token to use for logging into the DockerHub registry.
@@ -54,6 +59,9 @@ on:
           certificates required to authenticate with it. If omitted, a remote
           Earthly runner will not be configured.
         required: false
+
+env:
+  CUE_VERSION: 0.7.0  # Pin to a known working version of CUE
 
 jobs:
   deploy:
@@ -75,9 +83,11 @@ jobs:
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
           runner_address: ${{ secrets.earthly_runner_address }}
           updater_skip_install: "false"
-          updater_version: local
+          updater_version: ${{ inputs.updater_version }}
       - name: Install CUE
         uses: cue-lang/setup-cue@v1.0.0
+        with:
+          version: ${{ env.CUE_VERSION }}
       - name: Fetch deployment secrets
         uses: aws-actions/aws-secretsmanager-get-secrets@v1
         with:
