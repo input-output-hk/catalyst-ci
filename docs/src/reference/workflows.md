@@ -116,10 +116,10 @@ These artifacts are then compressed and ultimately uploaded as artifacts for the
 
 ## Deploy
 
-The deploy workflow is responsible for deploying services to the Catalyst `dev` cluster when new container images are produced.
-It checks out the code from a private Project Catalyst repository and uses the custom `merge` GitHub Action to merge the new image
-tags into the repository files.
-The changes are then committed, which triggers the `dev` environment to deploy the newly produced images.
+The deploy workflow is responsible for deploying services to the Catalyst testing environments.
+It uses a similar auto-discovery mechanism as the main workflows except that it finds and reads `deployment.yml` files.
+Each `deployment.yml` file specifies one or more overrides that are necessary to deploy an updated image in our GitOps repository.
+The deploy workflow will automatically apply these overrides and commit the changes to the repository.
 
 ### Inputs
 
@@ -127,9 +127,6 @@ The changes are then committed, which triggers the `dev` environment to deploy t
 | --------------- | ------ | -------------------------------------------------------- | -------- | -------------------------------- |
 | deployment_repo | string | The URL of the repository to merge with                  | No       | `input-output-hk/catalyst-world` |
 | environment     | string | The target environment to deploy                         | No       | `dev`                            |
-| images          | string | A newline separated list of image names to deploy        | Yes      | N/A                              |
-| tag             | string | The image tag to deploy                                  | Yes      | N/A                              |
-| token           | string | A Github token with access to the deployment repository. | Yes      | N/A                              |
 
 ## Pages
 
