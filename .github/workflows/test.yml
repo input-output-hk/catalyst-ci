@@ -1,9 +1,5 @@
-name: Dogfood
-
 on:
   push:
-    branches:
-      - foobar
 
 permissions:
   id-token: write
@@ -11,14 +7,12 @@ permissions:
   packages: write
 
 jobs:
-  ci:
-    uses: ./.github/workflows/ci.yml
+  test:
+    uses: input-output-hk/catalyst-ci/.github/workflows/deploy.yml@master
     with:
-      aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
       aws_role_arn: arn:aws:iam::332405224602:role/ci
       aws_region: eu-central-1
-      ci_cli_version: 'local'
-      updater_version: 'local'
+      deployment_repo: input-output-hk/catalyst-world
     secrets:
       dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
       dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
