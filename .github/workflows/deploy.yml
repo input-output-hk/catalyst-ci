@@ -54,13 +54,6 @@ on:
           certificates required to authenticate with it. If omitted, a remote
           Earthly runner will not be configured.
         required: false
-      signing_key:
-        description: The private key to use for signing the deployment commit
-        required: true
-      token:
-        description: A Github token with access to the deployment repository.
-        required: true
-
 
 jobs:
   deploy:
@@ -85,6 +78,12 @@ jobs:
           updater_version: local
       - name: Install CUE
         uses: cue-lang/setup-cue@v1.0.0
+      - name: Fetch deployment secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v1
+        with:
+          secret-ids: |
+            global/ci/deploy
+          parse-json-secrets: true
       - name: Discover deployment files
         id: discover
         run: |
@@ -95,7 +94,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: ${{ inputs.deployment_repo }}
-          token: ${{ secrets.token }}
+          token: ${{ env.GLOBAL_CI_DEPLOY_TOKEN }}
       - name: Create deployment branch
         run: |
           git checkout -b "auto-deploy-${{ github.sha }}"
@@ -120,7 +119,7 @@ jobs:
       - name: Sign commit hash
         id: sign
         run: |
-          echo -n "${{ secrets.signing_key }}" | base64 --decode > /tmp/privkey
+          echo -n "${{ env.GLOBAL_CI_DEPLOY_PRIV_KEY }}" | base64 --decode > /tmp/privkey
           COMMIT=$(git rev-parse HEAD)
           SIG=$(updater signing sign -k /tmp/privkey "$COMMIT")
           rm /tmp/privkey
@@ -133,4 +132,4 @@ jobs:
           BODY="BEGIN-AUTO-DEPLOY-SIGNATURE:${{ steps.sign.outputs.signature }}:END-AUTO-DEPLOY-SIGNATURE"
           gh pr create --title "chore: auto-deploy from ${{ github.event.repository.name }}" --body "$BODY"
         env:
-          GITHUB_TOKEN: ${{ secrets.token }}
+          GITHUB_TOKEN: ${{ env.GLOBAL_CI_DEPLOY_TOKEN }}
