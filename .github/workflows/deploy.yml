@@ -61,7 +61,7 @@ on:
         required: false
 
 env:
-  CUE_VERSION: 0.7.0  # Pin to a known working version of CUE
+  CUE_VERSION: v0.7.0  # Pin to a known working version of CUE
 
 jobs:
   deploy:
