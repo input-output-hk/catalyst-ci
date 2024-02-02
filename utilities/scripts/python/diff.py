@@ -145,7 +145,7 @@ class Diff:
         def change_flags(diff):
             if isinstance(diff, DiffEntry):
                 diff.add_or_remove_flag = not diff.add_or_remove_flag
-            if isinstance(diff, list):
+            if isinstance(diff, tuple):
                 for val in diff:
                     change_flags(val)
             if isinstance(diff, dict):
