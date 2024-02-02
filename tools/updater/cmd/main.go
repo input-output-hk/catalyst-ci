@@ -3,6 +3,7 @@ package main
 // cspell: words afero alecthomas cuectx existingdir existingfile Timoni nolint
 
 import (
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -16,8 +17,14 @@ import (
 )
 
 var cli struct {
-	Scan   scanCmd   `cmd:"" help:"Scans a directory for deployment files."`
-	Update updateCmd `cmd:"" help:"Overrides a target path in a CUE file with the given value."`
+	Scan    scanCmd    `cmd:"" help:"Scans a directory for deployment files."`
+	Signing signingCmd `cmd:"" help:"Commands for signing and verifying deployments."`
+	Update  updateCmd  `cmd:"" help:"Overrides a target path in a CUE file with the given value."`
+}
+
+type signingCmd struct {
+	Sign   signCmd   `cmd:"" help:"Signs a message using a private key."`
+	Verify verifyCmd `cmd:"" help:"Verifies a message using a public key."`
 }
 
 type updateCmd struct {
@@ -53,6 +60,54 @@ func (c *scanCmd) Run() error {
 	}
 
 	fmt.Print(string(output))
+
+	return nil
+}
+
+type signCmd struct {
+	PrivateKey string `short:"k" help:"The path to the private key file." required:"true"`
+	Message    string `arg:"" help:"The message to sign." required:"true"`
+}
+
+func (c *signCmd) Run() error {
+	keyContent, err := os.ReadFile(c.PrivateKey)
+	if err != nil {
+		return fmt.Errorf("failed to read private key file %q: %v", c.PrivateKey, err)
+	}
+
+	signature, err := pkg.Sign(keyContent, c.Message)
+	if err != nil {
+		return fmt.Errorf("failed to sign message: %v", err)
+	}
+
+	encodedSignature := base64.StdEncoding.EncodeToString(signature)
+	fmt.Println(encodedSignature)
+
+	return nil
+}
+
+type verifyCmd struct {
+	PublicKey string `short:"k" help:"The path to the public key file." required:"true"`
+	Message   string `arg:"" help:"The message to verify." required:"true"`
+	Signature string `arg:"" help:"The signature to verify." required:"true"`
+}
+
+func (c *verifyCmd) Run() error {
+	keyContent, err := os.ReadFile(c.PublicKey)
+	if err != nil {
+		return fmt.Errorf("failed to read public key file %q: %v", c.PublicKey, err)
+	}
+
+	signature, err := base64.StdEncoding.DecodeString(c.Signature)
+	if err != nil {
+		return fmt.Errorf("failed to decode signature: %v", err)
+	}
+
+	if err := pkg.Verify(keyContent, c.Message, signature); err != nil {
+		return fmt.Errorf("failed to verify signature: %v", err)
+	}
+
+	fmt.Println("Signature is valid")
 
 	return nil
 }

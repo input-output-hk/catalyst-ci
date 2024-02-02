@@ -180,3 +180,53 @@ Prior to updating the bundle files, the `updater` CLI will replace all occurrenc
 This allows dynamically updating the image tag of the application deployment at runtime if you tag images using the commit SHA
 
 [timoni]: https://timoni.sh/
+
+### Signing Deployments
+
+The `updater` CLI provides some basic functionality for signing and verifying messages using an RSA private/public key pair.
+The primary use case for this functionality is for submitting "signed" PRs to a given deployment repository.
+To fully understand the use case, some additional context is required.
+
+#### GitOps Deployments
+
+In a typical GitOps repository with branch-protection enabled, it's not possible to commit directly against the default branch.
+This complicates the auto-deployment process as the CI/CD system has no automated way with which to apply updates to the repository.
+It's possible to work around this limitation by having the CI/CD system submit a PR to the repository and then have that PR
+automatically merged via automation in the GitOps repository.
+
+However, this introduces a serious problem: how does the GitOps repository know which PRs to automatically merge and which to
+ignore?
+To provide security, it's possible to include a signed message within the body of the PR.
+As long as the GitOps repository has the necessary public key, it can validate the signature in the PR body and "prove" that the PR
+originated from a trusted system.
+Furthermore, to prevent abuse, the CI/CD system signs the commit hash of the PR.
+This prevents someone from just copying a prior signature and re-using it, as commit hashes are unique across commits.
+
+With this in place, it's possible to verify a given PR is safe to automatically merge.
+The CI/CD system submits the PR with the signed commit hash and the GitOps repository validates the signed commit hash prior to
+merging the PR.
+
+#### Setup
+
+Prior to using the functionality, you must first establish an RSA private/public key pair.
+This can be done using openssl:
+
+```shell
+# Generate the private key
+openssl genpkey -algorithm RSA -out rsa_private.pem -pkeyopt rsa_keygen_bits:2048
+
+# Extract the public key
+openssl rsa -pubout -in rsa_private.pem -out rsa_public.pem
+```
+
+#### Sign and verify
+
+To sign and verify a message:
+
+```shell
+# Sign the commit hash (assuming it's in $COMMIT_HASH)
+SIG=$(updater signing sign -k rsa_private.pem "$COMMIT_HASH")
+
+# Verify the commit hash (should produce: "Signature is valid")
+updater signing verify -k rsa_public.pem "$COMMIT_HASH" "$SIG"
+```

@@ -12,6 +12,7 @@ errchkjson
 extldflags
 fontawesome
 fontconfig
+genpkey
 ginkgolinter
 gitops
 glightbox
@@ -43,8 +44,10 @@ nilnil
 nixos
 nixpkgs
 onsi
+pkeyopt
 pkgs
 projectcatalyst
+pubout
 pymdownx
 PYTHONDONTWRITEBYTECODE
 rivo
