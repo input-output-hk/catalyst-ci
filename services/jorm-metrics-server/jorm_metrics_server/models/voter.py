@@ -14,9 +14,10 @@ class Voter(BaseModel):
         id (str): The ID of the voter.
         power (int): The voting power of the voter.
         votes (list[Proposal]):
-            A list of proposals ids that the voter has voted on.
+            A dictionary of vote plan IDs and the proposals the voter has voted
+            on.
     """
 
     id: str
     data: AccountByID
-    votes: list[int]
+    votes: dict[str, list[int]]
