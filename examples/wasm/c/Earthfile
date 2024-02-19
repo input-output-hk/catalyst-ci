@@ -9,7 +9,6 @@ builder:
 build: 
     FROM +builder
 
-    DO ./../../../earthly/wasm/c+BUILD --c_files="component.c"
-
-    SAVE ARTIFACT component.wasm AS LOCAL .
+    RUN /scripts/std_build.py --c_files="component.c" --out="component.wasm"
+    RUN ls
 

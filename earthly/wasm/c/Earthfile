@@ -8,22 +8,16 @@ wasm-c-base:
 
     RUN apk update && \
         apk add --no-cache \
-        clang=17.0.5-r0 \
-        lld=17.0.5-r0 \
-        wasi-sdk=20-r3
+            py3-rich \
+            clang=17.0.5-r0 \
+            lld=17.0.5-r0 \
+            wasi-sdk=20-r3
 
     COPY ./../../rust+rust-base/wasm-tools /bin
     COPY ./../../rust+rust-base/wit-bindgen /bin
 
-BUILD:
-    FUNCTION
-    ARG wit_path="wit"
-    ARG --required c_files
-    ARG output_file="component.wasm"
-
-    RUN wit-bindgen c --autodrop-borrows yes $wit_path
-
-    RUN clang demo.c demo_component_type.o $c_files -o out.wasm -mexec-model=reactor --target=wasm32-wasi
-
-    RUN wasm-tools validate out.wasm && \
-        wasm-tools component new out.wasm -o $output_file
+    # Universal build scripts.
+    COPY --dir scripts /scripts
+    # Copy our common scripts so we can use them inside the container.
+    DO ./../../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO ./../../../utilities/scripts+ADD_PYTHON_SCRIPTS
