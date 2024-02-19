@@ -1,10 +1,10 @@
-VERSION --global-cache 0.7
+VERSION --global-cache --use-function-keyword 0.7
 
 # cspell: words bindgen autodrop mexec
 
 wasm-c-base:
     FROM alpine:3.19
-    WORKDIR /repo
+    WORKDIR /root
 
     RUN apk update && \
         apk add --no-cache \
@@ -12,24 +12,18 @@ wasm-c-base:
         lld=17.0.5-r0 \
         wasi-sdk=20-r3
 
+    COPY ./../../rust+rust-base/wasm-tools /bin
+    COPY ./../../rust+rust-base/wit-bindgen /bin
+
 BUILD:
     FUNCTION
-    ARG --required wit_path
+    ARG wit_path="wit"
     ARG --required c_files
-    ARG output_file="out.wasm"
-    ARG component_file="component.wasm"
+    ARG output_file="component.wasm"
 
     RUN wit-bindgen c --autodrop-borrows yes $wit_path
 
-    RUN clang hermes.c hermes_component_type.o $c_files -o $output_file -mexec-model=reactor --target=wasm32-wasi
+    RUN clang demo.c demo_component_type.o $c_files -o out.wasm -mexec-model=reactor --target=wasm32-wasi
 
-    RUN wasm-tools validate $output_file && \
-        wasm-tools component new $output_file -o $component_file
-
-example:
-    FROM +wasm-c-base
-
-    COPY ../wasi/wit .
-    COPY my-component.c .
-
-    DO +BUILD --wit_path="wasi/wit" --c_files="my-component.c"
+    RUN wasm-tools validate out.wasm && \
+        wasm-tools component new out.wasm -o $output_file

@@ -1,0 +1,15 @@
+VERSION --global-cache 0.7
+
+builder:
+    FROM ./../../../earthly/wasm/c+wasm-c-base
+
+    COPY demo.wit ./wit/
+    COPY component.c .
+
+build: 
+    FROM +builder
+
+    DO ./../../../earthly/wasm/c+BUILD --c_files="component.c"
+
+    SAVE ARTIFACT component.wasm AS LOCAL .
+
