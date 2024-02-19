@@ -25,6 +25,7 @@ def wit_bindgen_c(results: exec_manager.Results, wit_path: str):
 
 
 def clang_wasm_compile(results: exec_manager.Results, c_files: str):
+    # get file names from the BINDINGS_SRC except *.h files
     bindings_src = " ".join(
         [
             BINDINGS_SRC + "/" + f
