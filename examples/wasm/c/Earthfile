@@ -10,5 +10,5 @@ build:
     FROM +builder
 
     RUN /scripts/std_build.py --c_files="component.c" --out="component.wasm"
-    RUN ls
+    SAVE ARTIFACT component.wasm
 

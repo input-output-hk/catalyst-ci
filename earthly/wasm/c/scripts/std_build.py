@@ -5,29 +5,40 @@
 import python.exec_manager as exec_manager
 import argparse
 import rich
+import os
 
 # This script is run inside the `build` stage.
-# This is set up so that ALL build steps are run and it will fail if any fail.
-# This improves visibility into all issues that need to be corrected for `build`
-# to pass without needing to iterate excessively.
 
+BINDINGS_SRC = "bindings_src"
 
 def wit_bindgen_c(results: exec_manager.Results, wit_path: str):
     results.add(
         exec_manager.cli_run(
-            "wit-bindgen c --autodrop-borrows yes " + f"{wit_path} ",
-            name="",
+            "wit-bindgen c --autodrop-borrows yes "
+            + f"--out-dir {BINDINGS_SRC} "
+            + f"{wit_path} ",
+            name="Generate bindings C code.",
+            verbose=True,
         )
     )
 
 
 def clang_wasm_compile(results: exec_manager.Results, c_files: str):
+    bindings_src = " ".join(
+        [
+            BINDINGS_SRC + "/" + f
+            for f in os.listdir(BINDINGS_SRC)
+            if not f.endswith(".h")
+        ]
+    )
     results.add(
         exec_manager.cli_run(
-            "clang demo.c demo_component_type.o "
-            + f"{c_files}"
-            + " -o out.wasm -mexec-model=reactor --target=wasm32-wasi",
-            name="Build all code in the workspace",
+            "clang "
+            + f"{bindings_src} "
+            + f"{c_files} "
+            + "-o out.wasm -mexec-model=reactor --target=wasm32-wasi",
+            name="Compile C code to wasm module",
+            verbose=True,
         )
     )
 
@@ -37,12 +48,14 @@ def wasm_tools_gen_component(results: exec_manager.Results, out: str):
         exec_manager.cli_run(
             "wasm-tools validate out.wasm",
             name="Validate wasm module",
+            verbose=True,
         )
     )
     results.add(
         exec_manager.cli_run(
             "wasm-tools component new out.wasm -o " + f"{out}",
             name="Generate WASM component",
+            verbose=True,
         )
     )
 
