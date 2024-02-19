@@ -11,6 +11,7 @@ import os
 
 BINDINGS_SRC = "bindings_src"
 
+
 def wit_bindgen_c(results: exec_manager.Results, wit_path: str):
     results.add(
         exec_manager.cli_run(
@@ -68,15 +69,15 @@ def main():
     parser.add_argument(
         "--wit_path",
         default="wit",
-        help=".",
+        help="Path to the .wit files.",
     )
     parser.add_argument(
         "--c_files",
-        help=".",
+        help="Source C files to compile.",
     )
     parser.add_argument(
         "--out",
-        help=".",
+        help="Output WASM component file.",
     )
     args = parser.parse_args()
 
