@@ -1,5 +1,7 @@
 VERSION --global-cache 0.7
 
+# cspell: words bindgen autodrop mexec
+
 wasm-c-base:
     FROM alpine:3.19
     WORKDIR /repo
