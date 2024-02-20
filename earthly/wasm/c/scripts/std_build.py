@@ -15,9 +15,11 @@ BINDINGS_SRC = "bindings_src"
 def wit_bindgen_c(results: exec_manager.Results, wit_path: str):
     results.add(
         exec_manager.cli_run(
-            "wit-bindgen c --autodrop-borrows yes "
-            + f"--out-dir {BINDINGS_SRC} "
-            + f"{wit_path} ",
+            " ".join([
+                "wit-bindgen c --autodrop-borrows yes",
+                f"--out-dir {BINDINGS_SRC}",
+                wit_path
+            ]),
             name="Generate bindings C code.",
             verbose=True,
         )
@@ -35,10 +37,12 @@ def clang_wasm_compile(results: exec_manager.Results, c_files: str):
     )
     results.add(
         exec_manager.cli_run(
-            "clang "
-            + f"{bindings_src} "
-            + f"{c_files} "
-            + "-o out.wasm -mexec-model=reactor --target=wasm32-wasi",
+            " ".join([
+                "clang",
+                bindings_src,
+                c_files,
+                "-o out.wasm -mexec-model=reactor --target=wasm32-wasi"
+            ]),
             name="Compile C code to wasm module",
             verbose=True,
         )
