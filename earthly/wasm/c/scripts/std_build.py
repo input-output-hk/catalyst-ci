@@ -42,6 +42,7 @@ def clang_wasm_compile(results: exec_manager.Results, c_files: str):
                 "clang",
                 bindings_src,
                 c_files,
+                "-Oz",
                 "-o out.wasm",
                 "-mexec-model=reactor",
                 "--target=wasm32-wasi"
