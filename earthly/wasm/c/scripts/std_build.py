@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cspell: words lcov depgraph readelf sysroot
+# cspell: words lcov depgraph readelf sysroot bindgen autodrop mexec
 
 import python.exec_manager as exec_manager
 import argparse
