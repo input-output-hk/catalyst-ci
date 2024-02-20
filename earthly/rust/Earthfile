@@ -82,6 +82,8 @@ rust-base:
         cargo install --git https://github.com/bytecodealliance/wit-bindgen --rev 442f005 wit-bindgen-cli
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
+    SAVE ARTIFACT $CARGO_HOME/bin/wasm-tools wasm-tools
+    SAVE ARTIFACT $CARGO_HOME/bin/wit-bindgen wit-bindgen
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
