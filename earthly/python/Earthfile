@@ -7,11 +7,13 @@ python-base:
     FROM python:3.12-alpine3.19
 
     # Install extra packages we will need to support plugins.
-    RUN apk add --no-cache curl
-    RUN apk add --no-cache libffi-dev
-    RUN apk add --no-cache gcc
-    RUN apk add --no-cache musl-dev
-    RUN apk add --no-cache libgcc
+    RUN apk add --no-cache \
+        curl \
+        libffi-dev \
+        gcc \
+        musl-dev \
+        libgcc
+
 
     # Set up a virtual environment
     ENV VIRTUAL_ENV=/opt/venv
