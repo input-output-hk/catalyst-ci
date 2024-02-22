@@ -1,0 +1,23 @@
+VERSION --global-cache --use-function-keyword 0.7
+
+# cspell: words bindgen autodrop mexec
+
+wasm-c-base:
+    FROM alpine:3.19
+    WORKDIR /root
+
+    RUN apk update && \
+        apk add --no-cache \
+            py3-rich \
+            clang=17.0.5-r0 \
+            lld=17.0.5-r0 \
+            wasi-sdk=20-r3
+
+    COPY ./../../rust+rust-base/wasm-tools /bin
+    COPY ./../../rust+rust-base/wit-bindgen /bin
+
+    # Universal build scripts.
+    COPY --dir scripts /scripts
+    # Copy our common scripts so we can use them inside the container.
+    DO ./../../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO ./../../../utilities/scripts+ADD_PYTHON_SCRIPTS
