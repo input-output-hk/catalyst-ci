@@ -89,21 +89,27 @@ class ApiClient:
             await self.get(f"api/v0/account/{account_id}")
         )
 
-    async def get_account_votes(self, account_id: str):
+    async def get_account_votes(self, account_id: str) -> dict[str, list[int]]:
         """Get the proposal internal IDs that the account has voted on.
 
         Args:
             account_id (str): The account ID to get votes for.
 
         Returns:
-            list[int]: The proposal internal IDs that the account has voted on.
+            dict[str, list[int]]:
+                A dictionary of vote plan IDs and the proposals the account
+                has voted on.
         """
         adapter = TypeAdapter(list[AccountVotes])
         resp = adapter.validate_python(
             await self.get(f"api/v1/votes/plan/account-votes/{account_id}")
         )
 
-        return sum([r.votes for r in resp], [])
+        votes = {}
+        for r in resp:
+            votes[r.vote_plan_id] = r.votes
+
+        return votes
 
     async def get_accounts_votes(self) -> AccountVotesCount:
         """Get the number of votes per wallet.

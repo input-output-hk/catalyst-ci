@@ -62,6 +62,7 @@ Timoni
 transpiling
 UDCs
 uniseg
+voteplan
 webkitallowfullscreen
 WORKDIR
 xerrors
@@ -79,3 +80,4 @@ testcov
 testdocs
 fmtchk
 fmtfix
+wasi

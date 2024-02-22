@@ -1,0 +1,14 @@
+VERSION --global-cache 0.7
+
+builder:
+    FROM ./../../../earthly/wasm/c+wasm-c-base
+
+    COPY demo.wit ./wit/
+    COPY component.c .
+
+build: 
+    FROM +builder
+
+    RUN /scripts/std_build.py --c_files="component.c" --out="component.wasm"
+    SAVE ARTIFACT component.wasm
+
