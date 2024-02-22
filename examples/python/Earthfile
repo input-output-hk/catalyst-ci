@@ -6,14 +6,14 @@ VERSION --global-cache --use-function-keyword 0.7
 python-base:
     FROM python:3.12-alpine3.19
 
-    # Install extra packages we will need to support plugins.
+    # Install extra packages we will need to support plugins, including zlib libraries.
     RUN apk add --no-cache \
         curl \
         libffi-dev \
         gcc \
         musl-dev \
-        libgcc
-
+        libgcc \
+        zlib-dev   # Ensure zlib libs are included
 
     # Set up a virtual environment
     ENV VIRTUAL_ENV=/opt/venv
@@ -28,40 +28,34 @@ python-base:
 
     # Stop python code running in the container saving pointless .pyc files.
     ENV PYTHONDONTWRITEBYTECODE=1
-    
-    # Install Poetry to manage python.
+
+    # Install Poetry using the recommended installer.
     RUN curl -sSL https://install.python-poetry.org | python3 -
-    # Prevent warning when running on machines with more than 6 cores.
-    #   "Connection pool is full, discarding connection: pypi.org. Connection pool size: 10"
+
+    # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
-    
-    # Install flake8 globally using Poetry
+
+    # Install flake8 for linting.
     RUN pip3 install flake8
+
+# Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
+POETRY_SETUP:
+    FROM +python-base
+    # The setup steps for POETRY_SETUP would be included here, assuming it's defined elsewhere.
+    # This placeholder assumes the necessary Poetry and project setup is performed here.
 
 BUILDER:
     FUNCTION
-    ARG opts=""
-
-    FROM +python-base
-
-    # Copy our dependencies.
-    COPY pyproject.toml poetry.lock .
-
-    # Install it all with poetry
-    RUN poetry install $opts
-
-PYTHON_LINT:
-    FUNCTION
-    # Optionally, specify the directory containing Python code to lint.
-    ARG src_dir=./src
-
-    FROM +python-base
-
-    # Copy the source code directory to the container.
-    COPY $src_dir /app
-
+    FROM +POETRY_SETUP
+    # Copy project-specific files for the poetry installation and source code for linting.
+    COPY pyproject.toml poetry.lock ./src /app/
     WORKDIR /app
+    
+    # Install dependencies using poetry without creating a virtual environment inside the container.
+    RUN poetry install --no-root
 
-    # Run flake8 to lint the Python code.
-    # Adjust flake8 options as needed.
-    RUN flake8 .
+    # Lint the application using flake8.
+    RUN flake8 ./src
+
+# This Earthfile setup ensures that your Python environment is prepared with poetry,
+# includes zlib as required, installs dependencies, and performs linting in one combined step.

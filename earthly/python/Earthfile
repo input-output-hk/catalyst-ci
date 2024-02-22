@@ -45,6 +45,7 @@ POETRY_SETUP:
     # This placeholder assumes the necessary Poetry and project setup is performed here.
 
 BUILDER:
+    FUNCTION
     FROM +POETRY_SETUP
     # Copy project-specific files for the poetry installation and source code for linting.
     COPY pyproject.toml poetry.lock ./src /app/
