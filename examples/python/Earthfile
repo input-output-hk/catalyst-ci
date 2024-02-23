@@ -1,9 +1,9 @@
 # Common Python UDCs and Builders.
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words libgcc flake8
+# cspell: words libgcc ruff
 
-python-linter:
+python-base:
     FROM python:3.12-alpine3.19
 
     # Install extra packages we will need to support plugins, including zlib libraries.
@@ -31,12 +31,12 @@ python-linter:
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
 
-    # Install flake8 for linting.
-    RUN pip3 install flake8
+    # Install ruff for linting instead of flake8.
+    RUN pip3 install ruff
 
 # Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
 poetry:
-    FROM +python-linter
+    FROM +python-base
     # The setup steps for POETRY_SETUP would be included here, assuming it's defined elsewhere.
     # This placeholder assumes the necessary Poetry and project setup is performed here.
 
@@ -50,5 +50,5 @@ BUILDER:
     # Install dependencies using poetry without creating a virtual environment inside the container.
     RUN poetry install --no-root
 
-    # Lint the application using flake8.
-    RUN flake8 .
+    # Lint the application using ruff instead of flake8.
+    RUN ruff .
