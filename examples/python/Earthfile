@@ -48,9 +48,6 @@ BUILDER:
     # Copy project-specific files for the poetry installation and source code for linting.
     COPY pyproject.toml poetry.lock .
     WORKDIR .
-    
-    # Install dependencies using poetry without creating a virtual environment inside the container.
-    RUN poetry install --no-root
 
     # Lint the application using ruff instead of flake8.
     RUN ruff .
