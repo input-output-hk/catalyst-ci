@@ -14,10 +14,7 @@ python-base:
         musl-dev \
         libgcc \
         zlib-dev \
-        apt-get update && \
-        apt-get install -y libjpeg-dev libpng-dev libtiff-dev && \
-        rm -rf /var/lib/apt/lists/*
-
+        jpeg-dev \
 
     # Set up a virtual environment
     ENV VIRTUAL_ENV=/opt/venv
@@ -56,7 +53,7 @@ BUILDER:
     WORKDIR .
     
     # Install dependencies using poetry without creating a virtual environment inside the container.
-    RUN poetry install --no-root
+    RUN poetry install
 
     # Lint the application using flake8.
     RUN flake8 .
