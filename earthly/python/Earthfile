@@ -39,7 +39,6 @@ python-base:
 # Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
 poetry:
     FROM +python-base
-    # The setup steps for POETRY_SETUP would be included here, assuming it's defined elsewhere.
     # This placeholder assumes the necessary Poetry and project setup is performed here.
 
 BUILDER:
