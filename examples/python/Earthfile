@@ -38,15 +38,9 @@ python-base:
     # Install flake8 for linting.
     RUN pip3 install flake8
 
-# Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
-poetry:
-    FROM +python-base
-    # The setup steps for POETRY_SETUP would be included here, assuming it's defined elsewhere.
-    # This placeholder assumes the necessary Poetry and project setup is performed here.
-
 BUILDER:
     FUNCTION
-    FROM +poetry
+    FROM +python-base
     # Copy project-specific files for the poetry installation and source code for linting.
     COPY pyproject.toml poetry.lock .
     WORKDIR .
