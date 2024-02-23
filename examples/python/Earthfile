@@ -6,8 +6,9 @@ VERSION --global-cache --use-function-keyword 0.7
 python-base:
     FROM python:3.12-alpine3.19
 
-    # Install extra packages we will need to support plugins, including zlib libraries.
+    # Install extra packages we will need to support plugins, including zlib libraries and bash.
     RUN apk add --no-cache \
+        bash \
         curl \
         libffi-dev \
         gcc \
