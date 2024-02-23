@@ -55,7 +55,7 @@ BUILDER:
     RUN poetry install --no-root
 
     # Lint the application using flake8.
-    RUN flake8 ./src
+    RUN flake8 .
 
 # This Earthfile setup ensures that your Python environment is prepared with poetry,
 # includes zlib as required, installs dependencies, and performs linting in one combined step.
