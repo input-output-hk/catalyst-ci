@@ -82,6 +82,8 @@ SRC:
 BUILD:
     FUNCTION
 
+    RUN pip3 install mkdocs  # Install mkdocs
+    
     RUN /scripts/build.sh
 
     SAVE ARTIFACT /site/*
