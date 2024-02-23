@@ -33,7 +33,7 @@ python-base:
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
 
-    # Install ruff for linting instead of flake8.
+    # Install ruff for linting.
     RUN pip3 install ruff
 
 # Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
@@ -44,10 +44,10 @@ poetry:
 
 BUILDER:
     FUNCTION
-    FROM +poetry
+    FROM +python-base
     # Copy project-specific files for the poetry installation and source code for linting.
     COPY pyproject.toml poetry.lock .
     WORKDIR .
 
-    # Lint the application using ruff instead of flake8.
+    # Lint the application using ruff.
     RUN ruff .
