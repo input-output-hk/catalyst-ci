@@ -25,7 +25,11 @@
         "typescript",
         "html",
         "css",
-        "golang"
+        "golang",
+        "UTXO",
+        "mithril",
+        "Arbritrary",
+        "iohk",
     ],
     "ignorePaths": [
         ".config/dictionaries",
