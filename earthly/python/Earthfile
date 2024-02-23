@@ -3,7 +3,7 @@ VERSION --global-cache --use-function-keyword 0.7
 
 # cspell: words libgcc flake8
 
-python-base:
+python-linter:
     FROM python:3.12-alpine3.19
 
     # Install extra packages we will need to support plugins, including zlib libraries.
@@ -14,7 +14,7 @@ python-base:
         musl-dev \
         libgcc \
         zlib-dev \
-        jpeg-dev \
+        jpeg-dev
 
     # Set up a virtual environment
     ENV VIRTUAL_ENV=/opt/venv
@@ -41,7 +41,7 @@ python-base:
 
 # Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
 poetry:
-    FROM +python-base
+    FROM +python-linter
     # The setup steps for POETRY_SETUP would be included here, assuming it's defined elsewhere.
     # This placeholder assumes the necessary Poetry and project setup is performed here.
 
