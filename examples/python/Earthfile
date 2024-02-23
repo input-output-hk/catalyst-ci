@@ -18,11 +18,6 @@ python-base:
         jpeg-dev \
         git
 
-    # Set up a virtual environment
-    ENV VIRTUAL_ENV=/opt/venv
-    RUN python3 -m venv $VIRTUAL_ENV
-    ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.
     WORKDIR /poetry
