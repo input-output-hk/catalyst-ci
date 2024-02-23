@@ -41,14 +41,8 @@ python-base:
     # Install ruff for linting.
     RUN pip3 install ruff
 
-# Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
-poetry:
+BUILDER:
     FROM +python-base
-    # The setup steps for POETRY_SETUP would be included here, assuming it's defined elsewhere.
-    # This placeholder assumes the necessary Poetry and project setup is performed here.
-
-build:
-    FROM +poetry
     # Copy project-specific files for the poetry installation and source code for linting.
     COPY pyproject.toml poetry.lock .
     WORKDIR .

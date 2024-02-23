@@ -38,7 +38,7 @@ deps:
     RUN fc-cache -f
 
     # Install poetry and our python dependencies.
-    DO ../python+builder
+    DO ../python+BUILDER
 
     # Copy our run scripts
     COPY --dir scripts /scripts
