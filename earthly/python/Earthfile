@@ -18,6 +18,11 @@ python-base:
         jpeg-dev \
         git
 
+    # Set up a virtual environment
+    ENV VIRTUAL_ENV=/opt/venv
+    RUN python3 -m venv $VIRTUAL_ENV
+    ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.
     WORKDIR /poetry
@@ -33,7 +38,7 @@ python-base:
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
 
-    # Install ruff for linting instead of flake8.
+    # Install ruff for linting.
     RUN pip3 install ruff
 
 # Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
@@ -42,15 +47,11 @@ poetry:
     # The setup steps for POETRY_SETUP would be included here, assuming it's defined elsewhere.
     # This placeholder assumes the necessary Poetry and project setup is performed here.
 
-BUILDER:
-    FUNCTION
+build:
     FROM +poetry
     # Copy project-specific files for the poetry installation and source code for linting.
     COPY pyproject.toml poetry.lock .
     WORKDIR .
-    
-    # Install dependencies using poetry without creating a virtual environment inside the container.
-    RUN poetry install --no-root
 
-    # Lint the application using ruff instead of flake8.
+    # Lint the application using ruff.
     RUN ruff .
