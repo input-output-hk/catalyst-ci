@@ -14,7 +14,8 @@ python-base:
         musl-dev \
         libgcc \
         zlib-dev \
-        jpeg-dev
+        jpeg-dev \
+        git
 
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.
