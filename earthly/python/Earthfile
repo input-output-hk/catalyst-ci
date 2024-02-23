@@ -48,7 +48,7 @@ BUILDER:
     FUNCTION
     FROM +poetry
     # Copy project-specific files for the poetry installation and source code for linting.
-    COPY pyproject.toml poetry.lock ./src /app/
+    COPY pyproject.toml poetry.lock .
     WORKDIR /app
     
     # Install dependencies using poetry without creating a virtual environment inside the container.
