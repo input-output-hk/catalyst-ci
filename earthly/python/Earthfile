@@ -49,13 +49,10 @@ BUILDER:
     FROM +poetry
     # Copy project-specific files for the poetry installation and source code for linting.
     COPY pyproject.toml poetry.lock .
-    WORKDIR /app
+    WORKDIR .
     
     # Install dependencies using poetry without creating a virtual environment inside the container.
     RUN poetry install --no-root
 
     # Lint the application using flake8.
     RUN flake8 .
-
-# This Earthfile setup ensures that your Python environment is prepared with poetry,
-# includes zlib as required, installs dependencies, and performs linting in one combined step.
