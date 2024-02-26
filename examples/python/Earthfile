@@ -1,56 +1,12 @@
-# Common Python UDCs and Builders.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION --global-cache 0.7
 
-# cspell: words libgcc ruff
+builder:
+    FROM ./../../earthly/python+python-base
 
-python-base:
-    FROM python:3.12-alpine3.19
+    COPY --dir ./src .
+    DO ./../../earthly/python+BUILDER
 
-    # Install extra packages we will need to support plugins, including zlib libraries and bash.
-    RUN apk add --no-cache \
-        bash \
-        curl \
-        libffi-dev \
-        gcc \
-        musl-dev \
-        libgcc \
-        zlib-dev \
-        jpeg-dev \
-        git
+test:
+    FROM +builder
 
-    # Poetry Installation directory.
-    # Gives poetry and our poetry project a reliable location.
-    WORKDIR /poetry
-    ENV POETRY_HOME=/poetry
-    ENV PATH=$POETRY_HOME/bin:$PATH
-
-    # Stop python code running in the container saving pointless .pyc files.
-    ENV PYTHONDONTWRITEBYTECODE=1
-
-    # Install Poetry using the recommended installer.
-    RUN curl -sSL https://install.python-poetry.org | python3 -
-
-    # Adjust Poetry's configuration to prevent connection pool warnings.
-    RUN poetry config installer.max-workers 10
-
-    # Install ruff for linting instead of flake8.
-    RUN pip3 install ruff
-
-# Utilize the POETRY_SETUP UDC for setting up Poetry within our environment.
-poetry:
-    FROM +python-base
-    # The setup steps for POETRY_SETUP would be included here, assuming it's defined elsewhere.
-    # This placeholder assumes the necessary Poetry and project setup is performed here.
-
-BUILDER:
-    FUNCTION
-    FROM +poetry
-    # Copy project-specific files for the poetry installation and source code for linting.
-    COPY pyproject.toml poetry.lock .
-    WORKDIR .
-    
-    # Install dependencies using poetry without creating a virtual environment inside the container.
-    RUN poetry install --no-root
-
-    # Lint the application using ruff instead of flake8.
-    RUN ruff .
+    RUN poetry run pytest
