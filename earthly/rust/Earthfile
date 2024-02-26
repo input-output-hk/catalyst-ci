@@ -21,6 +21,12 @@ rust-base:
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
+
+    # WARNING:
+    # Dont bump the version of the alpine.
+    # A potential bug was found inside `libgcc:13` version.
+    # It works fine with the `libgcc:12` version.
+    # Look: https://github.com/bytecodealliance/wasmtime/issues/7997
     FROM rust:1.75-alpine3.18
 
     RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
