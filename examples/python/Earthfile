@@ -1,12 +1,28 @@
-VERSION --global-cache 0.7
+# Common Python UDCs and Builders.
+VERSION --global-cache --use-function-keyword 0.7
+
+# Assuming the detailed setup from the second snippet is defined in relevant Earthly targets.
 
 builder:
     FROM ./../../earthly/python+python-base
 
-    COPY --dir ./src .
-    DO ./../../earthly/python+BUILDER
+    # Copy the src directory and project-specific files into /poetry in the container.
+    # Adjusted to match your setup where the WORKDIR is set to /poetry.
+    COPY --dir src ./src
+    COPY pyproject.toml poetry.lock ./
+
+    # Install dependencies without creating a virtual environment inside the container.
+    RUN poetry install --no-root
+
+    # Lint the application using ruff.
+    RUN ruff ./src
 
 test:
     FROM +builder
 
+    # Change the working directory to where the source code and tests are located.
+    # Adjusted to the specific structure of your project.
+    WORKDIR /poetry/src
+
+    # Run pytest using Poetry. This ensures that tests are executed with all dependencies available.
     RUN poetry run pytest
