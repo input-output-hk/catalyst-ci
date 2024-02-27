@@ -43,6 +43,8 @@ mkdocs-material-adr = { git = "https://github.com/stevenj/mkdocs-material-adr" }
 # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
 mkdocs-awesome-pages-plugin = "^2.9.2"
 
+# https://github.com/landmaj/mkdocs-d2-plugin
+mkdocs-d2-plugin = "^1.1.0"
 
 ### DO NOT ENABLE THESE BAD PLUGINS.
 ### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
