@@ -73,6 +73,7 @@ rustdoc
 rustdocflags
 rustfmt
 codegen
+libgcc
 lintfix
 testunit
 nextest

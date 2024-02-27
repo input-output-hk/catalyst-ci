@@ -1,6 +1,6 @@
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words libgcc freetype lcms openjpeg etag
+# cspell: words freetype lcms openjpeg etag
 
 deps:
     FROM ../python+python-base

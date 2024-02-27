@@ -1,8 +1,6 @@
 # Common Python UDCs and Builders.
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words libgcc
-
 python-base:
     FROM python:3.12-alpine3.19
 
