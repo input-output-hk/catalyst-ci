@@ -32,13 +32,17 @@ deps:
         tiff-dev \
         tk-dev \
         tcl-dev  \
-        git
+        git \
+        make
 
     # Fix up font cache
     RUN fc-cache -f
 
+    # Install D2
+    RUN curl -fsSL https://d2lang.com/install.sh | sh -s --
+
     # Install poetry and our python dependencies.
-    DO ../python+BUILDER
+    DO ../python+BUILDER --opts=--no-root
 
     # Copy our run scripts
     COPY --dir scripts /scripts
