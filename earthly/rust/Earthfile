@@ -21,7 +21,13 @@ rust-base:
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
-    FROM rust:1.75-alpine3.19
+
+    # WARNING:
+    # Dont bump the version of the alpine.
+    # A potential bug was found inside `libgcc:13` version.
+    # It works fine with the `libgcc:12` version.
+    # Look: https://github.com/bytecodealliance/wasmtime/issues/7997
+    FROM rust:1.75-alpine3.18
 
     RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
         echo "TARGETOS       = $TARGETOS"; \
@@ -78,8 +84,8 @@ rust-base:
         cargo install cargo-llvm-cov --version=0.6.4 && \
         cargo install wasm-tools --version=1.0.57 && \
         cargo install cargo-expand --version=1.0.79 && \
-        cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter && \
-        cargo install --git https://github.com/bytecodealliance/wit-bindgen --rev 442f005 wit-bindgen-cli
+        cargo install wit-bindgen-cli --version=0.17.0 && \
+        cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
     SAVE ARTIFACT $CARGO_HOME/bin/wasm-tools wasm-tools
