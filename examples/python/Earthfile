@@ -4,7 +4,7 @@ VERSION --global-cache --use-function-keyword 0.7
 # Assuming the detailed setup from the second snippet is defined in relevant Earthly targets.
 
 builder:
-    FROM ./../../earthly/python+python-base
+    DO ./../../earthly/python+BUILDER
 
     # Copy the src directory and project-specific files into /poetry in the container.
     # Adjusted to match your setup where the WORKDIR is set to /poetry.
@@ -17,12 +17,19 @@ builder:
     # Lint the application using ruff.
     RUN ruff ./src
 
-test:
+check:
     FROM +builder
 
-    # Change the working directory to where the source code and tests are located.
-    # Adjusted to the specific structure of your project.
-    WORKDIR /poetry/src
+    DO ./../../earthly/python+CHECK
 
-    # Run pytest using Poetry. This ensures that tests are executed with all dependencies available.
-    RUN poetry run pytest
+# format all Python files in the current project.  Local developers tool.
+#   CI target : false
+format:
+    LOCALLY
+
+    DO ./../../earthly/python+FORMAT --src=$(echo ${PWD})
+
+pythonlinter:
+    FROM +builder
+    
+    DO ./../../earthly/python+LINT_PYTHON
