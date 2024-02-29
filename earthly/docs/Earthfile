@@ -82,6 +82,8 @@ SRC:
 BUILD:
     FUNCTION
 
+    FROM +deps
+
     RUN /scripts/build.sh
 
     SAVE ARTIFACT /site/*
