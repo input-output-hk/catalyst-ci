@@ -22,13 +22,6 @@ check:
 
     DO ./../../earthly/python+CHECK
 
-# format all Python files in the current project.  Local developers tool.
-#   CI target : false
-format:
-    LOCALLY
-
-    DO ./../../earthly/python+FORMAT --src=$(echo ${PWD})
-
 python-linter:
     FROM +builder
     
