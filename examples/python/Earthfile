@@ -29,7 +29,7 @@ format:
 
     DO ./../../earthly/python+FORMAT --src=$(echo ${PWD})
 
-pythonlinter:
+python-linter:
     FROM +builder
     
     DO ./../../earthly/python+LINT_PYTHON

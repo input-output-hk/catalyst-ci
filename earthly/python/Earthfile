@@ -76,15 +76,6 @@ CHECK:
     # Execute the check script
     RUN /scripts/std_checks.py
 
-FORMAT:
-    FUNCTION
-
-    # Can not run format LOCALLY as it changes permissions of files to root:root
-    RUN --no-cache printf "%s\n%s\n%s\n" \
-        "Python code can only be formatted locally from the command line." \
-        "Run locally installed 'ruff' from the repo root:" \
-        "    $ ruff fmt ."
-
 LINT_PYTHON:
     # Linting all Python code is done with ruff
     # See: https://github.com/charliermarsh/ruff
