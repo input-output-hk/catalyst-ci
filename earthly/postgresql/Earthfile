@@ -108,8 +108,7 @@ DOCS:
 # Linter checks for sql files
 CHECK:
     FUNCTION
-    COPY ./scripts/build.sh /scripts/build.sh
-    RUN chmod +x /scripts/build.sh
+
     RUN /scripts/std_checks.sh
 
 # Format sql files
@@ -163,3 +162,4 @@ BUILD:
 
     # Push the container...
     SAVE IMAGE ${image_name}:latest
+
