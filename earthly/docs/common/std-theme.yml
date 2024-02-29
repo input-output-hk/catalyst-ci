@@ -57,6 +57,7 @@ plugins:
       ServerURL: https://kroki.io
       EnableDiagramsnet: true
       HttpMethod: POST
+  - d2
   - glightbox
 
 markdown_extensions:
