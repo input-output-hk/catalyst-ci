@@ -18,7 +18,7 @@ check:
 
     # Copy the build.sh script from the project's scripts directory to the expected location in the container
     # Adjust the path as needed if your Earthfile or scripts directory is located elsewhere
-    COPY ./scripts /scripts
+    COPY ./scripts ./scripts
 
     # Ensure the script is executable
     RUN chmod +x /scripts/build.sh
