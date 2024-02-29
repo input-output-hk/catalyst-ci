@@ -40,11 +40,6 @@ deps:
     # Install poetry and our python dependencies.
     DO ../python+BUILDER
 
-    # Copy our run scripts
-    COPY --dir /scripts /scripts
-    # Copy our common scripts so we can use them inside the container.
-    DO ../../../docs/scripts+ADD_BASH_SCRIPTS
-
     # Trust directory, required for git >= 2.35.2. (mkdocs Git plugin requirement).
     RUN git config --global --add safe.directory /docs &&\
         git config --global --add safe.directory /site
@@ -82,6 +77,8 @@ SRC:
 BUILD:
     FUNCTION
 
+    COPY --dir scripts /scripts
+    
     RUN /scripts/build.sh
 
     SAVE ARTIFACT /site/*
