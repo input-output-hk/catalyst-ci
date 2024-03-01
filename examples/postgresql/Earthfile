@@ -16,6 +16,7 @@ builder:
 check:
     FROM +builder
 
+    # Now you can run the script without the file not found error
     DO ./../../earthly/postgresql+CHECK
 
 # format all SQL files in the current project.  Local developers tool.
