@@ -45,7 +45,7 @@ deps:
     DO ../python+BUILDER --opts=--no-root
 
     # Copy our run scripts
-    COPY --dir scripts /scripts
+    COPY --dir scripts/* /scripts/
     # Copy our common scripts so we can use them inside the container.
     DO ../../utilities/scripts+ADD_BASH_SCRIPTS
 
