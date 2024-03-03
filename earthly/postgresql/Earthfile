@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words colordiff psycopg dbviz
+# cspell: words psycopg dbviz
 
 postgres-base:
     FROM postgres:16.1-alpine3.19

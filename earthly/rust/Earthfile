@@ -1,7 +1,7 @@
 # Common Rust UDCs and Builders.
 VERSION --global-cache --use-function-keyword 0.7
 
-# cspell: words rustup miri ripgrep colordiff stdcfgs toolset depgraph lcov psycopg bindgen
+# cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg bindgen
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
