@@ -37,7 +37,7 @@ def main():
     results = exec_manager.Results("Postgres checks")
 
     results.add(
-        vendor_files_check.toml_diff_check(
+        vendor_files_check.colordiff_check(
             "/sql/.sqlfluff",
             ".sqlfluff",
         )
