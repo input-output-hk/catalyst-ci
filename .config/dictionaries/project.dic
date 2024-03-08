@@ -1,6 +1,7 @@
 aarch
 buildkit
 camelcase
+colordiff
 cowsay
 cytopia
 devenv

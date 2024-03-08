@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# cspell: words localfile vendorfile colordiff Naur
+# cspell: words localfile vendorfile Naur
 
 # shellcheck disable=SC2034 # This file is intended to bo sourced.
 
