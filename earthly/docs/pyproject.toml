@@ -46,6 +46,9 @@ mkdocs-awesome-pages-plugin = "^2.9.2"
 # https://github.com/landmaj/mkdocs-d2-plugin
 mkdocs-d2-plugin = "^1.1.0"
 
+# https://gitlab.com/rod2ik/mkdocs-graphviz
+mkdocs-graphviz = "^1.5.3"
+
 ### DO NOT ENABLE THESE BAD PLUGINS.
 ### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
 # https://github.com/zoni/mkdocs-diagrams
