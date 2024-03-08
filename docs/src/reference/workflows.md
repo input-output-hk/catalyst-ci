@@ -97,9 +97,15 @@ It then uses the custom `push` GitHub Action to re-tag the image and push it to 
 | Name             | Type   | Description                                                                        | Required | Default                                         |
 | ---------------- | ------ | ---------------------------------------------------------------------------------- | -------- | ----------------------------------------------- |
 | aws_ecr_registry | string | The AWS ECR registry that will be used to publish images                           | No       | `""`                                            |
-| default_branch   | string | The default branch of the repository.                                              | No       | `${{ github.event.repository.default_branch }}` |
+| default_branch   | string | The default branch of the repository.                                              | No       | `master` |
 | tags             | string | A line separated list of additional tags that will be applied to published images. | No       | `""`                                            |
 | target           | string | The target used to mark check builds                                               | No       | `publish`                                       |
+
+<!-- Note: `default_branch` `Default` column was defined as a mkdocs macro.
+It had the value `github.event.repository.default_branch`  
+This breaks local builds of the documentation.
+It has been hardcoded to `master` until a proper fix can be found.
+-->
 
 ## Release
 
