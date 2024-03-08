@@ -19,7 +19,7 @@ window.addEventListener('load', function() {
       var dataDark = span.getAttribute("data-dark");
       tag_default();
       update_theme();
-    } // else no grapviz diagram
+    } // else no graphviz diagram
   
     function tag_default() {
       // console.log("TAG DEFAULTS");
