@@ -30,6 +30,10 @@
         "mithril",
         "Arbritrary",
         "iohk",
+        "dalek",
+        "Keyhash",
+        "Scripthash",
+        "vkey",
     ],
     "ignorePaths": [
         ".config/dictionaries",
