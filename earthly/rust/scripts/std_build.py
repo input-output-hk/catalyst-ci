@@ -83,9 +83,7 @@ def cargo_bench(results: exec_manager.Results, flags: str):
 
 
 def cargo_doc(results: exec_manager.Results):
-    results.add(
-        exec_manager.cli_run("cargo +nightly docs ", name="Documentation build")
-    )
+    results.add(exec_manager.cli_run("cargo +stable docs ", name="Documentation build"))
 
 
 def cargo_depgraph(results: exec_manager.Results):
@@ -114,14 +112,12 @@ def cargo_depgraph(results: exec_manager.Results):
         )
     )
 
+
 COMMON_CARGO_MODULES_ORPHANS = (
-    "NO_COLOR=1 "
-    + "cargo modules orphans --all-features "
-    + "--deny --cfg-test "
+    "NO_COLOR=1 " + "cargo modules orphans --all-features " + "--deny --cfg-test "
 )
 COMMON_CARGO_MODULES_STRUCTURE = (
-    "NO_COLOR=1 "
-    + "cargo modules structure --no-fns --all-features "
+    "NO_COLOR=1 " + "cargo modules structure --no-fns --all-features "
 )
 COMMON_CARGO_MODULES_DEPENDENCIES = (
     "NO_COLOR=1 "
@@ -129,16 +125,16 @@ COMMON_CARGO_MODULES_DEPENDENCIES = (
     + "--no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses "
 )
 
+
 def cargo_modules_lib(results: exec_manager.Results, lib: str):
     # Check if we have any Orphans.
     results.add(
         exec_manager.cli_run(
-            COMMON_CARGO_MODULES_ORPHANS
-            + f"--package '{lib}' --lib",
-            name=f"Checking Orphans for {lib}",            
+            COMMON_CARGO_MODULES_ORPHANS + f"--package '{lib}' --lib",
+            name=f"Checking Orphans for {lib}",
         )
     )
-    
+
     # Generate tree
     results.add(
         exec_manager.cli_run(
@@ -161,9 +157,8 @@ def cargo_modules_bin(results: exec_manager.Results, package: str, bin: str):
     # Check if we have any Orphans.
     results.add(
         exec_manager.cli_run(
-            COMMON_CARGO_MODULES_ORPHANS
-            + f"--package '{package}' --bin '{bin}'",
-            name=f"Checking Orphans for {package}/{bin}",            
+            COMMON_CARGO_MODULES_ORPHANS + f"--package '{package}' --bin '{bin}'",
+            name=f"Checking Orphans for {package}/{bin}",
         )
     )
 
