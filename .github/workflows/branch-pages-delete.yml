@@ -1,5 +1,5 @@
 name: Branch Pages Deleted
-on: 
+on:
   workflow_call:
     inputs:
       earthfile:
@@ -61,24 +61,22 @@ jobs:
       - name: Set env
         run: |
           GIT_BRANCH=$(echo ${{ github.event.ref }} | sed -e "s#refs/heads/##g")
-          DEST_DIR="branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
+          DEST_DIR_DOCS="branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
+          DEST_DIR_TESTS="allure-action/${GIT_BRANCH//[^a-zA-Z0-9_-]/_}"
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
-          echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV    
+          echo "DEST_DIR_DOCS=$DEST_DIR_DOCS" >> $GITHUB_ENV
+          echo "DEST_DIR_TESTS=$DEST_DIR_TESTS" >> $GITHUB_ENV
 
       - name: Clean up
         run: |
-          echo "Clean up for branch ${{ env.GIT_BRANCH }} at ${{ env.DEST_DIR }}"
+          echo "Clean up for branch ${{ env.GIT_BRANCH }} at ${{ env.DEST_DIR_DOCS }} and ${{ env.DEST_DIR_TESTS }}"
 
-      - name: Get current published documentation
-        uses: actions/checkout@v3
-        with:
-          ref: gh-pages
-
-      - name: Remove branches draft docs
+      - name: Remove branches draft docs and test reports
         run: |
-          rm -rf ${{ env.DEST_DIR }}
+          rm -rf ${{ env.DEST_DIR_DOCS }}
+          rm -rf ${{ env.DEST_DIR_TESTS}}
 
-      - name: Save updated docs
+      - name: Save updated docs and test reports
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          commit_message: Removed Draft Docs for ${{ env.GIT_BRANCH }}
+          commit_message: Removed draft docs and test reports for ${{ env.GIT_BRANCH }}
