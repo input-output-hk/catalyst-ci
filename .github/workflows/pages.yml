@@ -65,7 +65,7 @@ jobs:
           GIT_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           if [[ $GIT_BRANCH == "${{ github.event.repository.default_branch }}" ]]; then
             DEST_DIR="/"
-            CLEAN_EXCLUDE="/branch/*"
+            CLEAN_EXCLUDE="/branch/*\n/allure-action/*"
           else
             DEST_DIR="/branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
             CLEAN_EXCLUDE="/nothing"
