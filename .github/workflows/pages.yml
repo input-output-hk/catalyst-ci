@@ -65,14 +65,18 @@ jobs:
           GIT_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
           if [[ $GIT_BRANCH == "${{ github.event.repository.default_branch }}" ]]; then
             DEST_DIR="/"
-            CLEAN_EXCLUDE="/branch/*\n/allure-action/*"
+            {
+            echo 'CLEAN_EXCLUDE<<EOF'
+            echo "/branch/*"
+            echo "/allure-action/*"
+            echo EOF
+            } >> "$GITHUB_ENV"
           else
             DEST_DIR="/branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
-            CLEAN_EXCLUDE="/nothing"
+            echo "CLEAN_EXCLUDE="/nothing"" >> $GITHUB_ENV
           fi
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
           echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV
-          echo "CLEAN_EXCLUDE=$CLEAN_EXCLUDE" >> $GITHUB_ENV
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:

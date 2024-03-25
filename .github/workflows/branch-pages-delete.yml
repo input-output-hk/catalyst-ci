@@ -71,6 +71,11 @@ jobs:
         run: |
           echo "Clean up for branch ${{ env.GIT_BRANCH }} at ${{ env.DEST_DIR_DOCS }} and ${{ env.DEST_DIR_TESTS }}"
 
+      - name: Get current published documentation
+        uses: actions/checkout@v3
+        with:
+          ref: gh-pages
+
       - name: Remove branches draft docs and test reports
         run: |
           rm -rf ${{ env.DEST_DIR_DOCS }}
