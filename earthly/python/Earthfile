@@ -35,6 +35,7 @@ python-base:
 
     # Install ruff for linting.
     RUN pip3 install ruff
+    RUN pip3 install rich
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
