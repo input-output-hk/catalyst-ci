@@ -1,0 +1,22 @@
+VERSION 0.7
+
+
+mithril-cli-base:
+    FROM ghcr.io/input-output-hk/mithril-client:2412.0-2e462c0
+
+    USER root
+    RUN apt update && apt install python3-pip -y
+    RUN pip3 install rich
+
+    COPY --dir scripts /scripts
+    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
+
+    ENV PATH=$PATH:./bin
+
+    RUN mithril-client --version
+    RUN python3 --version
+
+load:
+    FROM +mithril-cli-base
+
+    RUN /scripts/std_load.py --network=preprod
