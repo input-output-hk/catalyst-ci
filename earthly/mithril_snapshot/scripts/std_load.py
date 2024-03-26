@@ -11,6 +11,7 @@ import enum
 
 # This script loads latest mithril snapshot archive
 
+
 class NetworkType(enum.Enum):
     Mainnet = "mainnet"
     Testnet = "testnet"
@@ -28,7 +29,7 @@ class NetworkType(enum.Enum):
             return (
                 "https://aggregator.pre-release-preview.api.mithril.network/aggregator"
             )
-    
+
     # taken from https://github.com/input-output-hk/mithril/tree/main/mithril-infra/configuration
     def get_genesis_verification_key(self):
         if self == NetworkType.Mainnet:
@@ -38,9 +39,7 @@ class NetworkType(enum.Enum):
         if self == NetworkType.Preprod:
             return "5b3132372c37332c3132342c3136312c362c3133372c3133312c3231332c3230372c3131372c3139382c38352c3137362c3139392c3136322c3234312c36382c3132332c3131392c3134352c31332c3233322c3234332c34392c3232392c322c3234392c3230352c3230352c33392c3233352c34345d"
         if self == NetworkType.Preview:
-            return (
-                "5b3132372c37332c3132342c3136312c362c3133372c3133312c3231332c3230372c3131372c3139382c38352c3137362c3139392c3136322c3234312c36382c3132332c3131392c3134352c31332c3233322c3234332c34392c3232392c322c3234392c3230352c3230352c33392c3233352c34345d"
-            )
+            return "5b3132372c37332c3132342c3136312c362c3133372c3133312c3231332c3230372c3131372c3139382c38352c3137362c3139392c3136322c3234312c36382c3132332c3131392c3134352c31332c3233322c3234332c34392c3232392c322c3234392c3230352c3230352c33392c3233352c34345d"
 
 
 def main():
@@ -58,18 +57,20 @@ def main():
     results = exec_manager.Results("Mithril snapshot loading.")
 
     # download latest snapshot
-    exec_manager.cli_run(
-        " ".join(
-            [
-                f"GENESIS_VERIFICATION_KEY={args.network.get_genesis_verification_key()}",
-                f"AGGREGATOR_ENDPOINT={args.network.get_aggregator_url()}",
-                "mithril-client",
-                "cardano-db",
-                "download",
-                "latest",
-            ]
-        ),
-        name="Dowload latest mithril snapshot",
+    results.add(
+        exec_manager.cli_run(
+            " ".join(
+                [
+                    f"GENESIS_VERIFICATION_KEY={args.network.get_genesis_verification_key()}",
+                    f"AGGREGATOR_ENDPOINT={args.network.get_aggregator_url()}",
+                    "mithril-client",
+                    "cardano-db",
+                    "download",
+                    "latest",
+                ]
+            ),
+            name=f"Dowload latest mithril snapshot for {args.network}",
+        )
     )
 
     results.print()
