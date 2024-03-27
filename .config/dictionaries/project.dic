@@ -1,6 +1,7 @@
 aarch
 buildkit
 camelcase
+cardano
 codegen
 colordiff
 cowsay
@@ -47,6 +48,7 @@ lintfix
 markdownlint
 mattn
 mdlint
+mithril
 mkdocs
 modcache
 mozallowfullscreen
@@ -59,6 +61,7 @@ onsi
 penwidth
 pkeyopt
 pkgs
+preprod
 projectcatalyst
 pubout
 pymdownx

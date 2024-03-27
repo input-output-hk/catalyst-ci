@@ -69,7 +69,7 @@ def main():
                     "latest",
                 ]
             ),
-            name=f"Dowload latest mithril snapshot for {args.network}",
+            name=f"Download latest mithril snapshot for {args.network}",
         )
     )
 
