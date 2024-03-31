@@ -1,10 +1,17 @@
 VERSION 0.7
 
-preview-snapshot:
+preview-snapshot-image:
     FROM alpine:3.19
+
+    WORKDIR /snapshot
 
     RUN wget -O \
         preview.tar.zst \
         https://storage.googleapis.com/cdn.aggregator.pre-release-preview.api.mithril.network/preview-e522-i10448.1b95bab3ba6f8a939cf27d1e2ca0a1e34ec4399a6374f7c043462db64e8c9ef0.tar.zst
 
-    SAVE ARTIFACT ./preview.tar.zst preview.tar.zst
+    # extract preview archive
+    RUN apk add zstd
+    RUN mkdir preview && zstd -d preview.tar.zst && tar -xf preview.tar
+    RUN rm preview.tar && rm preview.tar.zst
+
+    SAVE IMAGE preview-snapshot:latest
