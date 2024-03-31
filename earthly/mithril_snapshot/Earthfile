@@ -13,5 +13,6 @@ package-preview-snapshot:
     RUN apk add zstd
     RUN mkdir preview && zstd -d preview.tar.zst && tar -xf preview.tar
     RUN rm preview.tar && rm preview.tar.zst
+    RUN ls /snapshot/immutable
 
     SAVE IMAGE preview-snapshot:latest
