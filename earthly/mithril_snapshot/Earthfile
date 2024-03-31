@@ -11,7 +11,7 @@ package-preview-snapshot:
 
     # extract preview archive
     RUN apk add zstd
-    RUN mkdir preview && zstd -d preview.tar.zst && tar -xf preview.tar
+    RUN zstd -d preview.tar.zst && tar -xf preview.tar
     RUN rm preview.tar && rm preview.tar.zst
     RUN ls /snapshot/immutable
 
