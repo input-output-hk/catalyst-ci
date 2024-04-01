@@ -14,4 +14,4 @@ package-preview-snapshot:
     RUN zstd -d preview.tar.zst && tar -xf preview.tar
     RUN rm preview.tar && rm preview.tar.zst
 
-    SAVE ARTIFACT preview preview
+    SAVE ARTIFACT /snapshot snapshot
