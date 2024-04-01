@@ -13,6 +13,5 @@ package-preview-snapshot:
     RUN apk add zstd
     RUN zstd -d preview.tar.zst && tar -xf preview.tar
     RUN rm preview.tar && rm preview.tar.zst
-    RUN ls
 
-    SAVE IMAGE preview-snapshot:latest
+    SAVE ARTIFACT preview preview
