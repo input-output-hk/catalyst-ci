@@ -1,5 +1,7 @@
 VERSION 0.7
 
+# cspell: words preprod
+
 package-preview-snapshot:
     FROM alpine:3.19
 
@@ -13,6 +15,21 @@ package-preview-snapshot:
     RUN apk add zstd
     RUN zstd -d preview.tar.zst && tar -xf preview.tar
     RUN rm preview.tar && rm preview.tar.zst
-    RUN ls
 
-    SAVE IMAGE preview-snapshot:latest
+    SAVE ARTIFACT /snapshot snapshot
+
+package-preprod-snapshot:
+    FROM alpine:3.19
+
+    WORKDIR /snapshot
+
+    RUN wget -O \
+        preprod.tar.zst \
+        https://storage.googleapis.com/cdn.aggregator.release-preprod.api.mithril.network/preprod-e134-i2606.b528cd83ca54f10cab0e915cf01e0bc2600b97e616c4de8e5a70f2176de37a0a.tar.zst
+
+    # extract preprod archive
+    RUN apk add zstd
+    RUN zstd -d preprod.tar.zst && tar -xf preprod.tar
+    RUN rm preprod.tar && rm preprod.tar.zst
+
+    SAVE ARTIFACT /snapshot snapshot
