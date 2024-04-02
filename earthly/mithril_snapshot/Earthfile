@@ -22,12 +22,12 @@ package-preprod-snapshot:
     WORKDIR /snapshot
 
     RUN wget -O \
-        preview.tar.zst \
+        preprod.tar.zst \
         https://storage.googleapis.com/cdn.aggregator.release-preprod.api.mithril.network/preprod-e134-i2606.b528cd83ca54f10cab0e915cf01e0bc2600b97e616c4de8e5a70f2176de37a0a.tar.zst
 
-    # extract preview archive
+    # extract preprod archive
     RUN apk add zstd
-    RUN zstd -d preview.tar.zst && tar -xf preview.tar
-    RUN rm preview.tar && rm preview.tar.zst
+    RUN zstd -d preprod.tar.zst && tar -xf preprod.tar
+    RUN rm preprod.tar && rm preprod.tar.zst
 
     SAVE ARTIFACT /snapshot snapshot
