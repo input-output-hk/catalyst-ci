@@ -43,6 +43,7 @@ def cargo_nextest(results: exec_manager.Results, flags: str):
         exec_manager.cli_run(
             "cargo testunit " + f"{flags} ",
             name="Self contained Unit tests all pass check",
+            verbose=True,
         )
     )
 
