@@ -75,17 +75,19 @@ rust-base:
     # Install tools we use commonly with `cargo`.
     # Note, we disable static compiles for tools, specifically, as its not required.
     # These tools are not artifacts and we do not use them in production.
-    RUN cargo install cargo-nextest --version=0.9.68 && \
-        cargo install cargo-machete --version=0.6.1  && \
-        cargo install refinery_cli  --version=0.8.12 && \
-        cargo install cargo-deny    --version=0.14.17 && \
-        cargo install cargo-modules --version=0.14.0 && \
-        cargo install cargo-depgraph --version=1.6.0 && \
-        cargo install cargo-llvm-cov --version=0.6.8 && \
-        cargo install wasm-tools --version=1.201.0 && \
-        cargo install cargo-expand --version=1.0.79 && \
-        cargo install wit-bindgen-cli --version=0.22.0 && \
-        cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter
+    RUN cargo install cargo-nextest --version=0.9.68
+    RUN cargo install cargo-machete --version=0.6.1
+    RUN cargo install refinery_cli  --version=0.8.13
+    # TODO: https://github.com/input-output-hk/catalyst-ci/issues/214
+    RUN cargo install cargo-deny    --version=0.14.10
+    RUN cargo install cargo-modules --version=0.14.0
+    RUN cargo install cargo-depgraph --version=1.6.0
+    RUN cargo install cargo-llvm-cov --version=0.6.8
+    RUN cargo install wasm-tools --version=1.201.0
+    RUN cargo install wasm-tools --version=1.201.0
+    RUN cargo install cargo-expand --version=1.0.79
+    RUN cargo install wit-bindgen-cli --version=0.22.0
+    RUN cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
     SAVE ARTIFACT $CARGO_HOME/bin/wasm-tools wasm-tools
