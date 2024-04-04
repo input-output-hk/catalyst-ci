@@ -12,47 +12,51 @@ import rich
 # to pass without needing to iterate excessively.
 
 
-def cargo_build(results: exec_manager.Results, flags: str):
+def cargo_build(results: exec_manager.Results, flags: str, verbose: bool=False):
     results.add(
         exec_manager.cli_run(
             "cargo build " + "--release " + f"{flags} ",
             name="Build all code in the workspace",
+            verbose=verbose,
         )
     )
 
 
-def cargo_lint(results: exec_manager.Results, flags: str):
+def cargo_lint(results: exec_manager.Results, flags: str, verbose: bool=False):
     results.add(
         exec_manager.cli_run(
-            "cargo lint " + f"{flags}", name="Clippy Lints in the workspace check"
+            "cargo lint " + f"{flags}", name="Clippy Lints in the workspace check",
+            verbose=verbose,
         )
     )
 
 
-def cargo_doctest(results: exec_manager.Results, flags: str):
+def cargo_doctest(results: exec_manager.Results, flags: str, verbose: bool=False):
     results.add(
         exec_manager.cli_run(
             "cargo +nightly testdocs " + f"{flags} ",
             name="Documentation tests all pass check",
+            verbose=verbose,
         )
     )
 
 
-def cargo_nextest(results: exec_manager.Results, flags: str):
+def cargo_nextest(results: exec_manager.Results, flags: str, verbose: bool=False):
     results.add(
         exec_manager.cli_run(
             "cargo testunit " + f"{flags} ",
             name="Self contained Unit tests all pass check",
-            verbose=True,
+            verbose=verbose,
         )
     )
 
 
-def cargo_llvm_cov(results: exec_manager.Results, flags: str, cov_report: str):
+def cargo_llvm_cov(results: exec_manager.Results, flags: str, cov_report: str, verbose: bool=False):
     # Remove artifacts that may affect the coverage results
     res = exec_manager.cli_run(
         "cargo llvm-cov clean",
         name="Remove artifacts that may affect the coverage results",
+        verbose=verbose,
     )
     results.add(res)
     # Run unit tests and generates test and coverage report artifacts
@@ -60,6 +64,7 @@ def cargo_llvm_cov(results: exec_manager.Results, flags: str, cov_report: str):
         res = exec_manager.cli_run(
             "cargo testcov " + f"{flags} ",
             name="Self contained Unit tests and collect coverage",
+            verbose=verbose,
         )
         results.add(res)
     # Save coverage report to file if it is provided
@@ -70,26 +75,29 @@ def cargo_llvm_cov(results: exec_manager.Results, flags: str, cov_report: str):
             + "--release "
             + f"--output-path {cov_report} ",
             name=f"Generate lcov report to {cov_report}",
+            verbose=verbose,
         )
         results.add(res)
 
 
-def cargo_bench(results: exec_manager.Results, flags: str):
+def cargo_bench(results: exec_manager.Results, flags: str, verbose: bool=False):
     results.add(
         exec_manager.cli_run(
             "cargo bench " + f"{flags} ",
             name="Benchmarks all run to completion check",
+            verbose=verbose,
         )
     )
 
 
-def cargo_doc(results: exec_manager.Results):
+def cargo_doc(results: exec_manager.Results, verbose: bool=False):
     results.add(
-        exec_manager.cli_run("cargo +nightly docs ", name="Documentation build")
+        exec_manager.cli_run("cargo +nightly docs ", name="Documentation build",
+                             verbose=verbose)
     )
 
 
-def cargo_depgraph(results: exec_manager.Results):
+def cargo_depgraph(results: exec_manager.Results, verbose: bool=False):
     results.add(
         exec_manager.cli_run(
             "cargo depgraph "
@@ -97,12 +105,14 @@ def cargo_depgraph(results: exec_manager.Results):
             + "--dedup-transitive-deps "
             + "> target/doc/workspace.dot ",
             name="Workspace dependency graphs generation",
+            verbose=verbose,
         )
     )
     results.add(
         exec_manager.cli_run(
             "cargo depgraph " + "--dedup-transitive-deps " + "> target/doc/full.dot ",
             name="Full dependency graphs generation",
+            verbose=verbose,
         )
     )
     results.add(
@@ -112,6 +122,7 @@ def cargo_depgraph(results: exec_manager.Results):
             + "--dedup-transitive-deps "
             + "> target/doc/all.dot ",
             name="All dependency graphs generation",
+            verbose=verbose,
         )
     )
 
@@ -130,13 +141,14 @@ COMMON_CARGO_MODULES_DEPENDENCIES = (
     + "--no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses "
 )
 
-def cargo_modules_lib(results: exec_manager.Results, lib: str):
+def cargo_modules_lib(results: exec_manager.Results, lib: str, verbose: bool=False):
     # Check if we have any Orphans.
     results.add(
         exec_manager.cli_run(
             COMMON_CARGO_MODULES_ORPHANS
             + f"--package '{lib}' --lib",
-            name=f"Checking Orphans for {lib}",            
+            name=f"Checking Orphans for {lib}",  
+            verbose=verbose
         )
     )
     
@@ -146,6 +158,7 @@ def cargo_modules_lib(results: exec_manager.Results, lib: str):
             COMMON_CARGO_MODULES_STRUCTURE
             + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.tree' ",
             name=f"Generate Module Trees for {lib}",
+            verbose=verbose
         )
     )
     # Generate graph
@@ -154,17 +167,19 @@ def cargo_modules_lib(results: exec_manager.Results, lib: str):
             COMMON_CARGO_MODULES_DEPENDENCIES
             + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.dot' ",
             name=f"Generate Module Graphs for {lib}",
+            verbose=verbose
         )
     )
 
 
-def cargo_modules_bin(results: exec_manager.Results, package: str, bin: str):
+def cargo_modules_bin(results: exec_manager.Results, package: str, bin: str, verbose: bool=False):
     # Check if we have any Orphans.
     results.add(
         exec_manager.cli_run(
             COMMON_CARGO_MODULES_ORPHANS
             + f"--package '{package}' --bin '{bin}'",
             name=f"Checking Orphans for {package}/{bin}",            
+            verbose=verbose
         )
     )
 
@@ -174,6 +189,7 @@ def cargo_modules_bin(results: exec_manager.Results, package: str, bin: str):
             COMMON_CARGO_MODULES_STRUCTURE
             + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.tree' ",
             name=f"Generate Module Trees for {package}/{bin}",
+            verbose=verbose
         )
     )
     # Generate graph
@@ -182,16 +198,18 @@ def cargo_modules_bin(results: exec_manager.Results, package: str, bin: str):
             COMMON_CARGO_MODULES_DEPENDENCIES
             + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.dot' ",
             name=f"Generate Module Graphs for {package}/{bin}",
+            verbose=verbose
         )
     )
 
 
 # ALL executables MUST have `--help` as an option.
-def help_check(results: exec_manager.Results, bin: str):
+def help_check(results: exec_manager.Results, bin: str, verbose: bool=False):
     results.add(
         exec_manager.cli_run(
             f"target/release/{bin} --help",
             name=f"Executable '{bin}' MUST have `--help` as an option.",
+            verbose=verbose,
         )
     )
 
@@ -227,6 +245,11 @@ def main():
     rich.reconfigure(color_system="256")
 
     parser = argparse.ArgumentParser(description="Rust build processing.")
+    parser.add_argument(
+        "--verbose",
+        action="store_true",
+        help="Show the output of executed commands verbosely.",
+    )
     parser.add_argument(
         "--build_flags",
         default="",
@@ -289,36 +312,36 @@ def main():
 
     results = exec_manager.Results("Rust build")
     # Build the code.
-    cargo_build(results, args.build_flags)
+    cargo_build(results, args.build_flags, args.verbose)
     # Check the code passes all clippy lint checks.
-    cargo_lint(results, args.lint_flags)
+    cargo_lint(results, args.lint_flags, args.verbose)
     # Check if all Self contained tests pass (Test that need no external resources).
     if not args.disable_tests:
         # Check if all documentation tests pass.
-        cargo_doctest(results, args.doctest_flags)
+        cargo_doctest(results, args.doctest_flags, args.verbose)
         if args.cov_report == "":
             # Without coverage report
-            cargo_nextest(results, args.test_flags)
+            cargo_nextest(results, args.test_flags, args.verbose)
         else:
             # With coverage report
-            cargo_llvm_cov(results, args.test_flags, args.cov_report)
+            cargo_llvm_cov(results, args.test_flags, args.cov_report, args.verbose)
 
     # Check if any benchmarks defined run (We don't validate the results.)
     if not args.disable_benches:
-        cargo_bench(results, args.bench_flags)
+        cargo_bench(results, args.bench_flags, args.verbose)
 
     # Generate all the documentation.
     if not args.disable_docs:
         # Generate rust docs.
-        cargo_doc(results)
+        cargo_doc(results, args.verbose)
         # Generate dependency graphs
-        cargo_depgraph(results)
+        cargo_depgraph(results, args.verbose)
 
         for lib in libs:
-            cargo_modules_lib(results, lib)
+            cargo_modules_lib(results, lib, args.verbose)
         for bin in bins:
             package, bin_name = bin.split("/")
-            cargo_modules_bin(results, package, bin_name)
+            cargo_modules_bin(results, package, bin_name, args.verbose)
 
     results.print()
     if not results.ok():
@@ -329,7 +352,7 @@ def main():
 
     for bin in bins:
         _, bin_name = bin.split("/")
-        help_check(results, bin_name)
+        help_check(results, bin_name, args.verbose)
         ldd(results, bin_name)
         readelf(results, bin_name)
         strip(results, bin_name)
