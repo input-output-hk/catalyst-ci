@@ -15,8 +15,8 @@ export async function run(): Promise<void> {
 
     core.info(`Running command: ${command}`)
     
-    await exec("docker images | grep earthly/buildkitd")
-    const { stdout } = await getExecOutput(command)
+    // await exec("docker images | grep earthly/buildkitd")
+    const { stdout } = await getExecOutput("docker images | grep earthly/buildkitd")
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const parsedData = JSON.parse(stdout)
