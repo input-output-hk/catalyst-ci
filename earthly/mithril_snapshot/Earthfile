@@ -39,7 +39,7 @@ DL_SNAPSHOT:
         # This is faster, but it could be a faked snapshot file.
         LET DLFILE=$(mithril-client cardano-db snapshot show --json $snapshot_digest | jq '.locations[0]' | tr -d '\"')
         RUN mkdir -p ./db && \
-            wget -O - $DLFILE | zstdcat | tar -xf - -C ./db
+            wget --progress=dot:giga -O - $DLFILE | zstdcat | tar -xf - -C ./db
     END
 
 mainnet-snapshot:
