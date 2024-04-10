@@ -25,8 +25,8 @@ DL_SNAPSHOT:
     ARG validate=false
 
     LET NETWORK=$network
-    LET AGGREGATOR_ENDPOINT=https://aggregator."$mithril_network".api.mithril.network/aggregator
-    LET GENESIS_VERIFICATION_KEY=$(wget -q -O - https://raw.githubusercontent.com/input-output-hk/mithril/main/mithril-infra/configuration/"$mithril_network"/genesis.vkey)
+    LET AGGREGATOR_ENDPOINT=https://aggregator.${mithril_network}.api.mithril.network/aggregator
+    LET GENESIS_VERIFICATION_KEY=$(wget -q -O - https://raw.githubusercontent.com/input-output-hk/mithril/main/mithril-infra/configuration/${mithril_network}/genesis.vkey)
     LET SNAPSHOT_DIGEST=$snapshot_digest
 
     WORKDIR /snapshot
