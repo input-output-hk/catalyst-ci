@@ -72,7 +72,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+        uses: input-output-hk/catalyst-ci/actions/setup@fix/ci-tools
         with:
           configure_registries: "false"
           aws_role_arn: ${{ inputs.aws_role_arn }}
@@ -84,7 +84,7 @@ jobs:
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@master
+        uses: input-output-hk/catalyst-ci/actions/discover@fix/ci-tools
         id: discover
         with:
           targets: ${{ inputs.target }}
@@ -121,7 +121,7 @@ jobs:
           echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+        uses: input-output-hk/catalyst-ci/actions/setup@fix/ci-tools
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
@@ -132,7 +132,7 @@ jobs:
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Build artifact
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-ci/actions/run@fix/ci-tools
         id: build
         with:
           earthfile: ${{ matrix.earthfile }}
