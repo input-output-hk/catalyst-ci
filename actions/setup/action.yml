@@ -86,12 +86,12 @@ runs:
     with:
       version: ${{ inputs.earthly_version }}
   - name: Install CI CLI
-    uses: input-output-hk/catalyst-ci/actions/install@fix/ci-tools
+    uses: input-output-hk/catalyst-ci/actions/install@master
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version != 'local' }}
     with:
       version: ${{ inputs.updater_version }}
   - name: Install updater CLI
-    uses: input-output-hk/catalyst-ci/actions/install@fix/ci-tools
+    uses: input-output-hk/catalyst-ci/actions/install@master
     if: ${{ inputs.updater_skip_install == 'false' && inputs.updater_version != 'local' }}
     with:
       asset: updater
@@ -115,13 +115,13 @@ runs:
       username: ${{ github.actor }}
       password: ${{ inputs.github_token }}
   - name: Setup Remote Runner
-    uses: input-output-hk/catalyst-ci/actions/configure-runner@fix/ci-tools
+    uses: input-output-hk/catalyst-ci/actions/configure-runner@master
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}
   - name: Build CI CLI
     id: build-ci-artifact
-    uses: input-output-hk/catalyst-ci/actions/run@fix/ci-tools
+    uses: input-output-hk/catalyst-ci/actions/run@master
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
       artifact: "true"
@@ -135,7 +135,7 @@ runs:
     run: mv '${{ steps.build-ci-artifact.outputs.artifact }}/ci' /usr/local/bin
   - name: Build updater CLI
     id: build-updater-artifact
-    uses: input-output-hk/catalyst-ci/actions/run@fix/ci-tools
+    uses: input-output-hk/catalyst-ci/actions/run@master
     if: ${{ inputs.updater_skip_install == 'false' && inputs.updater_version == 'local' }}
     with:
       artifact: "true"

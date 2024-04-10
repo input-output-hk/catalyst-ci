@@ -71,7 +71,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@fix/ci-tools
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}

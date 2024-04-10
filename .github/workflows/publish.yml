@@ -88,7 +88,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@fix/ci-tools
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           configure_registries: "false"
           aws_ecr_registry: ${{ inputs.aws_ecr_registry }}
@@ -101,7 +101,7 @@ jobs:
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@fix/ci-tools
+        uses: input-output-hk/catalyst-ci/actions/discover@master
         id: discover
         with:
           targets: ${{ inputs.target }}
@@ -138,7 +138,7 @@ jobs:
           echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
       - uses: actions/checkout@v3
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@fix/ci-tools
+        uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
           aws_ecr_registry: ${{ inputs.aws_ecr_registry }}
           aws_role_arn: ${{ inputs.aws_role_arn }}
@@ -150,7 +150,7 @@ jobs:
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Build image
-        uses: input-output-hk/catalyst-ci/actions/run@fix/ci-tools
+        uses: input-output-hk/catalyst-ci/actions/run@master
         id: build
         with:
           earthfile: ${{ matrix.earthfile }}
@@ -158,7 +158,7 @@ jobs:
           platform: ${{ matrix.platform }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Push image
-        uses: input-output-hk/catalyst-ci/actions/push@fix/ci-tools
+        uses: input-output-hk/catalyst-ci/actions/push@master
         if: github.ref == format('refs/heads/{0}', inputs.default_branch) && !inputs.skip_publish_on_default
         with:
           image: ${{ steps.build.outputs.image }}
@@ -172,7 +172,7 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
       - name: Push release image
-        uses: input-output-hk/catalyst-ci/actions/push@fix/ci-tools
+        uses: input-output-hk/catalyst-ci/actions/push@master
         if: startsWith(github.ref, 'refs/tags/')
         with:
           image: ${{ steps.build.outputs.image }}
