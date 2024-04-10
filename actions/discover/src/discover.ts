@@ -1,5 +1,5 @@
 import * as core from '@actions/core'
-import { exec, getExecOutput } from '@actions/exec'
+import { getExecOutput } from '@actions/exec'
 import { quote } from 'shell-quote'
 
 export async function run(): Promise<void> {
@@ -14,9 +14,7 @@ export async function run(): Promise<void> {
     const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)
-    
-    // await exec("docker images | grep earthly/buildkitd")
-    const { stdout } = await getExecOutput("docker images | grep earthly/buildkitd")
+    const { stdout } = await getExecOutput("earthly --version")
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const parsedData = JSON.parse(stdout)

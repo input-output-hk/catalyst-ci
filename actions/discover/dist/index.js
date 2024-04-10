@@ -4411,8 +4411,7 @@ async function run() {
         }
         const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ');
         core.info(`Running command: ${command}`);
-        // await exec("docker images | grep earthly/buildkitd")
-        const { stdout } = await (0,exec.getExecOutput)("docker images | grep earthly/buildkitd");
+        const { stdout } = await (0,exec.getExecOutput)("earthly --version");
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const parsedData = JSON.parse(stdout);
         const pathsArray = [];
