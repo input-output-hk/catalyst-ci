@@ -1,19 +1,86 @@
-VERSION 0.7
+VERSION 0.8
 
 # cspell: words preprod
 
-package-preprod-snapshot:
-    FROM alpine:3.19
+base-snapshot-builder:
+    # Note: an official docker image is here, but it could not reliably pull from Earthly.
+    # It gives permission denied errors randomly.
+    # Image comes from: https://github.com/input-output-hk/mithril/pkgs/container/mithril-client
+    # FROM ghcr.io/input-output-hk/mithril-client:latest
+
+    # Build our own simple mithril client image
+    FROM debian:stable-20240408-slim
+
+    RUN apt-get update && apt-get -y install wget jq zstd
+
+    RUN wget -O mithril-cli.deb \
+            https://github.com/input-output-hk/mithril/releases/download/2412.0/mithril-client-cli_0.7.6+2e462c0-1_amd64.deb
+    RUN dpkg -i mithril-cli.deb
+
+DL_SNAPSHOT:
+    FUNCTION
+    ARG network
+    ARG mithril_network
+    ARG snapshot_digest=latest
+    ARG validate=false
+
+    LET NETWORK=$network
+    LET AGGREGATOR_ENDPOINT=https://aggregator.${mithril_network}.api.mithril.network/aggregator
+    LET GENESIS_VERIFICATION_KEY=$(wget -q -O - https://raw.githubusercontent.com/input-output-hk/mithril/main/mithril-infra/configuration/${mithril_network}/genesis.vkey)
+    LET SNAPSHOT_DIGEST=$snapshot_digest
 
     WORKDIR /snapshot
 
-    RUN wget -O \
-        preprod.tar.zst \
-        https://storage.googleapis.com/cdn.aggregator.release-preprod.api.mithril.network/preprod-e135-i2625.80b0c02cd0c86c47a79a9b6d0d9b0e6936d5f621e8094ed53405fef3ee103a3b.tar.zst
+    IF $validate
+        # Validation is slower, but the file will be guaranteed to be valid.
+        # This automatically handles unarchiving the snapshot
+        RUN mithril-client -vvv cardano-db download --json $snapshot_digest
+    ELSE
+        # This is faster, but it could be a faked snapshot file.
+        LET DLFILE=$(mithril-client cardano-db snapshot show --json $snapshot_digest | jq '.locations[0]' | tr -d '\"')
+        RUN mkdir -p ./db && \
+            wget -O - $DLFILE | zstdcat | tar -xf - -C ./db
+    END
 
-    # extract preprod archive
-    RUN apk add zstd
-    RUN zstd -d preprod.tar.zst && tar -xf preprod.tar
-    RUN rm preprod.tar && rm preprod.tar.zst
+mainnet-snapshot:
+    FROM +base-snapshot-builder
 
-    SAVE ARTIFACT /snapshot snapshot
+    DO +DL_SNAPSHOT \
+        --network=mainnet \
+        --mithril_network=release-mainnet
+
+    SAVE ARTIFACT /snapshot/db snapshot
+
+preprod-snapshot:
+    FROM +base-snapshot-builder
+
+    DO +DL_SNAPSHOT \
+        --network=preprod \
+        --mithril_network=release-preprod \
+        --snapshot_digest=80b0c02cd0c86c47a79a9b6d0d9b0e6936d5f621e8094ed53405fef3ee103a3b
+
+    SAVE ARTIFACT /snapshot/db snapshot
+
+preview-snapshot:
+    FROM +base-snapshot-builder
+
+    DO +DL_SNAPSHOT \
+        --network=preview \
+        --mithril_network=pre-release-preview 
+
+    SAVE ARTIFACT /snapshot/db snapshot
+
+sanchonet-snapshot:
+    FROM +base-snapshot-builder
+
+    DO +DL_SNAPSHOT \
+        --network=sanchonet \
+        --mithril_network=testing-sanchonet
+
+    SAVE ARTIFACT /snapshot/db snapshot
+
+# Just for compatibility until we update cat-gateway tests to use the new targets.
+package-preprod-snapshot:
+    FROM +preprod-snapshot
+
+    SAVE ARTIFACT /snapshot/db snapshot
