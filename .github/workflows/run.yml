@@ -77,7 +77,7 @@ jobs:
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@master
+        uses: input-output-hk/catalyst-ci/actions/discover@fix/ci-tools
         id: discover
         with:
           targets: ${{ inputs.target }}
