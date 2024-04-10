@@ -2,12 +2,18 @@ VERSION 0.8
 
 # cspell: words preprod
 
-base-snapshot-builder:
-    # Note: an official docker image is here, but it could not reliably pull from Earthly.
-    # It gives permission denied errors randomly.
-    # Image comes from: https://github.com/input-output-hk/mithril/pkgs/container/mithril-client
-    # FROM ghcr.io/input-output-hk/mithril-client:latest
+package-preprod-snapshot:
+    FROM alpine:3.19
 
-    # Build our own simple mithril client image
-    FROM debian:stable-20240408-slim
-    
+    WORKDIR /snapshot
+
+    RUN wget -O \
+        preprod.tar.zst \
+        https://storage.googleapis.com/cdn.aggregator.release-preprod.api.mithril.network/preprod-e135-i2625.80b0c02cd0c86c47a79a9b6d0d9b0e6936d5f621e8094ed53405fef3ee103a3b.tar.zst
+
+    # extract preprod archive
+    RUN apk add zstd
+    RUN zstd -d preprod.tar.zst && tar -xf preprod.tar
+    RUN rm preprod.tar && rm preprod.tar.zst
+
+    SAVE ARTIFACT /snapshot snapshot
