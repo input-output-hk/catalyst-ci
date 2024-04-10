@@ -14,7 +14,7 @@ export async function run(): Promise<void> {
     const command = ['ci', 'scan', ...flags, paths].filter(Boolean).join(' ')
 
     core.info(`Running command: ${command}`)
-    const { stdout } = await getExecOutput("earthly --version")
+    const { stdout } = await getExecOutput(command)
 
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     const parsedData = JSON.parse(stdout)
