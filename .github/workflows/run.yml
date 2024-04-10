@@ -86,7 +86,6 @@ jobs:
         run: |
           json=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
           paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
-          docker images | grep earthly/buildkitd
           if [ "$output" == "null" ]; then
             echo "json=[]" >> $GITHUB_OUTPUT
             echo "paths=[]" >> $GITHUB_OUTPUT
