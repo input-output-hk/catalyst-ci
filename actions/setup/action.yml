@@ -147,7 +147,3 @@ runs:
     shell: bash
     if: ${{ inputs.updater_skip_install == 'false' && inputs.updater_version == 'local' }}
     run: mv '${{ steps.build-updater-artifact.outputs.artifact }}/updater' /usr/local/bin
-  - name: Check
-    shell: bash
-    id: check
-    run: docker images | grep earthly/buildkitd
