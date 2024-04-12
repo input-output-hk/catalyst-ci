@@ -85,7 +85,7 @@ rust-base:
     RUN cargo install cargo-llvm-cov --version=0.6.8
     RUN cargo install wasm-tools --version=1.201.0
     RUN cargo install cargo-expand --version=1.0.79
-    RUN cargo install wit-bindgen-cli --version=0.22.0
+    RUN cargo install wit-bindgen-cli --version=0.24.0
     RUN cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter
 
     SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery

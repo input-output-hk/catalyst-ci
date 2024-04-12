@@ -1,12 +1,14 @@
 module github.com/input-output-hk/catalyst-ci/cli
 
-go 1.19
+go 1.21
+
+toolchain go1.22.2
 
 require (
 	github.com/Masterminds/semver/v3 v3.2.1
 	github.com/alecthomas/kong v0.7.1
 	github.com/aws/aws-sdk-go v1.44.274
-	github.com/earthly/earthly/ast v0.0.2-0.20231213200555-95fef7ce99cb
+	github.com/earthly/earthly/ast v0.0.2-0.20240228223838-42e8ca204e8a
 	github.com/onsi/ginkgo/v2 v2.9.7
 	github.com/onsi/gomega v1.27.7
 	github.com/spf13/afero v1.9.5
