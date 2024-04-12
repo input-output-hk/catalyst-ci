@@ -1,5 +1,5 @@
 # Common Rust UDCs and Builders.
-VERSION 0.8
+VERSION --global-cache --use-function-keyword 0.7
 
 # cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg bindgen
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
@@ -27,7 +27,8 @@ rust-base:
     # A potential bug was found inside `libgcc:13` version.
     # It works fine with the `libgcc:12` version.
     # Look: https://github.com/bytecodealliance/wasmtime/issues/7997
-    FROM rust:1.75-alpine3.19
+    # TODO - Fixme
+    FROM rust:1.75-alpine3.18
 
     RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
         echo "TARGETOS       = $TARGETOS"; \
