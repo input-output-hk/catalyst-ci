@@ -1,0 +1,57 @@
+VERSION 0.8
+
+tool-cargo-nextest:
+    FROM ../+rust-base
+    RUN cargo install cargo-nextest --version=0.9.68 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-nextest cargo-nextest
+
+
+tool-cargo-machete:
+    FROM ../+rust-base
+    RUN cargo install cargo-machete --version=0.6.2 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-machete cargo-machete
+
+tool-refinery:
+    FROM ../+rust-base
+    RUN cargo install refinery_cli --version=0.8.14 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/refinery refinery AS LOCAL artifact/refinery
+
+tool-cargo-deny:
+    FROM ../+rust-base
+    RUN cargo install cargo-deny --version=0.14.10 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-deny cargo-deny
+
+tool-cargo-modules:
+    FROM ../+rust-base
+    RUN cargo install cargo-modules --version=0.14.0 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-modules cargo-modules
+
+tool-cargo-depgraph:
+    FROM ../+rust-base
+    RUN cargo install cargo-depgraph --version=1.6.0 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-depgraph cargo-depgraph
+
+tool-cargo-llvm-cov:
+    FROM ../+rust-base
+    RUN cargo install cargo-llvm-cov --version=0.6.9 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-llvm-cov cargo-llvm-cov
+
+tool-wasm-tools:
+    FROM ../+rust-base
+    RUN cargo install wasm-tools --version=1.203.0 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/wasm-tools wasm-tools
+
+tool-cargo-expand:
+    FROM ../+rust-base
+    RUN cargo install cargo-expand --version=1.0.82 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/cargo-expand cargo-expand
+
+tool-wit-bindgen-cli:
+    FROM ../+rust-base
+    RUN cargo install wit-bindgen-cli --version=0.24.0 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/wit-bindgen wit-bindgen
+
+tool-wasmtime:
+    FROM ../+rust-base
+    RUN cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/verify-component-adapter verify-component-adapter

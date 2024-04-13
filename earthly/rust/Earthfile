@@ -1,7 +1,8 @@
-# Common Rust UDCs and Builders.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
 
-# cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg bindgen
+IMPORT ./tools AS tools
+
+# cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
@@ -27,8 +28,7 @@ rust-base:
     # A potential bug was found inside `libgcc:13` version.
     # It works fine with the `libgcc:12` version.
     # Look: https://github.com/bytecodealliance/wasmtime/issues/7997
-    # TODO - Fixme
-    FROM rust:1.75-alpine3.18
+    FROM rust:1.75-alpine3.19
 
     RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
         echo "TARGETOS       = $TARGETOS"; \
@@ -38,7 +38,6 @@ rust-base:
         echo "USEROS         = $USEROS"; \
         echo "USERARCH       = $USERARCH"; \
         echo "USERVARIANT    = $USERVARIANT";
-
     WORKDIR /root
 
     # Install necessary packages
@@ -72,26 +71,21 @@ rust-base:
     # Install the default cargo config.
     COPY stdcfgs/cargo_config.toml $CARGO_HOME/config.toml
 
-    # Install rust based tooling
-    # Install tools we use commonly with `cargo`.
-    # Note, we disable static compiles for tools, specifically, as its not required.
-    # These tools are not artifacts and we do not use them in production.
-    RUN cargo install cargo-nextest --version=0.9.68
-    RUN cargo install cargo-machete --version=0.6.1
-    RUN cargo install refinery_cli  --version=0.8.13
-    # TODO: https://github.com/input-output-hk/catalyst-ci/issues/214
-    RUN cargo install cargo-deny    --version=0.14.10
-    RUN cargo install cargo-modules --version=0.14.0
-    RUN cargo install cargo-depgraph --version=1.6.0
-    RUN cargo install cargo-llvm-cov --version=0.6.8
-    RUN cargo install wasm-tools --version=1.201.0
-    RUN cargo install cargo-expand --version=1.0.79
-    RUN cargo install wit-bindgen-cli --version=0.24.0
-    RUN cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter
+    
+builder:
+    FROM +rust-base
 
-    SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
-    SAVE ARTIFACT $CARGO_HOME/bin/wasm-tools wasm-tools
-    SAVE ARTIFACT $CARGO_HOME/bin/wit-bindgen wit-bindgen
+    COPY tools+tool-cargo-nextest/cargo-nextest $CARO_HOME/bin/nextest
+    COPY tools+tool-cargo-machete/cargo-machete $CARO_HOME/bin/machete
+    COPY tools+tool-refinery/refinery $CARO_HOME/bin/refinery
+    COPY tools+tool-cargo-deny/cargo-deny $CARO_HOME/bin/deny
+    COPY tools+tool-cargo-modules/cargo-modules $CARO_HOME/bin/modules
+    COPY tools+tool-cargo-depgraph/cargo-depgraph $CARO_HOME/bin/depgraph
+    COPY tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARO_HOME/bin/llvm-cov
+    COPY tools+tool-wasm-tools/wasm-tools $CARO_HOME/bin/wasm-tools
+    COPY tools+tool-cargo-expand/cargo-expand $CARO_HOME/bin/expand
+    COPY tools+tool-wit-bindgen-cli/wit-bindgen $CARO_HOME/bin/wit-bindgen
+    COPY tools+tool-wasmtime/verify-component-adapter $CARO_HOME/bin/verify-component-adapter
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
