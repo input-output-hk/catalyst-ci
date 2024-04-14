@@ -106,14 +106,14 @@ builder:
 # docker enabled on Mac.
 # Again, this is just a test target, and not for general use.
 rust-base-all-hosts:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +builder
 
 # Common Rust setup.
 # Parameters:
 #  * toolchain : The `rust-toolchain` toml file.
 SETUP:
     FUNCTION
-    FROM +rust-base
+    FROM +builder
 
     ARG toolchain=./rust-toolchain.toml 
 

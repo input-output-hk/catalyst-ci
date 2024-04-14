@@ -33,7 +33,7 @@ postgres-base:
     RUN sqlfluff version
 
     # Get refinery
-    COPY ../rust+rust-base/refinery /bin
+    COPY ../rust/tools+tool-refinery/refinery /bin
 
     # Get dbviz
     COPY ../../utilities/dbviz+build/dbviz /bin
