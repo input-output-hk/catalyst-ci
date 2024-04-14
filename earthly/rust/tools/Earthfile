@@ -14,7 +14,7 @@ tool-cargo-machete:
 tool-refinery:
     FROM ../+rust-base
     RUN cargo install refinery_cli --version=0.8.14 --locked
-    SAVE ARTIFACT /usr/local/cargo/bin/refinery_cli refinery_cli
+    SAVE ARTIFACT /usr/local/cargo/bin/refinery refinery
 
 tool-cargo-deny:
     FROM ../+rust-base
