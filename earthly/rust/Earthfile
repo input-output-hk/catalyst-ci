@@ -75,15 +75,15 @@ rust-base:
 builder:
     FROM +rust-base
 
-    COPY tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/nextest
-    COPY tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/machete
+    COPY tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
+    COPY tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
     COPY tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
-    COPY tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/deny
-    COPY tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/modules
-    COPY tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/depgraph
-    COPY tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/llvm-cov
+    COPY tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
+    COPY tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
+    COPY tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
+    COPY tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
     COPY tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
-    COPY tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/expand
+    COPY tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
     COPY tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
     COPY tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
 
