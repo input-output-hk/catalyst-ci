@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ./tools AS tools
 
-# cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg
+# cspell: words rustup miri ripgrep stdcfgs toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
@@ -97,8 +97,6 @@ builder:
     # Build will refuse to proceed if the projects rust configs do not match these.
     # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
     COPY --dir stdcfgs /stdcfgs
-
-    RUN ls
 
 # Builds all the rust-base targets for each supported DOCKER architecture.
 # Currently only used for multi-platform cross build testing.
