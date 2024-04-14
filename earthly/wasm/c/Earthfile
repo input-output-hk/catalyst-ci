@@ -13,8 +13,8 @@ wasm-c-base:
             lld=17.0.5-r0 \
             wasi-sdk=20-r3
 
-    COPY ./../../rust+rust-base/wasm-tools /bin
-    COPY ./../../rust+rust-base/wit-bindgen /bin
+    COPY ./../../rust/tools+tool-wasm-tools/wasm-tools /bin
+    COPY ./../../rust/tools+tool-wit-bindgen-cli/wit-bindgen /bin
 
     # Universal build scripts.
     COPY --dir scripts /scripts
