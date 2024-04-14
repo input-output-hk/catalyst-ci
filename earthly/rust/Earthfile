@@ -77,7 +77,7 @@ builder:
 
     COPY tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/nextest
     COPY tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/machete
-    COPY tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
+    COPY tools+tool-refinery/refinery_cli $CARGO_HOME/bin/refinery_cli
     COPY tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/deny
     COPY tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/modules
     COPY tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/depgraph
@@ -97,6 +97,8 @@ builder:
     # Build will refuse to proceed if the projects rust configs do not match these.
     # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
     COPY --dir stdcfgs /stdcfgs
+
+    RUN ls
 
 # Builds all the rust-base targets for each supported DOCKER architecture.
 # Currently only used for multi-platform cross build testing.
