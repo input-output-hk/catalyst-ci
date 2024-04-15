@@ -49,7 +49,7 @@ Also we will take a look how we are setup Rust projects and what configuration i
 ### Prepare base builder
 
 ```Earthfile
-VERSION --global-cache 0.7
+VERSION 0.8
 
 # Set up our target toolchains, and copy our files.
 builder:
@@ -60,10 +60,11 @@ builder:
     COPY clippy.toml deny.toml rustfmt.toml .
 ```
 
-The first target `builder` is responsible for preparing an already configured Rust environment,
-instal all needed tools and dependencies.
+The first target `builder` is responsible for preparing configured Rust environments and,
+install all needed tools and dependencies.
 
-The fist step of the `builder` target is to prepare a Rust environment via `+rust-base` target.
+The fist step of the `builder` target is to prepare a Rust environment via `+rust-base` target,
+which is called in `SETUP` Function.
 Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
 any other irrelevant stuff should omitted.
@@ -92,8 +93,8 @@ all-hosts-check:
 ```
 
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
-The `check` target which actually performs all checks and validation
-with the help of `std_checks.py` script.
+The `check` target performs all checks and validation procedures
+using the help of `std_checks.py` script.
 This script performs static checks of the Rust project as
 `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
 find unused dependencies and any supply chain issues with dependencies.
@@ -105,18 +106,18 @@ look at `./earthly/rust/stdcfgs/cargo_config.toml`)Checking Rust Code Format.
 3. `cargo machete` - Checking for Unused Dependencies.
 4. `cargo deny check` - Checking for Supply Chain Issues.
 
-As it was mentioned above it validates configuration files as
+As it was mentioned above, it validates configuration files as
 `.cargo/config.toml`, `rustfmt.toml`, `.config/nextest.toml`, `clippy.toml`, `deny.toml`
 to be the same as defined in `earthly/rust/stdcfgs` directory of the `catalyst-ci` repo.
-So when you are going to setup a new Rust project copy these configuration files
+So when you are going to setup a new Rust project, copy these configuration files
 described above to the appropriate location of your Rust project.
 
 Another target as `all-hosts-check` just invokes `check` with the specified `--platform`.
-It is needed for the local development to double check that everything is works for different platforms.
-It is important to define a `linux` target platform with a proper cpu architecture
+It is needed for the local development to double check that everything works for different platforms.
+It is important to define a `linux` target platform with a proper CPU architecture
 for the Rust project when you are building it inside Docker
 and check the build process with different scenarios.
-The same approach we will see for the another targets of this guide.
+The same approach will be seen in other targets throughout this guide.
 
 ### Build
 
@@ -148,10 +149,10 @@ all-hosts-build:
 ```
 
 After successful performing checks of the Rust project we can finally `build` artifacts.
-Obviously it inherits `builder` target environment and than performs build of the binary.
+Obviously it inherits `builder` target environment and then performs build of the binary.
 Important to note that in this particular example we are dealing with the executable Rust project,
 so it produces binary as a final artifact.
-Another case of the building Rust library we will consider later.
+We will discuss another scenario of building a Rust library later.
 Actual build process is done with the `std_build.py` script.
 Here is the full list of configuration of this script:
 
@@ -230,7 +231,7 @@ Final step is to provide desired artifacts: docs and binary.
 ### Test
 
 As you already mentioned that running of unit tests is done during the `build` process,
-but if you need some integration tests pls follow how it is done for [PostgreSQL builder](./postgresql.md),
+but if you need some integration tests please follow this [PostgreSQL builder](./postgresql.md),
 Rust will have the same approach.
 
 ### Release and publish
