@@ -71,10 +71,7 @@ rust-base:
     # Install the default cargo config.
     COPY stdcfgs/cargo_config.toml $CARGO_HOME/config.toml
 
-    
-builder:
-    FROM +rust-base
-
+    # Install the rust based toolings.
     COPY tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
     COPY tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
     COPY tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
@@ -104,14 +101,14 @@ builder:
 # docker enabled on Mac.
 # Again, this is just a test target, and not for general use.
 rust-base-all-hosts:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +builder
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
 
 # Common Rust setup.
 # Parameters:
 #  * toolchain : The `rust-toolchain` toml file.
 SETUP:
     FUNCTION
-    FROM +builder
+    FROM +rust-base
 
     ARG toolchain=./rust-toolchain.toml 
 
