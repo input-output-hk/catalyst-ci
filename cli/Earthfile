@@ -37,8 +37,9 @@ build:
 
 test:
     FROM +build
-
-    RUN ginkgo ./...
+    RUN go run github.com/onsi/ginkgo/v2/ginkgo ./...
+    # Got ginkgo not found
+    # RUN ginkgo ./...
 
 release:
     FROM +build
