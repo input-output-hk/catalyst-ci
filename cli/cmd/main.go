@@ -278,7 +278,7 @@ func runEarthlyTarget(earthlyCmd string) {
 type generateCmd struct {
 	Path    string   `                      help:"directory path to be iterated to search for targets within the Earthfile"               arg:"" type:"path"`
 	Targets []string `short:"t"             help:"Earthly targets pattern"                                               default:"check,check-*,build,test,test-*"`
-	Version string   `short:"v"             help:"Earthly version"                    default:"0.7"`
+	Version string   `short:"v"             help:"Earthly version"                    default:"0.8"`
 }
 
 // Generate Earthfile with given targets.
