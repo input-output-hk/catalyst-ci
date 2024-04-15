@@ -1,5 +1,6 @@
 # Earthfile containing common scripts for easy reference
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
+
 
 # Internal: bash-scripts : Common bash scripts.
 bash-scripts:

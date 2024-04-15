@@ -1,5 +1,4 @@
-# Common Python UDCs and Builders.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
 
 # Assuming the detailed setup from the second snippet is defined in relevant Earthly targets.
 

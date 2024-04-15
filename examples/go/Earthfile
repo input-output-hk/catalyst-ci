@@ -1,6 +1,6 @@
 # WARNING: If you modify this file, please update the guide that it is dependent
 # on in docs/guides/languages/go.md.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
 
 # The structure of this Earthfile is derived from the style guide:
 # https://input-output-hk.github.io/catalyst-ci/style/#adhere-to-a-consistent-structure
