@@ -11,6 +11,7 @@ lint:
 
 deps:
     WORKDIR /work
+    CACHE --persist --sharing shared /go
 
     RUN apk add --no-cache gcc musl-dev
     DO ../../earthly/go+DEPS
