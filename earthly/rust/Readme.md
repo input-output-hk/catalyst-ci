@@ -8,7 +8,7 @@ This repo defines common rust targets and UDCs for use with rust.
 
 ### RUST_SETUP
 
-This UDC sets up a rust build environment.
+This FUNCTION sets up a rust build environment.
 
 Rust build environments are locked to the `rust-toolchain.toml` file in the repo.
 This ensures that the version of the toolchain used is locked with the dependencies.

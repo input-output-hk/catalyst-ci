@@ -13,7 +13,7 @@ deps:
     # Any build dependencies should also be captured in this target.
     RUN apk add --no-cache gcc musl-dev
 
-    # This UDC automatically copies the go.mod and go.sum files and runs
+    # This FUNCTION automatically copies the go.mod and go.sum files and runs
     # `go mod download` to install the dependencies.
     DO ../../earthly/go+DEPS --ginkgo="false"
 
@@ -27,10 +27,10 @@ check:
     # This target checks the overall health of the source code.
     FROM +src
 
-    # This UDC validates the code is formatted according to Go standards.
+    # This FUNCTION validates the code is formatted according to Go standards.
     DO ../../earthly/go+FMT --src="go.mod go.sum cmd"
 
-    # This UDC runs golangci-lint to check for common errors.
+    # This FUNCTION runs golangci-lint to check for common errors.
     DO ../../earthly/go+LINT --src="go.mod go.sum cmd"
 
 build:

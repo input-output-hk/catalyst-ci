@@ -95,7 +95,7 @@ The generateCmd struct is designed to be used with a command-line interface (CLI
 * `Target`: A list of Earthly target patterns that the simulation will run.
 If the flag is not set, the default pipeline will be run `check check-* build test test-*`
 * `Version`: An Earthly version that need to be specify at the top of Earthfile.
-The default version is 0.7
+The default version is 0.8
 
 ### Default value
 
@@ -107,7 +107,7 @@ ci generate .
 ```
 
 The ci will create an Earthfile in `generate/` folder of the current directory.
-The version of the Earthly will be set to 0.7
+The version of the Earthly will be set to 0.8
 The targets will be listed under the `simulate` target.
 eg. `BUILD ../test/+target`
 
