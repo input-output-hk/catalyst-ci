@@ -1,4 +1,5 @@
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
+
 
 # cspell: words freetype lcms openjpeg etag
 
@@ -117,7 +118,7 @@ PACKAGE:
     # Start Nginx when the container is run
     CMD ["nginx", "-g", "daemon off;"]
 
-    # These steps are done outside the UDC.
+    # These steps are done outside the FUNCTION.
 
     # Copy the static pages into the container like this...
     #COPY $docs /usr/share/nginx/html

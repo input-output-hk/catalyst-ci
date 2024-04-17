@@ -1,5 +1,5 @@
-# cspell UDCs and Containers.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
+
 
 # Internal: builder creates a container we can use to execute shellcheck
 builder:

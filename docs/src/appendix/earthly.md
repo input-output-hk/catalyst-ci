@@ -75,7 +75,7 @@ Like a `Dockerfile`, only a single `Earthfile` can exist per directory and it *m
 #### Sample Structure
 
 ```Earthfile
-VERSION --global-cache 0.7  # This defines the "schema version" that this Earthfile satisfies
+VERSION 0.8  # This defines the "schema version" that this Earthfile satisfies
 
 # A target, which is functionally equivalent to a `makefile` target.
 deps:
@@ -95,7 +95,7 @@ The commands are in all uppercase letters and there's typically only one command
 
 An `Earthfile` always starts by specifying a schema version which informs Earthly how it should go about parsing the file.
 This allows the syntax and format of an Earthfile to evolve while maintaining backwards compatibility.
-In our case, we target version `0.7` which is the latest version at the time of this writing.
+In our case, we target version `0.8` which is the latest version at the time of this writing.
 
 #### Targets
 
@@ -104,7 +104,7 @@ A target can be thought of as a grouping of image layers, similar to the way mul
 Each target then specifies one or more commands that create the image layers associated with that target.
 
 ```Earthfile
-VERSION --global-cache 0.7
+VERSION 0.8
 
 deps:
     FROM golang:1.21-alpine3.19

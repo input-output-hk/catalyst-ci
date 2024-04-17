@@ -49,7 +49,7 @@ Also we will take a look how we are setup Rust projects and what configuration i
 ### Prepare base builder
 
 ```Earthfile
-VERSION --global-cache 0.7
+VERSION --try 0.8
 
 # Set up our target toolchains, and copy our files.
 builder:

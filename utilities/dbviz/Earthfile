@@ -1,5 +1,4 @@
-# Common Rust UDCs and Builders.
-VERSION --global-cache 0.7
+VERSION 0.8
 
 # cspell: words stdcfgs toolset toolsets
 
