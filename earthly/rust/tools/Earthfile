@@ -55,3 +55,8 @@ tool-wasmtime:
     FROM ../+rust-base
     RUN cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter --locked
     SAVE ARTIFACT /usr/local/cargo/bin/verify-component-adapter
+
+tool-wasm-pack:
+    FROM ../+rust-base
+    RUN cargo install wasm-pack --version=0.12.1 --locked
+    SAVE ARTIFACT /usr/local/cargo/bin/wasm-pack

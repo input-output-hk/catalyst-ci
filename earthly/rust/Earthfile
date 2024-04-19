@@ -86,6 +86,7 @@ installer:
     COPY tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
     COPY tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
     COPY tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
+    COPY tools+tool-wamm-pack/wasm-pack $CARGO_HOME/bin/wasm-pack
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
