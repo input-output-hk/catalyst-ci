@@ -7,8 +7,8 @@ This repo defines common python targets and UDCs for use with python.
 
 ### POETRY_SETUP
 
-This UDC sets up a python based container that uses poetry for dependency management.
-Once the UDC has run, the Earthly target that invoked it will
+This FUNCTION sets up a python based container that uses poetry for dependency management.
+Once the FUNCTION has run, the Earthly target that invoked it will
 
 #### Invocation
 
@@ -27,7 +27,7 @@ You may also pass optional arguments:
 
 These arguments are optional and neither is required to be set.
 
-The directory that contains the Earthfile that invokes this UDC MUST have:
+The directory that contains the Earthfile that invokes this FUNCTION MUST have:
 
 * `pyproject.toml` : Definitions of the project to be installed with Poetry.
 * `poetry.lock` : Dependency lock file.

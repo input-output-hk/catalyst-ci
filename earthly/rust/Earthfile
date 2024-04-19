@@ -20,7 +20,7 @@ rust-base:
 
     # This is our base Host toolset, and rustup.
     # The ACTUAL version of rust that will be used, and available targets
-    # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
+    # is controlled by a `rust-toolchain.toml` file when the `SETUP` FUNCTION is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
 
     # WARNING:

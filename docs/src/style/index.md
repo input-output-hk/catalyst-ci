@@ -12,14 +12,6 @@ In most circumstances, the standards provided by this style guide should *not* b
 If an exception must me made, the rationale should be included in the respective PR.
 Any `Earthfile` which does not adhere to this style guide will be rejected if no further justification is made.
 
-<!-- markdownlint-disable max-one-sentence-per-line -->
-!!! Warning
-    UDC (User Defined Commands) will be renamed to FUNCTION in Earthly 0.8.
-    Earthly 0.7 still uses COMMAND for declaring functions, but
-    the keyword is deprecated and will be replaced by FUNCTION in
-    Earthly 0.8. Please refer to [link](https://docs.earthly.dev/docs/guides/functions) for more information.
-<!-- markdownlint-enable max-one-sentence-per-line -->
-
 ## Organization
 
 ### Adhere to a consistent structure
@@ -27,7 +19,7 @@ Any `Earthfile` which does not adhere to this style guide will be rejected if no
 The following structure should be used to provide a consistent structure to `Earthfile`s:
 
 ```Earthfile
-VERSION --global-cache 0.7  # Should be the same across the repository
+VERSION 0.8  # Should be the same across the repository
 
 deps:
     FROM <base image>
@@ -95,7 +87,7 @@ This target is made up of the commands that appear outside of an existing target
 For example:
 
 ```Earthfile
-VERSION --global-cache 0.7
+VERSION 0.8
 FROM ubuntu:latest  # Apart of the base target
 WORKDIR /work  # Apart of the base target
 ```
@@ -112,7 +104,7 @@ As such, the base target should be avoided, and individual targets should be
 clear about their intentions:
 
 ```Earthfile
-VERSION --global-cache 0.7
+VERSION 0.8
 
 deps:
     FROM ubuntu:latest

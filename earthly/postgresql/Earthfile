@@ -1,5 +1,6 @@
 # Common PostgreSQL Earthly builders
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
+
 
 # cspell: words psycopg dbviz
 
@@ -72,7 +73,7 @@ BUILDER:
     COPY --dir $seed .
     COPY --dir $refinery_toml .
 
-# DOCS - UDC to build the docs, needs to be run INSIDE the BUILDER like so:
+# DOCS - FUNCTION to build the docs, needs to be run INSIDE the BUILDER like so:
 # 
 # 1. Create a ./docs/diagrams.json which has the options needed to run to generate the docs to /docs
 # 2. Define the following targets in your earthfile

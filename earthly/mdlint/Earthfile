@@ -1,8 +1,9 @@
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
+
 # cspell: words markdownlint
 
 MDLINT_LOCALLY:
-    # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
+    # DO NOT RUN THIS FUNCTION INSIDE CONTAINER BUILDS.
     # IT IS NOT FOR CONTAINER BUILDS.
     # See: https://github.com/earthly/earthly/issues/580
 
@@ -41,7 +42,7 @@ MDLINT_LOCALLY:
 
 # Markdown check used in standard CI target check.
 CHECK: 
-    # DO NOT RUN THIS UDC INSIDE CONTAINER BUILDS.
+    # DO NOT RUN THIS FUNCTION INSIDE CONTAINER BUILDS.
     # IT IS NOT FOR CONTAINER BUILDS.
     # See: https://github.com/earthly/earthly/issues/580
 
@@ -74,7 +75,7 @@ CHECK:
         "**/*.md" \
         --config $cfg_file 
 
-# A Test and example invocation of the above UDC.
+# A Test and example invocation of the above FUNCTION.
 mdlint-test:
     # Test Markdown lint checks.
     # Run with `earthly -P +mdlint-test
