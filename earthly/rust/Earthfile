@@ -1,8 +1,8 @@
 VERSION 0.8
 
+IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 IMPORT ./tools AS tools
-
-# cspell: words rustup miri ripgrep stdcfgs toolset lcov psycopg
+# cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
 # Base Rustup build container.
@@ -38,6 +38,7 @@ rust-base:
         echo "USEROS         = $USEROS"; \
         echo "USERARCH       = $USERARCH"; \
         echo "USERVARIANT    = $USERVARIANT";
+
     WORKDIR /root
 
     # Install necessary packages
@@ -68,25 +69,29 @@ rust-base:
     # Install a nightly toolchain which matches.
     RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
 
+    # Call +INIT before copying the source file to avoid installing depencies every time source code changes. 
+    # This parametrization will be used in future calls to functions of the library
+    DO rust+INIT --keep_fingerprints=true
+
     # Install the default cargo config.
     COPY stdcfgs/cargo_config.toml $CARGO_HOME/config.toml
+
 
 # installer - Install necessary tools for the rust-base.
 installer:
     FROM +rust-base
 
-    COPY tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
-    COPY tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
-    COPY tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
-    COPY tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
-    COPY tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
-    COPY tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
-    COPY tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
-    COPY tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
-    COPY tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
-    COPY tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
-    COPY tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
-    COPY tools+tool-wasm-pack/wasm-pack $CARGO_HOME/bin/wasm-pack
+    COPY --keep-ts tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
+    COPY --keep-ts tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
+    COPY --keep-ts tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
+    COPY --keep-ts tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
+    COPY --keep-ts tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
+    COPY --keep-ts tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
+    COPY --keep-ts tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
+    COPY --keep-ts tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
+    COPY --keep-ts tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
+    COPY --keep-ts tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
+    COPY --keep-ts tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
