@@ -69,7 +69,7 @@ rust-base:
     # Install a nightly toolchain which matches.
     RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
 
-    # Call +INIT before copying the source file to avoid installing depencies every time source code changes. 
+    # Call +INIT before copying the source file to avoid installing dependencies every time source code changes. 
     # This parametrization will be used in future calls to functions of the library
     DO rust+INIT --keep_fingerprints=true
 
