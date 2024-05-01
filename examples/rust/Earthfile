@@ -38,7 +38,7 @@ build:
 
     # This WILL save the junit and coverage reports even if it fails.
     DO rust-ci+EXECUTE \
-        --cmd="/scripts/std_build.py --cov_report=$HOME/coverage-report.info --libs=bar --bins=foo/foo --verbose" \
+        --cmd="/scripts/std_build.py --cov_report=$HOME/coverage-report.info --libs=bar --bins=foo/foo" \
         --junit="example.junit-report.xml" \
         --coverage="example.coverage-report.info"
 
