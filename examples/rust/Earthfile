@@ -1,6 +1,5 @@
 VERSION 0.8
 
-IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 IMPORT ./../../earthly/rust AS rust-ci
 
 # cspell: words USERARCH toolsets
