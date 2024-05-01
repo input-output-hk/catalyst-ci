@@ -6,6 +6,7 @@ IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
+# cspell: words findutils fileset
 
 # Base Rustup build container.
 # Parameters:
@@ -111,7 +112,7 @@ EXECUTE:
 
     # This uses a workaround to TRY/FINALLY not working inside a FUNCTION.
     # The command is executed and a "fail" file is created ONLY if it fails.
-    # We then check the existance of the "fail" file after any artifacts are saved that
+    # We then check the existence of the "fail" file after any artifacts are saved that
     # should be saved regardless.
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         set -e; \
