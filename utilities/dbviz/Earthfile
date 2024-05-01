@@ -6,7 +6,7 @@ IMPORT ./../../earthly/rust AS rust-ci
 
 # Internal: Set up our target toolchains, and copy our files.
 builder:
-    DO ./../../earthly/rust+SETUP
+    DO rust-ci+SETUP
 
     COPY --dir .cargo .config src .
     COPY Cargo.toml .
