@@ -2,6 +2,8 @@ VERSION 0.8
 
 IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 IMPORT ./tools AS tools
+IMPORT ../../utilities/scripts AS scripts
+
 # cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 
@@ -22,22 +24,7 @@ rust-base:
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` FUNCTION is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
-
-    # WARNING:
-    # Dont bump the version of the alpine.
-    # A potential bug was found inside `libgcc:13` version.
-    # It works fine with the `libgcc:12` version.
-    # Look: https://github.com/bytecodealliance/wasmtime/issues/7997
-    FROM rust:1.75-alpine3.19
-
-    RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
-        echo "TARGETOS       = $TARGETOS"; \
-        echo "TARGETARCH     = $TARGETARCH"; \
-        echo "TARGETVARIANT  = $TARGETVARIANT"; \
-        echo "USERPLATFORM   = $USERPLATFORM"; \
-        echo "USEROS         = $USEROS"; \
-        echo "USERARCH       = $USERARCH"; \
-        echo "USERVARIANT    = $USERVARIANT";
+    FROM rust:1.77.2-alpine3.19
 
     WORKDIR /root
 
@@ -73,31 +60,65 @@ rust-base:
     # This parametrization will be used in future calls to functions of the library
     DO rust+INIT --keep_fingerprints=true
 
-    # Install the default cargo config.
-    COPY stdcfgs/cargo_config.toml $CARGO_HOME/config.toml
+    # Install the default cargo config, and ensure its in the cached CARGO_HOME as well.
+    COPY stdcfgs/cargo_config.toml $CARGO_INSTALL_ROOT/config.toml
+    DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
+
+# Add all tools we use for rust builds to the base builder image.
+rust-base-plus-tools:
+    FROM +rust-base
+
+    COPY --keep-ts tools+tool-cargo-nextest/cargo-nextest $CARGO_INSTALL_ROOT/bin/cargo-nextest
+    COPY --keep-ts tools+tool-cargo-machete/cargo-machete $CARGO_INSTALL_ROOT/bin/cargo-machete
+    COPY --keep-ts tools+tool-refinery/refinery $CARGO_INSTALL_ROOT/bin/refinery
+    COPY --keep-ts tools+tool-cargo-deny/cargo-deny $CARGO_INSTALL_ROOT/bin/cargo-deny
+    COPY --keep-ts tools+tool-cargo-modules/cargo-modules $CARGO_INSTALL_ROOT/bin/cargo-modules
+    COPY --keep-ts tools+tool-cargo-depgraph/cargo-depgraph $CARGO_INSTALL_ROOT/bin/cargo-depgraph
+    COPY --keep-ts tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_INSTALL_ROOT/bin/cargo-llvm-cov
+    COPY --keep-ts tools+tool-wasm-tools/wasm-tools $CARGO_INSTALL_ROOT/bin/wasm-tools
+    COPY --keep-ts tools+tool-cargo-expand/cargo-expand $CARGO_INSTALL_ROOT/bin/cargo-expand
+    COPY --keep-ts tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_INSTALL_ROOT/bin/wit-bindgen
+    COPY --keep-ts tools+tool-wasmtime/verify-component-adapter $CARGO_INSTALL_ROOT/bin/verify-component-adapter
+    
+# EXECUTE runs the cargo command "$args".
+# This function is thread safe. Parallel builds of targets calling this function should be free of race conditions.
+# Notice that in order to run this function, +INIT must be called first.
+# Arguments:
+#   - cmd: Command and its arguments. Required.
+#   - output: Regex matching output artifacts files to be copied to ./target folder in the caller filesystem (image layers).
+#     Use this argument when you want to SAVE an ARTIFACT from the target folder (mounted cache), always trying to minimize the total size of the copied fileset.
+#     For example --output="release/[^\./]+" would keep all the files in /target/release that don't have any extension.
+#
+# This is heavily based off of the rust `CARGO` command in the Earthly library.
+# Updates to that library must be reflected in this function when updating the version of the earthly rust library.
+EXECUTE:
+    FUNCTION
+    DO rust+CHECK_INITED
+    ARG --required cmd
+    ARG output
+    DO rust+SET_CACHE_MOUNTS_ENV
+    IF [ "$EARTHLY_KEEP_FINGERPRINTS" = "false" ]
+       DO rust+REMOVE_SOURCE_FINGERPRINTS
+    END
+    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+      set -e; \
+      $cmd; \
+      cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
+      cargo sweep -r -i;
+    IF [ "$output" != "" ]
+      DO rust+COPY_OUTPUT --output=$output
+    END
 
 
 # installer - Install necessary tools for the rust-base.
 installer:
-    FROM +rust-base
-
-    COPY --keep-ts tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
-    COPY --keep-ts tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
-    COPY --keep-ts tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
-    COPY --keep-ts tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
-    COPY --keep-ts tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
-    COPY --keep-ts tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
-    COPY --keep-ts tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
-    COPY --keep-ts tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
-    COPY --keep-ts tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
-    COPY --keep-ts tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
-    COPY --keep-ts tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
+    FROM +rust-base-plus-tools
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
-    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
-    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
+    DO scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_PYTHON_SCRIPTS
 
     # Standardized Rust configs.
     # Build will refuse to proceed if the projects rust configs do not match these.
@@ -124,8 +145,5 @@ SETUP:
     # Copy our toolchain dependency.
     COPY $toolchain ./rust-toolchain.toml
 
-    # Install pinned Rustup from `rust-toolchain.toml`
-    # Plus nightly latest so we can use it for docs, lints, etc.
-    RUN rustup show && \
-        cargo --version && \
-        cargo +nightly --version
+    # Toolchain MUST be the same as vendored, and if it is the toolchain is
+    # already installed.
