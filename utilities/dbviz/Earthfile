@@ -1,5 +1,8 @@
 VERSION 0.8
 
+IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
+IMPORT ./../../earthly/rust AS rust-ci
+
 # cspell: words stdcfgs toolset toolsets
 
 # Internal: Set up our target toolchains, and copy our files.
@@ -21,7 +24,7 @@ builder:
 check:
     FROM +builder
 
-    RUN /scripts/std_checks.py
+    DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -33,7 +36,8 @@ all-hosts-check:
 build:
     FROM +builder
  
-    RUN /scripts/std_build.py  --bins="dbviz/dbviz"
+    DO rust-ci+EXECUTE \
+        --cmd="/scripts/std_build.py --bins=dbviz/dbviz"
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/dbviz dbviz
