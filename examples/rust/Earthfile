@@ -1,4 +1,4 @@
-VERSION --try 0.8
+VERSION 0.8
 
 IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 IMPORT ./../../earthly/rust AS rust-ci
@@ -36,52 +36,11 @@ all-hosts-check:
 build:
     FROM +builder
 
-    # TRY doesn't work with DO, so we can't use it here anymore.
-    # Code commented out to show the intent for when we have a solution to this.
-    #TRY
-        DO rust-ci+EXECUTE --cmd="/scripts/std_build.py --cov_report=coverage-report.info --libs=bar --bins=foo/foo --verbose"
-    #FINALLY
-        # TODO: Not finding artifacts, fix this before release.
-
-        #SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL example.junit-report.xml
-        #SAVE ARTIFACT coverage-report.info AS LOCAL example.coverage-report.info
-    #END
-
-    SAVE ARTIFACT target/doc doc
-    SAVE ARTIFACT target/release/foo foo
-
-# Test what build is like if we do everything `build` does but using +CARGO to run the commands manually.
-explicit-build:
-    FROM +builder
-
-    RUN echo break cache here 1
-
-    # TRY doesn't work with DO, so we can't use it here anymore.
-    # Code commented out to show the intent for when we have a solution to this.
-    #TRY
-        DO rust+CARGO --args="build --release"
-        DO rust+CARGO --args="lint"
-        DO rust+CARGO --args="+nightly testdocs"
-        DO rust+CARGO --args="llvm-cov clean"
-        DO rust+CARGO --args="testcov"
-        DO rust+CARGO --args="llvm-cov report  --release --output-path coverage-report.info"
-        DO rust+CARGO --args="bench"
-        DO rust+CARGO --args="+nightly docs"
-        DO rust+CARGO --args="depgraph --workspace-only --dedup-transitive-deps"
-        DO rust+CARGO --args="depgraph --all-deps --dedup-transitive-deps"
-        DO rust+CARGO --args="modules orphans --all-features --deny --cfg-test --package bar --lib"
-        DO rust+CARGO --args="modules structure --no-fns --all-features --package bar --lib"
-        DO rust+CARGO --args="modules dependencies --all-features --no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses --package bar --lib"
-        DO rust+CARGO --args="modules orphans --all-features --deny --cfg-test --package foo --bin foo"
-        DO rust+CARGO --args="modules structure --no-fns --all-features --package foo --bin foo"
-        DO rust+CARGO --args="modules dependencies --all-features --no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses --package foo --bin foo"
-
-    #FINALLY
-        # TODO: Not finding artifacts, fix this before release.
-
-        #SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL example.junit-report.xml
-        #SAVE ARTIFACT coverage-report.info AS LOCAL example.coverage-report.info
-    #END
+    # This WILL save the junit and coverage reports even if it fails.
+    DO rust-ci+EXECUTE \
+        --cmd="/scripts/std_build.py --cov_report=$HOME/coverage-report.info --libs=bar --bins=foo/foo --verbose" \
+        --junit="example.junit-report.xml" \
+        --coverage="example.coverage-report.info"
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/foo foo
