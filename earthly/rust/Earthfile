@@ -140,6 +140,15 @@ EXECUTE:
         DO rust+COPY_OUTPUT --output=$output
     END
 
+# Shim so we use the correct upstream RUST library consistently
+# without having to import it into consuming Earthfiles.
+CARGO:
+    FUNCTION
+
+    ARG --required args
+    ARG output
+
+    DO rust+CARGO --args=$args --output=output
 
 # installer - Install necessary tools for the rust-base.
 installer:
