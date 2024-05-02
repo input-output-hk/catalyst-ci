@@ -2,7 +2,7 @@ VERSION 0.8
 
 # In order to ensure all consumers of CAT-CI use the correct upstream
 # Rust library from Earthly, this is the only place that Earthfile can be imported.
-# Functions or targets in that Earthfile MUST be shimed here.
+# Functions or targets in that Earthfile MUST be shimmed here.
 # No other earthfile should reference the rust library in the earthly/lib repo.
 IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 
