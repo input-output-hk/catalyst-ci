@@ -7,7 +7,7 @@ VERSION 0.8
 IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 
 # Local Earthfile reference imports
-IMPORT ./tools AS tools
+IMPORT ./tools AS rust-tools
 IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg
@@ -76,17 +76,17 @@ rust-base:
 rust-base-plus-tools:
     FROM +rust-base
 
-    COPY --keep-ts tools+tool-cargo-nextest/cargo-nextest $CARGO_INSTALL_ROOT/bin/cargo-nextest
-    COPY --keep-ts tools+tool-cargo-machete/cargo-machete $CARGO_INSTALL_ROOT/bin/cargo-machete
-    COPY --keep-ts tools+tool-refinery/refinery $CARGO_INSTALL_ROOT/bin/refinery
-    COPY --keep-ts tools+tool-cargo-deny/cargo-deny $CARGO_INSTALL_ROOT/bin/cargo-deny
-    COPY --keep-ts tools+tool-cargo-modules/cargo-modules $CARGO_INSTALL_ROOT/bin/cargo-modules
-    COPY --keep-ts tools+tool-cargo-depgraph/cargo-depgraph $CARGO_INSTALL_ROOT/bin/cargo-depgraph
-    COPY --keep-ts tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_INSTALL_ROOT/bin/cargo-llvm-cov
-    COPY --keep-ts tools+tool-wasm-tools/wasm-tools $CARGO_INSTALL_ROOT/bin/wasm-tools
-    COPY --keep-ts tools+tool-cargo-expand/cargo-expand $CARGO_INSTALL_ROOT/bin/cargo-expand
-    COPY --keep-ts tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_INSTALL_ROOT/bin/wit-bindgen
-    COPY --keep-ts tools+tool-wasmtime/verify-component-adapter $CARGO_INSTALL_ROOT/bin/verify-component-adapter
+    COPY --keep-ts rust-tools+tool-cargo-nextest/cargo-nextest $CARGO_INSTALL_ROOT/bin/cargo-nextest
+    COPY --keep-ts rust-tools+tool-cargo-machete/cargo-machete $CARGO_INSTALL_ROOT/bin/cargo-machete
+    COPY --keep-ts rust-tools+tool-refinery/refinery $CARGO_INSTALL_ROOT/bin/refinery
+    COPY --keep-ts rust-tools+tool-cargo-deny/cargo-deny $CARGO_INSTALL_ROOT/bin/cargo-deny
+    COPY --keep-ts rust-tools+tool-cargo-modules/cargo-modules $CARGO_INSTALL_ROOT/bin/cargo-modules
+    COPY --keep-ts rust-tools+tool-cargo-depgraph/cargo-depgraph $CARGO_INSTALL_ROOT/bin/cargo-depgraph
+    COPY --keep-ts rust-tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_INSTALL_ROOT/bin/cargo-llvm-cov
+    COPY --keep-ts rust-tools+tool-wasm-tools/wasm-tools $CARGO_INSTALL_ROOT/bin/wasm-tools
+    COPY --keep-ts rust-tools+tool-cargo-expand/cargo-expand $CARGO_INSTALL_ROOT/bin/cargo-expand
+    COPY --keep-ts rust-tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_INSTALL_ROOT/bin/wit-bindgen
+    COPY --keep-ts rust-tools+tool-wasmtime/verify-component-adapter $CARGO_INSTALL_ROOT/bin/verify-component-adapter
     
 # EXECUTE runs the cargo command "$args".
 # This function is thread safe. Parallel builds of targets calling this function should be free of race conditions.

@@ -1,10 +1,12 @@
 VERSION 0.8
 
+IMPORT ../python AS python-ci
+IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words freetype lcms openjpeg etag
 
 deps:
-    FROM ../python+python-base
+    FROM python-ci+python-base
     # Derived from official mkdocs-material docker container.
     # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile
     # Due to docs being constructed not only from Doc source but Build artifacts,
@@ -43,12 +45,12 @@ deps:
     RUN curl -fsSL https://d2lang.com/install.sh | sh -s --
 
     # Install poetry and our python dependencies.
-    DO ../python+BUILDER --opts=--no-root
+    DO python-ci+BUILDER --opts=--no-root
 
     # Copy our run scripts
     COPY --dir scripts/* /scripts/
     # Copy our common scripts so we can use them inside the container.
-    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_BASH_SCRIPTS
 
     # Trust directory, required for git >= 2.35.2. (mkdocs Git plugin requirement).
     RUN git config --global --add safe.directory /docs &&\
