@@ -40,7 +40,7 @@ build:
         --cmd="/scripts/std_build.py --cov_report=$HOME/coverage-report.info --libs=bar --bins=foo/foo" \
         --junit="example.junit-report.xml" \
         --coverage="example.coverage-report.info" \
-        --output="(doc)|(release/foo)"
+        --output="(doc/.*)|(release/foo)"
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/foo foo
