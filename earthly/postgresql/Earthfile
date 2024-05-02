@@ -1,7 +1,7 @@
 # Common PostgreSQL Earthly builders
 VERSION 0.8
 
-IMPORT ../rust/rools AS rust-tools
+IMPORT ../rust/tools AS rust-tools
 IMPORT ../../utilities/dbviz AS dbviz
 IMPORT ../../utilities/scripts AS scripts
 
