@@ -36,7 +36,8 @@ build:
     FROM +builder
  
     DO rust-ci+EXECUTE \
-        --cmd="/scripts/std_build.py --bins=dbviz/dbviz"
+        --cmd="/scripts/std_build.py --bins=dbviz/dbviz" \
+        --output="(doc)|(release\/dbviz)"
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/dbviz dbviz
