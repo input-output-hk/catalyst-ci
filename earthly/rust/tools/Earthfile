@@ -1,59 +1,58 @@
 VERSION 0.8
 
-IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 IMPORT .. AS rust-ci
 
 tool-cargo-nextest:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install cargo-nextest --version=0.9.70 --locked"    
+    DO rust-ci+CARGO --args="install cargo-nextest --version=0.9.70 --locked"    
     SAVE ARTIFACT /usr/local/cargo/bin/cargo-nextest
 
 tool-cargo-machete:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install cargo-machete --version=0.6.2 --locked"
+    DO rust-ci+CARGO --args="install cargo-machete --version=0.6.2 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/cargo-machete
 
 tool-refinery:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install refinery_cli --version=0.8.14 --locked"
+    DO rust-ci+CARGO --args="install refinery_cli --version=0.8.14 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/refinery
 
 tool-cargo-deny:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install cargo-deny --version=0.14.22 --locked"
+    DO rust-ci+CARGO --args="install cargo-deny --version=0.14.22 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/cargo-deny
 
 tool-cargo-modules:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install cargo-modules --version=0.15.5 --locked"
+    DO rust-ci+CARGO --args="install cargo-modules --version=0.15.5 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/cargo-modules
 
 tool-cargo-depgraph:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install cargo-depgraph --version=1.6.0 --locked"
+    DO rust-ci+CARGO --args="install cargo-depgraph --version=1.6.0 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/cargo-depgraph
 
 tool-cargo-llvm-cov:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install cargo-llvm-cov --version=0.6.9 --locked"
+    DO rust-ci+CARGO --args="install cargo-llvm-cov --version=0.6.9 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/cargo-llvm-cov
 
 tool-wasm-tools:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install wasm-tools --version=1.206.0 --locked"
+    DO rust-ci+CARGO --args="install wasm-tools --version=1.206.0 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/wasm-tools
 
 tool-cargo-expand:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install cargo-expand --version=1.0.82 --locked"
+    DO rust-ci+CARGO --args="install cargo-expand --version=1.0.82 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/cargo-expand
 
 tool-wit-bindgen-cli:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install wit-bindgen-cli --version=0.24.0 --locked"
+    DO rust-ci+CARGO --args="install wit-bindgen-cli --version=0.24.0 --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/wit-bindgen
 
 tool-wasmtime:
     FROM rust-ci+rust-base
-    DO rust+CARGO --args="install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter --locked"
+    DO rust-ci+CARGO --args="install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/verify-component-adapter
