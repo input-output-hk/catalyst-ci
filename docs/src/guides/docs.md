@@ -23,7 +23,7 @@ To begin, clone the Catalyst CI repository:
 git clone https://github.com/input-output-hk/catalyst-ci.git
 ```
 
-Navigate to `docs` directory to find current documentation
+Navigate to `docs` directory to find the current documentation
 which you are reading right now.
 This folder already has an `Earthfile` in it, which contains all build process.
 
@@ -40,19 +40,25 @@ This folder already has an `Earthfile` in it, which contains all build process.
 
 ```Earthfile
 VERSION 0.8
+IMPORT ../earthly/docs AS docs-ci
+IMPORT .. AS cat-ci
+IMPORT ../examples/postgresql AS postgresql-ci
 
 # Copy all the source we need to build the docs
 src:
     # Common src setup
-    DO ../earthly/docs+SRC
+    DO docs-ci+SRC
 
     # Now copy into that any artifacts we pull from the builds.
-    COPY --dir ../+repo-docs/repo includes
+    COPY --dir cat-ci+repo-docs/repo includes
+
+    # Copy docs we build in the postgres example.
+    COPY --dir postgresql-ci+build/docs 
 ```
 
-The first step of building process it preparing a source files.
+The first step of building process is to prepare a source files.
 It is mandatory to have a `src` directory with all documentation md files in it and `mkdocs.yml` file.
-This directory and file will be picked during the execution of `+SRC` Function.
+This directory and file will be picked during the execution of `+SRC` FUNCTION.
 Also it is possible to replace defined `includes`, `macros` and `overrides` dirs
 to customize some docs appearance and configuration.
 
@@ -75,35 +81,32 @@ Individual documentation targets can customize the theme in their `mkdocs.yml` f
 docs:
     FROM +src
 
-    DO ../earthly/docs+BUILD
+    DO docs-ci+BUILD
 ```
 
-To build a docs artifact which will be used later just invoke `+BUILD` Function
-on the already prepared docs environment `+src` target which we have discussed before.
+To create a documentation artifact for future use, simply call the `+BUILD` FUNCTION within the existing documentation environment, specifically the `+src` target we previously discussed.
 
 ```Earthfile
 # Make a docker image that can serve the docs for development purposes.
 # This target is only for local developer use.
 local:
-    DO ../earthly/docs+PACKAGE
+    DO docs-ci+PACKAGE
 
     COPY +docs/ /usr/share/nginx/html
 
     SAVE IMAGE cat-ci-docs:latest
 ```
 
-To finally build a docker image which is pretty strait forward process,
-you should firstly invoke `+PACKAGE` Function which will prepare an environment for future docs image,
-next step is to copy builded artifact from the previous step to `/usr/share/nginx/html` folder.
-And the last step is to save a docker image with the specified name, tag and registry if it is needed.
+
+To create a Docker image, begin by executing the `+PACKAGE` FUNCTION to set up an environment for the future documentation image. 
+Then, copy the built artifact from the preceding step into the `/usr/share/nginx/html` directory. Finally, save the Docker image with the designated name, tag, and registry, if required.
 
 ## Local docs run
 
-To locally run docs which it is needed to get a `earthly/docs/dev/local.py` python script
-which will automatically invoke `+local` to build docs image what was discussed before.
-This script will locally deploy docs and rebuild them if they changed every `10` seconds.
-Script should be run from the root of the repository in which `docs` folder exists
-with all documentation in it and already discussed `Earthfile`.
+To run the documentation locally, the need of `earthly/docs/dev/local.py` Python script is required. This script automatically triggers the `+local` command to build the documentation image, as previously discussed. 
+It deploys the documentation locally and rebuilds it every `10` seconds if any changes are detected. 
+To execute the script, navigate to the root of the repository containing the docs folder with all the documentation and the previously discussed `Earthfile`.
+
 Script arguments:
 
 * `container_name` - Name of the container.
@@ -119,16 +122,15 @@ earthly/docs/dev/local.py cat-ci-docs:latest
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Note
-    To deploy docs for any other repositories as for example `catalyst-voices` or any other
-    as it was mentioned above it is needed to get `local.py` script and run it from the root
+    To deploy docs for any other repositories as for example `catalyst-voices`, it is needed to get `local.py` script and run it from the root
     of your repo as for example `<path_to_catalyst_ci>/earthly/docs/dev/local.py <docker_image_name>`
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
 ## Doc's update PR
 
-When a PR is raised the documentation for that PR is built and published.
+When a PR is raised, the documentation for that PR is built and published.
 Branch docs are published to `<pages>/branch/<branch_name>`.
-`<branch_name>` is the name of the branch with all non alpha-numeric characters replaced by underscore (`_`).
+`<branch_name>` is the name of the branch with all **non alpha-numeric characters replaced by underscore** (`_`).
 
 When the branch is finally merged, the branch documentation is removed.
 This allows us to easily validate what any PR will do to the published documentation before its published officially.
