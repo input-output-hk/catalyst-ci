@@ -54,5 +54,5 @@ tool-wit-bindgen-cli:
 
 tool-wasmtime:
     FROM rust-ci+rust-base
-    DO rust-ci+CARGO --args="install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter --locked"
+    DO rust-ci+CARGO --args="install --git https://github.com/bytecodealliance/wasmtime --tag v20.0.0 verify-component-adapter --locked"
     SAVE ARTIFACT /usr/local/cargo/bin/verify-component-adapter
