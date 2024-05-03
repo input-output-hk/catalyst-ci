@@ -25,7 +25,7 @@ def cargo_build(results: exec_manager.Results, flags: str, verbose: bool=False):
 def cargo_lint(results: exec_manager.Results, flags: str, verbose: bool=False):
     results.add(
         exec_manager.cli_run(
-            "cargo lint " + f"{flags}", name="Clippy Lints in the workspace check",
+            "cargo lint --release " + f"{flags}", name="Clippy Lints in the workspace check",
             verbose=verbose,
         )
     )
@@ -342,7 +342,7 @@ def main():
         for bin in bins:
             package, bin_name = bin.split("/")
             cargo_modules_bin(results, package, bin_name, args.verbose)
-
+    
     results.print()
     if not results.ok():
         exit(1)
