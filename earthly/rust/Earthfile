@@ -111,9 +111,17 @@ EXECUTE:
     ARG output
     ARG junit
     ARG coverage
+    ARG ALLOW_DEBUG_TARGET="false"
     DO rust+SET_CACHE_MOUNTS_ENV
     IF [ "$EARTHLY_KEEP_FINGERPRINTS" = "false" ]
        DO rust+REMOVE_SOURCE_FINGERPRINTS
+    END
+
+    # target/debug should not be present, so purge it just in case
+    IF [ "$ALLOW_DEBUG_TARGET" != "true" ]
+        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+            set -e; \
+            rm -rf target/debug;
     END
 
     # This uses a workaround to TRY/FINALLY not working inside a FUNCTION.
@@ -138,7 +146,16 @@ EXECUTE:
 
     # Defer the failure to here.
     IF [ -f fail ]
+        RUN echo "Error on +EXECUTE: $cmd"
         RUN exit 1
+    END
+
+    IF [ "$ALLOW_DEBUG_TARGET" != "true" ]
+        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+            if [ -d target/debug ]; then \
+                echo "Error: 'target/debug' should not be built in CI.  Failing."; \
+                exit 1; \
+            fi;
     END
 
     # This output is ONLY saved on successful command execution.
@@ -153,8 +170,34 @@ CARGO:
 
     ARG --required args
     ARG output
+    ARG ALLOW_DEBUG_TARGET="false"
 
-    DO rust+CARGO --args=$args --output=output
+    DO +EXECUTE \
+        --cmd="cargo $args" \
+        --output="$output" \
+        --junit="$junit" \
+        --coverage="$coverage" \
+        --ALLOW_DEBUG_TARGET="$ALLOW_DEBUG_TARGET"
+
+# COPY_OUTPUT copies files out of the target cache into the image layers.
+#
+# This is a shim which MUST be used by projects consuming catalyst-ci rather than using the 
+# upstream earthly rust library directly.
+#
+# Use this function when you want to SAVE an ARTIFACT from the target folder (mounted cache), always trying to minimize the total size of the copied fileset.
+# Notice that in order to run this function, +SET_CACHE_MOUNTS_ENV or +CARGO must be called first.
+# Arguments:
+#   - output: Regex matching output artifacts files to be copied to ./target folder in the caller filesystem (image layers).
+# Example:
+#   DO rust+SET_CACHE_MOUNTS_ENV
+#   RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE cargo build --release
+#   DO rust+COPY_OUTPUT --output="release/[^\./]+" # Keep all the files in /target/release that don't have any extension.
+COPY_OUTPUT:
+    FUNCTION
+    ARG --required output
+    ARG TMP_FOLDER="/tmp/earthly/lib/rust"
+
+    DO rust+COPY_OUTPUT --output=$output --TMP_FOLDER=$TMP_FOLDER
 
 # installer - Install necessary tools for the rust-base.
 installer:

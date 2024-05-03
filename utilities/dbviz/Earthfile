@@ -35,9 +35,14 @@ all-hosts-check:
 build:
     FROM +builder
  
+    RUN echo cache breaker 1
+
     DO rust-ci+EXECUTE \
         --cmd="/scripts/std_build.py --bins=dbviz/dbviz" \
-        --output="(doc/.*)|(release/dbviz/.*)"
+        --output="release/[^\./]+"
+
+    DO rust-ci+COPY_OUTPUT \
+        --output="doc/.*"
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/dbviz dbviz
@@ -46,4 +51,3 @@ build:
 # Only used to validate tooling is working across host toolsets.
 all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
-
