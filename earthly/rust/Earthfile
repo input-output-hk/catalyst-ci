@@ -159,7 +159,7 @@ EXECUTE:
             fi;
     END
 
-    if [ "$docs" != "false" ]
+    IF [ "$docs" != "false" ]
         DO rust+COPY_OUTPUT --output="doc/.*"
         SAVE ARTIFACT target/doc doc
     END
