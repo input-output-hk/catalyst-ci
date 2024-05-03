@@ -111,6 +111,7 @@ EXECUTE:
     ARG output
     ARG junit
     ARG coverage
+    ARG docs="false"
     ARG ALLOW_DEBUG_TARGET="false"
     DO rust+SET_CACHE_MOUNTS_ENV
     IF [ "$EARTHLY_KEEP_FINGERPRINTS" = "false" ]
@@ -158,6 +159,11 @@ EXECUTE:
             fi;
     END
 
+    if [ "$docs" != "false" ]
+        DO rust+COPY_OUTPUT --output="doc/.*"
+        SAVE ARTIFACT target/doc doc
+    END
+
     # This output is ONLY saved on successful command execution.
     IF [ "$output" != "" ]
         DO rust+COPY_OUTPUT --output=$output
@@ -165,19 +171,22 @@ EXECUTE:
 
 # Shim so we use the correct upstream RUST library consistently
 # without having to import it into consuming Earthfiles.
+# By default this will NOT expose docs built during the execution of cargo
 CARGO:
     FUNCTION
 
     ARG --required args
     ARG output
     ARG ALLOW_DEBUG_TARGET="false"
+    ARG docs="false"
 
     DO +EXECUTE \
         --cmd="cargo $args" \
         --output="$output" \
         --junit="$junit" \
         --coverage="$coverage" \
-        --ALLOW_DEBUG_TARGET="$ALLOW_DEBUG_TARGET"
+        --ALLOW_DEBUG_TARGET="$ALLOW_DEBUG_TARGET" \
+        --docs="$docs"
 
 # COPY_OUTPUT copies files out of the target cache into the image layers.
 #
