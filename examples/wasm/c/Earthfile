@@ -3,7 +3,7 @@ VERSION 0.8
 IMPORT ./../../../earthly/wasm/c AS wasm-c-ci
 
 builder:
-    FROM wasm-ci-ci+wasm-c-base
+    FROM wasm-c-ci+wasm-c-base
 
     COPY demo.wit ./wit/
     COPY component.c .
