@@ -2,6 +2,8 @@
 # on in docs/guides/languages/go.md.
 VERSION 0.8
 
+IMPORT ../../earthly/go AS go-ci
+
 # The structure of this Earthfile is derived from the style guide:
 # https://input-output-hk.github.io/catalyst-ci/style/#adhere-to-a-consistent-structure
 
@@ -15,7 +17,7 @@ deps:
 
     # This FUNCTION automatically copies the go.mod and go.sum files and runs
     # `go mod download` to install the dependencies.
-    DO ../../earthly/go+DEPS --ginkgo="false"
+    DO go-ci+DEPS --ginkgo="false"
 
 src:
     # This target copies the source code into the current build context
@@ -28,10 +30,10 @@ check:
     FROM +src
 
     # This FUNCTION validates the code is formatted according to Go standards.
-    DO ../../earthly/go+FMT --src="go.mod go.sum cmd"
+    DO go-ci+FMT --src="go.mod go.sum cmd"
 
     # This FUNCTION runs golangci-lint to check for common errors.
-    DO ../../earthly/go+LINT --src="go.mod go.sum cmd"
+    DO go-ci+LINT --src="go.mod go.sum cmd"
 
 build:
     # This target builds the application.

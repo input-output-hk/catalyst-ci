@@ -1,5 +1,8 @@
 VERSION 0.8
 
+IMPORT ../../rust/tools AS rust-tools
+IMPORT ../../../utilities/scripts AS scripts
+
 # cspell: words bindgen autodrop mexec
 
 wasm-c-base:
@@ -13,11 +16,11 @@ wasm-c-base:
             lld=17.0.5-r0 \
             wasi-sdk=20-r3
 
-    COPY ./../../rust/tools+tool-wasm-tools/wasm-tools /bin
-    COPY ./../../rust/tools+tool-wit-bindgen-cli/wit-bindgen /bin
+    COPY rust-tools+tool-wasm-tools/wasm-tools /bin
+    COPY rust-tools+tool-wit-bindgen-cli/wit-bindgen /bin
 
     # Universal build scripts.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
-    DO ./../../../utilities/scripts+ADD_BASH_SCRIPTS
-    DO ./../../../utilities/scripts+ADD_PYTHON_SCRIPTS
+    DO scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_PYTHON_SCRIPTS

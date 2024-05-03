@@ -1,10 +1,12 @@
 VERSION 0.8
 
+IMPORT ./../../earthly/rust AS rust-ci
+
 # cspell: words stdcfgs toolset toolsets
 
 # Internal: Set up our target toolchains, and copy our files.
 builder:
-    DO ./../../earthly/rust+SETUP
+    DO rust-ci+SETUP
 
     COPY --dir .cargo .config src .
     COPY Cargo.toml .
@@ -21,7 +23,7 @@ builder:
 check:
     FROM +builder
 
-    RUN /scripts/std_checks.py
+    DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -33,13 +35,16 @@ all-hosts-check:
 build:
     FROM +builder
  
-    RUN /scripts/std_build.py  --bins="dbviz/dbviz"
+    RUN echo cache breaker 1
 
-    SAVE ARTIFACT target/doc doc
+    DO rust-ci+EXECUTE \
+        --cmd="/scripts/std_build.py --bins=dbviz/dbviz" \
+        --output="release/[^\./]+" \
+        --docs="true"
+
     SAVE ARTIFACT target/release/dbviz dbviz
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
-
