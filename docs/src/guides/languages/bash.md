@@ -38,14 +38,18 @@ Bash script checking is to be added to a repo that is already using Catalyst CI.
 All that needs to happen is the following be added to the `Earthfile` in the root of the repo.
 
 ```Earthfile
-VERSION 0.8
-IMPORT ./earthly/bash AS bash-ci
-
-# check-bash - test all bash files lint properly according to shellcheck.
-check-bash:
+# Internal: shell-check - test all bash files against our shell check rules.
+shell-check:
     FROM alpine:3.19
 
-    DO bash-ci+SHELLCHECK --src=.
+    DO github.com/input-output-hk/catalyst-ci/earthly/bash:vx.y.z+SHELLCHECK --src=.
+
+# check all repo wide checks are run from here
+check:
+    FROM alpine:3.19
+
+    # Lint all bash files.
+    BUILD +shell-check
 
 ```
 
@@ -67,17 +71,11 @@ These scripts are intended to be used inside Earthly builds, and not locally.
 A common pattern to include these common scripts is the following:
 
 ```Earthfile
-VERSION 0.8
-
-IMPORT ../../utilities/scripts AS scripts
-
-# Any appropriated target
-builder:
     # Copy our target specific scripts
     COPY --dir scripts /scripts
 
     # Copy our common scripts so we can use them inside the container.
-    DO scripts+ADD_BASH_SCRIPTS
+    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
 ```
 
 <!-- markdownlint-disable max-one-sentence-per-line -->

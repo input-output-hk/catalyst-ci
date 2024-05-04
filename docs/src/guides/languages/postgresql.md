@@ -51,49 +51,18 @@ You can choose to either delete the file and start from scratch, or read the gui
 ```Earthfile
 VERSION 0.8
 
-IMPORT ../../earthly/postgresql AS postgresql-ci
-IMPORT ../../utilities/scripts AS scripts
-IMPORT ../../ AS cat-ci
-
-# Internal: builder is our Event db builder target. Prepares all necessary artifacts.
-#   CI target : dependency
 builder:
-    DO postgresql-ci+BUILDER
-
-    # MUST Manually copy the .sqlfluff config used in the repo because the FUNCTION
-    # above can not be passed a reference to a local target as an argument.
-    COPY cat-ci+repo-config/repo/.sqlfluff .
-```
-
-<!-- TODO - FIX this part -->
-Given `BUILDER`
-```Earthfile
-# Common build setup steps.
-# Arguments:
-#   sqlfluff_cfg - REQUIRED - Location of repos .sqlfluff configuration file.
-#   migrations - OPTIONAL - Location of Migrations directory - DEFAULT: ./migrations
-#   seed - OPTIONAL - Location of Seed data directory - DEFAULT: ./seed
-#   refinery_toml - OPTIONAL - Location of refinery,toml which configures migrations. DEFAULT: ./refinery.toml
-BUILDER:
-    FUNCTION
-
-    ARG migrations=./migrations
-    ARG seed=./seed
-    ARG refinery_toml=./refinery.toml
-    
-    FROM +postgres-base
+    FROM ./../../earthly/postgresql+postgres-base
 
     WORKDIR /build
 
-    COPY --dir $sqlfluff_cfg .
-    COPY --dir $migrations .
-    COPY --dir $seed .
-    COPY --dir $refinery_toml .
+    COPY --dir ./migrations ./data ./refinery.toml .
+    DO ./../../earthly/postgresql+BUILDER
 ```
 
 The first target we are going to consider will be responsible to prepare a PostgreSQL environment (Earthly `+postgres-base` target),
 migrations, migrations configuration and seed data (`COPY --dir ./migrations ./data ./refinery.toml .`),
-doing some final build step (Earthly `+BUILDER` FUNCTION).
+doing some final build step (Earthly `+BUILDER` Function).
 
 In the next steps we are going to inheriting from this `+builder` target which contains all necessary data,
 dependencies, environment to properly run PostgreSQL database.
@@ -101,35 +70,20 @@ dependencies, environment to properly run PostgreSQL database.
 ### Running checks
 
 ```Earthfile
-VERSION 0.8
-
-IMPORT ../../earthly/postgresql AS postgresql-ci
-IMPORT ../../utilities/scripts AS scripts
-IMPORT ../../ AS cat-ci
-
-# check if the sql files are properly formatted and pass lint quality checks.
-#   CI target : true
 check:
     FROM +builder
 
-    # Now you can run the script without the file not found error
-    DO postgresql-ci+CHECK
+    DO ./../../earthly/postgresql+CHECK
 
-# Internal: builder is our Event db builder target. Prepares all necessary artifacts.
-#   CI target : dependency
-builder:
-    DO postgresql-ci+BUILDER
+build-sqlfluff:
+    BUILD ./../../earthly/postgresql+sqlfluff-image   
 
-    # MUST Manually copy the .sqlfluff config used in the repo because the FUNCTION
-    # above can not be passed a reference to a local target as an argument.
-    COPY cat-ci+repo-config/repo/.sqlfluff . 
-
-# format all SQL files in the current project.  Local developers tool.
-#   CI target : false
 format:
     LOCALLY
 
-    DO postgresql-ci+FORMAT --src=$(echo ${PWD})
+    RUN earthly +build-sqlfluff
+
+    DO ./../../earthly/postgresql+FORMAT --src=$(echo ${PWD})
 ```
 
 With prepared environment and all data, we're now ready to start operating with the source code - `*.sql` files.
@@ -138,8 +92,8 @@ These checks are intended to verify the code is healthy and well formatted to a 
 and done with the help of the `sqlfluff` tool which is already configured during the `+postgres-base` target.
 
 To apply and fix some formatting issues you can run `+format` target which will picks up directory
-where your Earthly file lies in as a source dir for formatting and run `+FORMAT` FUNCTION.
-Under the hood `+FORMAT` FUNCTION runs `sqlfluff-image` docker image,
+where your Earthly file lies in as a source dir for formatting and run `+FORMAT` Function.
+Under the hood `+FORMAT` Function runs `sqlfluff-image` docker image,
 which contains the same configuration and setup which is applied during the `+check`.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
@@ -151,20 +105,20 @@ which contains the same configuration and setup which is applied during the `+ch
 ### Build
 
 ```Earthfile
-# build an event db docker image.
-#   CI target : true
 build:
     FROM +builder
 
-    DO postgresql-ci+BUILD --image_name=example-db
-    DO postgresql-ci+DOCS
+    ARG tag="latest"
+    ARG registry
+
+    DO ./../../earthly/postgresql+BUILD --image_name=example-db --tag=$tag --registry=$registry
 ```
 
 With the `*.sql` files validation out of the way, we can finally build our PostgreSQL docker image.
 Since we need migration and seed data files,
 we'll inherit from the `builder` target.
 The actual image build process is pretty straight-forward
-and fully defined under the `+BUILD` FUNCTION.
+and fully defined under the `+BUILD` Function.
 The only thing it is needed to specify is a few arguments:
 
 * `tag` - the tag of the image, default value `latest`.
@@ -232,7 +186,6 @@ otherwise will relies on remote PostgreSQL server connection
 Finally we can test already configured and prepared PostgreSQL image
 and trial it against 4 different cases
 
-<!-- TODO - FIX this part? -->
 ```Earthfile
 # Container runs PostgreSQL server, drops and initialise db, applies migrations, applies seed data.
 test-1:

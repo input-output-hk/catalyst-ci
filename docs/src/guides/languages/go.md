@@ -48,18 +48,17 @@ You can choose to either delete the file and start from scratch, or read the gui
 ```Earthfile
 VERSION 0.8
 
-IMPORT ../../earthly/go AS go-ci
-
 deps:
     # This target is used to install external Go dependencies.
     FROM golang:1.21-alpine3.19
     WORKDIR /work
+
     # Any build dependencies should also be captured in this target.
     RUN apk add --no-cache gcc musl-dev
 
-    # This FUNCTION automatically copies the go.mod and go.sum files and runs
+    # This Function automatically copies the go.mod and go.sum files and runs
     # `go mod download` to install the dependencies.
-    DO go-ci+DEPS --ginkgo="false"
+    DO ../../earthly/go+DEPS --ginkgo="false"
 ```
 
 The first target we are going to create will be responsible for downloading the external dependencies that our Go program uses.
@@ -69,18 +68,18 @@ dependencies.
 
 We are going to be inheriting from an alpine image because we are pushing for a fully static build.
 When using example as a starting place, feel free to change the base image.
-This image is *only* used during the build steps, so it's not important to minimize its size.
+This image is *only* used during the build steps, so it's not important we minimize its size.
 Keep in mind, though, excessively large targets can impact the speed of the caching step (due to lots of I/O).
 
-This target is also going to be responsible for installing external build dependencies.
+This target is also going to build responsible for installing external build dependencies.
 These are dependencies that are not specific to a language and usually get installed system-wide.
 In our case, since we're building a static binary, we need `gcc` and `musl`.
 
-Finally, the actual logic we will be using is encapsulate in a FUNCTION.
+Finally, the actual logic we will be using is encapsulate in a Function.
 This is a very common pattern, as an `Earthfile` can get repetitive across a repository.
-In our case, we use the `go-ci+DEPS` FUNCTION that will automatically copy our `go.mod` and `go.sum` files and then execute
+In our case, we use the `go+DEPS` Function that will automatically copy our `go.mod` and `go.sum` files and then execute
 `go mod download`.
-The FUNCTION will also establish a cache for the Go tooling.
+The Function will also establish a cache for the Go tooling.
 This means that, even if our source code changes, we'll see a substantial speed boost when compiling because the cache is preserved
 across Earthly runs.
 
@@ -90,17 +89,18 @@ across Earthly runs.
 src:
     # This target copies the source code into the current build context
     FROM +deps
+
     COPY --dir cmd .
 
 check:
     # This target checks the overall health of the source code.
     FROM +src
 
-    # This FUNCTION validates the code is formatted according to Go standards.
-    DO go-ci+FMT --src="go.mod go.sum cmd"
+    # This Function validates the code is formatted according to Go standards.
+    DO ../../earthly/go+FMT --src="go.mod go.sum cmd"
 
-    # This FUNCTION runs golangci-lint to check for common errors.
-    DO go-ci+LINT --src="go.mod go.sum cmd"
+    # This Function runs golangci-lint to check for common errors.
+    DO ../../earthly/go+LINT --src="go.mod go.sum cmd"
 ```
 
 With our dependencies installed, we're now ready to start operating with the source code.
@@ -111,8 +111,8 @@ Any future targets which need access to the source code will inherit from this t
 
 Now that the source code is available, we can begin performing static checks.
 These checks are intended to verify the code is healthy and conforms to a certain standard.
-As we did in the previous section, here we rely on FUNCTIONs again to perform these checks.
-These two FUNCTIONs, `go-ci+FMT` and `go-ci+LINT` will validate the code formatting is correct and also perform a series of lints to validate code quality.
+As we did in the previous section, here we rely on Functions again to perform these checks.
+These two Functions will validate the code formatting is correct and also perform a series of lints to validate code quality.
 
 Note that these checks are fast (compared to later steps) and perform quick feedback on code quality.
 Since this is the first target run in CI, we want to fail the CI as quickly as possible if we can easily find code quality issues.
