@@ -9,7 +9,7 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
-<!-- cspell: words toolsets stdcfgs depgraph -->
+<!-- cspell: words toolsets stdcfgs depgraph Rustup -->
 
 ## Introduction
 
@@ -49,27 +49,36 @@ Also we will take a look how we are setup Rust projects and what configuration i
 ### Prepare base builder
 
 ```Earthfile
-VERSION --try 0.8
+VERSION 0.8
+
+IMPORT ./../../earthly/rust AS rust-ci
 
 # Set up our target toolchains, and copy our files.
 builder:
-    DO ./../../earthly/rust+SETUP
+    DO rust-ci+SETUP
 
     COPY --dir .cargo .config crates .
     COPY Cargo.toml .
-    COPY clippy.toml deny.toml rustfmt.toml .
 ```
 
 The first target `builder` is responsible for preparing configured Rust environments and,
 install all needed tools and dependencies.
 
-The fist step of the `builder` target is to prepare a Rust environment via `+rust-base` target,
-which is called in `SETUP` Function.
-Next step is to copy source code of the project.
+#### Builder steps
+
+1. First step of `builder` target is to prepare a Rust environment via `+installer` target,
+which is called in `SETUP` FUNCTION.
+The `installer` target installs necessary tools for `+rust-base` target and copies
+common scripts and standardized Rust configs.
+The `rust-base` provides a base Rustup build environment.
+  It installs necessary
+packages, including development libraries and tools.
+Clippy linter, LLVM tools for generating code coverage, and nightly toolchain are installed.
+2. Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
 any other irrelevant stuff should omitted.
-And finally finalize the build with `+SETUP` Function.
-The `+SETUP` Function requires `rust-toolchain.toml` file,
+3. And finally finalize the build with `+SETUP` FUNCTION.
+The `+SETUP` FUNCTION requires `rust-toolchain.toml` file,
 with the specified `channel` option in it.
 This `rust-toolchain.toml` file could be specified
 via the `toolchain` argument of the `+SETUP` target like this
@@ -84,7 +93,7 @@ By default `toolchain` setup to `rust-toolchain.toml`.
 check:
     FROM +builder
 
-    RUN /scripts/std_checks.py
+    DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -127,20 +136,15 @@ The same approach will be seen in other targets throughout this guide.
 build:
     FROM +builder
 
-    TRY
-        RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
-                                    --with_docs \
-                                    --libs="bar" \
-                                    --bins="foo/foo"
-    FINALLY
-        SAVE ARTIFACT target/nextest/ci/junit.xml example.junit-report.xml AS LOCAL
-        SAVE ARTIFACT coverage-report.info example.coverage-report.info AS LOCAL
-    END
+    # This WILL save the junit and coverage reports even if it fails.
+    DO rust-ci+EXECUTE \
+        --cmd="/scripts/std_build.py --cov_report=$HOME/coverage-report.info --libs=bar --bins=foo/foo" \
+        --junit="example.junit-report.xml" \
+        --coverage="example.coverage-report.info" \
+        --output="release/[^\./]+" \
+        --docs="true"
 
-    SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/foo foo
-
-    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -248,6 +252,46 @@ It is highly likely that the `nightly` toolchain version on the CI machines diff
 Unfortunately, Rust tooling does not have the capability to preserve and maintain consistency between
 `stable` and `nightly` toolchains simultaneously.
 In our builds, we only preserve the `stable` toolchain version (`rust-toolchain.toml` file).
+
+## Rust FUNCTIONs
+
+While leveraging the [Earthly lib/rust](https://github.com/earthly/lib/tree/main/rust),
+the following Rust FUNCTIONs are customize to align with our specific requirements
+that our project needed.
+
+* `EXECUTE` : This FUNCTION, adapted from the [Earthly lib/rust](https://github.com/earthly/lib/tree/main/rust),
+  is tailored to execute commands according to user specifications.
+  It serves a pivotal role in managing Rust project builds, handling outputs, and supporting features
+  such as `JUnit` reporting and code coverage.
+  Our modifications ensure that the command
+  executed utilize the cache efficiently, which result in a faster compilation time.
+
+```Earthfile
+    # Example of using `EXECUTE` with a simple copy command
+    DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
+```
+
+* `CARGO` : This FUNCTION serves as a shim of the original lib/rust `CARGO` FUNCTION
+  to guarantee consistent usage of the appropriate upstream Rust library.
+
+```Earthfile
+    # Example of using `CARGO` to install a Rust tool
+    DO rust-ci+CARGO --args="install cargo-nextest --version=0.9.70 --locked"
+```
+
+* `COPY_OUTPUT` : This FUNCTION serves as a shim of the original lib/rust `COPY_OUTPUT`
+  to facilitate the SAVE of ARTIFACT from the target folder (mounted cache) into the image layer.
+  This FUNCTION will always trying to minimize the total size of the copied files,
+  which result in a faster copy.
+
+```Earthfile
+    # Example of using `COPY_OUTPUT` where `SAVE ARTIFACT` is used
+    # The `COPY_OUTPUT` will copy the output to `target` folder 
+    DO rust+COPY_OUTPUT --output="nextest/ci/junit.xml"
+    SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL "$junit"
+```
+
+**Note that in order to called the above FUNCTIONs, `rust+INIT` should be called first.**
 
 ## Conclusion
 
