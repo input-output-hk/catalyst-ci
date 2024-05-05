@@ -64,30 +64,62 @@ rust-base:
     # Install a nightly toolchain which matches.
     RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
 
-    # Call +INIT before copying the source file to avoid installing dependencies every time source code changes. 
-    # This parametrization will be used in future calls to functions of the library
-    DO rust+INIT --keep_fingerprints=true
+    # Preset CARGO_HOME and the application search path.
+    ENV CARGO_HOME="$HOME/.cargo"
+    ENV PATH="$PATH:$CARGO_HOME/bin"
 
-    # Install the default cargo config, and ensure its in the cached CARGO_HOME as well.
-    COPY stdcfgs/cargo_config.toml $CARGO_INSTALL_ROOT/config.toml
-    DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
 
 # Add all tools we use for rust builds to the base builder image.
 rust-base-plus-tools:
     FROM +rust-base
 
-    COPY --keep-ts rust-tools+tool-cargo-nextest/cargo-nextest $CARGO_INSTALL_ROOT/bin/cargo-nextest
-    COPY --keep-ts rust-tools+tool-cargo-machete/cargo-machete $CARGO_INSTALL_ROOT/bin/cargo-machete
-    COPY --keep-ts rust-tools+tool-refinery/refinery $CARGO_INSTALL_ROOT/bin/refinery
-    COPY --keep-ts rust-tools+tool-cargo-deny/cargo-deny $CARGO_INSTALL_ROOT/bin/cargo-deny
-    COPY --keep-ts rust-tools+tool-cargo-modules/cargo-modules $CARGO_INSTALL_ROOT/bin/cargo-modules
-    COPY --keep-ts rust-tools+tool-cargo-depgraph/cargo-depgraph $CARGO_INSTALL_ROOT/bin/cargo-depgraph
-    COPY --keep-ts rust-tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_INSTALL_ROOT/bin/cargo-llvm-cov
-    COPY --keep-ts rust-tools+tool-wasm-tools/wasm-tools $CARGO_INSTALL_ROOT/bin/wasm-tools
-    COPY --keep-ts rust-tools+tool-cargo-expand/cargo-expand $CARGO_INSTALL_ROOT/bin/cargo-expand
-    COPY --keep-ts rust-tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_INSTALL_ROOT/bin/wit-bindgen
-    COPY --keep-ts rust-tools+tool-wasmtime/verify-component-adapter $CARGO_INSTALL_ROOT/bin/verify-component-adapter
-    
+    COPY rust-tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
+    COPY rust-tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
+    COPY rust-tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
+    COPY rust-tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
+    COPY rust-tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
+    COPY rust-tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
+    COPY rust-tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
+    COPY rust-tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
+    COPY rust-tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
+    COPY rust-tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
+    COPY rust-tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
+    COPY rust-tools+tool-cargo-sweep/cargo-sweep $CARGO_HOME/bin/cargo-sweep
+
+# installer - fully setup our RUST caching.
+installer:
+    FROM +rust-base-plus-tools
+
+    # Call +INIT before copying the source file to avoid installing dependencies every time source code changes. 
+    # This parametrization will be used in future calls to functions of the library
+    # Init using the common cat-ci cache prefix.
+    DO rust+INIT --keep_fingerprints=true
+
+    DO rust+SET_CACHE_MOUNTS_ENV
+
+    # Install the default cargo config, and ensure its in the cached CARGO_HOME as well.
+    COPY stdcfgs/cargo_config.toml $CARGO_INSTALL_ROOT/config.toml
+    DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
+
+    # Universal build scripts we will always need and are not target dependent.
+    COPY --dir scripts /scripts
+    # Copy our common scripts so we can use them inside the container.
+    DO scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_PYTHON_SCRIPTS
+
+    # Standardized Rust configs.
+    # Build will refuse to proceed if the projects rust configs do not match these.
+    # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
+    COPY --dir stdcfgs /stdcfgs
+
+# Builds all the rust-base targets for each supported DOCKER architecture.
+# Currently only used for multi-platform cross build testing.
+# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
+# docker enabled on Mac.
+# Again, this is just a test target, and not for general use.
+rust-base-all-hosts:
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +installer
+
 # EXECUTE runs the cargo command "$args".
 # This function is thread safe. Parallel builds of targets calling this function should be free of race conditions.
 # Notice that in order to run this function, +INIT must be called first.
@@ -130,6 +162,7 @@ EXECUTE:
     # We then check the existence of the "fail" file after any artifacts are saved that
     # should be saved regardless.
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        env | grep EARTHLY; \
         set -e; \
         rm -f fail; \
         $cmd || echo fail > fail; \
@@ -207,29 +240,6 @@ COPY_OUTPUT:
     ARG TMP_FOLDER="/tmp/earthly/lib/rust"
 
     DO rust+COPY_OUTPUT --output=$output --TMP_FOLDER=$TMP_FOLDER
-
-# installer - Install necessary tools for the rust-base.
-installer:
-    FROM +rust-base-plus-tools
-
-    # Universal build scripts we will always need and are not target dependent.
-    COPY --dir scripts /scripts
-    # Copy our common scripts so we can use them inside the container.
-    DO scripts+ADD_BASH_SCRIPTS
-    DO scripts+ADD_PYTHON_SCRIPTS
-
-    # Standardized Rust configs.
-    # Build will refuse to proceed if the projects rust configs do not match these.
-    # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
-    COPY --dir stdcfgs /stdcfgs
-
-# Builds all the rust-base targets for each supported DOCKER architecture.
-# Currently only used for multi-platform cross build testing.
-# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
-# docker enabled on Mac.
-# Again, this is just a test target, and not for general use.
-rust-base-all-hosts:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +installer
 
 # Common Rust setup.
 # Parameters:
