@@ -9,7 +9,7 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
-<!-- cspell: words toolsets stdcfgs depgraph -->
+<!-- cspell: words toolsets stdcfgs depgraph Rustup -->
 
 ## Introduction
 
@@ -69,7 +69,7 @@ install all needed tools and dependencies.
 1. First step of `builder` target is to prepare a Rust environment via `+installer` target,
 which is called in `SETUP` FUNCTION.
 The `installer` target installs necessary tools for `+rust-base` target and copies
-common scripts and standardizecd Rust configs.
+common scripts and standardized Rust configs.
 The `rust-base` provides a base Rustup build environment.
   It installs necessary
 packages, including development libraries and tools.
@@ -272,7 +272,7 @@ that our project needed.
 ```
 
 * `CARGO` : This FUNCTION serves as a shim of the original lib/rust `CARGO` FUNCTION
-  to guarantee consistent usage of the appropriate upsteam Rust library.
+  to guarantee consistent usage of the appropriate upstream Rust library.
 
 ```Earthfile
     # Example of using `CARGO` to install a Rust tool
@@ -281,7 +281,7 @@ that our project needed.
 
 * `COPY_OUTPUT` : This FUNCTION serves as a shim of the original lib/rust `COPY_OUTPUT`
   to facilitate the SAVE of ARTIFACT from the target folder (mounted cache) into the image layer.
-  This FUNCTION will always trying to minimize the total size of the copued fileset,
+  This FUNCTION will always trying to minimize the total size of the copied files,
   which result in a faster copy.
 
 ```Earthfile
