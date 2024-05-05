@@ -65,12 +65,14 @@ The first target `builder` is responsible for preparing configured Rust environm
 install all needed tools and dependencies.
 
 #### Builder steps
+
 1. First step of `builder` target is to prepare a Rust environment via `+installer` target,
 which is called in `SETUP` FUNCTION.
 The `installer` target installs necessary tools for `+rust-base` target and copies
 common scripts and standardizecd Rust configs.
-The `rust-base` provides a base Rustup build environment. It installs necessary
-packages, including development libraries and tools. 
+The `rust-base` provides a base Rustup build environment.
+  It installs necessary
+packages, including development libraries and tools.
 Clippy linter, LLVM tools for generating code coverage, and nightly toolchain are installed.
 2. Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
@@ -252,28 +254,36 @@ Unfortunately, Rust tooling does not have the capability to preserve and maintai
 In our builds, we only preserve the `stable` toolchain version (`rust-toolchain.toml` file).
 
 ## Rust FUNCTIONs
+
 While leveraging the [Earthly lib/rust](https://github.com/earthly/lib/tree/main/rust),
 the following Rust FUNCTIONs are customize to align with our specific requirements
 that our project needed.
-- `EXECUTE` : This function, adapted from the [Earthly lib/rust](https://github.com/earthly/lib/tree/main/rust),
-  is tailored to execute commands according to user specifications. 
-  It serves a pivotal role in managing Rust project builds, handling outputs, and supporting features 
-  such as `JUnit` reporting and code coverage. Our modifications ensure that the command
+
+* `EXECUTE` : This FUNCTION, adapted from the [Earthly lib/rust](https://github.com/earthly/lib/tree/main/rust),
+  is tailored to execute commands according to user specifications.
+  It serves a pivotal role in managing Rust project builds, handling outputs, and supporting features
+  such as `JUnit` reporting and code coverage.
+  Our modifications ensure that the command
   executed utilize the cache efficiently, which result in a faster compilation time.
+
 ```Earthfile
     # Example of using `EXECUTE` with a simple copy command
     DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
 ```
-- `CARGO` : This FUNCTION serves as a shim of the original lib/rust `CARGO` FUNCTION
-  to guarantee consistent usage of the appropriate upsteam Rust library. 
+
+* `CARGO` : This FUNCTION serves as a shim of the original lib/rust `CARGO` FUNCTION
+  to guarantee consistent usage of the appropriate upsteam Rust library.
+
 ```Earthfile
     # Example of using `CARGO` to install a Rust tool
     DO rust-ci+CARGO --args="install cargo-nextest --version=0.9.70 --locked"
 ```
-- `COPY_OUTPUT` : This FUNCTION serves as a shim of the original lib/rust `COPY_OUTPUT`
+
+* `COPY_OUTPUT` : This FUNCTION serves as a shim of the original lib/rust `COPY_OUTPUT`
   to facilitate the SAVE of ARTIFACT from the target folder (mounted cache) into the image layer.
   This FUNCTION will always trying to minimize the total size of the copued fileset,
   which result in a faster copy.
+
 ```Earthfile
     # Example of using `COPY_OUTPUT` where `SAVE ARTIFACT` is used
     # The `COPY_OUTPUT` will copy the output to `target` folder 

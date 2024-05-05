@@ -172,11 +172,15 @@ The use of FUNCTIONs in Earthly contributes to a more modular and organized buil
 enhancing code readability and maintainability.
 
 ### Use `IMPORT` when calling on `Target` or `FUNCTION` from other Earthfile
+
 Instead of referencing other `Target` or `FUNCTION` using path, importing the entire Earthfile
-with the `IMPORT` command is preferable. This is helpful when several targets in other accessible
-Earthfile need to be used. Also, this enhance the readability of the code.
+with the `IMPORT` command is preferable.
+This is helpful when several targets in other accessible
+Earthfile need to be used.
+Also, this enhance the readability of the code.
 
 For example, instead of
+
 ```Earthfile
 VERSION 0.8
 
@@ -187,6 +191,7 @@ package:
 ```
 
 use this `IMPORT` command
+
 ```Earthfile
 VERSION 0.8
 
