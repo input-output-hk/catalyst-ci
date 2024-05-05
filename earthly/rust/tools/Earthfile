@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT .. AS rust-ci
 
-# Note, TOOLS do not benefit from the CARGO caching, and polute it, so build without it.
+# Note, TOOLS do not benefit from the CARGO caching, and pollute it, so build without it.
 
 tool-cargo-nextest:
     FROM rust-ci+rust-base
