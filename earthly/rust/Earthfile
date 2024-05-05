@@ -68,7 +68,6 @@ rust-base:
     ENV CARGO_HOME="$HOME/.cargo"
     ENV PATH="$PATH:$CARGO_HOME/bin"
 
-
 # Add all tools we use for rust builds to the base builder image.
 rust-base-plus-tools:
     FROM +rust-base
@@ -85,6 +84,7 @@ rust-base-plus-tools:
     COPY rust-tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
     COPY rust-tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
     COPY rust-tools+tool-cargo-sweep/cargo-sweep $CARGO_HOME/bin/cargo-sweep
+
 
 # installer - fully setup our RUST caching.
 installer:
