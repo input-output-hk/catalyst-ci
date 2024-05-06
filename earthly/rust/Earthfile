@@ -31,12 +31,15 @@ rust-base:
     # The ACTUAL version of rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` FUNCTION is run.
     # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
-    FROM rust:1.77.2-alpine3.19
+    FROM rust:1.78-alpine3.19
 
     WORKDIR /root
 
     # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
+    #
+    # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
+    #       if that crate is removed, these dependencies can also be removed.
     RUN apk add --no-cache \
             musl-dev \
             mold \
@@ -52,7 +55,8 @@ rust-base:
             ttf-liberation \
             findutils \
             pkgconfig \
-            openssl-dev
+            openssl-dev \
+            openssl-libs-static
 
     # Fix up font cache
     RUN fc-cache -f
@@ -68,10 +72,10 @@ rust-base:
 
     # Ensure we have all the necessary targets
     RUN rustup target add wasm32-unknown-unknown
-    RUN rustup target add wasm32-wasi
+    RUN rustup target add wasm32-wasip1 # wasm32-wasip2 not yet available
 
     RUN rustup target add wasm32-unknown-unknown --toolchain nightly
-    RUN rustup target add wasm32-wasi --toolchain nightly
+    RUN rustup target add wasm32-wasip1 --toolchain nightly # wasm32-wasip2 not yet available
 
     # Preset CARGO_HOME and the application search path.
     ENV CARGO_HOME="$HOME/.cargo"
@@ -98,7 +102,6 @@ rust-base-plus-tools:
     DO +COPY_TOOL --tool="wasm-tools"
     DO +COPY_TOOL --tool="cargo-expand"
     DO +COPY_TOOL --tool="wit-bindgen"
-    DO +COPY_TOOL --tool="verify-component-adapter"
     DO +COPY_TOOL --tool="cargo-sweep"
     DO +COPY_TOOL --tool="cargo-component"
 
