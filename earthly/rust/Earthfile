@@ -1,8 +1,8 @@
 VERSION 0.8
 
-# In order to ensure all consumers of CAT-CI use the correct upstream
-# Rust library from Earthly, this is the only place that Earthfile can be imported.
-# Functions or targets in that Earthfile MUST be shimmed here.
+# To ensure all consumers of `catalyst-ci` use the correct upstream,
+# the Rust library from Earthly can only be imported in this Earthfile.
+# FUNCTIONs or targets in that Earthfile MUST be shimmed here.
 # No other earthfile should reference the rust library in the earthly/lib repo.
 IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 
@@ -28,9 +28,9 @@ rust-base:
     ARG USERVARIANT
 
     # This is our base Host toolset, and rustup.
-    # The ACTUAL version of rust that will be used, and available targets
+    # The ACTUAL version of Rust that will be used, and available targets
     # is controlled by a `rust-toolchain.toml` file when the `SETUP` FUNCTION is run.
-    # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
+    # HOWEVER, It is enforced that the Rust version in `rust-toolchain.toml` MUST match this version.
     FROM rust:1.77.2-alpine3.19
 
     WORKDIR /root
@@ -52,7 +52,7 @@ rust-base:
             ttf-liberation \
             findutils
 
-    # Fix up font cache
+    # Fix up font cache.
     RUN fc-cache -f
 
     # Make sure we have the clippy linter.
@@ -68,7 +68,7 @@ rust-base:
     ENV CARGO_HOME="$HOME/.cargo"
     ENV PATH="$PATH:$CARGO_HOME/bin"
 
-# Add all tools we use for rust builds to the base builder image.
+# Add all tools we use for Rust builds to the base builder image.
 rust-base-plus-tools:
     FROM +rust-base
 
@@ -86,13 +86,13 @@ rust-base-plus-tools:
     COPY rust-tools+tool-cargo-sweep/cargo-sweep $CARGO_HOME/bin/cargo-sweep
 
 
-# installer - fully setup our RUST caching.
+# installer - fully setup our Rust caching.
 installer:
     FROM +rust-base-plus-tools
 
-    # Call +INIT before copying the source file to avoid installing dependencies every time source code changes. 
+    # Call `+INIT` before copying the source file to avoid installing dependencies every time source code changes. 
     # This parametrization will be used in future calls to functions of the library
-    # Init using the common cat-ci cache prefix.
+    # Init using the common `cat-ci` cache prefix.
     DO rust+INIT --keep_fingerprints=true
 
     DO rust+SET_CACHE_MOUNTS_ENV
@@ -101,14 +101,15 @@ installer:
     COPY stdcfgs/cargo_config.toml $CARGO_INSTALL_ROOT/config.toml
     DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
 
-    # Universal build scripts we will always need and are not target dependent.
+    # Universal build scripts.
+    # We will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
 
     # Standardized Rust configs.
-    # Build will refuse to proceed if the projects rust configs do not match these.
+    # Build will refuse to proceed if the projects Rust configs do not match these.
     # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
     COPY --dir stdcfgs /stdcfgs
 
@@ -120,7 +121,7 @@ installer:
 rust-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +installer
 
-# EXECUTE runs the cargo command "$args".
+# EXECUTE runs the given command "$cmd".
 # This function is thread safe. Parallel builds of targets calling this function should be free of race conditions.
 # Notice that in order to run this function, +INIT must be called first.
 # Arguments:
@@ -150,7 +151,7 @@ EXECUTE:
        DO rust+REMOVE_SOURCE_FINGERPRINTS
     END
 
-    # target/debug should not be present, so purge it just in case
+    # target/debug should not be present, so purge it just in case.
     IF [ "$ALLOW_DEBUG_TARGET" != "true" ]
         RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
             set -e; \
@@ -226,8 +227,8 @@ CARGO:
 # This is a shim which MUST be used by projects consuming catalyst-ci rather than using the 
 # upstream earthly rust library directly.
 #
-# Use this function when you want to SAVE an ARTIFACT from the target folder (mounted cache), always trying to minimize the total size of the copied fileset.
-# Notice that in order to run this function, +SET_CACHE_MOUNTS_ENV or +CARGO must be called first.
+# Use this FUNCTION when you want to SAVE an ARTIFACT from the target folder (mounted cache), always trying to minimize the total size of the copied fileset.
+# Notice that in order to run this FUNCTION, +SET_CACHE_MOUNTS_ENV or +CARGO must be called first.
 # Arguments:
 #   - output: Regex matching output artifacts files to be copied to ./target folder in the caller filesystem (image layers).
 # Example:

@@ -59,6 +59,7 @@ builder:
 
     COPY --dir .cargo .config crates .
     COPY Cargo.toml .
+    COPY clippy.toml deny.toml rustfmt.toml .
 ```
 
 The first target `builder` is responsible for preparing configured Rust environments and,
@@ -66,13 +67,12 @@ install all needed tools and dependencies.
 
 #### Builder steps
 
-1. First step of `builder` target is to prepare a Rust environment via `+installer` target,
-which is called in `SETUP` FUNCTION.
-The `installer` target installs necessary tools for `+rust-base` target and copies
+1. First step of `+builder` target is to prepare a Rust environment via `+installer` target,
+which is called in `+SETUP` FUNCTION.
+The `+installer` target installs necessary tools for `+rust-base` target and copies
 common scripts and standardized Rust configs.
-The `rust-base` provides a base Rustup build environment.
-  It installs necessary
-packages, including development libraries and tools.
+The `+rust-base` provides a base Rustup build environment.
+It installs necessary packages, including development libraries and tools.
 Clippy linter, LLVM tools for generating code coverage, and nightly toolchain are installed.
 2. Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
@@ -84,6 +84,11 @@ This `rust-toolchain.toml` file could be specified
 via the `toolchain` argument of the `+SETUP` target like this
 with defining the specific location of this file with the specific name.
 By default `toolchain` setup to `rust-toolchain.toml`.
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
+    Please ensure that Rust version set in `rust-toolchain.toml` matches the Docker image tag uses in `+rust-base` target.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 ### Running checks
 
@@ -102,7 +107,7 @@ all-hosts-check:
 ```
 
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
-The `check` target performs all checks and validation procedures
+The `+check` target performs all checks and validation procedures
 using the help of `std_checks.py` script.
 This script performs static checks of the Rust project as
 `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
@@ -121,7 +126,7 @@ to be the same as defined in `earthly/rust/stdcfgs` directory of the `catalyst-c
 So when you are going to setup a new Rust project, copy these configuration files
 described above to the appropriate location of your Rust project.
 
-Another target as `all-hosts-check` just invokes `check` with the specified `--platform`.
+Another target as `+all-hosts-check` just invokes `+check` with the specified `--platform`.
 It is needed for the local development to double check that everything works for different platforms.
 It is important to define a `linux` target platform with a proper CPU architecture
 for the Rust project when you are building it inside Docker
@@ -152,8 +157,8 @@ all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 ```
 
-After successful performing checks of the Rust project we can finally `build` artifacts.
-Obviously it inherits `builder` target environment and then performs build of the binary.
+After successful performing checks of the Rust project we can finally build artifacts.
+Obviously it inherits `+builder` target environment and then performs build of the binary.
 Important to note that in this particular example we are dealing with the executable Rust project,
 so it produces binary as a final artifact.
 We will discuss another scenario of building a Rust library later.
@@ -161,7 +166,7 @@ Actual build process is done with the `std_build.py` script.
 Here is the full list of configuration of this script:
 
 ```bash
- usage: std_build.py [-h] [--build_flags BUILD_FLAGS]
+ usage: std_build.py [-h] [-v] [--build_flags BUILD_FLAGS]
                      [--doctest_flags DOCTEST_FLAGS] [--test_flags TEST_FLAGS]
                      [--bench_flags BENCH_FLAGS] [--with_test]
                      [--cov_report COV_REPORT] [--with_bench] [--libs LIBS]
@@ -170,7 +175,8 @@ Here is the full list of configuration of this script:
  Rust build processing.
 
  options:
-   -h, --help            show this help message and exit
+   -h, --help            Show this help message and exit.
+   -v --verbose          Show the output of executed commands verbosely.
    --build_flags BUILD_FLAGS
                          Additional command-line flags that can be passed to
                          the `cargo build` command.
@@ -231,6 +237,7 @@ for the specified `--libs="crate1"` argument.
 10. Running smoke tests on provided binary names (`--bins` argument).
 
 Final step is to provide desired artifacts: docs and binary.
+Note that all commands within the `std_build.py` are written to be run in parallel, resulting in a faster speeds.
 
 ### Test
 
@@ -253,6 +260,10 @@ Unfortunately, Rust tooling does not have the capability to preserve and maintai
 `stable` and `nightly` toolchains simultaneously.
 In our builds, we only preserve the `stable` toolchain version (`rust-toolchain.toml` file).
 
+## Rust tools
+
+All the necessary Rust tools can be found in [tool](../../../../earthly/rust/tools/Earthfile).
+
 ## Rust FUNCTIONs
 
 While leveraging the [Earthly lib/rust](https://github.com/earthly/lib/tree/main/rust),
@@ -273,6 +284,8 @@ that our project needed.
 
 * `CARGO` : This FUNCTION serves as a shim of the original lib/rust `CARGO` FUNCTION
   to guarantee consistent usage of the appropriate upstream Rust library.
+  Therefore, users of `catalyst-ci` who wish to use `rust+CARGO` from `lib/rust`
+  should utilize the `+CARGO` implementation provided in this repository.
 
 ```Earthfile
     # Example of using `CARGO` to install a Rust tool
