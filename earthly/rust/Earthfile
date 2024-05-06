@@ -64,6 +64,13 @@ rust-base:
     # Install a nightly toolchain which matches.
     RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
 
+    # Ensure we have all the necessary targets
+    RUN rustup target add wasm32-unknown-unknown
+    RUN rustup target add wasm32-wasi
+
+    RUN rustup target add wasm32-unknown-unknown --toolchain nightly
+    RUN rustup target add wasm32-wasi --toolchain nightly
+
     # Preset CARGO_HOME and the application search path.
     ENV CARGO_HOME="$HOME/.cargo"
     ENV PATH="$PATH:$CARGO_HOME/bin"
