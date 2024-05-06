@@ -61,6 +61,9 @@ rust-base:
     # Fix up font cache
     RUN fc-cache -f
 
+    # Make sure we have cargo.
+    RUN rustup component add cargo
+
     # Make sure we have the clippy linter.
     RUN rustup component add clippy
 
@@ -68,7 +71,7 @@ rust-base:
     RUN rustup component add llvm-tools-preview
 
     # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
 
     # Ensure we have all the necessary targets
     RUN rustup target add wasm32-unknown-unknown
