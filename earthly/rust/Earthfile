@@ -50,7 +50,9 @@ rust-base:
             graphviz \
             fontconfig \
             ttf-liberation \
-            findutils
+            findutils \
+            pkgconfig \
+            openssl-dev
 
     # Fix up font cache
     RUN fc-cache -f
@@ -75,22 +77,30 @@ rust-base:
     ENV CARGO_HOME="$HOME/.cargo"
     ENV PATH="$PATH:$CARGO_HOME/bin"
 
+# COPY_TOOL - DRY the tool installation.
+COPY_TOOL:
+    FUNCTION
+
+    ARG --required tool
+    COPY rust-tools+tool-$tool/$tool $CARGO_HOME/bin/$tool
+
 # Add all tools we use for rust builds to the base builder image.
 rust-base-plus-tools:
     FROM +rust-base
 
-    COPY rust-tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
-    COPY rust-tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
-    COPY rust-tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
-    COPY rust-tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
-    COPY rust-tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
-    COPY rust-tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
-    COPY rust-tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
-    COPY rust-tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
-    COPY rust-tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
-    COPY rust-tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
-    COPY rust-tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
-    COPY rust-tools+tool-cargo-sweep/cargo-sweep $CARGO_HOME/bin/cargo-sweep
+    DO +COPY_TOOL --tool="cargo-nextest"
+    DO +COPY_TOOL --tool="cargo-machete"
+    DO +COPY_TOOL --tool="refinery"
+    DO +COPY_TOOL --tool="cargo-deny"
+    DO +COPY_TOOL --tool="cargo-modules"
+    DO +COPY_TOOL --tool="cargo-depgraph"
+    DO +COPY_TOOL --tool="cargo-llvm-cov"
+    DO +COPY_TOOL --tool="wasm-tools"
+    DO +COPY_TOOL --tool="cargo-expand"
+    DO +COPY_TOOL --tool="wit-bindgen"
+    DO +COPY_TOOL --tool="verify-component-adapter"
+    DO +COPY_TOOL --tool="cargo-sweep"
+    DO +COPY_TOOL --tool="cargo-component"
 
 
 # installer - fully setup our RUST caching.
