@@ -10,7 +10,7 @@ IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 IMPORT ./tools AS rust-tools
 IMPORT ../../utilities/scripts AS scripts
 
-# cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg
+# cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset
 

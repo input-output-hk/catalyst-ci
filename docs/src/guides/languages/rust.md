@@ -9,8 +9,6 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
-<!-- cspell: words toolsets stdcfgs depgraph Rustup -->
-
 ## Introduction
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
