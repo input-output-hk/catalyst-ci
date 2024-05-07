@@ -253,23 +253,15 @@ def main():
     # Fix arguments because of munging that can happen because of the rust builder +EXECUTE function
     processed_args=[]
     for arg in sys.argv[1:]:
-        print("???"+arg+"???")
-        print(arg.endswith('"'))
-        print(len(processed_args)>0)
-        if len(processed_args)>0:
-            print(processed_args[-1])
-            print('"' in processed_args[-1])
         if arg.endswith('"') and len(processed_args) > 0 and '"' in processed_args[-1]:
             processed_args[-1] += " " + arg
+            processed_args[-1].replace('"', '')
         else:
             processed_args.append(arg)
             
     print("Processed args:"+str(processed_args))
     # Replace sys.argv with the processed arguments
     sys.argv = [sys.argv[0]] + processed_args
-
-    for arg in sys.argv[1:]:
-        print("..."+arg+"...")
 
     parser = argparse.ArgumentParser(description="Rust build processing.")
     parser.add_argument(
