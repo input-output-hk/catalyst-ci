@@ -280,10 +280,10 @@ SETUP:
 
     RUN rustup show
 
-    ARG toolchain=./rust-toolchain.toml 
+    #ARG toolchain=./rust-toolchain.toml 
 
     # Copy our toolchain dependency.
-    COPY $toolchain ./rust-toolchain.toml
+    #COPY $toolchain ./rust-toolchain.toml
 
     RUN rustup show
 
