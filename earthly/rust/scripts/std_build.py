@@ -257,6 +257,7 @@ def main():
         print(arg.endswith('"'))
         print(len(processed_args)>0)
         if len(processed_args)>0:
+            print(processed_args[:-1])
             print('"' in processed_args[:-1])
         if arg.endswith('"') and len(processed_args) > 0 and '"' in processed_args[:-1]:
             processed_args[:-1] += " " + arg
