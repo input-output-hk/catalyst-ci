@@ -14,9 +14,7 @@ IMPORT ../../utilities/scripts AS scripts
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset
 
-# Base Rustup build container.
-# Parameters:
-#  * toolchain : The `rust-toolchain` toml file.
+# rust-base : Base Rustup build container.
 rust-base:
     ARG TARGETPLATFORM
     ARG TARGETOS
@@ -28,9 +26,8 @@ rust-base:
     ARG USERVARIANT
 
     # This is our base Host toolset, and rustup.
-    # The ACTUAL version of rust that will be used, and available targets
-    # is controlled by a `rust-toolchain.toml` file when the `SETUP` FUNCTION is run.
-    # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
+    # Never use `rust-toolchain.toml` in CI as it breaks builds.
+    # The only toolchain supported is the one installed here.
     FROM rust:1.78-alpine3.19
 
     WORKDIR /root
@@ -112,18 +109,13 @@ rust-base-plus-tools:
 installer:
     FROM +rust-base-plus-tools
 
-    RUN rustup show
-
     # Call +INIT before copying the source file to avoid installing dependencies every time source code changes. 
     # This parametrization will be used in future calls to functions of the library
     # Init using the common cat-ci cache prefix.
     DO rust+INIT --keep_fingerprints=true
 
-    RUN rustup show
-
+    # Set the mount cache env vars
     DO rust+SET_CACHE_MOUNTS_ENV
-
-    RUN rustup show
 
     # Install the default cargo config, and ensure its in the cached CARGO_HOME as well.
     COPY stdcfgs/cargo_config.toml $CARGO_INSTALL_ROOT/config.toml
@@ -139,8 +131,6 @@ installer:
     # Build will refuse to proceed if the projects rust configs do not match these.
     # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
     COPY --dir stdcfgs /stdcfgs
-
-    RUN rustup show
 
 # Builds all the rust-base targets for each supported DOCKER architecture.
 # Currently only used for multi-platform cross build testing.
@@ -278,14 +268,6 @@ SETUP:
     FUNCTION
     FROM +installer
 
-    RUN rustup show
-
-    #ARG toolchain=./rust-toolchain.toml 
-
-    # Copy our toolchain dependency.
-    #COPY $toolchain ./rust-toolchain.toml
-
-    RUN rustup show
-
-    # Toolchain MUST be the same as vendored, and if it is the toolchain is
-    # already installed.
+    # The ONLY toolchain we support is the one in the installer.
+    # DO NOT copy the `rust-toolchain.toml` file into CI as it breaks
+    # the toolchain on some targets and leads to build failure.

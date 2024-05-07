@@ -77,13 +77,7 @@ Clippy linter, LLVM tools for generating code coverage, and nightly toolchain ar
 2. Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
 any other irrelevant stuff should omitted.
-3. And finally finalize the build with `+SETUP` FUNCTION.
-The `+SETUP` FUNCTION requires `rust-toolchain.toml` file,
-with the specified `channel` option in it.
-This `rust-toolchain.toml` file could be specified
-via the `toolchain` argument of the `+SETUP` target like this
-with defining the specific location of this file with the specific name.
-By default `toolchain` setup to `rust-toolchain.toml`.
+3. And finally finalize the build with `+SETUP` FUNCTION which takes no arguments.
 
 ### Running checks
 
