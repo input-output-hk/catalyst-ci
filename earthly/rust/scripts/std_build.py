@@ -255,7 +255,7 @@ def main():
     for arg in sys.argv[1:]:
         if arg.endswith('"') and len(processed_args) > 0 and '"' in processed_args[-1]:
             processed_args[-1] += " " + arg
-            processed_args[-1].replace('"', '')
+            processed_args[-1] = processed_args[-1].replace('"', '')
         else:
             processed_args.append(arg)
             
