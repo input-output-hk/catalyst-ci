@@ -15,6 +15,7 @@ IMPORT ../../utilities/scripts AS scripts
 # cspell: words findutils fileset
 
 # rust-base : Base Rustup build container.
+#   Not called directly, used by other targets.
 rust-base:
     ARG TARGETPLATFORM
     ARG TARGETOS
@@ -87,7 +88,8 @@ COPY_TOOL:
     ARG --required tool
     COPY rust-tools+tool-$tool/$tool $CARGO_HOME/bin/$tool
 
-# Add all tools we use for rust builds to the base builder image.
+# rust-base-plus-tools : Add all tools we use for rust builds to the base builder image.
+#   Not called directly, used by other targets.
 rust-base-plus-tools:
     FROM +rust-base
 
@@ -105,7 +107,7 @@ rust-base-plus-tools:
     DO +COPY_TOOL --tool="cargo-component"
 
 
-# installer - fully setup our RUST caching.
+# installer : fully setup our RUST caching.
 installer:
     FROM +rust-base-plus-tools
 
@@ -132,15 +134,15 @@ installer:
     # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
     COPY --dir stdcfgs /stdcfgs
 
-# Builds all the rust-base targets for each supported DOCKER architecture.
-# Currently only used for multi-platform cross build testing.
-# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
-# docker enabled on Mac.
-# Again, this is just a test target, and not for general use.
+# rust-base-all-hosts : Builds all the rust-base targets for each supported DOCKER architecture.
+#   Currently only used for multi-platform cross build testing.
+#   This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
+#   docker enabled on Mac.
+#   Again, this is just a test target, and not for general use.
 rust-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +installer
 
-# EXECUTE runs the cargo command "$args".
+# EXECUTE : runs the cargo command "$args".
 # This function is thread safe. Parallel builds of targets calling this function should be free of race conditions.
 # Notice that in order to run this function, +INIT must be called first.
 # Arguments:
@@ -222,7 +224,7 @@ EXECUTE:
         DO rust+COPY_OUTPUT --output=$output
     END
 
-# Shim so we use the correct upstream RUST library consistently
+# CARGO : Shim so we use the correct upstream RUST library consistently
 # without having to import it into consuming Earthfiles.
 # By default this will NOT expose docs built during the execution of cargo
 CARGO:
@@ -241,7 +243,7 @@ CARGO:
         --ALLOW_DEBUG_TARGET="$ALLOW_DEBUG_TARGET" \
         --docs="$docs"
 
-# COPY_OUTPUT copies files out of the target cache into the image layers.
+# COPY_OUTPUT : copies files out of the target cache into the image layers.
 #
 # This is a shim which MUST be used by projects consuming catalyst-ci rather than using the 
 # upstream earthly rust library directly.
@@ -261,9 +263,7 @@ COPY_OUTPUT:
 
     DO rust+COPY_OUTPUT --output=$output --TMP_FOLDER=$TMP_FOLDER
 
-# Common Rust setup.
-# Parameters:
-#  * toolchain : The `rust-toolchain` toml file.
+# SETUP : Common Rust setup.
 SETUP:
     FUNCTION
     FROM +installer
