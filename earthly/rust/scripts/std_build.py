@@ -244,10 +244,14 @@ def strip(results: exec_manager.Results, bin: str):
         )
     )
 
+import sys
 
 def main():
     # Force color output in CI
     rich.reconfigure(color_system="256")
+
+    for arg in sys.argv[1:]:
+        print(arg)
 
     parser = argparse.ArgumentParser(description="Rust build processing.")
     parser.add_argument(
