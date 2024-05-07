@@ -80,9 +80,8 @@ rust-base:
     RUN rustup target add wasm32-unknown-unknown --toolchain nightly
     RUN rustup target add wasm32-wasip1 --toolchain nightly # wasm32-wasip2 not yet available
 
-    # Preset CARGO_HOME and the application search path.
-    ENV CARGO_HOME="$HOME/.cargo"
-    ENV PATH="$PATH:$CARGO_HOME/bin"
+    # CARGO_HOME, PATH and RUSTUP_HOME is already set by the base container.
+    # Do not change them.
 
 # COPY_TOOL - DRY the tool installation.
 COPY_TOOL:
