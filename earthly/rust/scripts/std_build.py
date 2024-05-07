@@ -258,8 +258,7 @@ def main():
             processed_args[-1] = processed_args[-1].replace('"', '')
         else:
             processed_args.append(arg)
-            
-    print("Processed args:"+str(processed_args))
+
     # Replace sys.argv with the processed arguments
     sys.argv = [sys.argv[0]] + processed_args
 
