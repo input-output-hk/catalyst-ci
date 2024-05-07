@@ -312,8 +312,8 @@ def main():
     )
     args = parser.parse_args()
 
-    libs = filter(lambda lib: lib != "", args.libs.split(", "))
-    bins = list(filter(lambda bin: bin != "", args.bins.split(", ")))
+    libs = filter(lambda lib:  lib.strip() and len(lib.strip()) > 0, args.libs.split(","))
+    bins = list(filter(lambda bin: bin.strip() and len(bin.strip()) > 0, args.bins.split(",")))
 
     with exec_manager.ParallelRunner("Rust build") as runner:
         # Build the code.
