@@ -251,7 +251,7 @@ def main():
     rich.reconfigure(color_system="256")
 
     for arg in sys.argv[1:]:
-        print(arg)
+        print("'''"+arg+"'''")
 
     parser = argparse.ArgumentParser(description="Rust build processing.")
     parser.add_argument(
