@@ -250,8 +250,19 @@ def main():
     # Force color output in CI
     rich.reconfigure(color_system="256")
 
+    # Fix arguments because of munging that can happen because of the rust builder +EXECUTE function
+    processed_args=[]
     for arg in sys.argv[1:]:
-        print("'''"+arg+"'''")
+        if arg.endswith('"') and len(processed_args) > 0 and '"' in processed_args[:-1]:
+            processed_args[:-1] += " " + arg
+        else:
+            processed_args.append(arg)
+            
+    # Replace sys.argv with the processed arguments
+    sys.argv = [sys.argv[0]] + processed_args
+
+    for arg in sys.argv[1:]:
+        print("..."+arg+"...")
 
     parser = argparse.ArgumentParser(description="Rust build processing.")
     parser.add_argument(
