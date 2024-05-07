@@ -253,6 +253,7 @@ def main():
     # Fix arguments because of munging that can happen because of the rust builder +EXECUTE function
     processed_args=[]
     for arg in sys.argv[1:]:
+        print("???"+arg+"???")
         if arg.endswith('"') and len(processed_args) > 0 and '"' in processed_args[:-1]:
             processed_args[:-1] += " " + arg
         else:
