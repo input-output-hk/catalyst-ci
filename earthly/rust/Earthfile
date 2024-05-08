@@ -1,8 +1,8 @@
 VERSION 0.8
 
-# In order to ensure all consumers of CAT-CI use the correct upstream
-# Rust library from Earthly, this is the only place that Earthfile can be imported.
-# Functions or targets in that Earthfile MUST be shimmed here.
+# To ensure all consumers of `catalyst-ci` use the correct upstream,
+# the Rust library from Earthly can only be imported in this Earthfile.
+# FUNCTIONs or targets in that Earthfile MUST be shimmed here.
 # No other earthfile should reference the rust library in the earthly/lib repo.
 IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 
@@ -10,7 +10,7 @@ IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
 IMPORT ./tools AS rust-tools
 IMPORT ../../utilities/scripts AS scripts
 
-# cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg
+# cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset
 
@@ -56,7 +56,7 @@ rust-base:
             openssl-dev \
             openssl-libs-static
 
-    # Fix up font cache
+    # Fix up font cache.
     RUN fc-cache -f
 
     # Make sure we have cargo.
@@ -111,7 +111,33 @@ rust-base-plus-tools:
 installer:
     FROM +rust-base-plus-tools
 
-    # Call +INIT before copying the source file to avoid installing dependencies every time source code changes. 
+    # Preset CARGO_HOME and the application search path.
+    ENV CARGO_HOME="$HOME/.cargo"
+    ENV PATH="$PATH:$CARGO_HOME/bin"
+
+# Add all tools we use for Rust builds to the base builder image.
+rust-base-plus-tools:
+    FROM +rust-base
+
+    COPY rust-tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
+    COPY rust-tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
+    COPY rust-tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
+    COPY rust-tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
+    COPY rust-tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
+    COPY rust-tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
+    COPY rust-tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
+    COPY rust-tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
+    COPY rust-tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
+    COPY rust-tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
+    COPY rust-tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
+    COPY rust-tools+tool-cargo-sweep/cargo-sweep $CARGO_HOME/bin/cargo-sweep
+
+
+# installer - fully setup our Rust caching.
+installer:
+    FROM +rust-base-plus-tools
+
+    # Call `+INIT` before copying the source file to avoid installing dependencies every time source code changes. 
     # This parametrization will be used in future calls to functions of the library
     # Init using the common cat-ci cache prefix.
     DO rust+INIT --keep_fingerprints=true
@@ -178,7 +204,7 @@ EXECUTE:
        DO rust+REMOVE_SOURCE_FINGERPRINTS
     END
 
-    # target/debug should not be present, so purge it just in case
+    # target/debug should not be present, so purge it just in case.
     IF [ "$ALLOW_DEBUG_TARGET" != "true" ]
         RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
             set -e; \
@@ -190,7 +216,7 @@ EXECUTE:
     # We then check the existence of the "fail" file after any artifacts are saved that
     # should be saved regardless.
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-        set +e; \
+        set -e; \
         rm -f fail; \
         $cmd $args1 $args2 $args3 $args4 $args5 $args6 || touch fail; \
         cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
@@ -257,8 +283,8 @@ CARGO:
 # This is a shim which MUST be used by projects consuming catalyst-ci rather than using the 
 # upstream earthly rust library directly.
 #
-# Use this function when you want to SAVE an ARTIFACT from the target folder (mounted cache), always trying to minimize the total size of the copied fileset.
-# Notice that in order to run this function, +SET_CACHE_MOUNTS_ENV or +CARGO must be called first.
+# Use this FUNCTION when you want to SAVE an ARTIFACT from the target folder (mounted cache), always trying to minimize the total size of the copied fileset.
+# Notice that in order to run this FUNCTION, +SET_CACHE_MOUNTS_ENV or +CARGO must be called first.
 # Arguments:
 #   - output: Regex matching output artifacts files to be copied to ./target folder in the caller filesystem (image layers).
 # Example:
