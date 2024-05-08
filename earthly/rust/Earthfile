@@ -106,33 +106,6 @@ rust-base-plus-tools:
     DO +COPY_TOOL --tool="cargo-sweep"
     DO +COPY_TOOL --tool="cargo-component"
 
-
-# installer : fully setup our RUST caching.
-installer:
-    FROM +rust-base-plus-tools
-
-    # Preset CARGO_HOME and the application search path.
-    ENV CARGO_HOME="$HOME/.cargo"
-    ENV PATH="$PATH:$CARGO_HOME/bin"
-
-# Add all tools we use for Rust builds to the base builder image.
-rust-base-plus-tools:
-    FROM +rust-base
-
-    COPY rust-tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
-    COPY rust-tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
-    COPY rust-tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
-    COPY rust-tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
-    COPY rust-tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
-    COPY rust-tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
-    COPY rust-tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
-    COPY rust-tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
-    COPY rust-tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
-    COPY rust-tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
-    COPY rust-tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
-    COPY rust-tools+tool-cargo-sweep/cargo-sweep $CARGO_HOME/bin/cargo-sweep
-
-
 # installer - fully setup our Rust caching.
 installer:
     FROM +rust-base-plus-tools
