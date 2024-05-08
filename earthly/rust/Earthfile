@@ -12,7 +12,7 @@ IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
-# cspell: words findutils fileset
+# cspell: words findutils fileset pkgconfig wasip
 
 # rust-base : Base Rustup build container.
 #   Not called directly, used by other targets.
