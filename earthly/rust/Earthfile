@@ -191,11 +191,15 @@ EXECUTE:
     # should be saved regardless.
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         env | grep EARTHLY; \
-        set -e; \
+        set +e; \
         rm -f fail; \
-        $cmd $args1 $args2 $args3 $args4 $args5 $args6 || echo fail > fail; \
+        $cmd $args1 $args2 $args3 $args4 $args5 $args6 ; \
+        if [ $? -ne 0 ]; then \
+            touch fail; \
+        fi \
         cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
-        cargo sweep -r -i;
+        cargo sweep -r -i; \
+        
 
     # We always want to save these (if requested) even if the command fails.
     IF [ "$junit" != "" ]
