@@ -6,7 +6,7 @@ fn test_fibonacci() {
     assert_eq!(fibonacci(20), 6765);
 }
 
-///
+/// fibonacci calculates the nth fibonacci number
 fn fibonacci(n: u64) -> u64 {
     match n {
         0 | 1 => 1,
@@ -14,7 +14,7 @@ fn fibonacci(n: u64) -> u64 {
     }
 }
 
-///
+/// run a criterion benchmark
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("fib 20", |b| b.iter(|| fibonacci(black_box(20))));
 }
