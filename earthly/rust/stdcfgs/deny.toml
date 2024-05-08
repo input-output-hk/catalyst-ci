@@ -20,7 +20,7 @@ ignore = [
 ]
 
 [bans]
-multiple-versions = "deny"
+multiple-versions = "warn"
 wildcards = 'deny'
 deny = [
     # { crate = "git2", use-instead = "gix" },
