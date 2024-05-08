@@ -162,6 +162,12 @@ EXECUTE:
     FUNCTION
     DO rust+CHECK_INITED
     ARG --required cmd
+    ARG args1
+    ARG args2
+    ARG args3
+    ARG args4
+    ARG args5
+    ARG args6
     ARG output
     ARG junit
     ARG coverage
@@ -187,7 +193,7 @@ EXECUTE:
         env | grep EARTHLY; \
         set -e; \
         rm -f fail; \
-        $cmd || echo fail > fail; \
+        $cmd $args1 $args2 $args3 $args4 $args5 $args6 || echo fail > fail; \
         cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
         cargo sweep -r -i;
 
@@ -236,7 +242,8 @@ CARGO:
     ARG docs="false"
 
     DO +EXECUTE \
-        --cmd="cargo $args" \
+        --cmd="cargo" \
+        --args1="$args"
         --output="$output" \
         --junit="$junit" \
         --coverage="$coverage" \
