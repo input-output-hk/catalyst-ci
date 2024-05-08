@@ -243,7 +243,7 @@ CARGO:
 
     DO +EXECUTE \
         --cmd="cargo" \
-        --args1="$args"
+        --args1="$args" \
         --output="$output" \
         --junit="$junit" \
         --coverage="$coverage" \
