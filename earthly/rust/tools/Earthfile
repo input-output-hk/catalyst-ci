@@ -49,18 +49,18 @@ tool-cargo-expand:
     RUN cargo install cargo-expand --version=1.0.85 --locked
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-expand
 
-tool-wit-bindgen-cli:
+tool-wit-bindgen:
     FROM rust-ci+rust-base
     RUN cargo install wit-bindgen-cli --version=0.24.0 --locked
     SAVE ARTIFACT $CARGO_HOME/bin/wit-bindgen
-
-tool-wasmtime:
-    FROM rust-ci+rust-base
-    RUN cargo install --git https://github.com/bytecodealliance/wasmtime --tag v20.0.0 verify-component-adapter --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/verify-component-adapter
 
 # We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
 tool-cargo-sweep:
     FROM rust-ci+rust-base
     RUN cargo install cargo-sweep@0.7.0 --locked
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-sweep
+
+tool-cargo-component:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-component@0.11.0 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-component

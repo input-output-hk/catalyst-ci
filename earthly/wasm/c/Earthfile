@@ -17,7 +17,7 @@ wasm-c-base:
             wasi-sdk=20-r3
 
     COPY rust-tools+tool-wasm-tools/wasm-tools /bin
-    COPY rust-tools+tool-wit-bindgen-cli/wit-bindgen /bin
+    COPY rust-tools+tool-wit-bindgen/wit-bindgen /bin
 
     # Universal build scripts.
     COPY --dir scripts /scripts

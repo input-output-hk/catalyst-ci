@@ -12,11 +12,10 @@ IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
-# cspell: words findutils fileset
+# cspell: words findutils fileset pkgconfig wasip
 
-# Base Rustup build container.
-# Parameters:
-#  * toolchain : The `rust-toolchain` toml file.
+# rust-base : Base Rustup build container.
+#   Not called directly, used by other targets.
 rust-base:
     ARG TARGETPLATFORM
     ARG TARGETOS
@@ -28,15 +27,17 @@ rust-base:
     ARG USERVARIANT
 
     # This is our base Host toolset, and rustup.
-    # The ACTUAL version of Rust that will be used, and available targets
-    # is controlled by a `rust-toolchain.toml` file when the `SETUP` FUNCTION is run.
-    # HOWEVER, It is enforced that the Rust version in `rust-toolchain.toml` MUST match this version.
-    FROM rust:1.77.2-alpine3.19
+    # Never use `rust-toolchain.toml` in CI as it breaks builds.
+    # The only toolchain supported is the one installed here.
+    FROM rust:1.78-alpine3.19
 
     WORKDIR /root
 
     # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
+    #
+    # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
+    #       if that crate is removed, these dependencies can also be removed.
     RUN apk add --no-cache \
             musl-dev \
             mold \
@@ -50,10 +51,16 @@ rust-base:
             graphviz \
             fontconfig \
             ttf-liberation \
-            findutils
+            findutils \
+            pkgconfig \
+            openssl-dev \
+            openssl-libs-static
 
     # Fix up font cache.
     RUN fc-cache -f
+
+    # Make sure we have cargo.
+    RUN rustup component add cargo
 
     # Make sure we have the clippy linter.
     RUN rustup component add clippy
@@ -62,29 +69,42 @@ rust-base:
     RUN rustup component add llvm-tools-preview
 
     # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
 
-    # Preset CARGO_HOME and the application search path.
-    ENV CARGO_HOME="$HOME/.cargo"
-    ENV PATH="$PATH:$CARGO_HOME/bin"
+    # Ensure we have all the necessary targets
+    RUN rustup target add wasm32-unknown-unknown
+    RUN rustup target add wasm32-wasip1 # wasm32-wasip2 not yet available
 
-# Add all tools we use for Rust builds to the base builder image.
+    RUN rustup target add wasm32-unknown-unknown --toolchain nightly
+    RUN rustup target add wasm32-wasip1 --toolchain nightly # wasm32-wasip2 not yet available
+
+    # CARGO_HOME, PATH and RUSTUP_HOME is already set by the base container.
+    # Do not change them.
+
+# COPY_TOOL - DRY the tool installation.
+COPY_TOOL:
+    FUNCTION
+
+    ARG --required tool
+    COPY rust-tools+tool-$tool/$tool $CARGO_HOME/bin/$tool
+
+# rust-base-plus-tools : Add all tools we use for rust builds to the base builder image.
+#   Not called directly, used by other targets.
 rust-base-plus-tools:
     FROM +rust-base
 
-    COPY rust-tools+tool-cargo-nextest/cargo-nextest $CARGO_HOME/bin/cargo-nextest
-    COPY rust-tools+tool-cargo-machete/cargo-machete $CARGO_HOME/bin/cargo-machete
-    COPY rust-tools+tool-refinery/refinery $CARGO_HOME/bin/refinery
-    COPY rust-tools+tool-cargo-deny/cargo-deny $CARGO_HOME/bin/cargo-deny
-    COPY rust-tools+tool-cargo-modules/cargo-modules $CARGO_HOME/bin/cargo-modules
-    COPY rust-tools+tool-cargo-depgraph/cargo-depgraph $CARGO_HOME/bin/cargo-depgraph
-    COPY rust-tools+tool-cargo-llvm-cov/cargo-llvm-cov $CARGO_HOME/bin/cargo-llvm-cov
-    COPY rust-tools+tool-wasm-tools/wasm-tools $CARGO_HOME/bin/wasm-tools
-    COPY rust-tools+tool-cargo-expand/cargo-expand $CARGO_HOME/bin/cargo-expand
-    COPY rust-tools+tool-wit-bindgen-cli/wit-bindgen $CARGO_HOME/bin/wit-bindgen
-    COPY rust-tools+tool-wasmtime/verify-component-adapter $CARGO_HOME/bin/verify-component-adapter
-    COPY rust-tools+tool-cargo-sweep/cargo-sweep $CARGO_HOME/bin/cargo-sweep
-
+    DO +COPY_TOOL --tool="cargo-nextest"
+    DO +COPY_TOOL --tool="cargo-machete"
+    DO +COPY_TOOL --tool="refinery"
+    DO +COPY_TOOL --tool="cargo-deny"
+    DO +COPY_TOOL --tool="cargo-modules"
+    DO +COPY_TOOL --tool="cargo-depgraph"
+    DO +COPY_TOOL --tool="cargo-llvm-cov"
+    DO +COPY_TOOL --tool="wasm-tools"
+    DO +COPY_TOOL --tool="cargo-expand"
+    DO +COPY_TOOL --tool="wit-bindgen"
+    DO +COPY_TOOL --tool="cargo-sweep"
+    DO +COPY_TOOL --tool="cargo-component"
 
 # installer - fully setup our Rust caching.
 installer:
@@ -92,36 +112,36 @@ installer:
 
     # Call `+INIT` before copying the source file to avoid installing dependencies every time source code changes. 
     # This parametrization will be used in future calls to functions of the library
-    # Init using the common `cat-ci` cache prefix.
+    # Init using the common cat-ci cache prefix.
     DO rust+INIT --keep_fingerprints=true
 
+    # Set the mount cache env vars
     DO rust+SET_CACHE_MOUNTS_ENV
 
     # Install the default cargo config, and ensure its in the cached CARGO_HOME as well.
     COPY stdcfgs/cargo_config.toml $CARGO_INSTALL_ROOT/config.toml
     DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
 
-    # Universal build scripts.
-    # We will always need and are not target dependent.
+    # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
 
     # Standardized Rust configs.
-    # Build will refuse to proceed if the projects Rust configs do not match these.
+    # Build will refuse to proceed if the projects rust configs do not match these.
     # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
     COPY --dir stdcfgs /stdcfgs
 
-# Builds all the rust-base targets for each supported DOCKER architecture.
-# Currently only used for multi-platform cross build testing.
-# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
-# docker enabled on Mac.
-# Again, this is just a test target, and not for general use.
+# rust-base-all-hosts : Builds all the rust-base targets for each supported DOCKER architecture.
+#   Currently only used for multi-platform cross build testing.
+#   This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
+#   docker enabled on Mac.
+#   Again, this is just a test target, and not for general use.
 rust-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +installer
 
-# EXECUTE runs the given command "$cmd".
+# EXECUTE : runs the cargo command "$args".
 # This function is thread safe. Parallel builds of targets calling this function should be free of race conditions.
 # Notice that in order to run this function, +INIT must be called first.
 # Arguments:
@@ -141,6 +161,12 @@ EXECUTE:
     FUNCTION
     DO rust+CHECK_INITED
     ARG --required cmd
+    ARG args1
+    ARG args2
+    ARG args3
+    ARG args4
+    ARG args5
+    ARG args6
     ARG output
     ARG junit
     ARG coverage
@@ -163,12 +189,12 @@ EXECUTE:
     # We then check the existence of the "fail" file after any artifacts are saved that
     # should be saved regardless.
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-        env | grep EARTHLY; \
         set -e; \
         rm -f fail; \
-        $cmd || echo fail > fail; \
+        $cmd $args1 $args2 $args3 $args4 $args5 $args6 || touch fail; \
         cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
-        cargo sweep -r -i;
+        cargo sweep -r -i
+        
 
     # We always want to save these (if requested) even if the command fails.
     IF [ "$junit" != "" ]
@@ -203,7 +229,7 @@ EXECUTE:
         DO rust+COPY_OUTPUT --output=$output
     END
 
-# Shim so we use the correct upstream RUST library consistently
+# CARGO : Shim so we use the correct upstream RUST library consistently
 # without having to import it into consuming Earthfiles.
 # By default this will NOT expose docs built during the execution of cargo
 CARGO:
@@ -212,17 +238,20 @@ CARGO:
     ARG --required args
     ARG output
     ARG ALLOW_DEBUG_TARGET="false"
+    ARG junit
+    ARG coverage
     ARG docs="false"
 
     DO +EXECUTE \
-        --cmd="cargo $args" \
+        --cmd="cargo" \
+        --args1="$args" \
         --output="$output" \
         --junit="$junit" \
         --coverage="$coverage" \
         --ALLOW_DEBUG_TARGET="$ALLOW_DEBUG_TARGET" \
         --docs="$docs"
 
-# COPY_OUTPUT copies files out of the target cache into the image layers.
+# COPY_OUTPUT : copies files out of the target cache into the image layers.
 #
 # This is a shim which MUST be used by projects consuming catalyst-ci rather than using the 
 # upstream earthly rust library directly.
@@ -242,17 +271,11 @@ COPY_OUTPUT:
 
     DO rust+COPY_OUTPUT --output=$output --TMP_FOLDER=$TMP_FOLDER
 
-# Common Rust setup.
-# Parameters:
-#  * toolchain : The `rust-toolchain` toml file.
+# SETUP : Common Rust setup.
 SETUP:
     FUNCTION
     FROM +installer
 
-    ARG toolchain=./rust-toolchain.toml 
-
-    # Copy our toolchain dependency.
-    COPY $toolchain ./rust-toolchain.toml
-
-    # Toolchain MUST be the same as vendored, and if it is the toolchain is
-    # already installed.
+    # The ONLY toolchain we support is the one in the installer.
+    # DO NOT copy the `rust-toolchain.toml` file into CI as it breaks
+    # the toolchain on some targets and leads to build failure.

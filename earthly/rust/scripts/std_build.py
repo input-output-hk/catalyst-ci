@@ -10,6 +10,7 @@ import argparse
 import rich
 
 import python.exec_manager as exec_manager
+from python.utils import fix_quoted_earthly_args
 
 # This script is run inside the `build` stage.
 # This is set up so that ALL build steps are run and it will fail if any fail.
@@ -244,10 +245,14 @@ def strip(results: exec_manager.Results, bin: str):
         )
     )
 
+import sys
 
 def main():
     # Force color output in CI
     rich.reconfigure(color_system="256")
+
+    # Fix arguments because of munging that can happen because of the rust builder +EXECUTE function
+    fix_quoted_earthly_args()
 
     parser = argparse.ArgumentParser(description="Rust build processing.")
     parser.add_argument(
@@ -312,8 +317,8 @@ def main():
     )
     args = parser.parse_args()
 
-    libs = filter(lambda lib: lib != "", args.libs.split(", "))
-    bins = list(filter(lambda bin: bin != "", args.bins.split(", ")))
+    libs = filter(lambda lib:  lib.strip() and len(lib.strip()) > 0, args.libs.split(","))
+    bins = list(filter(lambda bin: bin.strip() and len(bin.strip()) > 0, args.bins.split(",")))
 
     with exec_manager.ParallelRunner("Rust build") as runner:
         # Build the code.
