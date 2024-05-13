@@ -34,8 +34,6 @@ all-hosts-check:
 # CI Automated Entry point.
 build:
     FROM +builder
- 
-    RUN echo cache breaker 1
 
     DO rust-ci+EXECUTE \
         --cmd="/scripts/std_build.py --bins=dbviz/dbviz" \
