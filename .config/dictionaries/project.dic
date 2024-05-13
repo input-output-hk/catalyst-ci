@@ -72,7 +72,6 @@ rustdoc
 rustdocflags
 rustflags
 rustfmt
-Rustup
 rustup
 sqlfluff
 stdcfgs
