@@ -1,13 +1,13 @@
 ---
 icon: simple/flutter
-title: Flutter/Dart
+title: Flutter
 tags:
     - Flutter
     - Dart
 ---
 
 <!-- markdownlint-disable single-h1 -->
-# :simple-flutter: Flutter / :simple-dart: Dart
+# :simple-flutter: Flutter
 <!-- markdownlint-enable single-h1 -->
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
