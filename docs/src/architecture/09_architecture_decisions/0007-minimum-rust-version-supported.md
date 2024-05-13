@@ -26,6 +26,8 @@ We will not use the `rust-version` feature of `cargo.toml` during initial bring 
 We have not defined a maximum range of valid Rust versions, and always build ONLY with the version defined in `rust-toolchain.toml`.
 
 Currently the ONLY supported rust version is the one specified by `rust-toolchain.toml`.
+However `rust-toolchain.toml` breaks CI when it is used, so this file is ONLY used for local development and MUST
+be synchronized with the toolchain version used in CI.
 
 If at a later time, a range of rust versions is decided to be supported then:
 

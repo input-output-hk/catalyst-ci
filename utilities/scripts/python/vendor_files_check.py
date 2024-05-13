@@ -25,24 +25,35 @@ def toml_diff_check(
         f"{'' if strict else 'Non '}Strict Checking"
         + f" if Provided File {provided_file_path} == Vendored File {vendor_file_path}"
     )
-    with open(vendor_file_path, "rb") as vendor_file, open(
-        provided_file_path, "rb"
-    ) as provided_file:
+    
+    try:
+        with open(vendor_file_path, "rb") as vendor_file, open(
+            provided_file_path, "rb"
+        ) as provided_file:
 
-        def procedure() -> exec_manager.ProcedureResult:
-            vendor_obj = tomllib.load(vendor_file)
-            provided_obj = tomllib.load(provided_file)
+            def procedure() -> exec_manager.ProcedureResult:
+                vendor_obj = tomllib.load(vendor_file)
+                provided_obj = tomllib.load(provided_file)
 
-            diff = Diff(vendor_obj, provided_obj, strict).get_diff()
+                diff = Diff(vendor_obj, provided_obj, strict).get_diff()
 
-            return exec_manager.ProcedureResult(
-                1 if diff.has_diff() else 0,
+                return exec_manager.ProcedureResult(
+                    1 if diff.has_diff() else 0,
+                    command_name,
+                    diff.to_ascii_colored_string(vendor_file_path, provided_file_path),
+                )
+
+            res = exec_manager.procedure_run(
+                procedure,
                 command_name,
-                diff.to_ascii_colored_string(vendor_file_path, provided_file_path),
+                log=log,
             )
-
-        return exec_manager.procedure_run(
-            procedure,
-            command_name,
-            log=log,
+    except Exception as exc:
+        res = exec_manager.Result(
+            1, command_name, f"Exception caught: {exc}", 0.0, command_name
         )
+        
+        if log:
+            res.print(verbose_errors=True, verbose=False)
+
+    return res        
