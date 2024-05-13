@@ -1,0 +1,66 @@
+VERSION 0.8
+
+IMPORT .. AS rust-ci
+
+# Note, TOOLS do not benefit from the CARGO caching, and pollute it, so build without it.
+
+tool-cargo-nextest:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-nextest --version=0.9.70 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-nextest
+
+tool-cargo-machete:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-machete --version=0.6.2 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-machete
+
+tool-refinery:
+    FROM rust-ci+rust-base
+    RUN cargo install refinery_cli --version=0.8.14 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/refinery
+
+tool-cargo-deny:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-deny --version=0.14.22 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-deny
+
+tool-cargo-modules:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-modules --version=0.15.5 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-modules
+
+tool-cargo-depgraph:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-depgraph --version=1.6.0 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-depgraph
+
+tool-cargo-llvm-cov:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-llvm-cov --version=0.6.9 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-llvm-cov
+
+tool-wasm-tools:
+    FROM rust-ci+rust-base
+    RUN cargo install wasm-tools --version=1.206.0 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/wasm-tools
+
+tool-cargo-expand:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-expand --version=1.0.85 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-expand
+
+tool-wit-bindgen:
+    FROM rust-ci+rust-base
+    RUN cargo install wit-bindgen-cli --version=0.24.0 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/wit-bindgen
+
+# We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
+tool-cargo-sweep:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-sweep@0.7.0 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-sweep
+
+tool-cargo-component:
+    FROM rust-ci+rust-base
+    RUN cargo install cargo-component@0.11.0 --locked
+    SAVE ARTIFACT $CARGO_HOME/bin/cargo-component

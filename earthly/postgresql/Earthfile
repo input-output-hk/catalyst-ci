@@ -1,6 +1,9 @@
 # Common PostgreSQL Earthly builders
 VERSION 0.8
 
+IMPORT ../rust/tools AS rust-tools
+IMPORT ../../utilities/dbviz AS dbviz
+IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words psycopg dbviz
 
@@ -34,10 +37,10 @@ postgres-base:
     RUN sqlfluff version
 
     # Get refinery
-    COPY ../rust+rust-base/refinery /bin
+    COPY rust-tools+tool-refinery/refinery /bin
 
     # Get dbviz
-    COPY ../../utilities/dbviz+build/dbviz /bin
+    COPY dbviz+build/dbviz /bin
     RUN dbviz --help
 
     # Copy our set SQL files
@@ -46,8 +49,8 @@ postgres-base:
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
-    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
-    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
+    DO scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_PYTHON_SCRIPTS
 
     SAVE ARTIFACT /scripts /scripts
 
