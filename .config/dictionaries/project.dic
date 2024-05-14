@@ -1,6 +1,7 @@
 aarch
 bindgen
 buildkit
+cardano
 camelcase
 codegen
 colordiff
@@ -23,6 +24,7 @@ fontconfig
 fontname
 forcelabels
 genpkey
+giga
 ginkgolinter
 gitops
 glightbox
@@ -49,6 +51,7 @@ lintfix
 markdownlint
 mattn
 mdlint
+mithril
 mkdocs
 modcache
 mozallowfullscreen
@@ -72,6 +75,7 @@ rustdoc
 rustdocflags
 rustflags
 rustfmt
+sanchonet
 rustup
 sqlfluff
 stdcfgs
@@ -87,6 +91,7 @@ Timoni
 toolsets
 transpiling
 UDCs
+unarchiving
 uniseg
 voteplan
 wasi
@@ -95,3 +100,4 @@ webkitallowfullscreen
 WORKDIR
 xerrors
 zstd
+zstdcat
