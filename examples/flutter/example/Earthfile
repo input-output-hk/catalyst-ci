@@ -1,5 +1,6 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/rust:v3.00.0 AS flutter-ci
+IMPORT github.com/input-output-hk/catalyst-ci/tree/feat-add-guide-for-flutter-dart AS flutter-ci
 
 builder:
+    DO flutter-ci+SETUP

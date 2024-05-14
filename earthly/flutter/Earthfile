@@ -24,3 +24,7 @@ flutter-base:
     RUN dart pub global activate melos
     RUN dart pub global activate junitreport
     RUN dart pub global activate coverage
+
+SETUP:
+    FUNCTION
+    FROM +flutter-base
