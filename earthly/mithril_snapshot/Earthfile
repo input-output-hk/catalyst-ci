@@ -2,21 +2,30 @@ VERSION 0.8
 
 # cspell: words preprod
 
+# base-snapshot-builder : Base OS image to run the mithril client for all networks.
+# Shouldn't be used directly.
 base-snapshot-builder:
     # Note: an official docker image is here, but it could not reliably pull from Earthly.
     # It gives permission denied errors randomly.
     # Image comes from: https://github.com/input-output-hk/mithril/pkgs/container/mithril-client
     # FROM ghcr.io/input-output-hk/mithril-client:latest
 
-    # Build our own simple mithril client image
-    FROM debian:stable-20240408-slim
+    # Build our own simple mithril client image - it's not hard
+    FROM debian:stable-20240513-slim
 
     RUN apt-get update && apt-get -y install wget jq zstd
 
     RUN wget -O mithril-cli.deb \
-            https://github.com/input-output-hk/mithril/releases/download/2412.0/mithril-client-cli_0.7.6+2e462c0-1_amd64.deb
+            https://github.com/input-output-hk/mithril/releases/download/2418.1/mithril-client-cli_0.8.0+512fe8d-1_amd64.deb
     RUN dpkg -i mithril-cli.deb
 
+# DL_SNAPSHOT : Main function which manages downloading and validating mithril snapshots.
+# Arguments:
+# * network - The network to download "mainnet", "preview", "preprod" or "sanchonet"
+# * mithril-network - The name of the mithril network to access, must match what is required by the `network` argument.
+# * snapshot_digest - The digest of the snapshot to get, locks the download to a particular instant in time. `latest` will fetch the most recent.
+# * validate - `false` do not validate the snapshot, faster but could be an invalid snapshot. (default)
+#            - `true`  validate the snapshot, so we know it was authoritatively generated.
 DL_SNAPSHOT:
     FUNCTION
     ARG network
@@ -34,7 +43,7 @@ DL_SNAPSHOT:
     IF $validate
         # Validation is slower, but the file will be guaranteed to be valid.
         # This automatically handles unarchiving the snapshot
-        RUN mithril-client -vvv cardano-db download --json $snapshot_digest
+        RUN mithril-client -v cardano-db download --json $snapshot_digest
     ELSE
         # This is faster, but it could be a faked snapshot file.
         LET DL_FILE=$(mithril-client cardano-db snapshot show --json $snapshot_digest | jq '.locations[0]' | tr -d '\"')
@@ -42,45 +51,83 @@ DL_SNAPSHOT:
             wget --progress=dot:giga -O - $DL_FILE | zstdcat | tar -xf - -C ./db
     END
 
-mainnet-snapshot:
+# mainnet : Get latest mithril snapshot for Cardano mainnet.
+# Arguments :
+# * digest = The specific snapshot digest to download. Defaults to `latest`.
+# This target is used for developers to test against different networks and
+# is not currently used in CI.
+# This snapshot is NOT validated, in order to speed up its use in development.
+# Warning, this snapshot is VERY LARGE. > 44GB
+mainnet:
     FROM +base-snapshot-builder
+    ARG digest=latest
 
     DO +DL_SNAPSHOT \
         --network=mainnet \
-        --mithril_network=release-mainnet
+        --mithril_network=release-mainnet \
+        --snapshot_digest=$digest
 
     SAVE ARTIFACT /snapshot/db snapshot
 
-preprod-snapshot:
+# preprod : Mithril snapshot from the pre-prod network.
+# This snapshot is defaulted to a snapshot from:
+# Epoch : 142
+# Immutable File Number: 2773
+# Created : 14/05/2024 @ 8:46:19 am
+# The snapshot can be changed by altering the `digest` argument with the
+# required digest to download.
+# Also, as this snapshot is used in CI, we only used a validated image here
+# This is slower, but guaranteed to be accurate.
+preprod:
     FROM +base-snapshot-builder
+    ARG digest="1ee36c3ee0aa4fec38d2487641ee64f687e675696783f4cea1e4857ebc2ef38c"
 
     DO +DL_SNAPSHOT \
         --network=preprod \
         --mithril_network=release-preprod \
-        --snapshot_digest=80b0c02cd0c86c47a79a9b6d0d9b0e6936d5f621e8094ed53405fef3ee103a3b
+        --snapshot_digest=$digest \
+        --validate=true
 
     SAVE ARTIFACT /snapshot/db snapshot
 
-preview-snapshot:
+# preview : Get latest mithril snapshot for the preview network.
+# Arguments :
+# * digest = The specific snapshot digest to download. Defaults to `latest`.
+# This target is used for developers to test against different networks and
+# is not currently used in CI.
+# This snapshot is NOT validated, in order to speed up its use in development.
+preview:
     FROM +base-snapshot-builder
+    ARG digest=latest
 
     DO +DL_SNAPSHOT \
         --network=preview \
-        --mithril_network=pre-release-preview 
+        --mithril_network=pre-release-preview \
+        --snapshot-digest=$digest
 
     SAVE ARTIFACT /snapshot/db snapshot
 
-sanchonet-snapshot:
+# sanchonet : Get latest mithril snapshot for sanchonet (CIP-1694 test network).
+# Arguments :
+# * digest = The specific snapshot digest to download. Defaults to `latest`.
+# This target is used for developers to test against different networks and
+# is not currently used in CI.
+# This snapshot is NOT validated, in order to speed up its use in development.
+sanchonet:
     FROM +base-snapshot-builder
+    ARG digest=latest
 
     DO +DL_SNAPSHOT \
         --network=sanchonet \
-        --mithril_network=testing-sanchonet
+        --mithril_network=testing-sanchonet \
+        --snapshot-digest=$digest
 
     SAVE ARTIFACT /snapshot/db snapshot
 
-# Just for compatibility until we update cat-gateway tests to use the new targets.
+# package-preprod-snapshot : Create a mithril snapshot of pre-prod automatically for CI
+# This target is for CI use, we do NOT generate snapshot packages for other networks
+# because they are slow and not used currently in any CI process.
 package-preprod-snapshot:
-    FROM +preprod-snapshot
+    FROM +preprod
 
     SAVE ARTIFACT /snapshot/db snapshot
