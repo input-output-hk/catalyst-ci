@@ -1,15 +1,19 @@
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
+
+IMPORT ../../earthly/postgresql AS postgresql-ci
+IMPORT ../../utilities/scripts AS scripts
+IMPORT ../../ AS cat-ci
 
 # cspell: words psql
 
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
 #   CI target : dependency
 builder:
-    DO ./../../earthly/postgresql+BUILDER
+    DO postgresql-ci+BUILDER
 
     # MUST Manually copy the .sqlfluff config used in the repo because the FUNCTION
     # above can not be passed a reference to a local target as an argument.
-    COPY ./../../+repo-config/repo/.sqlfluff .
+    COPY cat-ci+repo-config/repo/.sqlfluff .
 
 # check if the sql files are properly formatted and pass lint quality checks.
 #   CI target : true
@@ -17,14 +21,14 @@ check:
     FROM +builder
 
     # Now you can run the script without the file not found error
-    DO ./../../earthly/postgresql+CHECK
+    DO postgresql-ci+CHECK
 
 # format all SQL files in the current project.  Local developers tool.
 #   CI target : false
 format:
     LOCALLY
 
-    DO ./../../earthly/postgresql+FORMAT --src=$(echo ${PWD})
+    DO postgresql-ci+FORMAT --src=$(echo ${PWD})
 
 
 # build an event db docker image.
@@ -32,13 +36,13 @@ format:
 build:
     FROM +builder
 
-    DO ./../../earthly/postgresql+BUILD --image_name=example-db
-    DO ./../../earthly/postgresql+DOCS
+    DO postgresql-ci+BUILD --image_name=example-db
+    DO postgresql-ci+DOCS
 
 # Internal: common integration test image
 all-tests:
-    DO ./../../earthly/postgresql+INTEGRATION_TEST_SETUP
-    DO ./../../utilities/scripts+ADD_BASH_SCRIPTS
+    DO postgresql-ci+INTEGRATION_TEST_SETUP
+    DO scripts+ADD_BASH_SCRIPTS
     
     COPY --dir tests .
 

@@ -1,7 +1,9 @@
-VERSION --global-cache 0.7
+VERSION 0.8
+
+IMPORT ./../../../earthly/wasm/c AS wasm-c-ci
 
 builder:
-    FROM ./../../../earthly/wasm/c+wasm-c-base
+    FROM wasm-c-ci+wasm-c-base
 
     COPY demo.wit ./wit/
     COPY component.c .

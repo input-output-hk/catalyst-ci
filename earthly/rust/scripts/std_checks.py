@@ -22,6 +22,8 @@ import os
 
 
 def main():
+    rust_toolchain_enabled=False
+    
     # Force color output in CI
     rich.reconfigure(color_system="256")
 
@@ -61,13 +63,14 @@ def main():
             f"{os.environ.get('CARGO_HOME')}/config.toml", ".cargo/config.toml"
         )
     )
-    results.add(
-        vendor_files_check.toml_diff_check(
-            "/stdcfgs/rust-toolchain.toml",
-            "rust-toolchain.toml",
-            strict=False,
+    if rust_toolchain_enabled:
+        results.add(
+            vendor_files_check.toml_diff_check(
+                "/stdcfgs/rust-toolchain.toml",
+                "rust-toolchain.toml",
+                strict=False,
+            )
         )
-    )
     results.add(
         vendor_files_check.toml_diff_check("/stdcfgs/rustfmt.toml", "rustfmt.toml")
     )

@@ -1,5 +1,7 @@
 # Common Python UDCs and Builders.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
+
+IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words libgcc ruff
 
@@ -40,8 +42,8 @@ python-base:
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
-    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
-    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
+    DO scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_PYTHON_SCRIPTS
 
 BUILDER:
     FUNCTION

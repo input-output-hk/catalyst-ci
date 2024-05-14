@@ -1,12 +1,21 @@
-# Common Rust UDCs and Builders.
-VERSION --global-cache --use-function-keyword 0.7
+VERSION 0.8
 
-# cspell: words rustup miri ripgrep stdcfgs toolset depgraph lcov psycopg bindgen
+# To ensure all consumers of `catalyst-ci` use the correct upstream,
+# the Rust library from Earthly can only be imported in this Earthfile.
+# FUNCTIONs or targets in that Earthfile MUST be shimmed here.
+# No other earthfile should reference the rust library in the earthly/lib repo.
+IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
+
+# Local Earthfile reference imports
+IMPORT ./tools AS rust-tools
+IMPORT ../../utilities/scripts AS scripts
+
+# cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
+# cspell: words findutils fileset pkgconfig wasip
 
-# Base Rustup build container.
-# Parameters:
-#  * toolchain : The `rust-toolchain` toml file.
+# rust-base : Base Rustup build container.
+#   Not called directly, used by other targets.
 rust-base:
     ARG TARGETPLATFORM
     ARG TARGETOS
@@ -18,30 +27,17 @@ rust-base:
     ARG USERVARIANT
 
     # This is our base Host toolset, and rustup.
-    # The ACTUAL version of rust that will be used, and available targets
-    # is controlled by a `rust-toolchain.toml` file when the `SETUP` UDC is run.
-    # HOWEVER, It is enforced that the rust version in `rust-toolchain.toml` MUST match this version.
-
-    # WARNING:
-    # Dont bump the version of the alpine.
-    # A potential bug was found inside `libgcc:13` version.
-    # It works fine with the `libgcc:12` version.
-    # Look: https://github.com/bytecodealliance/wasmtime/issues/7997
-    FROM rust:1.75-alpine3.18
-
-    RUN echo "TARGETPLATFORM = $TARGETPLATFORM"; \
-        echo "TARGETOS       = $TARGETOS"; \
-        echo "TARGETARCH     = $TARGETARCH"; \
-        echo "TARGETVARIANT  = $TARGETVARIANT"; \
-        echo "USERPLATFORM   = $USERPLATFORM"; \
-        echo "USEROS         = $USEROS"; \
-        echo "USERARCH       = $USERARCH"; \
-        echo "USERVARIANT    = $USERVARIANT";
+    # Never use `rust-toolchain.toml` in CI as it breaks builds.
+    # The only toolchain supported is the one installed here.
+    FROM rust:1.78-alpine3.19
 
     WORKDIR /root
 
     # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
+    #
+    # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
+    #       if that crate is removed, these dependencies can also be removed.
     RUN apk add --no-cache \
             musl-dev \
             mold \
@@ -54,10 +50,17 @@ rust-base:
             colordiff \
             graphviz \
             fontconfig \
-            ttf-liberation
+            ttf-liberation \
+            findutils \
+            pkgconfig \
+            openssl-dev \
+            openssl-libs-static
 
-    # Fix up font cache
+    # Fix up font cache.
     RUN fc-cache -f
+
+    # Make sure we have cargo.
+    RUN rustup component add cargo
 
     # Make sure we have the clippy linter.
     RUN rustup component add clippy
@@ -66,65 +69,213 @@ rust-base:
     RUN rustup component add llvm-tools-preview
 
     # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
 
-    # Install the default cargo config.
-    COPY stdcfgs/cargo_config.toml $CARGO_HOME/config.toml
+    # Ensure we have all the necessary targets
+    RUN rustup target add wasm32-unknown-unknown
+    RUN rustup target add wasm32-wasip1 # wasm32-wasip2 not yet available
 
-    # Install rust based tooling
-    # Install tools we use commonly with `cargo`.
-    # Note, we disable static compiles for tools, specifically, as its not required.
-    # These tools are not artifacts and we do not use them in production.
-    RUN cargo install cargo-nextest --version=0.9.68
-    RUN cargo install cargo-machete --version=0.6.1
-    RUN cargo install refinery_cli  --version=0.8.13
-    # TODO: https://github.com/input-output-hk/catalyst-ci/issues/214
-    RUN cargo install cargo-deny    --version=0.14.10
-    RUN cargo install cargo-modules --version=0.14.0
-    RUN cargo install cargo-depgraph --version=1.6.0
-    RUN cargo install cargo-llvm-cov --version=0.6.8
-    RUN cargo install wasm-tools --version=1.201.0
-    RUN cargo install cargo-expand --version=1.0.79
-    RUN cargo install wit-bindgen-cli --version=0.24.0
-    RUN cargo install --git https://github.com/bytecodealliance/wasmtime --tag v17.0.0 verify-component-adapter
+    RUN rustup target add wasm32-unknown-unknown --toolchain nightly
+    RUN rustup target add wasm32-wasip1 --toolchain nightly # wasm32-wasip2 not yet available
 
-    SAVE ARTIFACT $CARGO_HOME/bin/refinery refinery
-    SAVE ARTIFACT $CARGO_HOME/bin/wasm-tools wasm-tools
-    SAVE ARTIFACT $CARGO_HOME/bin/wit-bindgen wit-bindgen
+    # CARGO_HOME, PATH and RUSTUP_HOME is already set by the base container.
+    # Do not change them.
+
+# COPY_TOOL - DRY the tool installation.
+COPY_TOOL:
+    FUNCTION
+
+    ARG --required tool
+    COPY rust-tools+tool-$tool/$tool $CARGO_HOME/bin/$tool
+
+# rust-base-plus-tools : Add all tools we use for rust builds to the base builder image.
+#   Not called directly, used by other targets.
+rust-base-plus-tools:
+    FROM +rust-base
+
+    DO +COPY_TOOL --tool="cargo-nextest"
+    DO +COPY_TOOL --tool="cargo-machete"
+    DO +COPY_TOOL --tool="refinery"
+    DO +COPY_TOOL --tool="cargo-deny"
+    DO +COPY_TOOL --tool="cargo-modules"
+    DO +COPY_TOOL --tool="cargo-depgraph"
+    DO +COPY_TOOL --tool="cargo-llvm-cov"
+    DO +COPY_TOOL --tool="wasm-tools"
+    DO +COPY_TOOL --tool="cargo-expand"
+    DO +COPY_TOOL --tool="wit-bindgen"
+    DO +COPY_TOOL --tool="cargo-sweep"
+    DO +COPY_TOOL --tool="cargo-component"
+
+# installer - fully setup our Rust caching.
+installer:
+    FROM +rust-base-plus-tools
+
+    # Call `+INIT` before copying the source file to avoid installing dependencies every time source code changes. 
+    # This parametrization will be used in future calls to functions of the library
+    # Init using the common cat-ci cache prefix.
+    DO rust+INIT --keep_fingerprints=true
+
+    # Set the mount cache env vars
+    DO rust+SET_CACHE_MOUNTS_ENV
+
+    # Install the default cargo config, and ensure its in the cached CARGO_HOME as well.
+    COPY stdcfgs/cargo_config.toml $CARGO_INSTALL_ROOT/config.toml
+    DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
-    DO ../../utilities/scripts+ADD_BASH_SCRIPTS
-    DO ../../utilities/scripts+ADD_PYTHON_SCRIPTS
+    DO scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_PYTHON_SCRIPTS
 
     # Standardized Rust configs.
     # Build will refuse to proceed if the projects rust configs do not match these.
     # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
     COPY --dir stdcfgs /stdcfgs
 
-# Builds all the rust-base targets for each supported DOCKER architecture.
-# Currently only used for multi-platform cross build testing.
-# This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
-# docker enabled on Mac.
-# Again, this is just a test target, and not for general use.
+# rust-base-all-hosts : Builds all the rust-base targets for each supported DOCKER architecture.
+#   Currently only used for multi-platform cross build testing.
+#   This will ONLY work if you have `qemu` properly setup on linux and `rosetta` for
+#   docker enabled on Mac.
+#   Again, this is just a test target, and not for general use.
 rust-base-all-hosts:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +rust-base
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +installer
 
-# Common Rust setup.
-# Parameters:
-#  * toolchain : The `rust-toolchain` toml file.
+# EXECUTE : runs the cargo command "$args".
+# This function is thread safe. Parallel builds of targets calling this function should be free of race conditions.
+# Notice that in order to run this function, +INIT must be called first.
+# Arguments:
+#   - cmd: Command and its arguments. Required.
+#   - output: Regex matching output artifacts files to be copied to ./target folder in the caller filesystem (image layers).
+#     Use this argument when you want to SAVE an ARTIFACT from the target folder (mounted cache), always trying to minimize the total size of the copied fileset.
+#     For example --output="release/[^\./]+" would keep all the files in /target/release that don't have any extension.
+#   - junit: Filename to save the junit.xml file LOCALLY.
+#            Also saves the junit.xml file in the target layer.
+#            If not defined, "junit.xml" will not be saved, and will not be in the layer.
+#   - coverage: Filename to save the coverage-report.info as LOCALLY
+#            If not defined, "coverage-report.info" will not be saved, but will be in the layer.
+#
+# This is heavily based off of the rust `CARGO` command in the Earthly library.
+# Updates to that library must be reflected in this function when updating the version of the earthly rust library.
+EXECUTE:
+    FUNCTION
+    DO rust+CHECK_INITED
+    ARG --required cmd
+    ARG args1
+    ARG args2
+    ARG args3
+    ARG args4
+    ARG args5
+    ARG args6
+    ARG output
+    ARG junit
+    ARG coverage
+    ARG docs="false"
+    ARG ALLOW_DEBUG_TARGET="false"
+    DO rust+SET_CACHE_MOUNTS_ENV
+    IF [ "$EARTHLY_KEEP_FINGERPRINTS" = "false" ]
+       DO rust+REMOVE_SOURCE_FINGERPRINTS
+    END
+
+    # target/debug should not be present, so purge it just in case.
+    IF [ "$ALLOW_DEBUG_TARGET" != "true" ]
+        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+            set -e; \
+            rm -rf target/debug;
+    END
+
+    # This uses a workaround to TRY/FINALLY not working inside a FUNCTION.
+    # The command is executed and a "fail" file is created ONLY if it fails.
+    # We then check the existence of the "fail" file after any artifacts are saved that
+    # should be saved regardless.
+    RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+        set -e; \
+        rm -f fail; \
+        $cmd $args1 $args2 $args3 $args4 $args5 $args6 || touch fail; \
+        cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
+        cargo sweep -r -i
+        
+
+    # We always want to save these (if requested) even if the command fails.
+    IF [ "$junit" != "" ]
+        DO rust+COPY_OUTPUT --output="nextest/ci/junit.xml"
+        SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL "$junit"
+    END
+    IF [ "$coverage" != "" ]
+        SAVE ARTIFACT coverage-report.info AS LOCAL "$coverage"
+    END
+
+    # Defer the failure to here.
+    IF [ -f fail ]
+        RUN echo "Error on +EXECUTE: $cmd"
+        RUN exit 1
+    END
+
+    IF [ "$ALLOW_DEBUG_TARGET" != "true" ]
+        RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
+            if [ -d target/debug ]; then \
+                echo "Error: 'target/debug' should not be built in CI.  Failing."; \
+                exit 1; \
+            fi;
+    END
+
+    IF [ "$docs" != "false" ]
+        DO rust+COPY_OUTPUT --output="doc/.*"
+        SAVE ARTIFACT target/doc doc
+    END
+
+    # This output is ONLY saved on successful command execution.
+    IF [ "$output" != "" ]
+        DO rust+COPY_OUTPUT --output=$output
+    END
+
+# CARGO : Shim so we use the correct upstream RUST library consistently
+# without having to import it into consuming Earthfiles.
+# By default this will NOT expose docs built during the execution of cargo
+CARGO:
+    FUNCTION
+
+    ARG --required args
+    ARG output
+    ARG ALLOW_DEBUG_TARGET="false"
+    ARG junit
+    ARG coverage
+    ARG docs="false"
+
+    DO +EXECUTE \
+        --cmd="cargo" \
+        --args1="$args" \
+        --output="$output" \
+        --junit="$junit" \
+        --coverage="$coverage" \
+        --ALLOW_DEBUG_TARGET="$ALLOW_DEBUG_TARGET" \
+        --docs="$docs"
+
+# COPY_OUTPUT : copies files out of the target cache into the image layers.
+#
+# This is a shim which MUST be used by projects consuming catalyst-ci rather than using the 
+# upstream earthly rust library directly.
+#
+# Use this FUNCTION when you want to SAVE an ARTIFACT from the target folder (mounted cache), always trying to minimize the total size of the copied fileset.
+# Notice that in order to run this FUNCTION, +SET_CACHE_MOUNTS_ENV or +CARGO must be called first.
+# Arguments:
+#   - output: Regex matching output artifacts files to be copied to ./target folder in the caller filesystem (image layers).
+# Example:
+#   DO rust+SET_CACHE_MOUNTS_ENV
+#   RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE cargo build --release
+#   DO rust+COPY_OUTPUT --output="release/[^\./]+" # Keep all the files in /target/release that don't have any extension.
+COPY_OUTPUT:
+    FUNCTION
+    ARG --required output
+    ARG TMP_FOLDER="/tmp/earthly/lib/rust"
+
+    DO rust+COPY_OUTPUT --output=$output --TMP_FOLDER=$TMP_FOLDER
+
+# SETUP : Common Rust setup.
 SETUP:
     FUNCTION
-    FROM +rust-base
+    FROM +installer
 
-    ARG toolchain=./rust-toolchain.toml 
-
-    # Copy our toolchain dependency.
-    COPY $toolchain ./rust-toolchain.toml
-
-    # Install pinned Rustup from `rust-toolchain.toml`
-    # Plus nightly latest so we can use it for docs, lints, etc.
-    RUN rustup show && \
-        cargo --version && \
-        cargo +nightly --version
+    # The ONLY toolchain we support is the one in the installer.
+    # DO NOT copy the `rust-toolchain.toml` file into CI as it breaks
+    # the toolchain on some targets and leads to build failure.

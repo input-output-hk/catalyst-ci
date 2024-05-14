@@ -12,14 +12,6 @@ In most circumstances, the standards provided by this style guide should *not* b
 If an exception must me made, the rationale should be included in the respective PR.
 Any `Earthfile` which does not adhere to this style guide will be rejected if no further justification is made.
 
-<!-- markdownlint-disable max-one-sentence-per-line -->
-!!! Warning
-    UDC (User Defined Commands) will be renamed to FUNCTION in Earthly 0.8.
-    Earthly 0.7 still uses COMMAND for declaring functions, but
-    the keyword is deprecated and will be replaced by FUNCTION in
-    Earthly 0.8. Please refer to [link](https://docs.earthly.dev/docs/guides/functions) for more information.
-<!-- markdownlint-enable max-one-sentence-per-line -->
-
 ## Organization
 
 ### Adhere to a consistent structure
@@ -27,7 +19,10 @@ Any `Earthfile` which does not adhere to this style guide will be rejected if no
 The following structure should be used to provide a consistent structure to `Earthfile`s:
 
 ```Earthfile
-VERSION --global-cache 0.7  # Should be the same across the repository
+VERSION 0.8  # Should be the same across the repository
+
+# Use IMPORT to enhance the readability and consistency
+IMPORT ../other_project as other-project 
 
 deps:
     FROM <base image>
@@ -54,7 +49,7 @@ build:
 package:
     FROM +build
     COPY ./artifact pkg
-    COPY ../other_project+build/artifact pkg
+    COPY other-project+build/artifact pkg
     # This target is uncommon in most Earthfiles, however, certain subprojects
     # have dependencies on other subprojects which should be defined in this
     # target. We define it here to serve as an example, however, we don't use it
@@ -95,7 +90,7 @@ This target is made up of the commands that appear outside of an existing target
 For example:
 
 ```Earthfile
-VERSION --global-cache 0.7
+VERSION 0.8
 FROM ubuntu:latest  # Apart of the base target
 WORKDIR /work  # Apart of the base target
 ```
@@ -112,7 +107,7 @@ As such, the base target should be avoided, and individual targets should be
 clear about their intentions:
 
 ```Earthfile
-VERSION --global-cache 0.7
+VERSION 0.8
 
 deps:
     FROM ubuntu:latest
@@ -166,12 +161,44 @@ Each subproject has an authoritative `build` target that *all* targets use when 
 
 ### Prefer FUNCTION
 
-The primary purpose of a Function is to reduce boilerplate and promote reusing common workflows.
+The primary purpose of a FUNCTION is to reduce boilerplate and promote reusing common workflows.
 Many build patterns tend to be repetitive.
 For example, copying a package lockfile and installing dependencies is very common.
 In these cases, a FUNCTION should be preferred.
 The catalyst-ci repository provides a number of FUNCTIONs in the earthly subdirectory.
 These should be used prior to writing a new one.
 If a common use case is not covered in this subdirectory, a PR should be opened to add it.
-The use of functions in Earthly contributes to a more modular and organized build system,
+The use of FUNCTIONs in Earthly contributes to a more modular and organized build system,
 enhancing code readability and maintainability.
+
+### Use `IMPORT` when calling on `Target` or `FUNCTION` from other Earthfile
+
+Instead of referencing other `Target` or `FUNCTION` using path, importing the entire Earthfile
+with the `IMPORT` command is preferable.
+This is helpful when several targets in other accessible
+Earthfile need to be used.
+Also, this enhance the readability of the code.
+
+For example, instead of
+
+```Earthfile
+VERSION 0.8
+
+package:
+    FROM +build
+    COPY ./artifact pkg
+    COPY ../other_project+build/artifact pkg
+```
+
+use this `IMPORT` command
+
+```Earthfile
+VERSION 0.8
+
+IMPORT ../other_project as other-project 
+
+package:
+    FROM +build
+    COPY ./artifact pkg
+    COPY other-project+build/artifact pkg
+```
