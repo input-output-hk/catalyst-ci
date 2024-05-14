@@ -1,10 +1,13 @@
 aarch
+bindgen
 buildkit
+cardano
 camelcase
 codegen
 colordiff
 cowsay
 cytopia
+depgraph
 devenv
 dind
 dockerhub
@@ -21,6 +24,7 @@ fontconfig
 fontname
 forcelabels
 genpkey
+giga
 ginkgolinter
 gitops
 glightbox
@@ -47,6 +51,7 @@ lintfix
 markdownlint
 mattn
 mdlint
+mithril
 mkdocs
 modcache
 mozallowfullscreen
@@ -70,7 +75,10 @@ rustdoc
 rustdocflags
 rustflags
 rustfmt
+sanchonet
+rustup
 sqlfluff
+stdcfgs
 subproject
 subprojects
 superfences
@@ -80,12 +88,16 @@ testdocs
 testpackage
 testunit
 Timoni
+toolsets
 transpiling
 UDCs
+unarchiving
 uniseg
 voteplan
 wasi
+wasmtime
 webkitallowfullscreen
 WORKDIR
 xerrors
 zstd
+zstdcat

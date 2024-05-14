@@ -1,21 +1,23 @@
 VERSION 0.8
 
+IMPORT ../earthly/go AS go-ci
+
 FROM golang:1.21-alpine3.19
 
 # cspell: words onsi ldflags extldflags
 
 fmt:
-    DO ../earthly/go+FMT --src="go.mod go.sum cmd pkg"
+    DO go-ci+FMT --src="go.mod go.sum cmd pkg"
 
 lint:
-    DO ../earthly/go+LINT --src="go.mod go.sum cmd pkg"
+    DO go-ci+LINT --src="go.mod go.sum cmd pkg"
 
 deps:
     WORKDIR /work
     CACHE --persist --sharing shared /go
 
     RUN apk add --no-cache gcc musl-dev
-    DO ../earthly/go+DEPS
+    DO go-ci+DEPS
 
 src:
     FROM +deps

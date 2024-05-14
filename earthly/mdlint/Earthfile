@@ -76,13 +76,13 @@ CHECK:
         --config $cfg_file 
 
 # A Test and example invocation of the above FUNCTION.
-mdlint-test:
+test-mdlint:
     # Test Markdown lint checks.
-    # Run with `earthly -P +mdlint-test
+    # Run with `earthly -P +test-mdlint
 
     # Must be run LOCALLY as described above.
     LOCALLY
 
     ARG src=$(echo ${PWD}/../../)
 
-    RUN +MDLINT_LOCALLY --src=${src}
+    DO +MDLINT_LOCALLY --src=${src}

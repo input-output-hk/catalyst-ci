@@ -9,8 +9,6 @@ tags:
 # :simple-rust: Rust
 <!-- markdownlint-enable single-h1 -->
 
-<!-- cspell: words toolsets stdcfgs depgraph -->
-
 ## Introduction
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
@@ -49,31 +47,40 @@ Also we will take a look how we are setup Rust projects and what configuration i
 ### Prepare base builder
 
 ```Earthfile
-VERSION --try 0.8
+VERSION 0.8
+
+IMPORT ./../../earthly/rust AS rust-ci
 
 # Set up our target toolchains, and copy our files.
 builder:
-    DO ./../../earthly/rust+SETUP
+    DO rust-ci+SETUP
 
     COPY --dir .cargo .config crates .
     COPY Cargo.toml .
     COPY clippy.toml deny.toml rustfmt.toml .
 ```
 
-The first target `builder` is responsible for preparing an already configured Rust environment,
-instal all needed tools and dependencies.
+The first target `builder` is responsible for preparing configured Rust environments and,
+install all needed tools and dependencies.
 
-The fist step of the `builder` target is to prepare a Rust environment via `+rust-base` target.
-Next step is to copy source code of the project.
+#### Builder steps
+
+1. First step of `+builder` target is to prepare a Rust environment via `+installer` target,
+which is called in `+SETUP` FUNCTION.
+The `+installer` target installs necessary tools for `+rust-base` target and copies
+common scripts and standardized Rust configs.
+The `+rust-base` provides a base Rustup build environment.
+It installs necessary packages, including development libraries and tools.
+Clippy linter, LLVM tools for generating code coverage, and nightly toolchain are installed.
+2. Next step is to copy source code of the project.
 Note that you need to copy only needed files for Rust build process,
 any other irrelevant stuff should omitted.
-And finally finalize the build with `+SETUP` Function.
-The `+SETUP` Function requires `rust-toolchain.toml` file,
-with the specified `channel` option in it.
-This `rust-toolchain.toml` file could be specified
-via the `toolchain` argument of the `+SETUP` target like this
-with defining the specific location of this file with the specific name.
-By default `toolchain` setup to `rust-toolchain.toml`.
+3. And finally finalize the build with `+SETUP` FUNCTION which takes no arguments.
+
+<!-- markdownlint-disable max-one-sentence-per-line -->
+!!! Warning
+    Please ensure that Rust version set in `rust-toolchain.toml` matches the Docker image tag uses in `+rust-base` target.
+<!-- markdownlint-enable max-one-sentence-per-line -->
 
 ### Running checks
 
@@ -83,7 +90,7 @@ By default `toolchain` setup to `rust-toolchain.toml`.
 check:
     FROM +builder
 
-    RUN /scripts/std_checks.py
+    DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -92,8 +99,8 @@ all-hosts-check:
 ```
 
 With prepared environment and all data, we're now ready to start operating with the source code and configuration files.
-The `check` target which actually performs all checks and validation
-with the help of `std_checks.py` script.
+The `+check` target performs all checks and validation procedures
+using the help of `std_checks.py` script.
 This script performs static checks of the Rust project as
 `cargo fmt`, `cargo machete`, `cargo deny` which will validate formatting,
 find unused dependencies and any supply chain issues with dependencies.
@@ -105,18 +112,18 @@ look at `./earthly/rust/stdcfgs/cargo_config.toml`)Checking Rust Code Format.
 3. `cargo machete` - Checking for Unused Dependencies.
 4. `cargo deny check` - Checking for Supply Chain Issues.
 
-As it was mentioned above it validates configuration files as
+As it was mentioned above, it validates configuration files as
 `.cargo/config.toml`, `rustfmt.toml`, `.config/nextest.toml`, `clippy.toml`, `deny.toml`
 to be the same as defined in `earthly/rust/stdcfgs` directory of the `catalyst-ci` repo.
-So when you are going to setup a new Rust project copy these configuration files
+So when you are going to setup a new Rust project, copy these configuration files
 described above to the appropriate location of your Rust project.
 
-Another target as `all-hosts-check` just invokes `check` with the specified `--platform`.
-It is needed for the local development to double check that everything is works for different platforms.
-It is important to define a `linux` target platform with a proper cpu architecture
+Another target as `+all-hosts-check` just invokes `+check` with the specified `--platform`.
+It is needed for the local development to double check that everything works for different platforms.
+It is important to define a `linux` target platform with a proper CPU architecture
 for the Rust project when you are building it inside Docker
 and check the build process with different scenarios.
-The same approach we will see for the another targets of this guide.
+The same approach will be seen in other targets throughout this guide.
 
 ### Build
 
@@ -126,20 +133,15 @@ The same approach we will see for the another targets of this guide.
 build:
     FROM +builder
 
-    TRY
-        RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
-                                    --with_docs \
-                                    --libs="bar" \
-                                    --bins="foo/foo"
-    FINALLY
-        SAVE ARTIFACT target/nextest/ci/junit.xml example.junit-report.xml AS LOCAL
-        SAVE ARTIFACT coverage-report.info example.coverage-report.info AS LOCAL
-    END
+    # This WILL save the junit and coverage reports even if it fails.
+    DO rust-ci+EXECUTE \
+        --cmd="/scripts/std_build.py --cov_report=$HOME/coverage-report.info --libs=bar --bins=foo/foo" \
+        --junit="example.junit-report.xml" \
+        --coverage="example.coverage-report.info" \
+        --output="release/[^\./]+" \
+        --docs="true"
 
-    SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/foo foo
-
-    DO ./../../earthly/rust+SMOKE_TEST --bin="foo"
 
 # Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
@@ -147,16 +149,16 @@ all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
 ```
 
-After successful performing checks of the Rust project we can finally `build` artifacts.
-Obviously it inherits `builder` target environment and than performs build of the binary.
+After successful performing checks of the Rust project we can finally build artifacts.
+Obviously it inherits `+builder` target environment and then performs build of the binary.
 Important to note that in this particular example we are dealing with the executable Rust project,
 so it produces binary as a final artifact.
-Another case of the building Rust library we will consider later.
+We will discuss another scenario of building a Rust library later.
 Actual build process is done with the `std_build.py` script.
 Here is the full list of configuration of this script:
 
 ```bash
- usage: std_build.py [-h] [--build_flags BUILD_FLAGS]
+ usage: std_build.py [-h] [-v] [--build_flags BUILD_FLAGS]
                      [--doctest_flags DOCTEST_FLAGS] [--test_flags TEST_FLAGS]
                      [--bench_flags BENCH_FLAGS] [--with_test]
                      [--cov_report COV_REPORT] [--with_bench] [--libs LIBS]
@@ -165,7 +167,8 @@ Here is the full list of configuration of this script:
  Rust build processing.
 
  options:
-   -h, --help            show this help message and exit
+   -h, --help            Show this help message and exit.
+   -v --verbose          Show the output of executed commands verbosely.
    --build_flags BUILD_FLAGS
                          Additional command-line flags that can be passed to
                          the `cargo build` command.
@@ -226,11 +229,12 @@ for the specified `--libs="crate1"` argument.
 10. Running smoke tests on provided binary names (`--bins` argument).
 
 Final step is to provide desired artifacts: docs and binary.
+Note that all commands within the `std_build.py` are written to be run in parallel, resulting in a faster speeds.
 
 ### Test
 
 As you already mentioned that running of unit tests is done during the `build` process,
-but if you need some integration tests pls follow how it is done for [PostgreSQL builder](./postgresql.md),
+but if you need some integration tests please follow this [PostgreSQL builder](./postgresql.md),
 Rust will have the same approach.
 
 ### Release and publish
@@ -247,6 +251,52 @@ It is highly likely that the `nightly` toolchain version on the CI machines diff
 Unfortunately, Rust tooling does not have the capability to preserve and maintain consistency between
 `stable` and `nightly` toolchains simultaneously.
 In our builds, we only preserve the `stable` toolchain version (`rust-toolchain.toml` file).
+
+## Rust tools
+
+All the necessary Rust tools can be found in [tool](../../../../earthly/rust/tools/Earthfile).
+
+## Rust FUNCTIONs
+
+While leveraging the [Earthly lib/rust](https://github.com/earthly/lib/tree/main/rust),
+the following Rust FUNCTIONs are customize to align with our specific requirements
+that our project needed.
+
+* `EXECUTE` : This FUNCTION, adapted from the [Earthly lib/rust](https://github.com/earthly/lib/tree/main/rust),
+  is tailored to execute commands according to user specifications.
+  It serves a pivotal role in managing Rust project builds, handling outputs, and supporting features
+  such as `JUnit` reporting and code coverage.
+  Our modifications ensure that the command
+  executed utilize the cache efficiently, which result in a faster compilation time.
+
+```Earthfile
+    # Example of using `EXECUTE` with a simple copy command
+    DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
+```
+
+* `CARGO` : This FUNCTION serves as a shim of the original lib/rust `CARGO` FUNCTION
+  to guarantee consistent usage of the appropriate upstream Rust library.
+  Therefore, users of `catalyst-ci` who wish to use `rust+CARGO` from `lib/rust`
+  should utilize the `+CARGO` implementation provided in this repository.
+
+```Earthfile
+    # Example of using `CARGO` to install a Rust tool
+    DO rust-ci+CARGO --args="install cargo-nextest --version=0.9.70 --locked"
+```
+
+* `COPY_OUTPUT` : This FUNCTION serves as a shim of the original lib/rust `COPY_OUTPUT`
+  to facilitate the SAVE of ARTIFACT from the target folder (mounted cache) into the image layer.
+  This FUNCTION will always trying to minimize the total size of the copied files,
+  which result in a faster copy.
+
+```Earthfile
+    # Example of using `COPY_OUTPUT` where `SAVE ARTIFACT` is used
+    # The `COPY_OUTPUT` will copy the output to `target` folder 
+    DO rust+COPY_OUTPUT --output="nextest/ci/junit.xml"
+    SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL "$junit"
+```
+
+**Note that in order to called the above FUNCTIONs, `rust+INIT` should be called first.**
 
 ## Conclusion
 

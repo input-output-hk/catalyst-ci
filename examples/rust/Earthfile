@@ -1,10 +1,12 @@
-VERSION --try 0.8
+VERSION 0.8
+
+IMPORT ./../../earthly/rust AS rust-ci
 
 # cspell: words USERARCH toolsets
 
-# Set up our target toolchains, and copy our files.
+# builder : Set up our target toolchains, and copy our files.
 builder:
-    DO ./../../earthly/rust+SETUP
+    DO rust-ci+SETUP
 
     COPY --dir .cargo .config crates .
     COPY Cargo.toml .
@@ -16,36 +18,35 @@ builder:
 ##
 ## These targets are discovered and executed automatically by CI.
 
-# Run check using the most efficient host tooling
+# check : Run check using the most efficient host tooling
 # CI Automated Entry point.
 check:
     FROM +builder
 
-    RUN /scripts/std_checks.py
+    DO rust-ci+EXECUTE --cmd="/scripts/std_checks.py"
 
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# all-hosts-check ; Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 all-hosts-check:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +check
 
-# Run build using the most efficient host tooling
+# build : Run build using the most efficient host tooling
 # CI Automated Entry point.
 build:
     FROM +builder
 
-    TRY
-        RUN /scripts/std_build.py   --cov_report="coverage-report.info" \
-                                    --libs="bar" \
-                                    --bins="foo/foo"
-    FINALLY
-        SAVE ARTIFACT target/nextest/ci/junit.xml AS LOCAL example.junit-report.xml
-        SAVE ARTIFACT coverage-report.info AS LOCAL example.coverage-report.info
-    END
+    # This WILL save the junit and coverage reports even if it fails.
+    DO rust-ci+EXECUTE \
+        --cmd="/scripts/std_build.py --cov_report=$HOME/coverage-report.info --libs=bar --bins=foo/foo" \
+        --junit="example.junit-report.xml" \
+        --coverage="example.coverage-report.info" \
+        --output="release/[^\./]+" \
+        --docs="true"
 
     SAVE ARTIFACT target/doc doc
     SAVE ARTIFACT target/release/foo foo
 
-# Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
+# all-hosts-build : Test which runs check with all supported host tooling.  Needs qemu or rosetta to run.
 # Only used to validate tooling is working across host toolsets.
 all-hosts-build:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +build
