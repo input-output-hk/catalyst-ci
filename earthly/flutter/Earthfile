@@ -1,9 +1,8 @@
 VERSION 0.8
 
 flutter-base:
-    ARG FLUTTER_VERSION=3.19.5
-    ARG TARGETARCH
-    ARG WORKDIR
+    ARG FLUTTER_VERSION=3.22.0
+    ARG WORKDIR=frontend
 
     FROM debian:bookworm-slim
 
@@ -14,7 +13,7 @@ flutter-base:
     RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
     RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
 
-    WORKDIR WORKDIR
+    WORKDIR $WORKDIR
 
     RUN git clone --depth 1 --branch $FLUTTER_VERSION https://github.com/flutter/flutter.git /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
@@ -28,3 +27,11 @@ flutter-base:
 SETUP:
     FUNCTION
     FROM +flutter-base
+
+BOOTSTRAP:
+    FUNCTION
+    FROM +flutter-base
+
+    IF [ -f "melos.yaml" ]
+        RUN melos bootstrap
+    END
