@@ -32,6 +32,7 @@ BOOTSTRAP:
     FUNCTION
     FROM +flutter-base
 
+    RUN echo "Checking if project uses melos"
     IF [ -f "melos.yaml" ]
         RUN melos bootstrap
     END

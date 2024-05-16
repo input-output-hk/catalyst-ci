@@ -4,3 +4,6 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:feat-add-guide-for
 
 builder:
     DO flutter-ci+SETUP
+
+bootstrap:
+    DO flutter-ci+BOOTSTRAP
