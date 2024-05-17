@@ -32,10 +32,11 @@ BOOTSTRAP:
     FUNCTION
     FROM +flutter-base
 
-    if [ -f "melos.yaml" ]; then \
-        echo "Running melos bootstrap."; \
-        RUN melos bootstrap \
-    fi;
+    IF [ -f "melos.yaml" ]; then
+        RUN echo "Running melos bootstrap"
+        RUN melos bootstrap
+    END
+
 
 OPENAPI_CODE_GEN:
     FUNCTION
