@@ -39,7 +39,6 @@ BOOTSTRAP:
         RUN echo "No melos.yaml file found"
     END
 
-
 OPENAPI_CODE_GEN:
     FUNCTION
     FROM +flutter-base
@@ -51,14 +50,13 @@ OPENAPI_CODE_GEN:
     ARG --required GEN_CODE_PATH
     ARG --required LOCAL_GEN_CODE_PATH
 
-    FROM +src
     WORKDIR $WORKDIR
     COPY $OPEN_API_SPEC_PATH $OPEN_API_SPEC_COPY_PATH
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
 
     IF [ $SAVE_LOCALLY = true ]
-        SAVE ARTIFACT "$GEN_CODE_PATH*" AS LOCAL $LOCAL_GEN_CODE_PATH
+        SAVE ARTIFACT "$GEN_CODE_PATH/*" AS LOCAL $LOCAL_GEN_CODE_PATH
     ELSE
         SAVE ARTIFACT $GEN_CODE_PATH
     END
@@ -91,10 +89,10 @@ FORMAT:
     FROM +flutter-base
 
     IF [ -f melos.yaml ]
-        RUN echo "Running melos analyze"
+        RUN echo "Running melos fomat"
         RUN melos run format-check
     ELSE
-        RUN echo "Running flutter anaylze"
+        RUN echo "Running flutter format"
         RUN flutter format --set-exit-if-changed .
     END
 
@@ -103,7 +101,7 @@ UNIT_TESTS:
     FROM +flutter-base
 
     IF [ -f melos.yaml ]
-        RUN echo "Running melos analyze"
+        RUN echo "Running unut tests with melos."
         RUN melos run test-report
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
