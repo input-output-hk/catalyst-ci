@@ -35,6 +35,8 @@ BOOTSTRAP:
     IF [ -f melos.yaml ]
         RUN echo "Running melos bootstrap"
         RUN melos bootstrap
+    ELSE
+        RUN echo "No melos.yaml file found"
     END
 
 
