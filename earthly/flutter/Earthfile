@@ -45,67 +45,88 @@ OPENAPI_CODE_GEN:
     FROM +flutter-base
 
     ARG SAVE_LOCALLY=false
-    ARG WORKDIR
-    ARG OPEN_API_SPEC_PATH
+    ARG --required WORKDIR
+    ARG --required OPEN_API_SPEC_PATH
+    ARG --required OPEN_API_SPEC_COPY_PATH
+    ARG --required GEN_CODE_PATH
+    ARG --required LOCAL_GEN_CODE_PATH
 
     FROM +src
     WORKDIR $WORKDIR
-    COPY $OPEN_API_SPEC_PATH openapi/cat-gateway-api.json
+    COPY $OPEN_API_SPEC_PATH $OPEN_API_SPEC_COPY_PATH
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
 
     IF [ $SAVE_LOCALLY = true ]
-        SAVE ARTIFACT lib/generated/catalyst_gateway/* AS LOCAL ./packages/catalyst_voices_services/lib/generated/catalyst_gateway/
+        SAVE ARTIFACT "$GEN_CODE_PATH*" AS LOCAL $LOCAL_GEN_CODE_PATH
     ELSE
-        SAVE ARTIFACT lib/generated/catalyst_gateway
+        SAVE ARTIFACT $GEN_CODE_PATH
     END
 
 OPENAPI_VALIDATE:
     FUNCTION
     FROM +flutter-base
 
-    FROM +src
-    WORKDIR /frontend/catalyst_voices/packages/catalyst_voices_services
+    ARG --required WORKDIR
+
+    WORKDIR $WORKDIR
     RUN dart run openapi_validate
 
     SAVE ARTIFACT openapi_validate
 
-# ANALYZE:
-#     FUNCTION
-#     FROM +flutter-base
+ANALYZE:
+    FUNCTION
+    FROM +flutter-base
 
-#     FROM +src
-#     WORKDIR /frontend/catalyst_voices
-#     RUN flutter analyze
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos analyze"
+        RUN melos analyze --fatal-infos --fatal-warnings
+    ELSE
+        RUN echo "Running flutter anaylze"
+        RUN flutter analyze --fatal-infos --fatal-warnings
+    END
 
-#     SAVE ARTIFACT analyze
+FORMAT:
+    FUNCTION
+    FROM +flutter-base
 
-# FORMAT:
-#     FUNCTION
-#     FROM +flutter-base
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos analyze"
+        RUN melos run format-check
+    ELSE
+        RUN echo "Running flutter anaylze"
+        RUN flutter format --set-exit-if-changed .
+    END
 
-#     FROM +src
-#     WORKDIR /frontend/catalyst_voices
-#     RUN flutter format --set-exit-if-changed .
+UNIT_TESTS:
+    FUNCTION
+    FROM +flutter-base
 
-#     SAVE ARTIFACT format
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos analyze"
+        RUN melos run test-report
+        WAIT
+            SAVE ARTIFACT test_reports AS LOCAL test_reports
+        END
+    ELSE
+        RUN echo "Running flutter anaylze"
+        RUN flutter test
+        WAIT
+            SAVE ARTIFACT test_reports AS LOCAL test_reports
+        END
+    END
 
-# UNIT_TESTS:
-#     FUNCTION
-#     FROM +flutter-base
+BUILD_WEB:
+    FUNCTION
+    FROM +flutter-base
 
-#     FROM +src
-#     WORKDIR /frontend/catalyst_voices
-#     RUN flutter test
+    ARG --required WORKDIR
+    ARG --required TARGET
 
-#     SAVE ARTIFACT test
+    WORKDIR $WORKDIR
+    RUN flutter clean
+    RUN flutter pub get
+    RUN flutter build web --web-renderer canvaskit --release --target $TARGET
 
-# BUILD:
-#     FUNCTION
-#     FROM +flutter-base
-
-#     FROM +src
-#     WORKDIR /frontend/catalyst_voices
-#     RUN flutter build web --release
-
-#     SAVE ARTIFACT build/web
+    WORKDIR "$WORKDIR/build"
+    SAVE ARTIFACT web /web AS LOCAL web
