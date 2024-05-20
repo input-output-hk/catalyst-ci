@@ -4,5 +4,4 @@ IMPORT ../../earthly/dart AS dart-ci
 check:
     FROM dart-ci+dart-base
     COPY . .
-    DO dart-ci+LICENSE_CHECK --dir=flutter_example
-    
+    DO dart-ci+LICENSE_CHECK --dir=example_project
