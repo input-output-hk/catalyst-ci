@@ -20,5 +20,6 @@ LICENSE_CHECK:
     RUN diff ${dir} license_checker.yaml
 
     WORKDIR ${dir}
-
+    RUN dart pub get
+    
     RUN lic_ck check-licenses --config ${config_file}
