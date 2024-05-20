@@ -11,7 +11,7 @@ LICENSE_CHECK:
 
     # Required argument to specify the directory to check
     ARG --required dir
-    # Argument for the name of licese checker config file
+    # Argument for the name of license checker config file
     ARG config_file="license_checker.yaml"
 
     RUN dart pub global activate license_checker
