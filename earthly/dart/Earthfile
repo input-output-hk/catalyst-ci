@@ -1,0 +1,24 @@
+VERSION 0.8
+
+dart-base:
+    FROM dart:3.4.0
+    WORKDIR /work 
+    COPY . .
+
+
+LICENSE_CHECK:
+    FUNCTION
+
+    # Required argument to specify the directory to check
+    ARG --required dir
+    # Argument for the name of licese checker config file
+    ARG config_file="license_checker.yaml"
+
+    RUN dart pub global activate license_checker
+
+    # Check whether the license config files are the same
+    RUN diff ${dir} license_checker.yaml
+
+    WORKDIR ${dir}
+
+    RUN lic_ck check-licenses --config ${config_file}
