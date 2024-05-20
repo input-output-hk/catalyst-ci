@@ -2,8 +2,10 @@ VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:feat-add-guide-for-flutter-dart AS flutter-ci
 
+# Set up the CI environment for Flutter app.
 builder:
     DO flutter-ci+SETUP
 
+ # Bootstrap the Flutter app if mroject uses melos.
 bootstrap:
     DO flutter-ci+BOOTSTRAP

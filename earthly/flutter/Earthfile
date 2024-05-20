@@ -107,7 +107,7 @@ UNIT_TESTS:
             SAVE ARTIFACT test_reports AS LOCAL test_reports
         END
     ELSE
-        RUN echo "Running flutter anaylze"
+        RUN echo "Running flutter test."
         RUN flutter test
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
