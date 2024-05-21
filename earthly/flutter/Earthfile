@@ -9,9 +9,6 @@ flutter-base:
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
     COPY --dir scripts .
-    RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
-    RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
-    RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
 
     WORKDIR $WORKDIR
 
@@ -30,6 +27,7 @@ SETUP:
 
 BOOTSTRAP:
     FUNCTION
+    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos bootstrap"
@@ -106,7 +104,7 @@ UNIT_TESTS:
             SAVE ARTIFACT test_reports AS LOCAL test_reports
         END
     ELSE
-        RUN echo "Running flutter test."
+        RUN echo "Running flutter test"
         RUN flutter test
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports

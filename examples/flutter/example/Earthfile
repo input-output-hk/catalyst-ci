@@ -9,4 +9,3 @@ builder:
  # Bootstrap the Flutter app if mroject uses melos.
 bootstrap:
     FROM +builder
-    DO flutter-ci+BOOTSTRAP
