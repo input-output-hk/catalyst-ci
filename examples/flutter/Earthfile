@@ -1,7 +1,7 @@
 VERSION 0.8
 IMPORT ../../earthly/dart AS dart-ci
 
-check:
+check-license:
     FROM dart-ci+dart-base
     COPY . .
     DO dart-ci+LICENSE_CHECK --dir=example_project
