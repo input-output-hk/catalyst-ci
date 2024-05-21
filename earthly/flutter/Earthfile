@@ -1,7 +1,13 @@
 VERSION 0.8
 
+install-flutter:
+    FROM scratch
+    ARG version=3.22.0
+
+    GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
+    SAVE ARTIFACT flutter
+
 flutter-base:
-    ARG FLUTTER_VERSION=3.22.0
     ARG WORKDIR=frontend
 
     FROM debian:bookworm-slim
@@ -12,7 +18,7 @@ flutter-base:
 
     WORKDIR $WORKDIR
 
-    RUN git clone --depth 1 --branch $FLUTTER_VERSION https://github.com/flutter/flutter.git /usr/local/flutter
+    COPY +install-flutter/flutter /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter --version
     RUN flutter doctor -v
