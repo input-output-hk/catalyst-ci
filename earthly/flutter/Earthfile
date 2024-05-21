@@ -121,7 +121,7 @@ BUILD_WEB:
     FUNCTION
     FROM +flutter-base
 
-    ARG --required WORKDIR
+    ARG WORKDIR
     ARG --required TARGET
 
     WORKDIR $WORKDIR
