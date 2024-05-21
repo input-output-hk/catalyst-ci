@@ -1,0 +1,130 @@
+VERSION 0.8
+
+flutter-base:
+    ARG FLUTTER_VERSION=3.22.0
+    ARG WORKDIR=frontend
+
+    FROM debian:bookworm-slim
+
+    RUN apt-get update
+    RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
+    COPY --dir scripts .
+    RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
+    RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
+    RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
+
+    WORKDIR $WORKDIR
+
+    RUN git clone --depth 1 --branch $FLUTTER_VERSION https://github.com/flutter/flutter.git /usr/local/flutter
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    RUN flutter --version
+    RUN flutter doctor -v
+    RUN flutter config --enable-web
+    RUN dart pub global activate melos
+    RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
+
+SETUP:
+    FUNCTION
+    FROM +flutter-base
+
+BOOTSTRAP:
+    FUNCTION
+    FROM +flutter-base
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos bootstrap"
+        RUN melos bootstrap
+    ELSE
+        RUN echo "No melos.yaml file found"
+    END
+
+OPENAPI_CODE_GEN:
+    FUNCTION
+    FROM +flutter-base
+
+    ARG SAVE_LOCALLY=false
+    ARG --required WORKDIR
+    ARG --required OPEN_API_SPEC_PATH
+    ARG --required OPEN_API_SPEC_COPY_PATH
+    ARG --required GEN_CODE_PATH
+    ARG --required LOCAL_GEN_CODE_PATH
+
+    WORKDIR $WORKDIR
+    COPY $OPEN_API_SPEC_PATH $OPEN_API_SPEC_COPY_PATH
+    RUN flutter pub get
+    RUN dart run build_runner build --delete-conflicting-outputs
+
+    IF [ $SAVE_LOCALLY = true ]
+        SAVE ARTIFACT "$GEN_CODE_PATH/*" AS LOCAL $LOCAL_GEN_CODE_PATH
+    ELSE
+        SAVE ARTIFACT $GEN_CODE_PATH
+    END
+
+OPENAPI_VALIDATE:
+    FUNCTION
+    FROM +flutter-base
+
+    ARG --required WORKDIR
+
+    WORKDIR $WORKDIR
+    RUN dart run openapi_validate
+
+    SAVE ARTIFACT openapi_validate
+
+ANALYZE:
+    FUNCTION
+    FROM +flutter-base
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos analyze"
+        RUN melos analyze --fatal-infos --fatal-warnings
+    ELSE
+        RUN echo "Running flutter anaylze"
+        RUN flutter analyze --fatal-infos --fatal-warnings
+    END
+
+FORMAT:
+    FUNCTION
+    FROM +flutter-base
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos fomat"
+        RUN melos run format-check
+    ELSE
+        RUN echo "Running flutter format"
+        RUN flutter format --set-exit-if-changed .
+    END
+
+UNIT_TESTS:
+    FUNCTION
+    FROM +flutter-base
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running unut tests with melos."
+        RUN melos run test-report
+        WAIT
+            SAVE ARTIFACT test_reports AS LOCAL test_reports
+        END
+    ELSE
+        RUN echo "Running flutter test."
+        RUN flutter test
+        WAIT
+            SAVE ARTIFACT test_reports AS LOCAL test_reports
+        END
+    END
+
+BUILD_WEB:
+    FUNCTION
+    FROM +flutter-base
+
+    ARG --required WORKDIR
+    ARG --required TARGET
+
+    WORKDIR $WORKDIR
+    RUN flutter clean
+    RUN flutter pub get
+    RUN flutter build web --web-renderer canvaskit --release --target $TARGET
+
+    WORKDIR "$WORKDIR/build"
+    SAVE ARTIFACT web /web AS LOCAL web
