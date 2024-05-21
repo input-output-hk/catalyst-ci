@@ -54,7 +54,8 @@ rust-base:
             findutils \
             pkgconfig \
             openssl-dev \
-            openssl-libs-static
+            openssl-libs-static \
+            hdf5
 
     # Fix up font cache.
     RUN fc-cache -f
