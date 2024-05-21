@@ -1,7 +1,7 @@
 VERSION 0.8
-IMPORT ../../earthly/dart AS dart-ci
+IMPORT ../../earthly/flutter AS flutter-ci
 
 check-license:
-    FROM dart-ci+dart-base
+    DO flutter-ci+SETUP
     COPY . .
-    DO dart-ci+LICENSE_CHECK --dir=example_project
+    DO flutter-ci+LICENSE_CHECK --dir=example

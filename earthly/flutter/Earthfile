@@ -8,12 +8,13 @@ flutter-base:
 
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
-    COPY --dir scripts .
+    
+    WORKDIR $WORKDIR
+    COPY . .
     RUN chmod +x scripts/install-chrome-linux64.sh && ./scripts/install-chrome-linux64.sh
     RUN chmod +x scripts/install-edge-linux64.sh && ./scripts/install-edge-linux64.sh
     RUN chmod +x scripts/install-firefox-linux64.sh && ./scripts/install-firefox-linux64.sh
 
-    WORKDIR $WORKDIR
 
     RUN git clone --depth 1 --branch $FLUTTER_VERSION https://github.com/flutter/flutter.git /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
@@ -128,3 +129,21 @@ BUILD_WEB:
 
     WORKDIR "$WORKDIR/build"
     SAVE ARTIFACT web /web AS LOCAL web
+
+LICENSE_CHECK:
+    FUNCTION
+
+    # Required argument to specify the directory to check
+    ARG --required dir
+    # Argument for the name of license checker config file
+    ARG config_file="license_checker.yaml"
+
+    # Check whether the license config files are the same
+    RUN diff ${dir} license_checker.yaml
+
+    # Install license_checker
+    RUN dart pub global activate license_checker
+    WORKDIR ${dir}
+    # Generate pubspec.yaml file
+    RUN flutter pub get
+    RUN lic_ck check-licenses --config ${config_file} -i
