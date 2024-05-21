@@ -30,7 +30,6 @@ SETUP:
 
 BOOTSTRAP:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos bootstrap"
