@@ -2,10 +2,41 @@ VERSION 0.8
 
 IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:feat-add-guide-for-flutter-dart AS flutter-ci
 
+# To see more available functions, navigate to earthly/flutter/Earthfile.
+
 # Set up the CI environment for Flutter app.
 builder:
     DO flutter-ci+SETUP
 
- # Bootstrap the Flutter app if mroject uses melos.
-bootstrap:
+ # Run Flutter analyze orer melos analyze.
+analyze:
     FROM +builder
+
+    DO flutter-ci+ANALYZE
+
+# Run Flutter format orer melos format.
+format:
+    FROM +builder
+
+    DO flutter-ci+FORMAT
+
+# Run Flutter unit tests.
+unit-tests:
+    FROM +builder
+
+    DO flutter-ci+UNIT_TEST
+
+# Build the Flutter app for the web.
+# Asuming that we have a main.dart file in lib folder and we run `build-web` in folder
+# with pubspec.yaml file: earthly +build-web --WORKDIR=frontend --TARGET=lib/main.dart
+build-web:
+    FROM +builder
+
+    RUN echo "Building Flutter web $WORKDIR"
+    RUN pwd
+    RUN ls
+
+    ARG --required WORKDIR
+    ARG --required TARGET
+
+    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET
