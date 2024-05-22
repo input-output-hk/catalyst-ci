@@ -5,46 +5,50 @@ VERSION 0.8
 # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/1
 INSTALL_CHROME_LINUX64:
     FUNCTION
+    ARG TARGETARCH
 
-    IF ["$TARGETARCH" == "amd64"]
-        ARG DISTR=Debian 12 (Bookworm)
+    LET BLUE = "\033[1;34m"
+    # https://googlechromelabs.github.io/chrome-for-testing/
+    IF [ "$TARGETARCH" = "amd64" ]
+        LET DISTR = "Debian 12 (Bookworm)"
       
+        RUN echo "${BLUE}Installing Google Chrome..."
         # Installing dependencies for Chrome. Workaround for:
         # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/55
-        RUN echo -e "\033[1;34mInstalling Google Chrome..."
-        ARG chrome_deps=curl -s https://raw.githubusercontent.com/chromium/chromium/main/chrome/installer/linux/debian/dist_package_versions.json
-        ARG deps=echo"$chrome_deps" | jq -r ."$DISTR" | keys[]
-        RUN apt-get update
-        FOR dep IN "$deps"
-            RUN apt-get install -y "$dep"
-        END
+        # FIXME - Refactor and use Earthly for loop
+        RUN chrome_deps=$(curl -s https://raw.githubusercontent.com/chromium/chromium/125.0.6422.76/chrome/installer/linux/debian/dist_package_versions.json) && \
+            deps=$(echo "$chrome_deps" | jq -r ".\"$DISTR\" | keys[]") && \
+            apt-get update && \
+            for dep in $deps; do apt-get install -y "$dep"; done
 
-        # Get latest chrome-for-testing version
-        ARG json_chrome=curl -s https://googlechromelabs.github.io/chrome-for-testing/last-known-good-versions-with-downloads.json
-        RUN echo -e "\033[1;34mInstalling Google Chrome dependencies..."
-        ARG latest_chrome=echo "$json_chrome" | jq -r ".channels.Stable.downloads.chrome[].url | select(contains(\"linux64\"))"
-        RUN curl -s --create-dirs -o chrome.zip --output-dir /opt/chrome "$latest_chrome"
-        RUN unzip -d /opt/chrome -j /opt/chrome/chrome.zip && rm /opt/chrome/chrome.zip
+        # Install Chrome
+        RUN mkdir -p /opt/chrome
+        RUN curl -L https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/linux64/chrome-linux64.zip \
+            -o /opt/chrome/chrome.zip
+        RUN unzip -d /opt/chrome -j /opt/chrome/chrome.zip
+        RUN rm /opt/chrome/chrome.zip
         RUN ln -s /opt/chrome/chrome /usr/local/bin/google-chrome
-        RUN chmod +x /opt/chrome/chrome
         RUN google-chrome --version
 
         # Install Chromedriver
-        RUN echo -e "\033[1;34mInstalling Chromedriver..."
-        ARG latest_chromedriver=echo "$json_chrome" | jq -r ".channels.Stable.downloads.chromedriver[].url | select(contains(\"linux64\"))"
-        RUN curl -s --create-dirs -o chromedriver.zip --output-dir /opt/chromedriver "$latest_chromedriver"
-        RUN unzip -d /opt/chromedriver -j /opt/chromedriver/chromedriver.zip && rm /opt/chromedriver/chromedriver.zip
+        RUN echo "${BLUE}Installing Chromedriver..."
+        RUN mkdir -p /opt/chromedriver
+        RUN curl -L https://storage.googleapis.com/chrome-for-testing-public/125.0.6422.76/linux64/chromedriver-linux64.zip \
+            -o /opt/chromedriver/chromedriver.zip
+        RUN unzip -d /opt/chromedriver -j /opt/chromedriver/chromedriver.zip 
+        RUN rm /opt/chromedriver/chromedriver.zip
         RUN ln -s /opt/chromedriver/chromedriver /usr/local/bin/chromedriver
-        RUN chmod +x /opt/chromedriver/chromedriver
         RUN chromedriver --version
     ELSE 
-        RUN echo -e "\033[1;34mInstalling Chromium..."
+        # Install Chromium
+        RUN echo "${BLUE}Installing Chromium..."
         RUN apt-get update
         RUN apt-get install -y chromium
         RUN ln -s /usr/bin/chromium /usr/local/bin/google-chrome
         RUN google-chrome --version
 
-        RUN echo -e "\033[1;34mInstalling Chromedriver..."
+        # Install Chromium-driver
+        RUN echo "${BLUE}Installing Chromium-driver..."
         RUN apt-get install chromium-driver
         RUN chromedriver --version
     END
