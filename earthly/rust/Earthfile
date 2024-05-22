@@ -39,7 +39,7 @@ rust-base:
     # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
     #       if that crate is removed, these dependencies can also be removed.
     RUN apk add --no-cache \
-            musl-dev \
+            build-base \
             mold \
             clang \
             py3-pip \
@@ -54,7 +54,8 @@ rust-base:
             findutils \
             pkgconfig \
             openssl-dev \
-            openssl-libs-static
+            openssl-libs-static \
+            cmake
 
     # Fix up font cache.
     RUN fc-cache -f
