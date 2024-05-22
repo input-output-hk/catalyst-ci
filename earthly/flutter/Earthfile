@@ -115,6 +115,7 @@ BUILD_WEB:
     FUNCTION
 
     ARG WORKDIR
+    ARG SAVE_LOCALLY=false
     ARG --required TARGET
 
     WORKDIR $WORKDIR
@@ -123,4 +124,7 @@ BUILD_WEB:
     RUN flutter build web --web-renderer canvaskit --release --target $TARGET
 
     WORKDIR "$WORKDIR/build"
-    SAVE ARTIFACT web /web AS LOCAL web
+    IF [ $SAVE_LOCALLY = true ]
+        SAVE ARTIFACT web /web AS LOCAL web
+    END
+
