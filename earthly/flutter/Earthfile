@@ -33,7 +33,6 @@ SETUP:
 
 BOOTSTRAP:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos bootstrap"
@@ -44,7 +43,6 @@ BOOTSTRAP:
 
 OPENAPI_CODE_GEN:
     FUNCTION
-    FROM +flutter-base
 
     ARG SAVE_LOCALLY=false
     ARG --required WORKDIR
@@ -66,7 +64,6 @@ OPENAPI_CODE_GEN:
 
 OPENAPI_VALIDATE:
     FUNCTION
-    FROM +flutter-base
 
     ARG --required WORKDIR
 
@@ -77,7 +74,6 @@ OPENAPI_VALIDATE:
 
 ANALYZE:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos analyze"
@@ -89,7 +85,6 @@ ANALYZE:
 
 FORMAT:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos fomat"
@@ -101,7 +96,6 @@ FORMAT:
 
 UNIT_TESTS:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running unut tests with melos."
@@ -119,7 +113,6 @@ UNIT_TESTS:
 
 BUILD_WEB:
     FUNCTION
-    FROM +flutter-base
 
     ARG WORKDIR
     ARG --required TARGET
