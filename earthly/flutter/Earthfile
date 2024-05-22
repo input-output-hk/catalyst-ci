@@ -1,5 +1,7 @@
 VERSION 0.8
 
+IMPORT ./installer AS installer
+
 install-flutter:
     FROM scratch
     ARG version=3.22.0
@@ -14,9 +16,11 @@ flutter-base:
 
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
-    COPY --dir scripts .
 
     WORKDIR $WORKDIR
+    DO installer+INSTALL_CHROME_LINUX64
+    DO installer+INSTALL_EDGE_LINUX64
+    # DO installer+INSTALL_FIREFOX_LINUX64
 
     COPY +install-flutter/flutter /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
