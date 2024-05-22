@@ -8,7 +8,7 @@ install-flutter:
     SAVE ARTIFACT flutter
 
 flutter-base:
-    ARG WORKDIR=frontend
+    ARG WORKDIR=/frontend
 
     FROM debian:bookworm-slim
 

@@ -8,7 +8,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:feat-add-guide-for
 builder:
     DO flutter-ci+SETUP
 
-    COPY --dir pubspec.yaml .
+    COPY --dir . .
 
 # Run Flutter analyze orer melos analyze.
 analyze:
@@ -30,7 +30,7 @@ unit-tests:
 
 # Build the Flutter app for the web.
 # Asuming that we have a main.dart file in lib folder and we run `build-web` in folder
-# with pubspec.yaml file: earthly +build-web --WORKDIR=. --TARGET=lib/main.dart
+# with pubspec.yaml file: earthly +build-web --TARGET=lib/main.dart
 build-web:
     FROM +builder
 
