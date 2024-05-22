@@ -11,6 +11,7 @@ install-flutter:
 
 flutter-base:
     ARG WORKDIR=frontend
+    ARG TARGETARCH
 
     FROM debian:bookworm-slim
 
@@ -18,18 +19,22 @@ flutter-base:
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
 
     WORKDIR $WORKDIR
+
     DO installer+INSTALL_CHROME_LINUX64
-    DO installer+INSTALL_EDGE_LINUX64
+    # DO installer+INSTALL_EDGE_LINUX64
     # DO installer+INSTALL_FIREFOX_LINUX64
 
-    COPY +install-flutter/flutter /usr/local/flutter
-    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
-    RUN flutter --version
-    RUN flutter doctor -v
-    RUN flutter config --enable-web
-    RUN dart pub global activate melos
-    RUN dart pub global activate junitreport
-    RUN dart pub global activate coverage
+    # COPY +install-flutter/flutter /usr/local/flutter
+    # ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    # RUN flutter --version
+    # RUN flutter doctor -v
+    # RUN flutter config --enable-web
+    # RUN dart pub global activate melos
+    # RUN dart pub global activate junitreport
+    # RUN dart pub global activate coverage
+
+flutter-base-all-hosts:
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
 
 SETUP:
     FUNCTION
