@@ -1,5 +1,6 @@
 VERSION 0.8
 
+# Installs flutter.
 install-flutter:
     FROM scratch
     ARG version=3.22.0
@@ -7,6 +8,7 @@ install-flutter:
     GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
     SAVE ARTIFACT flutter
 
+# Installs requred tools and packages.
 flutter-base:
     ARG WORKDIR=/frontend
 
@@ -31,6 +33,7 @@ SETUP:
     FUNCTION
     FROM +flutter-base
 
+# Runs melos bootstrap if melos.yaml file is present.
 BOOTSTRAP:
     FUNCTION
 
@@ -41,6 +44,7 @@ BOOTSTRAP:
         RUN echo "No melos.yaml file found"
     END
 
+# Generatses dart code from open api spec.
 OPENAPI_CODE_GEN:
     FUNCTION
 
@@ -62,6 +66,7 @@ OPENAPI_CODE_GEN:
         SAVE ARTIFACT $GEN_CODE_PATH
     END
 
+# Validates open api generated specs.
 OPENAPI_VALIDATE:
     FUNCTION
 
@@ -72,6 +77,7 @@ OPENAPI_VALIDATE:
 
     SAVE ARTIFACT openapi_validate
 
+# Runs dart static analysis.
 ANALYZE:
     FUNCTION
 
@@ -83,6 +89,7 @@ ANALYZE:
         RUN flutter analyze --fatal-infos --fatal-warnings
     END
 
+# Runs dart formatting check.
 FORMAT:
     FUNCTION
 
@@ -94,6 +101,7 @@ FORMAT:
         RUN flutter format --set-exit-if-changed .
     END
 
+# Runs unit tests.
 UNIT_TESTS:
     FUNCTION
 
@@ -111,6 +119,7 @@ UNIT_TESTS:
         END
     END
 
+# Build web app and save artifacts locally if needed.
 BUILD_WEB:
     FUNCTION
 
