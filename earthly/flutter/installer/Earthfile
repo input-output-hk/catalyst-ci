@@ -1,0 +1,120 @@
+VERSION 0.8
+
+# cspell: words Chromedriver Edgedriver edgedriver msedgedriver Geckodriver geckodriver
+
+# Install Chrome/Chromium for testing and Chromedriver.
+# There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
+# https://github.com/GoogleChromeLabs/chrome-for-testing/issues/1
+
+LET BLUE = "\033[1;34m"
+
+INSTALL_CHROME_LINUX64:
+    FUNCTION
+    ARG TARGETARCH
+
+    # https://googlechromelabs.github.io/chrome-for-testing/
+    IF [ "$TARGETARCH" = "amd64" ]
+        LET DISTR = "Debian 12 (Bookworm)"
+        LET CHROME_VERSION = 125.0.6422.76
+
+        RUN echo "${BLUE}Installing Google Chrome..."
+        # Installing dependencies for Chrome. Workaround for:
+        # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/55
+        RUN chrome_deps=$(curl -s "https://raw.githubusercontent.com/chromium/chromium/${CHROME_VERSION}/chrome/installer/linux/debian/dist_package_versions.json") && \
+            deps=$(echo "$chrome_deps" | jq -r ".\"$DISTR\" | keys[]") && \
+            apt-get update && \
+            echo "$deps" | xargs apt-get install -y
+
+        # Install Chrome
+        RUN mkdir -p /opt/chrome
+        RUN curl -L "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chrome-linux64.zip" \
+            -o /opt/chrome/chrome.zip
+        RUN unzip -d /opt/chrome -j /opt/chrome/chrome.zip
+        RUN ln -s /opt/chrome/chrome /usr/local/bin/google-chrome
+        RUN google-chrome --version
+
+        # Install Chromedriver
+        RUN echo "${BLUE}Installing Chromedriver..."
+        RUN mkdir -p /opt/chromedriver
+        RUN curl -L "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip" \
+            -o /opt/chromedriver/chromedriver.zip
+        RUN unzip -d /opt/chromedriver -j /opt/chromedriver/chromedriver.zip 
+        RUN ln -s /opt/chromedriver/chromedriver /usr/local/bin/chromedriver
+        RUN chromedriver --version
+    ELSE 
+        # Install Chromium
+        RUN echo "${BLUE}Installing Chromium..."
+        RUN apt-get update
+        RUN apt-get install -y chromium
+        RUN ln -s /usr/bin/chromium /usr/local/bin/google-chrome
+        RUN google-chrome --version
+
+        # Install Chromium-driver
+        RUN echo "${BLUE}Installing Chromium-driver..."
+        RUN apt-get install chromium-driver
+        RUN chromedriver --version
+    END
+
+# Install Edge and EdgeDriver.
+# There is no Edge version build for linux/arm64, installing only for amd64.
+INSTALL_EDGE_LINUX64:
+    FUNCTION
+    ARG TARGETARCH
+    LET EDGE_VERSION = 125.0.2535.51
+
+    IF [ "$TARGETARCH" = "amd64" ]
+        # https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable
+        RUN echo "${BLUE}Installing Edge..."
+        RUN curl -LO "https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${EDGE_VERSION}-1_amd64.deb"
+        RUN apt-get install -y ./microsoft-edge-stable_"$EDGE_VERSION"-1_amd64.deb
+        RUN microsoft-edge-stable --version
+
+        # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
+        RUN echo "${BLUE}Installing Edgedriver..."
+        RUN mkdir -p /opt/edgedriver
+        RUN curl -L https://msedgedriver.azureedge.net/"$EDGE_VERSION"/edgedriver_linux64.zip \
+            -o /opt/edgedriver/edgedriver.zip
+        RUN unzip /opt/edgedriver/edgedriver.zip -d /usr/local/bin/
+        RUN msedgedriver --version
+    END
+
+# Install Firefox and Geckodriver. 
+# Geckodriver supported versions:
+# https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html
+# Firefox for linux/arm64 is only in the esr or the unstable version, using the latter.
+INSTALL_FIREFOX_LINUX64:
+    FUNCTION
+    ARG TARGETARCH
+    LET PLATFORM = ""
+    LET GECKO_VERSION = 0.34.0
+
+    RUN echo "${BLUE}Installing Firefox..."
+    WAIT
+        RUN install -d -m 0755 /etc/apt/keyrings
+        RUN curl -fSsL https://packages.mozilla.org/apt/repo-signing-key.gpg \
+            | tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+        RUN echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" \
+            | tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+        RUN echo "Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n\n" \
+            | tee /etc/apt/preferences.d/mozilla > /dev/null
+        RUN apt-get update
+    END
+    
+    IF [ "$TARGETARCH" = "amd64" ]
+        SET PLATFORM = linux64
+        RUN apt-get install -y firefox
+        RUN apt-get install -y -t mozilla firefox=126.0~build2
+    ELSE
+        SET PLATFORM = linux-aarch64
+        RUN apt-get install -y firefox-esr
+        RUN apt-get install -y -t mozilla firefox-esr=115.11.0esr-1~deb12u1
+    END
+
+    RUN firefox --version
+    
+    RUN echo "${BLUE}Installing Geckodriver..."
+    RUN mkdir -p /opt/geckodriver
+    RUN curl -sL "https://github.com/mozilla/geckodriver/releases/download/v${GECKO_VERSION}/geckodriver-v${GECKO_VERSION}-${PLATFORM}.tar.gz" \
+        | tar -xz -C /opt/geckodriver/
+    RUN ln -s /opt/geckodriver/geckodriver /usr/local/bin/geckodriver
+    RUN geckodriver --version

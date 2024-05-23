@@ -1,6 +1,9 @@
 VERSION 0.8
 
+IMPORT ./installer AS installer
+
 # Installs flutter.
+
 install-flutter:
     FROM scratch
     ARG version=3.22.0
@@ -8,17 +11,21 @@ install-flutter:
     GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
     SAVE ARTIFACT flutter
 
-# Installs requred tools and packages.
+# Installs required tools and packages.
 flutter-base:
-    ARG WORKDIR=/frontend
+    ARG WORKDIR=frontend
+    ARG TARGETARCH
 
     FROM debian:bookworm-slim
 
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
-    COPY --dir scripts .
 
     WORKDIR $WORKDIR
+
+    DO installer+INSTALL_CHROME_LINUX64
+    DO installer+INSTALL_EDGE_LINUX64
+    DO installer+INSTALL_FIREFOX_LINUX64
 
     COPY +install-flutter/flutter /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
@@ -28,6 +35,9 @@ flutter-base:
     RUN dart pub global activate melos
     RUN dart pub global activate junitreport
     RUN dart pub global activate coverage
+
+flutter-base-all-hosts:
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
 
 SETUP:
     FUNCTION
@@ -44,7 +54,7 @@ BOOTSTRAP:
         RUN echo "No melos.yaml file found"
     END
 
-# Generatses dart code from open api spec.
+# Generates dart code from open api spec.
 OPENAPI_CODE_GEN:
     FUNCTION
 
@@ -85,7 +95,7 @@ ANALYZE:
         RUN echo "Running melos analyze"
         RUN melos analyze --fatal-infos --fatal-warnings
     ELSE
-        RUN echo "Running flutter anaylze"
+        RUN echo "Running flutter analyze"
         RUN flutter analyze --fatal-infos --fatal-warnings
     END
 
@@ -94,7 +104,7 @@ FORMAT:
     FUNCTION
 
     IF [ -f melos.yaml ]
-        RUN echo "Running melos fomat"
+        RUN echo "Running melos format"
         RUN melos run format-check
     ELSE
         RUN echo "Running flutter format"
@@ -106,7 +116,7 @@ UNIT_TESTS:
     FUNCTION
 
     IF [ -f melos.yaml ]
-        RUN echo "Running unut tests with melos."
+        RUN echo "Running unit tests with melos."
         RUN melos run test-report
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
