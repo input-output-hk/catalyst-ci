@@ -2,6 +2,10 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
+IMPORT ./installer AS installer
+
+# Installs flutter.
+
 install-flutter:
     FROM scratch
     ARG version=3.22.0
@@ -9,6 +13,7 @@ install-flutter:
     GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
     SAVE ARTIFACT flutter
 
+# Installs requred tools and packages.
 flutter-base:
     ARG WORKDIR=frontend
     ARG TARGETARCH
@@ -21,17 +26,17 @@ flutter-base:
     WORKDIR $WORKDIR
 
     DO installer+INSTALL_CHROME_LINUX64
-    # DO installer+INSTALL_EDGE_LINUX64
-    # DO installer+INSTALL_FIREFOX_LINUX64
+    DO installer+INSTALL_EDGE_LINUX64
+    DO installer+INSTALL_FIREFOX_LINUX64
 
-    # COPY +install-flutter/flutter /usr/local/flutter
-    # ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
-    # RUN flutter --version
-    # RUN flutter doctor -v
-    # RUN flutter config --enable-web
-    # RUN dart pub global activate melos
-    # RUN dart pub global activate junitreport
-    # RUN dart pub global activate coverage
+    COPY +install-flutter/flutter /usr/local/flutter
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    RUN flutter --version
+    RUN flutter doctor -v
+    RUN flutter config --enable-web
+    RUN dart pub global activate melos
+    RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
 
 flutter-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
@@ -40,9 +45,9 @@ SETUP:
     FUNCTION
     FROM +flutter-base
 
+# Runs melos bootstrap if melos.yaml file is present.
 BOOTSTRAP:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos bootstrap"
@@ -51,9 +56,9 @@ BOOTSTRAP:
         RUN echo "No melos.yaml file found"
     END
 
+# Generatses dart code from open api spec.
 OPENAPI_CODE_GEN:
     FUNCTION
-    FROM +flutter-base
 
     ARG SAVE_LOCALLY=false
     ARG --required WORKDIR
@@ -73,9 +78,9 @@ OPENAPI_CODE_GEN:
         SAVE ARTIFACT $GEN_CODE_PATH
     END
 
+# Validates open api generated specs.
 OPENAPI_VALIDATE:
     FUNCTION
-    FROM +flutter-base
 
     ARG --required WORKDIR
 
@@ -84,9 +89,9 @@ OPENAPI_VALIDATE:
 
     SAVE ARTIFACT openapi_validate
 
+# Runs dart static analysis.
 ANALYZE:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos analyze"
@@ -96,9 +101,9 @@ ANALYZE:
         RUN flutter analyze --fatal-infos --fatal-warnings
     END
 
+# Runs dart formatting check.
 FORMAT:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos fomat"
@@ -108,9 +113,9 @@ FORMAT:
         RUN flutter format --set-exit-if-changed .
     END
 
+# Runs unit tests.
 UNIT_TESTS:
     FUNCTION
-    FROM +flutter-base
 
     IF [ -f melos.yaml ]
         RUN echo "Running unut tests with melos."
@@ -126,11 +131,12 @@ UNIT_TESTS:
         END
     END
 
+# Build web app and save artifacts locally if needed.
 BUILD_WEB:
     FUNCTION
-    FROM +flutter-base
 
     ARG WORKDIR
+    ARG SAVE_LOCALLY=false
     ARG --required TARGET
 
     WORKDIR $WORKDIR
@@ -139,4 +145,7 @@ BUILD_WEB:
     RUN flutter build web --web-renderer canvaskit --release --target $TARGET
 
     WORKDIR "$WORKDIR/build"
-    SAVE ARTIFACT web /web AS LOCAL web
+    IF [ $SAVE_LOCALLY = true ]
+        SAVE ARTIFACT web /web AS LOCAL web
+    END
+
