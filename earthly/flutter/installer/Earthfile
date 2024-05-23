@@ -62,7 +62,7 @@ INSTALL_EDGE_LINUX64:
 
     IF [ "$TARGETARCH" = "amd64" ]
         # https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable
-        RUN echo -e "${BLUE}Installing Edge..."
+        RUN echo "${BLUE}Installing Edge..."
         RUN curl -LO https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_125.0.2535.51-1_amd64.deb
         RUN apt-get update 
         RUN apt-get install -y ./microsoft-edge-stable_125.0.2535.51-1_amd64.deb
@@ -70,7 +70,7 @@ INSTALL_EDGE_LINUX64:
 
 
         # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
-        RUN echo -e "${BLUE}Installing Edgedriver..."
+        RUN echo "${BLUE}Installing Edgedriver..."
         RUN mkdir -p /opt/edgeriver
         RUN curl -L https://msedgedriver.azureedge.net/125.0.2535.51/edgedriver_linux64.zip \
             -o /opt/edgeriver/edgedriver.zip
@@ -85,30 +85,41 @@ INSTALL_EDGE_LINUX64:
 # Firefox for linux/arm64 is only in the esr or the unstable version, using the latter.
 INSTALL_FIREFOX_LINUX64:
     FUNCTION
+    ARG TARGETARCH
+    LET PLATFORM = ""
 
-    IF ["$TARGETARCH" == "amd64"]
-        ARG PLATFORM=linux64
-        RUN echo -e "\033[1;34mInstalling Firefox..."
+    RUN echo "${BLUE}Installing Firefox..."
+    WAIT
         RUN install -d -m 0755 /etc/apt/keyrings
-        RUN curl -fSsL https://packages.mozilla.org/apt/repo-signing-key.gpg | tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
-        RUN echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" | tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
-        RUN echo "Package: * Pin: origin packages.mozilla.org Pin-Priority: 1000" | tee /etc/apt/preferences.d/mozilla
-        RUN apt-get update && apt-get install -y firefox
-        RUN firefox --version
-    ELSE
-        ARG PLATFORM=linux-aarch64
-        RUN echo -e "\033[1;34mInstalling Firefox..."
-        RUN echo "deb http://deb.debian.org/debian/ sid main" >> /etc/apt/sources.list
-        RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 0E98404D386FA1D9 6ED0E7B82643E131
-        RUN apt-get update && apt-get install -y libavcodec-extra firefox
-        RUN firefox --version
+        RUN curl -fSsL https://packages.mozilla.org/apt/repo-signing-key.gpg \
+            | tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
+        RUN echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" \
+            | tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
+        RUN echo "Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n\n" \
+            | tee /etc/apt/preferences.d/mozilla > /dev/null
     END
     
-    RUN echo -e "\033[1;34mInstalling Geckodriver..."
-    ARG json_geckodriver=curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest
-    ARG latest_geckodriver=echo "$json_geckodriver" | jq -r ".assets[].browser_download_url | select(contains(\"$PLATFORM\") and endswith(\"gz\"))"
-    RUN curl -sL --create-dirs -o geckodriver.tar.gz --output-dir /opt/geckodriver "$latest_geckodriver"
-    RUN tar -xzf /opt/geckodriver/geckodriver.tar.gz -C /opt/geckodriver/ && rm /opt/geckodriver/geckodriver.tar.gz
+    IF [ "$TARGETARCH" = "amd64" ]
+        SET PLATFORM = linux64
+        RUN apt-get update
+        RUN apt-get install -y firefox
+        RUN apt-get install -y -t mozilla firefox=126.0~build2
+    ELSE
+        SET PLATFORM = linux-aarch64
+        RUN apt-get update
+        RUN apt-get install -y  firefox-esr
+        RUN apt-get install -y -t mozilla firefox-esr=115.11.0esr-1~deb12u1
+    END
+
+    RUN firefox --version
+    
+    RUN echo "${BLUE}Installing Geckodriver..."
+
+    RUN mkdir -p /opt/geckodriver
+    RUN curl -sL "https://github.com/mozilla/geckodriver/releases/download/v0.34.0/geckodriver-v0.34.0-${PLATFORM}.tar.gz" \
+        -o /opt/geckodriver/geckodriver.tar.gz
+    RUN tar -xzf /opt/geckodriver/geckodriver.tar.gz -C /opt/geckodriver/ 
+    RUN rm /opt/geckodriver/geckodriver.tar.gz
     RUN ln -s /opt/geckodriver/geckodriver /usr/local/bin/geckodriver
     RUN chmod +x /opt/geckodriver/geckodriver
     RUN geckodriver --version
