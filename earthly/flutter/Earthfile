@@ -2,8 +2,6 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
-IMPORT ./installer AS installer
-
 # Installs flutter.
 
 install-flutter:
