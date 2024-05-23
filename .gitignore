@@ -5,6 +5,7 @@
 
 # Earthly
 bin/
+.tmp-earthly-out/
 
 # Node
 node_modules
