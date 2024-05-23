@@ -15,11 +15,10 @@ INSTALL_CHROME_LINUX64:
         RUN echo "${BLUE}Installing Google Chrome..."
         # Installing dependencies for Chrome. Workaround for:
         # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/55
-        # FIXME - Refactor and use Earthly for loop
         RUN chrome_deps=$(curl -s https://raw.githubusercontent.com/chromium/chromium/125.0.6422.76/chrome/installer/linux/debian/dist_package_versions.json) && \
             deps=$(echo "$chrome_deps" | jq -r ".\"$DISTR\" | keys[]") && \
             apt-get update && \
-            for dep in $deps; do apt-get install -y "$dep"; done
+            echo "$deps" | xargs apt-get install -y
 
         # Install Chrome
         RUN mkdir -p /opt/chrome
