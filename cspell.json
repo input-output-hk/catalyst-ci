@@ -54,6 +54,6 @@
         "**/**/go.mod",
         "**/**/go.sum",
         "**/**/pyproject.toml",
-        "examples/example/example/**",
+        "examples/flutter/example/**",
     ]
 }
