@@ -3,11 +3,13 @@ VERSION 0.8
 # Install Chrome/Chromium for testing and Chromedriver.
 # There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
 # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/1
+
+LET BLUE = "\033[1;34m"
+
 INSTALL_CHROME_LINUX64:
     FUNCTION
     ARG TARGETARCH
 
-    LET BLUE = "\033[1;34m"
     # https://googlechromelabs.github.io/chrome-for-testing/
     IF [ "$TARGETARCH" = "amd64" ]
         LET DISTR = "Debian 12 (Bookworm)"
@@ -56,21 +58,24 @@ INSTALL_CHROME_LINUX64:
 # There is no Edge version build for linux/arm64, installing only for amd64.
 INSTALL_EDGE_LINUX64:
     FUNCTION
-    IF ["$TARGETARCH" == "amd64"]
-        RUN echo -e "\033[1;34mInstalling Edge..."
-        RUN install -d -m 0755 /etc/apt/keyrings
-        RUN curl -fSsL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee /etc/apt/keyrings/microsoft-edge.gpg > /dev/null
-   
-        RUN echo deb [signed-by=/etc/apt/keyrings/microsoft-edge.gpg] https://packages.microsoft.com/repos/edge stable main | tee /etc/apt/sources.list.d/microsoft-edge.list
-        RUN apt-get update && apt-get install -y microsoft-edge-stable
+    ARG TARGETARCH
+
+    IF [ "$TARGETARCH" = "amd64" ]
+        # https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable
+        RUN echo -e "${BLUE}Installing Edge..."
+        RUN curl -LO https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_125.0.2535.51-1_amd64.deb
+        RUN apt-get update 
+        RUN apt-get install -y ./microsoft-edge-stable_125.0.2535.51-1_amd64.deb
         RUN microsoft-edge-stable --version
 
-        RUN echo -e "\033[1;34mInstalling Edgedriver..."
-        RUN edge_version=$(microsoft-edge-stable --version | grep -Eo '[0-9]+.+' | tr -d ' ')
-        RUN curl -s --create-dirs -o msedgedriver.zip --output-dir /opt/msedgedriver "https://msedgedriver.azureedge.net/$edge_version/edgedriver_linux64.zip"
-        RUN unzip -d /opt/msedgedriver -j /opt/msedgedriver/msedgedriver.zip && rm /opt/msedgedriver/msedgedriver.zip
-        RUN ln -s /opt/msedgedriver/msedgedriver /usr/local/bin/msedgedriver
-        RUN chmod +x /opt/msedgedriver/msedgedriver
+
+        # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
+        RUN echo -e "${BLUE}Installing Edgedriver..."
+        RUN mkdir -p /opt/edgeriver
+        RUN curl -L https://msedgedriver.azureedge.net/125.0.2535.51/edgedriver_linux64.zip \
+            -o /opt/edgeriver/edgedriver.zip
+        RUN unzip /opt/edgeriver/edgedriver.zip -d /usr/local/bin/
+        RUN rm /opt/edgeriver/edgedriver.zip
         RUN msedgedriver --version
     END
 
