@@ -11,7 +11,7 @@ install-flutter:
     GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
     SAVE ARTIFACT flutter
 
-# Installs requred tools and packages.
+# Installs required tools and packages.
 flutter-base:
     ARG WORKDIR=frontend
     ARG TARGETARCH
@@ -54,7 +54,7 @@ BOOTSTRAP:
         RUN echo "No melos.yaml file found"
     END
 
-# Generatses dart code from open api spec.
+# Generates dart code from open api spec.
 OPENAPI_CODE_GEN:
     FUNCTION
 
@@ -95,7 +95,7 @@ ANALYZE:
         RUN echo "Running melos analyze"
         RUN melos analyze --fatal-infos --fatal-warnings
     ELSE
-        RUN echo "Running flutter anaylze"
+        RUN echo "Running flutter analyze"
         RUN flutter analyze --fatal-infos --fatal-warnings
     END
 
@@ -104,7 +104,7 @@ FORMAT:
     FUNCTION
 
     IF [ -f melos.yaml ]
-        RUN echo "Running melos fomat"
+        RUN echo "Running melos format"
         RUN melos run format-check
     ELSE
         RUN echo "Running flutter format"
@@ -116,7 +116,7 @@ UNIT_TESTS:
     FUNCTION
 
     IF [ -f melos.yaml ]
-        RUN echo "Running unut tests with melos."
+        RUN echo "Running unit tests with melos."
         RUN melos run test-report
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports

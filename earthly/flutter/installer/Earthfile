@@ -1,5 +1,7 @@
 VERSION 0.8
 
+# cspell: words Chromedriver Edgedriver edgedriver msedgedriver Geckodriver geckodriver
+
 # Install Chrome/Chromium for testing and Chromedriver.
 # There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
 # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/1
@@ -69,10 +71,10 @@ INSTALL_EDGE_LINUX64:
 
         # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
         RUN echo "${BLUE}Installing Edgedriver..."
-        RUN mkdir -p /opt/edgeriver
+        RUN mkdir -p /opt/edgedriver
         RUN curl -L https://msedgedriver.azureedge.net/"$EDGE_VERSION"/edgedriver_linux64.zip \
-            -o /opt/edgeriver/edgedriver.zip
-        RUN unzip /opt/edgeriver/edgedriver.zip -d /usr/local/bin/
+            -o /opt/edgedriver/edgedriver.zip
+        RUN unzip /opt/edgedriver/edgedriver.zip -d /usr/local/bin/
         RUN msedgedriver --version
     END
 
