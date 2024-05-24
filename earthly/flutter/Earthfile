@@ -5,7 +5,7 @@ IMPORT ./installer AS installer
 # Installs flutter.
 install-flutter:
     FROM scratch
-    ARG version=3.22.1
+    ARG version=3.19.5
 
     GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
     SAVE ARTIFACT flutter
