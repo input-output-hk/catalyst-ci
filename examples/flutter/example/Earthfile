@@ -38,3 +38,8 @@ build-web:
     ARG --required TARGET
 
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET
+
+check-license:
+    DO flutter-ci+SETUP
+    COPY . .
+    DO flutter-ci+LICENSE_CHECK
