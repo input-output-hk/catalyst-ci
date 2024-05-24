@@ -3,7 +3,6 @@ VERSION 0.8
 IMPORT ./installer AS installer
 
 # Installs flutter.
-
 install-flutter:
     FROM scratch
     ARG version=3.22.1
@@ -21,6 +20,8 @@ flutter-base:
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
 
+    WORKDIR $WORKDIR
+
     DO installer+INSTALL_CHROME_LINUX64
     DO installer+INSTALL_EDGE_LINUX64
     DO installer+INSTALL_FIREFOX_LINUX64
@@ -33,7 +34,7 @@ flutter-base:
     RUN dart pub global activate melos
     RUN dart pub global activate junitreport
     RUN dart pub global activate coverage
-
+    
 flutter-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
 
@@ -145,25 +146,19 @@ BUILD_WEB:
         SAVE ARTIFACT web /web AS LOCAL web
     END
 
+license-checker-base:
+    DO +SETUP
+    COPY ./license_checker.yaml ./base/license_checker.yaml
+    
 LICENSE_CHECK:
     FUNCTION
 
-    # Required argument to specify the directory to check
-    ARG --required dir
     # Argument for the name of license checker config file
-    ARG config_file="license_checker.yaml"
-
+    ARG license_checker_file="license_checker.yaml"
     # Check whether the license config files are the same
-    RUN diff ${dir} license_checker.yaml
-
+    RUN diff ${license_checker_file} ./base/license_checker.yaml
     # Install license_checker
     RUN dart pub global activate license_checker
-    WORKDIR ${dir}
     # Generate pubspec.yaml file
     RUN flutter pub get
-    RUN lic_ck check-licenses --config ${config_file} -i
-
-    IF [ $SAVE_LOCALLY = true ]
-        SAVE ARTIFACT web /web AS LOCAL web
-    END
-
+    RUN lic_ck check-licenses --config ${license_checker_file} -i

@@ -40,6 +40,6 @@ build-web:
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET
 
 check-license:
-    DO flutter-ci+SETUP
+    FROM flutter-ci+license-checker-base
     COPY . .
     DO flutter-ci+LICENSE_CHECK
