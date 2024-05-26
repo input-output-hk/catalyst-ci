@@ -17,7 +17,7 @@ tags:
     This guide will provide detailed instructions for how the example was built.
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
-This guide will get you started with using the Catalyst CI to build Go-based projects.
+This guide will get you started with using the Catalyst CI to build Flutter-based projects.
 By the end of the guide, we'll have an `Earthfile` that utilizes the Catalyst CI to build,
 release, and publish our Flutter app.
 
@@ -57,6 +57,7 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/flutter:3.0.3 AS flutter-c
 # Set up the CI environment for Flutter app.
 builder:
     DO flutter-ci+SETUP
+    COPY --dir . .
 ```
 
 ### Running Bootstrap
@@ -106,7 +107,7 @@ unit-tests:
     DO flutter-ci+UNIT_TEST
 ```
 
-### Build FLutter app for Web
+### Build Flutter app for Web
 
 An finally we build the Flutter app for Web (atm the only supported platform by Catalyst).
 
@@ -125,6 +126,29 @@ You can run it like this:
 ```sh
 earthly +build-web --WORKDIR=path/to/flutter/app/ --TARGET=lib/main.dart
 ```
+
+### Running checks
+
+In addition to setting up a Flutter-based project, it is highly recommended to run a check to
+ensure the project is clean and well-defined.
+The example below illustrates how to implement a
+[licese_checker](https://pub.dev/packages/license_checker), allowing you to configure the
+licenses of dependencies to permit, reject, or approve using the license_checker package.
+This configuration can be managed through a `YAML` configuration file.
+
+```Earthfile
+check-license:
+    FROM flutter-ci+license-checker-base
+
+    COPY . .
+    DO flutter-ci+LICENSE_CHECK --license_checker_file=license_checker.yaml
+```
+
+To prevent the unintended approval of a package, a template `license_checker.yaml`
+is included within the `earthly/flutter/Earthfile`.
+This template will be compared with the provided `YAML` file
+specified by the `--license_checker_file` argument.
+If the files do not match, the program will return an error.
 
 ### Release and publish
 
