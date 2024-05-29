@@ -17,7 +17,7 @@ tags:
     This guide will provide detailed instructions for how the example was built.
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
-This guide will get you started with using the Catalyst CI to build Go-based projects.
+This guide will get you started with using the Catalyst CI to build Flutter-based projects.
 By the end of the guide, we'll have an `Earthfile` that utilizes the Catalyst CI to build,
 release, and publish our Flutter app.
 
