@@ -132,7 +132,7 @@ earthly +build-web --WORKDIR=path/to/flutter/app/ --TARGET=lib/main.dart
 In addition to setting up a Flutter-based project, it is highly recommended to run a check to
 ensure the project is clean and well-defined.
 The example below illustrates how to implement a
-[licese_checker](https://pub.dev/packages/license_checker), allowing you to configure the
+[license_checker](https://pub.dev/packages/license_checker), allowing you to configure the
 licenses of dependencies to permit, reject, or approve using the license_checker package.
 This configuration can be managed through a `YAML` configuration file.
 
