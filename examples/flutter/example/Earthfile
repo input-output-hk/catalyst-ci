@@ -10,19 +10,13 @@ builder:
 
     COPY --dir . .
 
-# bootstrap - Run bootstrap in case of using Melos
-bootstrap:
-    FROM +builder
-
-    DO flutter-ci+BOOTSTRAP
-
 # analyze - Run Flutter analyze orer melos analyze.
 analyze:
     FROM +builder
 
     DO flutter-ci+ANALYZE
 
-# format - Run Flutter format or melos format.
+# format - Run Flutter format orer melos format.
 format:
     FROM +builder
 
@@ -45,6 +39,7 @@ build-web:
 
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET
 
+# check-license - Check the licenses of the Flutter dependencies.
 check-license:
     FROM flutter-ci+license-checker-base
     
