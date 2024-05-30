@@ -38,3 +38,10 @@ build-web:
     ARG --required TARGET
 
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET
+
+# check-license - Check the licenses of the Flutter dependencies.
+check-license:
+    FROM flutter-ci+license-checker-base
+    
+    COPY . .
+    DO flutter-ci+LICENSE_CHECK --license_checker_file=license_checker.yaml
