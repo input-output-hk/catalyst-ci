@@ -1,0 +1,149 @@
+VERSION 0.8
+
+IMPORT ./installer AS installer
+
+# Installs flutter.
+
+install-flutter:
+    FROM scratch
+    ARG version=3.22.1
+
+    GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
+    SAVE ARTIFACT flutter
+
+# Installs required tools and packages.
+flutter-base:
+    ARG WORKDIR=frontend
+    ARG TARGETARCH
+
+    FROM debian:bookworm-slim
+
+    RUN apt-get update
+    RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
+
+    WORKDIR $WORKDIR
+
+    DO installer+INSTALL_CHROME_LINUX64
+    DO installer+INSTALL_EDGE_LINUX64
+    DO installer+INSTALL_FIREFOX_LINUX64
+
+    COPY +install-flutter/flutter /usr/local/flutter
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    RUN flutter --version
+    RUN flutter doctor -v
+    RUN flutter config --enable-web
+    RUN dart pub global activate melos
+    RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
+
+flutter-base-all-hosts:
+    BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
+
+SETUP:
+    FUNCTION
+    FROM +flutter-base
+
+# Runs melos bootstrap if melos.yaml file is present.
+BOOTSTRAP:
+    FUNCTION
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos bootstrap"
+        RUN melos bootstrap
+    ELSE
+        RUN echo "No melos.yaml file found"
+    END
+
+# Generates dart code from open api spec.
+OPENAPI_CODE_GEN:
+    FUNCTION
+
+    ARG SAVE_LOCALLY=false
+    ARG --required WORKDIR
+    ARG --required OPEN_API_SPEC_PATH
+    ARG --required OPEN_API_SPEC_COPY_PATH
+    ARG --required GEN_CODE_PATH
+    ARG --required LOCAL_GEN_CODE_PATH
+
+    WORKDIR $WORKDIR
+    COPY $OPEN_API_SPEC_PATH $OPEN_API_SPEC_COPY_PATH
+    RUN flutter pub get
+    RUN dart run build_runner build --delete-conflicting-outputs
+
+    IF [ $SAVE_LOCALLY = true ]
+        SAVE ARTIFACT "$GEN_CODE_PATH/*" AS LOCAL $LOCAL_GEN_CODE_PATH
+    ELSE
+        SAVE ARTIFACT $GEN_CODE_PATH
+    END
+
+# Validates open api generated specs.
+OPENAPI_VALIDATE:
+    FUNCTION
+
+    ARG --required WORKDIR
+
+    WORKDIR $WORKDIR
+    RUN dart run openapi_validate
+
+    SAVE ARTIFACT openapi_validate
+
+# Runs dart static analysis.
+ANALYZE:
+    FUNCTION
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos analyze"
+        RUN melos analyze --fatal-infos --fatal-warnings
+    ELSE
+        RUN echo "Running flutter analyze"
+        RUN flutter analyze --fatal-infos --fatal-warnings
+    END
+
+# Runs dart formatting check.
+FORMAT:
+    FUNCTION
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos format"
+        RUN melos run format-check
+    ELSE
+        RUN echo "Running flutter format"
+        RUN flutter format --set-exit-if-changed .
+    END
+
+# Runs unit tests.
+UNIT_TESTS:
+    FUNCTION
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running unit tests with melos."
+        RUN melos run test-report
+        WAIT
+            SAVE ARTIFACT test_reports AS LOCAL test_reports
+        END
+    ELSE
+        RUN echo "Running flutter test"
+        RUN flutter test
+        WAIT
+            SAVE ARTIFACT test_reports AS LOCAL test_reports
+        END
+    END
+
+# Build web app and save artifacts locally if needed.
+BUILD_WEB:
+    FUNCTION
+
+    ARG WORKDIR
+    ARG SAVE_LOCALLY=false
+    ARG --required TARGET
+
+    WORKDIR $WORKDIR
+    RUN flutter clean
+    RUN flutter pub get
+    RUN flutter build web --web-renderer canvaskit --release --target $TARGET
+
+    WORKDIR "$WORKDIR/build"
+    IF [ $SAVE_LOCALLY = true ]
+        SAVE ARTIFACT web /web AS LOCAL web
+    END
+

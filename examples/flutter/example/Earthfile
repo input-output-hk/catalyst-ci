@@ -1,0 +1,40 @@
+VERSION 0.8
+
+IMPORT ../../../earthly/flutter AS flutter-ci
+
+# To see more available functions, navigate to earthly/flutter/Earthfile.
+
+# builder - Set up the CI environment for Flutter app.
+builder:
+    DO flutter-ci+SETUP
+
+    COPY --dir . .
+
+# analyze - Run Flutter analyze orer melos analyze.
+analyze:
+    FROM +builder
+
+    DO flutter-ci+ANALYZE
+
+# format - Run Flutter format orer melos format.
+format:
+    FROM +builder
+
+    DO flutter-ci+FORMAT
+
+# unit-tests - Run Flutter unit tests.
+unit-tests:
+    FROM +builder
+
+    DO flutter-ci+UNIT_TEST
+
+# build-web - Build the Flutter app for the web.
+# Assuming that we have a main.dart file in lib folder and we run `build-web` in folder
+# with pubspec.yaml file: earthly +build-web --TARGET=lib/main.dart
+build-web:
+    FROM +builder
+
+    ARG WORKDIR=/frontend
+    ARG --required TARGET
+
+    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET
