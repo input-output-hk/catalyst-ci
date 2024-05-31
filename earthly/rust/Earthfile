@@ -186,8 +186,6 @@ EXECUTE:
     # We then check the existence of the "fail" file after any artifacts are saved that
     # should be saved regardless.
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
-        echo $CARGO_HOME; \
-        ls $CARGO_HOME; \
         set -e; \
         rm -f fail; \
         $cmd $args1 $args2 $args3 $args4 $args5 $args6 || touch fail; \
