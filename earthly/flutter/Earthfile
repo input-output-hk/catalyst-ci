@@ -4,11 +4,12 @@ IMPORT ./installer AS installer
 
 # Installs flutter.
 install-flutter:
-    FROM scratch
+    FROM busybox
     ARG version=3.22.1
-
-    GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
-    SAVE ARTIFACT flutter
+    RUN mkdir -p /tmp \
+        && wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
+        | tar -xJ -C /tmp
+    SAVE ARTIFACT /tmp flutter
 
 # Installs required tools and packages.
 flutter-base:
@@ -25,8 +26,7 @@ flutter-base:
     DO installer+INSTALL_CHROME_LINUX64
     DO installer+INSTALL_EDGE_LINUX64
     DO installer+INSTALL_FIREFOX_LINUX64
-
-    COPY +install-flutter/flutter /usr/local/flutter
+    COPY +install-flutter/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter --version
     RUN flutter doctor -v
