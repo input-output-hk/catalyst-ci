@@ -59,13 +59,9 @@ OPENAPI_CODE_GEN:
 
     ARG SAVE_LOCALLY=false
     ARG --required WORKDIR
-    ARG --required OPEN_API_SPEC_PATH
-    ARG --required OPEN_API_SPEC_COPY_PATH
     ARG --required GEN_CODE_PATH
     ARG --required LOCAL_GEN_CODE_PATH
 
-    WORKDIR $WORKDIR
-    COPY $OPEN_API_SPEC_PATH $OPEN_API_SPEC_COPY_PATH
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
 
