@@ -58,7 +58,6 @@ OPENAPI_CODE_GEN:
     FUNCTION
 
     ARG SAVE_LOCALLY=false
-    ARG --required WORKDIR
     ARG --required GEN_CODE_PATH
     ARG --required LOCAL_GEN_CODE_PATH
 
