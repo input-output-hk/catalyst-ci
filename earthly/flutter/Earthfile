@@ -139,6 +139,8 @@ BUILD_WEB:
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
         SAVE ARTIFACT web /web AS LOCAL web
+    ELSE
+        SAVE ARTIFACT web /web
     END
 
 license-checker-base:
