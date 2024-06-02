@@ -13,15 +13,12 @@ install-flutter:
 
 # Installs required tools and packages.
 flutter-base:
-    ARG WORKDIR=frontend
-    ARG TARGETARCH
-
     FROM debian:bookworm-20240513-slim
 
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
 
-    WORKDIR $WORKDIR
+    WORKDIR frontend
 
     DO installer+INSTALL_CHROME_LINUX64
     DO installer+INSTALL_EDGE_LINUX64
@@ -143,10 +140,12 @@ BUILD_WEB:
         SAVE ARTIFACT web /web
     END
 
+# Base license checker setup.
 license-checker-base:
     DO +SETUP
     COPY ./license_checker.yaml ./base/license_checker.yaml
     
+# Perform license check for Flutter project. 
 LICENSE_CHECK:
     FUNCTION
 
