@@ -6,10 +6,14 @@ IMPORT ./installer AS installer
 install-flutter:
     FROM busybox
     ARG version=3.22.1
-    RUN mkdir -p /tmp \
-        && wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
-        | tar -xJ -C /tmp
-    SAVE ARTIFACT /tmp flutter
+    RUN mkdir -p /flutter
+    IF [ "$TARGETARCH" = "amd64" ]
+        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
+            | tar -xJ -C /flutter
+    ELSE 
+        GIT CLONE --branch $version https://github.com/flutter/flutter.git /flutter
+    END
+    SAVE ARTIFACT /flutter flutter
 
 # Installs required tools and packages.
 flutter-base:
