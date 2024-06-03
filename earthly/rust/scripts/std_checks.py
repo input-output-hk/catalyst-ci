@@ -60,7 +60,7 @@ def main():
 
     results.add(
         vendor_files_check.toml_diff_check(
-            f"{os.environ.get('CARGO_HOME')}/config.toml", ".cargo/config.toml"
+            f"/stdcfgs/cargo_config.toml", ".cargo/config.toml"
         )
     )
     if rust_toolchain_enabled:

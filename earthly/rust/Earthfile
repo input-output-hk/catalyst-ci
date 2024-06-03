@@ -119,10 +119,6 @@ installer:
     # Set the mount cache env vars
     DO rust+SET_CACHE_MOUNTS_ENV
 
-    # Install the default cargo config, and ensure its in the cached CARGO_HOME as well.
-    COPY stdcfgs/cargo_config.toml $CARGO_INSTALL_ROOT/config.toml
-    DO +EXECUTE --cmd="cp $CARGO_INSTALL_ROOT/config.toml $CARGO_HOME/config.toml"
-
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
