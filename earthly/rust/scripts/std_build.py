@@ -66,21 +66,22 @@ def cargo_llvm_cov(
     if res.ok():
         res = exec_manager.cli_run(
             "cargo testcov " + f"{flags} ",
+            + f"--output-path {cov_report} ",
             name="Self contained Unit tests and collect coverage",
             verbose=verbose,
         )
         results.append(res)
     # Save coverage report to file if it is provided
-    if res.ok():
-        res = exec_manager.cli_run(
-            "cargo llvm-cov report "
-            + f"{flags} "
-            + "--release "
-            + f"--output-path {cov_report} ",
-            name=f"Generate lcov report to {cov_report}",
-            verbose=verbose,
-        )
-        results.append(res)
+   # if res.ok():
+    #    res = exec_manager.cli_run(
+    #        "cargo llvm-cov report "
+    #        + f"{flags} "
+    #        + "--release "
+    #        + f"--output-path {cov_report} ",
+    #        name=f"Generate lcov report to {cov_report}",
+    #        verbose=verbose,
+    #    )
+    #    results.append(res)
 
     return results
 
