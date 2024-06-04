@@ -147,7 +147,7 @@ BUILD_WEB:
 # Base license checker setup.
 license-checker-base:
     DO +SETUP
-    COPY ./license_checker.yaml ./base/license_checker.yaml
+    COPY ./template_license_checker.yaml .
     
 # Perform license check for Flutter project. 
 LICENSE_CHECK:
@@ -156,7 +156,7 @@ LICENSE_CHECK:
     # Argument for the name of license checker config file
     ARG license_checker_file="license_checker.yaml"
     # Check whether the license config files are the same
-    RUN diff ${license_checker_file} ./base/license_checker.yaml
+    RUN diff ${license_checker_file} ./template_license_checker.yaml
     # Install license_checker
     RUN dart pub global activate license_checker
     # Generate pubspec.yaml file
