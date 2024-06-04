@@ -65,7 +65,7 @@ def cargo_llvm_cov(
     # Run unit tests and generates test and coverage report artifacts
     if res.ok():
         res = exec_manager.cli_run(
-            "cargo testcov " + f"{flags} ",
+            "cargo testcov " + f"{flags} "
             + f"--output-path {cov_report} ",
             name="Self contained Unit tests and collect coverage",
             verbose=verbose,
