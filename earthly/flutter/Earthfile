@@ -2,8 +2,8 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
-# Installs flutter.
-install-flutter:
+# flutter-src - save Flutter source code as artifact.
+flutter-src:
     FROM busybox
     ARG version=3.22.1
     RUN mkdir -p /flutter
@@ -15,7 +15,7 @@ install-flutter:
     END
     SAVE ARTIFACT /flutter flutter
 
-# Installs required tools and packages.
+# flutter-base - installs required tools and packages.
 flutter-base:
     FROM debian:bookworm-20240513-slim
 
@@ -27,7 +27,7 @@ flutter-base:
     DO installer+INSTALL_CHROME_LINUX64
     DO installer+INSTALL_EDGE_LINUX64
     DO installer+INSTALL_FIREFOX_LINUX64
-    COPY +install-flutter/flutter /usr/local
+    COPY +flutter-src/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter --version
     RUN flutter doctor -v
