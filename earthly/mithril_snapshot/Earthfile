@@ -71,16 +71,16 @@ mainnet:
 
 # preprod : Mithril snapshot from the pre-prod network.
 # This snapshot is defaulted to a snapshot from:
-# Epoch : 142
-# Immutable File Number: 2773
-# Created : 14/05/2024 @ 8:46:19 am
+# Epoch : 147
+# Immutable File Number: 2861
+# Created : 05/06/2024 @ 8:50:00 am
 # The snapshot can be changed by altering the `digest` argument with the
 # required digest to download.
 # Also, as this snapshot is used in CI, we only used a validated image here
 # This is slower, but guaranteed to be accurate.
 preprod:
-    FROM +base-snapshot-builder
-    ARG digest="1ee36c3ee0aa4fec38d2487641ee64f687e675696783f4cea1e4857ebc2ef38c"
+    FROM +base-snapshot-builder                
+    ARG digest="9968eaf76df2ad225cd8ef25e16fb78bc80fa796466183adf1924508c483506c"
 
     DO +DL_SNAPSHOT \
         --network=preprod \
