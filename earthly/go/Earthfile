@@ -6,7 +6,7 @@ DEPS:
     ARG ginkgo="true"
 
     # Establish a cache
-    RUN mkdir -p /go/cache && mkdir /go/modcache
+    RUN mkdir -p /go/cache && mkdir -p /go/modcache
     ENV GOCACHE=/go/cache
     ENV GOMODCACHE=/go/modcache
     CACHE --sharing shared /go

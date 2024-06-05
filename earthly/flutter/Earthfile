@@ -2,31 +2,32 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
-# Installs flutter.
-install-flutter:
-    FROM scratch
+# flutter-src - save Flutter source code as artifact.
+flutter-src:
+    FROM busybox
     ARG version=3.22.1
+    RUN mkdir -p /flutter
+    IF [ "$TARGETARCH" = "amd64" ]
+        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
+            | tar -xJ -C /flutter
+    ELSE 
+        GIT CLONE --branch $version https://github.com/flutter/flutter.git /flutter
+    END
+    SAVE ARTIFACT /flutter flutter
 
-    GIT CLONE --branch $version https://github.com/flutter/flutter.git flutter
-    SAVE ARTIFACT flutter
-
-# Installs required tools and packages.
+# flutter-base - installs required tools and packages.
 flutter-base:
-    ARG WORKDIR=frontend
-    ARG TARGETARCH
-
-    FROM debian:bookworm-slim
+    FROM debian:bookworm-20240513-slim
 
     RUN apt-get update
     RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
 
-    WORKDIR $WORKDIR
+    WORKDIR frontend
 
     DO installer+INSTALL_CHROME_LINUX64
     DO installer+INSTALL_EDGE_LINUX64
     DO installer+INSTALL_FIREFOX_LINUX64
-
-    COPY +install-flutter/flutter /usr/local/flutter
+    COPY +flutter-src/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter --version
     RUN flutter doctor -v
@@ -58,14 +59,9 @@ OPENAPI_CODE_GEN:
     FUNCTION
 
     ARG SAVE_LOCALLY=false
-    ARG --required WORKDIR
-    ARG --required OPEN_API_SPEC_PATH
-    ARG --required OPEN_API_SPEC_COPY_PATH
     ARG --required GEN_CODE_PATH
     ARG --required LOCAL_GEN_CODE_PATH
 
-    WORKDIR $WORKDIR
-    COPY $OPEN_API_SPEC_PATH $OPEN_API_SPEC_COPY_PATH
     RUN flutter pub get
     RUN dart run build_runner build --delete-conflicting-outputs
 
@@ -144,21 +140,25 @@ BUILD_WEB:
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
         SAVE ARTIFACT web /web AS LOCAL web
+    ELSE
+        SAVE ARTIFACT web /web
     END
 
+# Base license checker setup.
 license-checker-base:
     DO +SETUP
-    COPY ./license_checker.yaml ./base/license_checker.yaml
+    COPY ./template_license_checker.yaml .
     
+# Perform license check for Flutter project. 
 LICENSE_CHECK:
     FUNCTION
 
     # Argument for the name of license checker config file
     ARG license_checker_file="license_checker.yaml"
     # Check whether the license config files are the same
-    RUN diff ${license_checker_file} ./base/license_checker.yaml
+    RUN diff $license_checker_file ./template_license_checker.yaml
     # Install license_checker
     RUN dart pub global activate license_checker
     # Generate pubspec.yaml file
     RUN flutter pub get
-    RUN lic_ck check-licenses --config ${license_checker_file} -i
+    RUN lic_ck check-licenses --config $license_checker_file -i

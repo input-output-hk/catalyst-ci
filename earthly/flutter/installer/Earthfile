@@ -102,11 +102,9 @@ INSTALL_FIREFOX_LINUX64:
     
     IF [ "$TARGETARCH" = "amd64" ]
         SET PLATFORM = linux64
-        RUN apt-get install -y firefox
         RUN apt-get install -y -t mozilla firefox=126.0~build2
     ELSE
         SET PLATFORM = linux-aarch64
-        RUN apt-get install -y firefox-esr
         RUN apt-get install -y -t mozilla firefox-esr=115.11.0esr-1~deb12u1
     END
 
