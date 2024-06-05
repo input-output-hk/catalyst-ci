@@ -73,7 +73,7 @@ def cargo_llvm_cov(
     # Save coverage report to file if it is provided
     if res.ok():
         res = exec_manager.cli_run(
-            "cargo llvm-cov report "
+            "cargo llvm-cov report --lcov "
             + f"{flags} "
             + "--release "
             + f"--output-path {cov_report} ",
