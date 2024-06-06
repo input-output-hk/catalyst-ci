@@ -9,11 +9,11 @@ flutter-src:
     ARG TARGETARCH
 
     RUN mkdir -p /flutter
-    IF [ "$TARGETARCH" = "amd64" ]
+    IF [ "$TARGETARCH" = "arm64" ]
+        GIT CLONE --branch $version https://github.com/flutter/flutter.git /flutter
+    ELSE 
         RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
             | tar -xJ -C /flutter
-    ELSE 
-        GIT CLONE --branch $version https://github.com/flutter/flutter.git /flutter
     END
     SAVE ARTIFACT /flutter flutter
 
