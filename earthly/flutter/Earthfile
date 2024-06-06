@@ -6,6 +6,8 @@ IMPORT ./installer AS installer
 flutter-src:
     FROM busybox
     ARG version=3.22.1
+    ARG TARGETARCH
+
     RUN mkdir -p /flutter
     IF [ "$TARGETARCH" = "amd64" ]
         RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
