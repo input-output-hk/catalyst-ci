@@ -37,14 +37,13 @@ INSTALL_CHROME_LINUX64:
     ELSE 
         # Install Chromium
         RUN echo "\033[1;34mInstalling Chromium..."
-        RUN apt-get update
-        RUN apt-get install -y chromium
+        RUN apt-get update && apt-get install -y chromium
         RUN ln -s /usr/bin/chromium /usr/local/bin/google-chrome
         RUN google-chrome --version
 
         # Install Chromium-driver
         RUN echo "\033[1;34mInstalling Chromium-driver..."
-        RUN apt-get install chromium-driver
+        RUN apt-get update && apt-get install chromium-driver
         RUN chromedriver --version
     END
 
@@ -59,7 +58,7 @@ INSTALL_EDGE_LINUX64:
     IF [ "$TARGETARCH" = "amd64" ]
         RUN echo "\033[1;34mInstalling Edge..."
         RUN curl -LO "https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${EDGE_VERSION}-1_amd64.deb"
-        RUN apt-get install -y ./microsoft-edge-stable_"$EDGE_VERSION$PACKAGE_RELEASE"_amd64.deb
+        RUN apt-get update && apt-get install -y ./microsoft-edge-stable_"$EDGE_VERSION$PACKAGE_RELEASE"_amd64.deb
         RUN microsoft-edge-stable --version
 
         # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
@@ -89,15 +88,14 @@ INSTALL_FIREFOX_LINUX64:
             | tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
         RUN echo "Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n\n" \
             | tee /etc/apt/preferences.d/mozilla > /dev/null
-        RUN apt-get update
     END
     
     IF [ "$TARGETARCH" = "amd64" ]
         SET PLATFORM = linux64
-        RUN apt-get install -y -t mozilla firefox=126.0~build2
+        RUN apt-get update && apt-get install -y -t mozilla firefox=126.0~build2
     ELSE
         SET PLATFORM = linux-aarch64
-        RUN apt-get install -y -t mozilla firefox-esr=115.11.0esr-1~deb12u1
+        RUN apt-get update && apt-get install -y -t mozilla firefox-esr=115.11.0esr-1~deb12u1
     END
 
     RUN firefox --version
