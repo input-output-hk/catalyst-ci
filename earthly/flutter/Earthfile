@@ -31,6 +31,7 @@ flutter-base:
     DO installer+INSTALL_FIREFOX_LINUX64
     COPY +flutter-src/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    RUN flutter --disable-analytics
     RUN flutter --version
     RUN flutter doctor -v
     RUN flutter config --enable-web
