@@ -9,7 +9,7 @@ IMPORT ../../earthly/go AS go-ci
 
 deps:
     # This target is used to install external Go dependencies.
-    FROM golang:1.21-alpine3.19
+    FROM golang:1.22.4-alpine3.19
     WORKDIR /work
 
     # Any build dependencies should also be captured in this target.
