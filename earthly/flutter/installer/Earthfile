@@ -11,8 +11,7 @@ INSTALL_CHROME_LINUX64:
 
     # https://googlechromelabs.github.io/chrome-for-testing/
     IF [ "$TARGETARCH" = "amd64" ]
-        LET DISTR = "Debian 12 (Bookworm)"
-        LET CHROME_VERSION = 126.0.6478.55
+        LET CHROME_VERSION = 126.0.6478.61
         LET PACKAGE_RELEASE = -1
 
         # Install Google Chrome
