@@ -81,7 +81,7 @@ VERSION 0.8  # This defines the "schema version" that this Earthfile satisfies
 deps:
     # A target can be thought of as a group of container image layers (think of Docker multi-stage builds)
     # For this target, we start by deriving from an image which contains the Go tooling we need
-    FROM golang:1.21-alpine3.19
+    FROM golang:1.22.4-alpine3.19
 
     # Earthly has a 1:1 relationship with most Dockerfile commands, but there are a few exceptions
     WORKDIR /work
@@ -107,7 +107,7 @@ Each target then specifies one or more commands that create the image layers ass
 VERSION 0.8
 
 deps:
-    FROM golang:1.21-alpine3.19
+    FROM golang:1.22.4-alpine3.19
     WORKDIR /work
 
     # These commands work identical to their Dockerfile equivalent
@@ -144,6 +144,7 @@ build:
 
     # This forces go to build a "static" binary with no dependencies
     ENV CGO_ENABLED=0
+    RUN go mod tidy
     RUN go build -ldflags="-extldflags=-static" -o bin/hello cmd/main.go
 
     # This "exports" the built binary as an "output" of this target
@@ -176,6 +177,7 @@ build:
     FROM +src
 
     ENV CGO_ENABLED=0
+    RUN go mod tidy
     RUN go build -ldflags="-extldflags=-static" -o bin/hello cmd/main.go
 
     SAVE ARTIFACT bin/hello hello

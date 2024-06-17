@@ -3,8 +3,6 @@ VERSION 0.8
 DEPS:
     FUNCTION
 
-    ARG ginkgo="true"
-
     # Establish a cache
     RUN mkdir -p /go/cache && mkdir -p /go/modcache
     ENV GOCACHE=/go/cache
@@ -14,10 +12,10 @@ DEPS:
     COPY go.mod go.sum ./
     RUN go mod download
 
-    # Optionally, install ginkgo for testing
-    IF ${ginkgo} == "true"
-        RUN go install github.com/onsi/ginkgo/v2/ginkgo
-    END
+    # Install ginkgo for testing - and test it works.
+    RUN go get github.com/onsi/ginkgo/v2/ginkgo && \
+        go install github.com/onsi/ginkgo/v2/ginkgo && \
+        ginkgo version
 
     # Save artifacts that may have been modified
     SAVE ARTIFACT go.mod AS LOCAL go.mod
