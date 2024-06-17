@@ -20,7 +20,7 @@ deps:
     DO go-ci+DEPS
 
 src:
-    FROM +deps
+    FROM +deps --ginkgo=true
 
     COPY --dir cmd pkg .
 

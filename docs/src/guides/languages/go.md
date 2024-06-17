@@ -58,7 +58,7 @@ deps:
 
     # This Function automatically copies the go.mod and go.sum files and runs
     # `go mod download` to install the dependencies.
-    DO ../../earthly/go+DEPS --ginkgo="false"
+    DO ../../earthly/go+DEPS
 ```
 
 The first target we are going to create will be responsible for downloading the external dependencies that our Go program uses.

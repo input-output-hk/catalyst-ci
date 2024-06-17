@@ -17,7 +17,7 @@ deps:
 
     # This FUNCTION automatically copies the go.mod and go.sum files and runs
     # `go mod download` to install the dependencies.
-    DO go-ci+DEPS --ginkgo="false"
+    DO go-ci+DEPS
 
 src:
     # This target copies the source code into the current build context
