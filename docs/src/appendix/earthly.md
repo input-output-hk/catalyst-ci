@@ -144,6 +144,7 @@ build:
 
     # This forces go to build a "static" binary with no dependencies
     ENV CGO_ENABLED=0
+    RUN go mod tidy
     RUN go build -ldflags="-extldflags=-static" -o bin/hello cmd/main.go
 
     # This "exports" the built binary as an "output" of this target
@@ -176,6 +177,7 @@ build:
     FROM +src
 
     ENV CGO_ENABLED=0
+    RUN go mod tidy
     RUN go build -ldflags="-extldflags=-static" -o bin/hello cmd/main.go
 
     SAVE ARTIFACT bin/hello hello

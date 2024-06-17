@@ -127,6 +127,7 @@ build:
 
     # The below just creates a fully static binary with no CGO dependencies.
     ENV CGO_ENABLED=0
+    RUN go mod tidy
     RUN go build -ldflags="-extldflags=-static" -o bin/hello cmd/main.go
 
     # We save the artifact here so that future targets can use it.

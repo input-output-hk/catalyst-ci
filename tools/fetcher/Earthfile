@@ -33,6 +33,7 @@ build:
     FROM +src
 
     ENV CGO_ENABLED=0
+    RUN go mod tidy
     RUN go build -ldflags="-extldflags=-static" -o bin/fetcher cmd/main.go
 
     SAVE ARTIFACT bin/fetcher fetcher
