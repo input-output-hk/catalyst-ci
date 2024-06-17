@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../earthly/go AS go-ci
 
-FROM golang:1.21-alpine3.19
+FROM golang:1.22.4-alpine3.19
 
 # cspell: words onsi ldflags extldflags
 
@@ -34,6 +34,7 @@ build:
     FROM +src
 
     ENV CGO_ENABLED=0
+    RUN go mod tidy
     RUN go build -ldflags="-extldflags=-static" -o bin/ci cmd/main.go
 
     SAVE ARTIFACT bin/ci ci

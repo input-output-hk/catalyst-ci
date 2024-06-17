@@ -50,7 +50,7 @@ VERSION 0.8
 
 deps:
     # This target is used to install external Go dependencies.
-    FROM golang:1.21-alpine3.19
+    FROM golang:1.22.4-alpine3.19
     WORKDIR /work
 
     # Any build dependencies should also be captured in this target.
@@ -58,7 +58,7 @@ deps:
 
     # This Function automatically copies the go.mod and go.sum files and runs
     # `go mod download` to install the dependencies.
-    DO ../../earthly/go+DEPS --ginkgo="false"
+    DO ../../earthly/go+DEPS
 ```
 
 The first target we are going to create will be responsible for downloading the external dependencies that our Go program uses.
@@ -127,6 +127,7 @@ build:
 
     # The below just creates a fully static binary with no CGO dependencies.
     ENV CGO_ENABLED=0
+    RUN go mod tidy
     RUN go build -ldflags="-extldflags=-static" -o bin/hello cmd/main.go
 
     # We save the artifact here so that future targets can use it.
