@@ -1,1 +1,2 @@
 watchdog
+python-dotenv
