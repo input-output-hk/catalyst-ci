@@ -18,10 +18,11 @@ class ChangeEventHandler(FileSystemEventHandler):
     def __init__(self):
         self.file_indexes = {}
 
-        # List initial file sizes during initialization
         self.list_initial_sizes()
 
     def list_initial_sizes(self):
+        """Lists initial file sizes during initialization."""
+
         for root, directories, files in os.walk(watch_dir):
             for filename in files:
                 file_path = os.path.join(root, filename)
@@ -34,6 +35,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 
     def on_any_event(self, event):
         """Logs any file system event."""
+        
         if event.is_directory:
             return None
 
@@ -47,7 +49,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 def main():
     global watch_dir
     watch_dir = sys.argv[1] if len(sys.argv) > 1 else '.'
-    
+
     logging.info(f'start watching directory {watch_dir!r}')
 
     observer = Observer()
