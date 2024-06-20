@@ -24,9 +24,9 @@ class Interval:
         thread.start()
 
     def set_interval(self):
-        nextTime=time.time()+self.interval
-        while not self.stop_event.wait(nextTime-time.time()):
-            nextTime+=self.interval
+        next_time = time.time() + self.interval
+        while not self.stop_event.wait(next_time - time.time()):
+            next_time += self.interval
             self.func()
 
     def drop(self):
@@ -53,6 +53,10 @@ class ChangeEventHandler(FileSystemEventHandler):
                 try:
                     size = os.path.getsize(file_path)
                     self.file_indexes[file_path] = size
+
+                    if size >= large_file_size:
+                        print(f"{file_path} exceeds large file criteria (size: {size} bytes)")
+
                     print(f"Initial file: {file_path} (size: {size} bytes)")
                 except OSError as e:
                     print(f"Error accessing file: {file_path} ({e})")
@@ -62,24 +66,34 @@ class ChangeEventHandler(FileSystemEventHandler):
         
         if event.is_directory:
             return None
-        elif event.event_type == 'created':
+        
+        if event.event_type == 'created':
             self.handle_created(event.src_path)
         elif event.event_type == 'modified':
             self.handle_modified(event.src_path)
         elif event.event_type == 'deleted':
             self.handle_deleted(event.src_path)
 
+        print(event.event_type)
+
     def handle_interval_change(self):
         print(f"Interval changed")
-        self.growth_indexes = {}
+        self.growth_indexes.clear()
 
     def handle_created(self, file_path: str):
         print(f"New file created: {file_path}")
 
+        if not os.path.isfile(file_path):
+            return
+        
         self.file_indexes[file_path] = os.path.getsize(file_path)
+        self.growth_indexes[file_path] = os.path.getsize(file_path)
 
     def handle_modified(self, file_path: str):
         print(f"File modified: {file_path}")
+
+        if not os.path.isfile(file_path):
+            return
 
         current_size = os.path.getsize(file_path)
 
@@ -90,7 +104,19 @@ class ChangeEventHandler(FileSystemEventHandler):
         elif current_size != self.file_indexes[file_path]:
             prev_size = self.file_indexes[file_path]
             diff_size = current_size - prev_size
+
             self.file_indexes[file_path] = current_size
+
+            if current_size >= large_file_size:
+                print(f"{file_path} exceeds large file criteria (size: {current_size} bytes)")
+
+            if file_path in self.growth_indexes:
+                self.growth_indexes[file_path] += max(diff_size, 0)
+
+                if self.growth_indexes[file_path] >= time_window_large_file_growth:
+                    print(f"{file_path} exceeds large file criteria (size: {current_size} bytes)")
+            else:
+                self.growth_indexes[file_path] = max(diff_size, 0)
 
             print(f"File modified: {file_path} (size changed from {prev_size} bytes to {current_size} bytes)")
         else:
@@ -99,7 +125,16 @@ class ChangeEventHandler(FileSystemEventHandler):
     def handle_deleted(self, file_path: str):
         print(f"File deleted: {file_path}")
 
-        del self.file_indexes[file_path]
+        if file_path in self.file_indexes:
+            del self.file_indexes[file_path]
+        if file_path in self.growth_indexes:
+            del self.growth_indexes[file_path]
+
+    def handle_file_size_exceeded():
+        print()
+
+    def handle_file_growth_exceeded():
+        print()
 
     def drop(self):
         self.interval.drop()
@@ -107,7 +142,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 def main():
     global watch_dir, large_file_size, max_cache_size, time_window, time_window_large_file_growth
 
-    cfg = dotenv_values("config.conf")
+    cfg = dotenv_values("default.conf")
     watch_dir = str(cfg["watch_dir"])
     large_file_size = int(cfg["large_file_size"])
     max_cache_size = int(cfg["max_cache_size"])
@@ -121,6 +156,7 @@ def main():
     observer = Observer()
     observer.schedule(handler, watch_dir, recursive=True)
     observer.start()
+    
     try:
         while True:
             time.sleep(1)
