@@ -23,9 +23,9 @@ INSTALL_CHROME_LINUX64:
             tee /usr/share/keyrings/google-chrome.gpg >> /dev/null
         RUN echo deb [arch=amd64 signed-by=/usr/share/keyrings/google-chrome.gpg] https://dl.google.com/linux/chrome/deb/ stable main | \
             tee /etc/apt/sources.list.d/google-chrome.list 
+        RUN apt-cache policy google-chrome-stable
         RUN apt-get update && apt-get install -y google-chrome-stable=${CHROME_VERSION}${PACKAGE_RELEASE}
         RUN google-chrome --version 
-        RUN apt-cache policy google-chrome-stable
 
         # Install Chromedriver
         RUN printf "${BLUE} Installing Chromedriver..."
