@@ -13,14 +13,13 @@ INSTALL_CHROME_LINUX64:
     # https://googlechromelabs.github.io/chrome-for-testing/
     IF [ "$TARGETARCH" = "amd64" ]
         ARG --required chrome_version
-        
+        ARG --required chrome_package_release
         # Install Google Chrome
         RUN printf "${BLUE} Installing Google Chrome..."
-        RUN mkdir -p /opt/chrome \
-            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${chrome_version}/linux64/chrome-linux64.zip \
-            -o /opt/chrome/chrome.zip \
-            && unzip -j /opt/chrome/chrome.zip -d /usr/local/bin/ \
-            && mv /usr/bin/chrome /usr/bin/google-chrome
+        RUN curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${chrome_version}-${chrome_package_release}_amd64.deb \
+            && apt install -y /opt/chrome.deb \
+            && rm /opt/chrome.deb \
+            && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
         RUN google-chrome --version
 
         # Install Chromedriver
