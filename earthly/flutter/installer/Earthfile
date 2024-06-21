@@ -11,22 +11,22 @@ INSTALL_CHROME_LINUX64:
     LET BLUE ='\033[0;34m'
 
     # https://googlechromelabs.github.io/chrome-for-testing/
-    # Stable version: https://www.ubuntuupdates.org/package/google_chrome/stable/main/base/google-chrome-stable
     IF [ "$TARGETARCH" = "amd64" ]
         ARG --required chrome_version
         
         # Install Google Chrome
         RUN printf "${BLUE} Installing Google Chrome..."
-        RUN curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${chrome_version}-${chrome_package_release}_amd64.deb \
-            && apt install -y /opt/chrome.deb \
-            && rm /opt/chrome.deb \
-            && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+        RUN mkdir -p /opt/chrome \
+            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${chrome_version}/linux64/chrome-linux64.zip \
+            -o /opt/chrome/chrome.zip \
+            && unzip -j /opt/chrome/chrome.zip -d /usr/local/bin/ \
+            && mv /usr/bin/chrome /usr/bin/google-chrome
         RUN google-chrome --version
 
         # Install Chromedriver
         RUN printf "${BLUE} Installing Chromedriver..."
-        RUN mkdir -p /opt/chromedriver
-        RUN curl -L https://storage.googleapis.com/chrome-for-testing-public/${chrome_version}/linux64/chromedriver-linux64.zip \
+        RUN mkdir -p /opt/chromedriver \
+            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${chrome_version}/linux64/chromedriver-linux64.zip \
             -o /opt/chromedriver/chromedriver.zip \
             && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
         RUN chromedriver --version
