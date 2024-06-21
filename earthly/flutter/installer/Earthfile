@@ -99,17 +99,17 @@ INSTALL_FIREFOX_LINUX64:
             | tee /etc/apt/preferences.d/mozilla > /dev/null
         RUN apt-get update
     END
-    
+
     IF [ "$TARGETARCH" = "amd64" ]
         SET PLATFORM = linux64
         RUN apt-get install -y -t mozilla firefox=126.0~build2
     ELSE
         SET PLATFORM = linux-aarch64
-        RUN apt-get install -y -t mozilla firefox-esr=115.11.0esr-1~deb12u1
+        RUN apt-get install -y -t mozilla firefox-esr=115.12.0esr-1~deb12u1
     END
 
     RUN firefox --version
-    
+
     RUN echo "${BLUE}Installing Geckodriver..."
     RUN mkdir -p /opt/geckodriver
     RUN curl -sL "https://github.com/mozilla/geckodriver/releases/download/v${GECKO_VERSION}/geckodriver-v${GECKO_VERSION}-${PLATFORM}.tar.gz" \
