@@ -93,7 +93,7 @@ INSTALL_FIREFOX_LINUX64:
         RUN echo "Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n\n" \
             | tee /etc/apt/preferences.d/mozilla > /dev/null
     END
-    
+
     IF [ "$TARGETARCH" = "amd64" ]
         SET PLATFORM = linux64
         ARG --required firefox_version_amd64
@@ -103,7 +103,6 @@ INSTALL_FIREFOX_LINUX64:
         ARG --required firefox_version_arm64
         RUN apt-get update && apt-get install -y -t mozilla firefox-esr=${firefox_version_arm64}
     END
-
     RUN firefox --version
     
     RUN printf "${BLUE} Installing Geckodriver..."
