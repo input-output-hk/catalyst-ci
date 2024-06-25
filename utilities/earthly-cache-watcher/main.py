@@ -9,7 +9,7 @@ from dotenv import dotenv_values
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(message)s',
+    format='[%(levelname)s] %(asctime)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
@@ -76,7 +76,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                     # checks individual
                     self.check_sizes(file_path, skip_sum_check=True, omit_growth_indexes=True)
 
-                    logging.info(f"initial file: {file_path} (size: {size} bytes)")
+                    logging.debug(f"initial file: {file_path} (size: {size} bytes)")
                 except OSError as e:
                     logging.error(f"error accessing file: {file_path} ({e})")
 
@@ -166,13 +166,13 @@ class ChangeEventHandler(FileSystemEventHandler):
             self.trigger_max_cache_size()
 
     def trigger_file_size_exceeded(self, file_path: str):
-        logging.info(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
+        logging.warning(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
 
     def trigger_file_growth_exceeded(self, file_path: str):
-        logging.info(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {time_window_large_file_growth} bytes)")
+        logging.warning(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {time_window_large_file_growth} bytes)")
 
     def trigger_max_cache_size(self):
-        logging.info(f"the total amount of cache exceeds the limitation (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
+        logging.warning(f"the total amount of cache exceeds the limitation (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
 
     def drop(self):
         self.interval.drop()
