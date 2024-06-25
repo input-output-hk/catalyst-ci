@@ -182,15 +182,31 @@ class ChangeEventHandler(FileSystemEventHandler):
 def main():
     global watch_dir, large_file_size, max_cache_size, time_window, max_time_window_growth_size
 
-    cfg = dotenv_values("default.conf")
-    watch_dir = str(cfg["watch_dir"])
-    large_file_size = int(cfg["large_file_size"])
-    max_cache_size = int(cfg["max_cache_size"])
-    time_window = int(cfg["time_window"])
-    max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
-    
-    logging.info(f'start watching directory {watch_dir!r}')
+    default_config_path = "default.conf"
 
+    # init configs
+    watch_dir = "."
+    large_file_size = 1073741824 # 1GB
+    max_cache_size = 536870912000 # 500GB
+    time_window = 10 # 10 secs
+    max_time_window_growth_size = 53687091200 # 50GB
+
+    if os.path.isfile(default_config_path):
+        cfg = dotenv_values(default_config_path)
+
+        watch_dir = str(cfg["watch_dir"])
+        large_file_size = int(cfg["large_file_size"])
+        max_cache_size = int(cfg["max_cache_size"])
+        time_window = int(cfg["time_window"])
+        max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
+    
+    logging.info(f'start watching directory {os.path.abspath(watch_dir)!r}')
+    logging.info(f'with `large_file_size` set to {large_file_size} bytes')
+    logging.info(f'with `max_cache_size` set to {max_cache_size} bytes')
+    logging.info(f'with `time_window` set to {time_window} bytes')
+    logging.info(f'with `max_time_window_growth_size` set to {max_time_window_growth_size} bytes')
+
+    # init watcher
     handler = ChangeEventHandler(time_window)
 
     observer = Observer()
