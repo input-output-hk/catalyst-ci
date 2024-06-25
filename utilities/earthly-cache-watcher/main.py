@@ -1,28 +1,32 @@
 # cspell: words dotenv levelname
 
-import threading
-import os
-import time
 import logging
+import os
+import threading
+import time
 from collections.abc import Callable
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+
 from dotenv import dotenv_values
+from watchdog.events import FileSystemEventHandler
+from watchdog.observers import Observer
 
 logging.basicConfig(
     level=logging.INFO,
-    format='[%(levelname)s] %(asctime)s - %(message)s',
-    datefmt='%Y-%m-%d %H:%M:%S'
+    format="[%(levelname)s] %(asctime)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
+
 
 class Interval:
     """
-    A class that repeatedly executes a function at specified intervals in a separate thread.
+    A class that repeatedly executes a function
+    at specified intervals in a separate thread.
     """
 
     def __init__(self, interval: int, func: Callable[[], None]):
         """
-        Initializes the Interval instance with the specified interval and function.
+        Initializes the Interval instance
+        with the specified interval and function.
         """
 
         self.interval = interval
@@ -34,7 +38,8 @@ class Interval:
 
     def set_interval(self):
         """
-        Repeatedly executes the function at the specified interval until the stop event is set.
+        Repeatedly executes the function at
+        the specified interval until the stop event is set.
         """
 
         next_time = time.time() + self.interval
@@ -48,6 +53,7 @@ class Interval:
         """
 
         self.stop_event.set()
+
 
 class ChangeEventHandler(FileSystemEventHandler):
     """
@@ -78,7 +84,9 @@ class ChangeEventHandler(FileSystemEventHandler):
                     # checks individual
                     self.check_sizes(file_path, skip_sum_check=True)
 
-                    logging.debug(f"initial file: {file_path} (size: {size} bytes)")
+                    logging.debug(
+                        f"initial file: {file_path} (size: {size} bytes)"
+                    )
                 except OSError as e:
                     logging.error(f"error accessing file: {file_path} ({e})")
 
@@ -89,21 +97,21 @@ class ChangeEventHandler(FileSystemEventHandler):
         """
         Logs any file system event.
         """
-        
+
         if event.is_directory:
             return None
-        
-        if event.event_type == 'created':
+
+        if event.event_type == "created":
             self.handle_created(event.src_path)
-        elif event.event_type == 'modified':
+        elif event.event_type == "modified":
             self.handle_modified(event.src_path)
-        elif event.event_type == 'deleted':
+        elif event.event_type == "deleted":
             self.handle_deleted(event.src_path)
 
         logging.debug(event.event_type)
 
     def handle_interval_change(self):
-        logging.debug(f"interval changed")
+        logging.debug("interval changed")
 
         self.growth_indexes.clear()
 
@@ -112,9 +120,9 @@ class ChangeEventHandler(FileSystemEventHandler):
 
         if not os.path.isfile(file_path):
             return
-        
+
         current_size = os.path.getsize(file_path)
-        
+
         self.file_indexes[file_path] = current_size
         self.growth_indexes[file_path] = current_size
 
@@ -147,7 +155,9 @@ class ChangeEventHandler(FileSystemEventHandler):
             # checks
             self.check_sizes(file_path)
 
-            logging.debug(f"file modified: {file_path} (size changed from {prev_size} bytes to {current_size} bytes)")
+            logging.debug(
+                f"file modified: {file_path} (size changed from {prev_size} bytes to {current_size} bytes)"
+            )
         else:
             logging.debug(f"file modified: {file_path} (size unchanged)")
 
@@ -159,37 +169,59 @@ class ChangeEventHandler(FileSystemEventHandler):
         if file_path in self.growth_indexes:
             del self.growth_indexes[file_path]
 
-    def check_sizes(self, file_path: str, skip_sum_check = False):
-        if file_path in self.file_indexes and self.file_indexes[file_path] >= large_file_size:
+    def check_sizes(self, file_path: str, skip_sum_check=False):
+        if (
+            file_path in self.file_indexes
+            and self.file_indexes[file_path] >= large_file_size
+        ):
             self.trigger_file_size_exceeded(file_path)
-        if not skip_sum_check and sum(self.growth_indexes.values()) >= max_time_window_growth_size:
+        if (
+            not skip_sum_check
+            and sum(self.growth_indexes.values())
+            >= max_time_window_growth_size
+        ):
             self.trigger_interval_growth_exceeded(file_path)
-        if not skip_sum_check and sum(self.file_indexes.values()) >= max_cache_size:
+        if (
+            not skip_sum_check
+            and sum(self.file_indexes.values()) >= max_cache_size
+        ):
             self.trigger_max_cache_size()
 
     def trigger_file_size_exceeded(self, file_path: str):
-        logging.warning(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
+        logging.warning(
+            f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)"
+        )
 
     def trigger_interval_growth_exceeded(self):
-        logging.warning(f"the total amount of cache growth within {time_window} secs exceeds the limit (size: {sum(self.growth_indexes.values())} bytes, limit: {max_time_window_growth_size} bytes)")
+        logging.warning(
+            f"the total amount of cache growth within {time_window} secs exceeds the limit (size: {sum(self.growth_indexes.values())} bytes, limit: {max_time_window_growth_size} bytes)"
+        )
 
     def trigger_max_cache_size(self):
-        logging.warning(f"the total amount of cache exceeds the limit (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
+        logging.warning(
+            f"the total amount of cache exceeds the limit (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)"
+        )
 
     def drop(self):
         self.interval.drop()
 
+
 def main():
-    global watch_dir, large_file_size, max_cache_size, time_window, max_time_window_growth_size
+    global \
+        watch_dir, \
+        large_file_size, \
+        max_cache_size, \
+        time_window, \
+        max_time_window_growth_size
 
     default_config_path = "default.conf"
 
     # init configs
     watch_dir = "."
-    large_file_size = 1073741824 # 1GB
-    max_cache_size = 536870912000 # 500GB
-    time_window = 10 # 10 secs
-    max_time_window_growth_size = 53687091200 # 50GB
+    large_file_size = 1073741824  # 1GB
+    max_cache_size = 536870912000  # 500GB
+    time_window = 10  # 10 secs
+    max_time_window_growth_size = 53687091200  # 50GB
 
     if os.path.isfile(default_config_path):
         cfg = dotenv_values(default_config_path)
@@ -199,12 +231,14 @@ def main():
         max_cache_size = int(cfg["max_cache_size"])
         time_window = int(cfg["time_window"])
         max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
-    
-    logging.info(f'start watching directory {os.path.abspath(watch_dir)!r}')
-    logging.info(f'with `large_file_size` set to {large_file_size} bytes')
-    logging.info(f'with `max_cache_size` set to {max_cache_size} bytes')
-    logging.info(f'with `time_window` set to {time_window} bytes')
-    logging.info(f'with `max_time_window_growth_size` set to {max_time_window_growth_size} bytes')
+
+    logging.info(f"start watching directory {os.path.abspath(watch_dir)!r}")
+    logging.info(f"with `large_file_size` set to {large_file_size} bytes")
+    logging.info(f"with `max_cache_size` set to {max_cache_size} bytes")
+    logging.info(f"with `time_window` set to {time_window} bytes")
+    logging.info(
+        f"with `max_time_window_growth_size` set to {max_time_window_growth_size} bytes"
+    )
 
     # init watcher
     handler = ChangeEventHandler(time_window)
@@ -212,7 +246,7 @@ def main():
     observer = Observer()
     observer.schedule(handler, watch_dir, recursive=True)
     observer.start()
-    
+
     try:
         while True:
             time.sleep(1)
@@ -221,6 +255,7 @@ def main():
         handler.drop()
     finally:
         observer.join()
+
 
 if __name__ == "__main__":
     main()
