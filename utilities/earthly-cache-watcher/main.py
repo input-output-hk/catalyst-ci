@@ -183,7 +183,7 @@ class ChangeEventHandler(FileSystemEventHandler):
             and sum(self.growth_indexes.values())
             >= max_time_window_growth_size
         ):
-            self.trigger_interval_growth_exceeded(file_path)
+            self.trigger_interval_growth_exceeded()
         if (
             not skip_sum_check
             and sum(self.file_indexes.values()) >= max_cache_size
