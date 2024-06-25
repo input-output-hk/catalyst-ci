@@ -1,0 +1,11 @@
+[Unit]
+Description=Earthly Cache Watcher
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/env python3 /path/to/my_script.py
+Restart=always
+User=your_username
+
+[Install]
+WantedBy=multi-user.target

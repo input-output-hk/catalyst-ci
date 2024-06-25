@@ -1,9 +1,7 @@
-import sys
 import threading
 import os
 import time
 import logging
-from systemd import journal
 from collections.abc import Callable
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -78,9 +76,9 @@ class ChangeEventHandler(FileSystemEventHandler):
                     # checks individual
                     self.check_sizes(file_path, skip_sum_check=True, omit_growth_indexes=True)
 
-                    print(f"Initial file: {file_path} (size: {size} bytes)")
+                    logging.info(f"initial file: {file_path} (size: {size} bytes)")
                 except OSError as e:
-                    print(f"Error accessing file: {file_path} ({e})")
+                    logging.error(f"error accessing file: {file_path} ({e})")
 
         # checks total
         self.check_sizes(file_path="")
@@ -100,15 +98,15 @@ class ChangeEventHandler(FileSystemEventHandler):
         elif event.event_type == 'deleted':
             self.handle_deleted(event.src_path)
 
-        print(event.event_type)
+        logging.debug(event.event_type)
 
     def handle_interval_change(self):
-        print(f"Interval changed")
+        logging.debug(f"interval changed")
 
         self.growth_indexes.clear()
 
     def handle_created(self, file_path: str):
-        print(f"New file created: {file_path}")
+        logging.debug(f"new file created: {file_path}")
 
         if not os.path.isfile(file_path):
             return
@@ -122,7 +120,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.check_sizes(file_path)
 
     def handle_modified(self, file_path: str):
-        print(f"File modified: {file_path}")
+        logging.debug(f"file modified: {file_path}")
 
         if not os.path.isfile(file_path):
             return
@@ -132,7 +130,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         if file_path not in self.file_indexes:
             self.file_indexes[file_path] = current_size
 
-            print(f"New file created: {file_path}")
+            logging.debug(f"new file created: {file_path}")
         elif current_size != self.file_indexes[file_path]:
             prev_size = self.file_indexes[file_path]
             diff_size = current_size - prev_size
@@ -147,12 +145,12 @@ class ChangeEventHandler(FileSystemEventHandler):
             # checks
             self.check_sizes(file_path)
 
-            print(f"File modified: {file_path} (size changed from {prev_size} bytes to {current_size} bytes)")
+            logging.debug(f"file modified: {file_path} (size changed from {prev_size} bytes to {current_size} bytes)")
         else:
-            print(f"File modified: {file_path} (size unchanged)")
+            logging.debug(f"file modified: {file_path} (size unchanged)")
 
     def handle_deleted(self, file_path: str):
-        print(f"File deleted: {file_path}")
+        logging.debug(f"file deleted: {file_path}")
 
         if file_path in self.file_indexes:
             del self.file_indexes[file_path]
@@ -168,13 +166,13 @@ class ChangeEventHandler(FileSystemEventHandler):
             self.trigger_max_cache_size()
 
     def trigger_file_size_exceeded(self, file_path: str):
-        journal.send(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
+        logging.info(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
 
     def trigger_file_growth_exceeded(self, file_path: str):
-        journal.send(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {time_window_large_file_growth} bytes)")
+        logging.info(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {time_window_large_file_growth} bytes)")
 
     def trigger_max_cache_size(self):
-        journal.send(f"The total amount of cache exceeds the limitation (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
+        logging.info(f"the total amount of cache exceeds the limitation (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
 
     def drop(self):
         self.interval.drop()
