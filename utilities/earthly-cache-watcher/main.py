@@ -3,6 +3,7 @@ import threading
 import os
 import time
 import logging
+from systemd import journal
 from collections.abc import Callable
 from watchdog.observers import Observer
 from watchdog.events import FileSystemEventHandler
@@ -159,21 +160,21 @@ class ChangeEventHandler(FileSystemEventHandler):
             del self.growth_indexes[file_path]
 
     def check_sizes(self, file_path: str, skip_sum_check = False, omit_growth_indexes = False):
-        if file_path != "" and self.file_indexes[file_path] >= large_file_size:
+        if file_path in self.file_indexes and self.file_indexes[file_path] >= large_file_size:
             self.trigger_file_size_exceeded(file_path)
-        if file_path != "" and not omit_growth_indexes and self.growth_indexes[file_path] >= time_window_large_file_growth:
+        if file_path in self.growth_indexes and not omit_growth_indexes and self.growth_indexes[file_path] >= time_window_large_file_growth:
             self.trigger_file_growth_exceeded(file_path)
         if not skip_sum_check and sum(self.file_indexes.values()) >= max_cache_size:
             self.trigger_max_cache_size()
 
     def trigger_file_size_exceeded(self, file_path: str):
-        print(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
+        journal.send(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
 
     def trigger_file_growth_exceeded(self, file_path: str):
-        print(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {time_window_large_file_growth} bytes)")
+        journal.send(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {time_window_large_file_growth} bytes)")
 
     def trigger_max_cache_size(self):
-        print(f"The total amount of cache exceeds the limitation (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
+        journal.send(f"The total amount of cache exceeds the limitation (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
 
     def drop(self):
         self.interval.drop()
