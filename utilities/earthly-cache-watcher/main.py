@@ -74,7 +74,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                     self.file_indexes[file_path] = size
 
                     # checks individual
-                    self.check_sizes(file_path, skip_sum_check=True, omit_growth_indexes=True)
+                    self.check_sizes(file_path, skip_sum_check=True)
 
                     logging.debug(f"initial file: {file_path} (size: {size} bytes)")
                 except OSError as e:
@@ -157,19 +157,19 @@ class ChangeEventHandler(FileSystemEventHandler):
         if file_path in self.growth_indexes:
             del self.growth_indexes[file_path]
 
-    def check_sizes(self, file_path: str, skip_sum_check = False, omit_growth_indexes = False):
+    def check_sizes(self, file_path: str, skip_sum_check = False):
         if file_path in self.file_indexes and self.file_indexes[file_path] >= large_file_size:
             self.trigger_file_size_exceeded(file_path)
-        if file_path in self.growth_indexes and not omit_growth_indexes and self.growth_indexes[file_path] >= time_window_large_file_growth:
-            self.trigger_file_growth_exceeded(file_path)
+        if not skip_sum_check and sum(self.growth_indexes.values()) >= max_time_window_growth_size:
+            self.trigger_interval_growth_exceeded(file_path)
         if not skip_sum_check and sum(self.file_indexes.values()) >= max_cache_size:
             self.trigger_max_cache_size()
 
     def trigger_file_size_exceeded(self, file_path: str):
         logging.warning(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
 
-    def trigger_file_growth_exceeded(self, file_path: str):
-        logging.warning(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {time_window_large_file_growth} bytes)")
+    def trigger_interval_growth_exceeded(self, file_path: str):
+        logging.warning(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {max_time_window_growth_size} bytes)")
 
     def trigger_max_cache_size(self):
         logging.warning(f"the total amount of cache exceeds the limitation (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
@@ -178,14 +178,14 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.interval.drop()
 
 def main():
-    global watch_dir, large_file_size, max_cache_size, time_window, time_window_large_file_growth
+    global watch_dir, large_file_size, max_cache_size, time_window, max_time_window_growth_size
 
     cfg = dotenv_values("default.conf")
     watch_dir = str(cfg["watch_dir"])
     large_file_size = int(cfg["large_file_size"])
     max_cache_size = int(cfg["max_cache_size"])
     time_window = int(cfg["time_window"])
-    time_window_large_file_growth = int(cfg["time_window_large_file_growth"])
+    max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
     
     logging.info(f'start watching directory {watch_dir!r}')
 
