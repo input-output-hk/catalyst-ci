@@ -3,7 +3,7 @@ Description=Earthly Cache Watcher
 
 [Service]
 Type=forking
-ExecStart=/usr/bin/env python3 /path/to/my_script.py
+ExecStart=/usr/bin/python /path/to/watchdog/main.py <config-path?>
 Restart=always
 User=your_username
 

@@ -2,6 +2,7 @@
 
 import logging
 import os
+import sys
 import threading
 import time
 from collections.abc import Callable
@@ -226,7 +227,7 @@ def main():
         time_window, \
         max_time_window_growth_size
 
-    default_config_path = "default.conf"
+    default_config_path = sys.argv[1] if len(sys.argv) > 1 else "default.conf"
 
     # init configs
     watch_dir = "."
@@ -236,6 +237,10 @@ def main():
     max_time_window_growth_size = 53687091200  # 50GB
 
     if os.path.isfile(default_config_path):
+        logging.info(
+            f"read config from {os.path.abspath(default_config_path)!r}"
+        )
+
         cfg = dotenv_values(default_config_path)
 
         watch_dir = str(cfg["watch_dir"])
@@ -243,6 +248,8 @@ def main():
         max_cache_size = int(cfg["max_cache_size"])
         time_window = int(cfg["time_window"])
         max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
+    else:
+        logging.info("cannot find the config file, use default config instead")
 
     logging.info(f"start watching directory {os.path.abspath(watch_dir)!r}")
     logging.info(f"with `large_file_size` set to {large_file_size} bytes")
