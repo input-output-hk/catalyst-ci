@@ -5,6 +5,6 @@ IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
 check:
     FROM python-ci+python-base
 
-    # COPY . .
+    COPY . .
 
-    DO python-ci+LINT_PYTHON
+    DO python-ci+CHECK
