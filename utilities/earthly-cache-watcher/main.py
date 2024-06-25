@@ -1,3 +1,5 @@
+# cspell: words dotenv levelname
+
 import threading
 import os
 import time
@@ -168,11 +170,11 @@ class ChangeEventHandler(FileSystemEventHandler):
     def trigger_file_size_exceeded(self, file_path: str):
         logging.warning(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)")
 
-    def trigger_interval_growth_exceeded(self, file_path: str):
-        logging.warning(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes, limit: {max_time_window_growth_size} bytes)")
+    def trigger_interval_growth_exceeded(self):
+        logging.warning(f"the total amount of cache growth within {time_window} secs exceeds the limit (size: {sum(self.growth_indexes.values())} bytes, limit: {max_time_window_growth_size} bytes)")
 
     def trigger_max_cache_size(self):
-        logging.warning(f"the total amount of cache exceeds the limitation (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
+        logging.warning(f"the total amount of cache exceeds the limit (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)")
 
     def drop(self):
         self.interval.drop()
