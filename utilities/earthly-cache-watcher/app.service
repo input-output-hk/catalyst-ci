@@ -1,8 +1,8 @@
 [Unit]
 Description=Earthly Cache Watcher
-After=network.target
 
 [Service]
+Type=forking
 ExecStart=/usr/bin/env python3 /path/to/my_script.py
 Restart=always
 User=your_username
