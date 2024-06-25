@@ -73,9 +73,9 @@ class ChangeEventHandler(FileSystemEventHandler):
         Lists initial file sizes during initialization.
         """
 
-        dir_abspath = os.path.abspath(watch_dir)
-        for root, directories, files in os.walk(watch_dir):
+        for root, _directories, files in os.walk(watch_dir):
             for filename in files:
+                dir_abspath = os.path.abspath(root)
                 file_path = os.path.join(dir_abspath, filename)
                 try:
                     size = os.path.getsize(file_path)
@@ -155,9 +155,11 @@ class ChangeEventHandler(FileSystemEventHandler):
             # checks
             self.check_sizes(file_path)
 
-            logging.debug(
-                f"file modified: {file_path} (size changed from {prev_size} bytes to {current_size} bytes)"
-            )
+            logging.debug(" ".join([
+                f"file modified: {file_path}",
+                f"(size changed from {prev_size} bytes",
+                f"to {current_size} bytes)"
+            ]))
         else:
             logging.debug(f"file modified: {file_path} (size unchanged)")
 
@@ -188,19 +190,26 @@ class ChangeEventHandler(FileSystemEventHandler):
             self.trigger_max_cache_size()
 
     def trigger_file_size_exceeded(self, file_path: str):
-        logging.warning(
-            f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes, limit: {large_file_size} bytes)"
-        )
+        logging.warning(" ".join([
+            f"{file_path} exceeds large file size criteria",
+            f"(size: {self.file_indexes[file_path]} bytes",
+            f"- limit: {large_file_size} bytes)"
+        ]))
 
     def trigger_interval_growth_exceeded(self):
-        logging.warning(
-            f"the total amount of cache growth within {time_window} secs exceeds the limit (size: {sum(self.growth_indexes.values())} bytes, limit: {max_time_window_growth_size} bytes)"
-        )
+        logging.warning(" ".join([
+            "the total amount of cache growth",
+            f"within {time_window} secs exceeds the limit",
+            f"(size: {sum(self.growth_indexes.values())} bytes",
+            f"- limit: {max_time_window_growth_size} bytes)"
+        ]))
 
     def trigger_max_cache_size(self):
-        logging.warning(
-            f"the total amount of cache exceeds the limit (size: {sum(self.file_indexes.values())} bytes, limit: {max_cache_size} bytes)"
-        )
+        logging.warning(" ".join([
+            "the total amount of cache exceeds the limit",
+            f"(size: {sum(self.file_indexes.values())} bytes",
+            f"- limit: {max_cache_size} bytes)"
+        ]))
 
     def drop(self):
         self.interval.drop()
@@ -236,9 +245,10 @@ def main():
     logging.info(f"with `large_file_size` set to {large_file_size} bytes")
     logging.info(f"with `max_cache_size` set to {max_cache_size} bytes")
     logging.info(f"with `time_window` set to {time_window} bytes")
-    logging.info(
-        f"with `max_time_window_growth_size` set to {max_time_window_growth_size} bytes"
-    )
+    logging.info(" ".join([
+        "with `max_time_window_growth_size` set to",
+        f"{max_time_window_growth_size} bytes"
+    ]))
 
     # init watcher
     handler = ChangeEventHandler(time_window)
