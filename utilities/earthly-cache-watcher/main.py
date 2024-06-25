@@ -204,6 +204,9 @@ class ChangeEventHandler(FileSystemEventHandler):
             f"- limit: {max_time_window_growth_size} bytes)"
         ]))
 
+        for file_path, size in self.growth_indexes.items():
+            logging.warning(f"{file_path} - {size} bytes within the interval")
+
     def trigger_max_cache_size(self):
         logging.warning(" ".join([
             "the total amount of cache exceeds the limit",
@@ -244,7 +247,7 @@ def main():
     logging.info(f"start watching directory {os.path.abspath(watch_dir)!r}")
     logging.info(f"with `large_file_size` set to {large_file_size} bytes")
     logging.info(f"with `max_cache_size` set to {max_cache_size} bytes")
-    logging.info(f"with `time_window` set to {time_window} bytes")
+    logging.info(f"with `time_window` set to {time_window} secs")
     logging.info(" ".join([
         "with `max_time_window_growth_size` set to",
         f"{max_time_window_growth_size} bytes"
