@@ -15,7 +15,15 @@ logging.basicConfig(
 )
 
 class Interval:
+    """
+    A class that repeatedly executes a function at specified intervals in a separate thread.
+    """
+
     def __init__(self, interval: int, func: Callable[[], None]):
+        """
+        Initializes the Interval instance with the specified interval and function.
+        """
+
         self.interval = interval
         self.func = func
         self.stop_event = threading.Event()
@@ -24,16 +32,26 @@ class Interval:
         thread.start()
 
     def set_interval(self):
+        """
+        Repeatedly executes the function at the specified interval until the stop event is set.
+        """
+
         next_time = time.time() + self.interval
         while not self.stop_event.wait(next_time - time.time()):
             next_time += self.interval
             self.func()
 
     def drop(self):
+        """
+        Signals the thread to stop executing the function.
+        """
+
         self.stop_event.set()
 
 class ChangeEventHandler(FileSystemEventHandler):
-    """Handles file system events."""
+    """
+    Handles file system events.
+    """
 
     def __init__(self, interval: int):
         self.time_window_interval: int = interval
@@ -44,7 +62,9 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.list_initial_sizes()
 
     def list_initial_sizes(self):
-        """Lists initial file sizes during initialization."""
+        """
+        Lists initial file sizes during initialization.
+        """
 
         dir_abspath = os.path.abspath(watch_dir)
         for root, directories, files in os.walk(watch_dir):
@@ -55,14 +75,16 @@ class ChangeEventHandler(FileSystemEventHandler):
                     self.file_indexes[file_path] = size
 
                     if size >= large_file_size:
-                        print(f"{file_path} exceeds large file criteria (size: {size} bytes)")
+                        self.trigger_file_size_exceeded(file_path)
 
                     print(f"Initial file: {file_path} (size: {size} bytes)")
                 except OSError as e:
                     print(f"Error accessing file: {file_path} ({e})")
 
     def on_any_event(self, event):
-        """Logs any file system event."""
+        """
+        Logs any file system event.
+        """
         
         if event.is_directory:
             return None
@@ -108,15 +130,15 @@ class ChangeEventHandler(FileSystemEventHandler):
             self.file_indexes[file_path] = current_size
 
             if current_size >= large_file_size:
-                print(f"{file_path} exceeds large file criteria (size: {current_size} bytes)")
+                self.trigger_file_size_exceeded(file_path)
 
-            if file_path in self.growth_indexes:
-                self.growth_indexes[file_path] += max(diff_size, 0)
+            if file_path not in self.growth_indexes:
+                self.growth_indexes[file_path] = 0
 
-                if self.growth_indexes[file_path] >= time_window_large_file_growth:
-                    print(f"{file_path} exceeds large file criteria (size: {current_size} bytes)")
-            else:
-                self.growth_indexes[file_path] = max(diff_size, 0)
+            self.growth_indexes[file_path] += max(diff_size, 0)
+
+            if self.growth_indexes[file_path] >= time_window_large_file_growth:
+                self.trigger_file_growth_exceeded(file_path)
 
             print(f"File modified: {file_path} (size changed from {prev_size} bytes to {current_size} bytes)")
         else:
@@ -130,11 +152,11 @@ class ChangeEventHandler(FileSystemEventHandler):
         if file_path in self.growth_indexes:
             del self.growth_indexes[file_path]
 
-    def handle_file_size_exceeded():
-        print()
+    def trigger_file_size_exceeded(self, file_path: str):
+        print(f"{file_path} exceeds large file size criteria (size: {self.file_indexes[file_path]} bytes)")
 
-    def handle_file_growth_exceeded():
-        print()
+    def trigger_file_growth_exceeded(self, file_path: str):
+        print(f"{file_path} exceeds large file growth criteria (growing: {self.growth_indexes[file_path]} bytes)")
 
     def drop(self):
         self.interval.drop()
