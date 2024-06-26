@@ -1,0 +1,134 @@
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_call:
+    inputs:
+      earthfile:
+        description: |
+          The path to the folder containing the Earthfile that will be built.
+          This path should be relative to the repository root.
+        required: true
+        type: string
+      target:
+        description: |
+          The target to run
+        required: false
+        type: string
+        default: nightly nightly-*
+      aws_role_arn:
+        description: |
+          The ARN of the AWS role that will be assumed by the workflow. Only
+          required when configuring a remote Earthly runner.
+        required: false
+        type: string
+      aws_region:
+        description: |
+          The AWS region that will be used by the workflow. Only required when
+          configuring a remote Earthly runner.
+        required: false
+        type: string
+      ci_cli_version:
+        description: |
+          The version of the CI CLI to use.
+        required: false
+        type: string
+        default: latest
+      earthly_version:
+        description: The version of Earthly to use.
+        required: false
+        type: string
+        default: latest
+    secrets:
+      dockerhub_username:
+        description: The token to use for logging into the DockerHub registry.
+        required: false
+      dockerhub_token:
+        description: The token to use for logging into the DockerHub registry.
+        required: false
+      earthly_runner_address:
+        description: |
+          The address of the Earthly runner that will be used to build the
+          Earthfile.
+        required: false
+      earthly_runner_secret:
+        description: |
+          The ID of the AWS secret holding Earthly remote runner credentials.
+          This secret must contain the runner address and the necessary TLS
+          certificates required to authenticate with it. If omitted, a remote
+          Earthly runner will not be configured.
+        required: false
+
+jobs:
+  build:
+    runs-on: macos-latest   # Assuming macOS for Flutter, adjust if using other platforms
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set env
+        run: |
+          GIT_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
+          if [[ $GIT_BRANCH == "${{ github.event.repository.default_branch }}" ]]; then
+            DEST_DIR="/"
+            {
+            echo 'CLEAN_EXCLUDE<<EOF'
+            echo "/branch/*"
+            echo "/allure-action/*"
+            echo EOF
+            } >> "$GITHUB_ENV"
+          else
+            DEST_DIR="/branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
+            echo "CLEAN_EXCLUDE="/nothing"" >> $GITHUB_ENV
+          fi
+          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+          echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV
+
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+          aws_role_arn: ${{ inputs.aws_role_arn }}
+          aws_region: ${{ inputs.aws_region }}
+          cli_version: ${{ inputs.ci_cli_version }}
+          earthly_version: ${{ inputs.earthly_version }}
+          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+
+      - name: Run Nightly Tests
+        run: flutter test --coverage
+
+      - name: Generate Nightly Test Report
+        run: |
+          mkdir -p test-results
+          flutter test --machine > test-results/nightly_test_report.json
+
+      - name: Upload Nightly Test Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: nightly-test-report
+          path: test-results/nightly_test_report.json
+
+      - name: Generate Nightly Coverage Report
+        run: |
+          mkdir -p coverage
+          genhtml coverage/lcov.info -o coverage/html
+
+      - name: Upload Nightly Coverage Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: nightly-coverage-report
+          path: coverage/html/index.html
+
+      - name: Trigger CI with nightly tests
+        uses: actions/github-script@v5
+        with:
+          script: |
+            github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              workflow_id: 'ci.yml',
+              ref: 'main',
+              inputs: {
+                nightly: 'true'
+              }
+            })
