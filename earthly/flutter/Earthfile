@@ -128,7 +128,7 @@ PUBLISH_DRY_RUN:
         RUN echo "Running melos publish --dry-run"
         RUN melos publish --dry-run --yes
     ELSE
-        RUN echo "Running pub publish --dry-run"
+        RUN echo "Running dart pub publish --dry-run"
         RUN dart pub publish --dry-run
     END
 
