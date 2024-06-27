@@ -15,7 +15,6 @@ on:
           The target to run
         required: false
         type: string
-        default: nightly nightly-*
       aws_role_arn:
         description: |
           The ARN of the AWS role that will be assumed by the workflow. Only
@@ -60,30 +59,59 @@ on:
         required: false
 
 jobs:
-  build:
-    runs-on: macos-latest   # Assuming macOS for Flutter, adjust if using other platforms
-
+  discover:
+    runs-on: ubuntu-latest
+    outputs:
+      json: ${{ steps.check.outputs.json }}
+      paths: ${{ steps.check.outputs.paths }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Set env
+      - uses: actions/checkout@v3
+      - name: Setup CI
+        uses: input-output-hk/catalyst-ci/actions/setup@master
+        with:
+          aws_role_arn: ${{ inputs.aws_role_arn }}
+          aws_region: ${{ inputs.aws_region }}
+          cli_version: ${{ inputs.ci_cli_version }}
+          dockerhub_token: ${{ secrets.dockerhub_token }}
+          dockerhub_username: ${{ secrets.dockerhub_username }}
+          earthly_version: ${{ inputs.earthly_version }}
+          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+          runner_address: ${{ secrets.earthly_runner_address }}
+      - name: Discover Earthly files
+        uses: input-output-hk/catalyst-ci/actions/discover@master
+        id: discover
+        with:
+          targets: ${{ inputs.target }}
+      - name: Check for empty output
+        id: check
         run: |
-          GIT_BRANCH=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}
-          if [[ $GIT_BRANCH == "${{ github.event.repository.default_branch }}" ]]; then
-            DEST_DIR="/"
-            {
-            echo 'CLEAN_EXCLUDE<<EOF'
-            echo "/branch/*"
-            echo "/allure-action/*"
-            echo EOF
-            } >> "$GITHUB_ENV"
+          json=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
+          paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
+          if [ "$output" == "null" ]; then
+            echo "json=[]" >> $GITHUB_OUTPUT
+            echo "paths=[]" >> $GITHUB_OUTPUT
           else
-            DEST_DIR="/branch/${GIT_BRANCH//[^a-zA-Z0-9_]/_}"
-            echo "CLEAN_EXCLUDE="/nothing"" >> $GITHUB_ENV
+            echo "json=$json" >> $GITHUB_OUTPUT
+            echo "paths=$paths" >> $GITHUB_OUTPUT
           fi
-          echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
-          echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV
+
+  run:
+    runs-on: ubuntu-latest
+    needs: [discover]
+    if: needs.discover.outputs.paths != '[]'
+    strategy:
+      fail-fast: false
+      matrix:
+        earthfile: ${{ fromJson(needs.discover.outputs.paths) }}
+    steps:
+      - name: Get filtered targets
+        id: get_target
+        run: |
+          targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
+          echo "Found targets: $targets"
+          targets_with_space=$(echo $targets | tr '\n' ' ')
+          echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
+      - uses: actions/checkout@v3
 
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
@@ -91,43 +119,53 @@ jobs:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
           cli_version: ${{ inputs.ci_cli_version }}
+          dockerhub_token: ${{ secrets.dockerhub_token }}
+          dockerhub_username: ${{ secrets.dockerhub_username }}
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+          runner_address: ${{ secrets.earthly_runner_address }}
+      
+      - name: Check nightly output
+        id: check-nightly
+        run: echo "nightly=${{ github.event.inputs.nightly }}" >> $GITHUB_ENV
+     
+      - name: Report tests if nightly return false
+        if: env.nightly == 'false'
+        run: pytest --junitxml=report.xml
 
-      - name: Run Nightly Tests
-        run: flutter test --coverage
+      - name: Run nightly tests
+        if: env.nightly == 'true'
+        run: pytest --tag=nightly --junitxml=nightly-report.xml
 
-      - name: Generate Nightly Test Report
+      - name: Generate coverage report
+        if: env.nightly == 'true'
         run: |
-          mkdir -p test-results
-          flutter test --machine > test-results/nightly_test_report.json
+          coverage run -m pytest --tag=nightly
+          coverage xml -o nightly-coverage.xml
 
-      - name: Upload Nightly Test Report
+      - name: Upload Test Report
+        if: env.nightly == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: nightly-test-report
-          path: test-results/nightly_test_report.json
+          path: nightly-report.xml
 
-      - name: Generate Nightly Coverage Report
-        run: |
-          mkdir -p coverage
-          genhtml coverage/lcov.info -o coverage/html
-
-      - name: Upload Nightly Coverage Report
+      - name: Upload Coverage Report
+        if: env.nightly == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: nightly-coverage-report
-          path: coverage/html/index.html
+          path: nightly-coverage.xml
 
       - name: Trigger CI with nightly tests
-        uses: actions/github-script@v5
+        uses: actions/github-script@v3
         with:
           script: |
             github.rest.actions.createWorkflowDispatch({
               owner: context.repo.owner,
               repo: context.repo.repo,
               workflow_id: 'ci.yml',
-              ref: 'main',
+              ref: 'master',
               inputs: {
                 nightly: 'true'
               }
