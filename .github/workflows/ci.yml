@@ -2,9 +2,10 @@ on:
   workflow_call:
     inputs:
       nightly:
-        description: 'Set to true to run nightly targets'
+        description: When set to true, the workflow will run with nightly reports
+        required: false
+        type: boolean
         default: false
-        type: string
       aws_ecr_registry:
         description: |
             The AWS ECR registry that will be used to publish images

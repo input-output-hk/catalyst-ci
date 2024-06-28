@@ -1,7 +1,7 @@
 
 on:
   schedule:
-    - cron: '0 0 * * 0'
+    - cron: '10 * * * *'
   workflow_call:
     inputs:
       earthfile:
@@ -130,28 +130,28 @@ jobs:
         run: echo "nightly=${{ github.event.inputs.nightly }}" >> $GITHUB_ENV
      
       - name: Report tests if nightly return false
-        if: env.nightly == 'false'
+        if: env.nightly == false
         run: pytest --junitxml=report.xml
 
       - name: Run nightly tests
-        if: env.nightly == 'true'
+        if: env.nightly == true
         run: pytest --tag=nightly --junitxml=nightly-report.xml
 
       - name: Generate coverage report
-        if: env.nightly == 'true'
+        if: env.nightly == true
         run: |
           coverage run -m pytest --tag=nightly
           coverage xml -o nightly-coverage.xml
 
       - name: Upload Test Report
-        if: env.nightly == 'true'
+        if: env.nightly == true
         uses: actions/upload-artifact@v3
         with:
           name: nightly-test-report
           path: nightly-report.xml
 
       - name: Upload Coverage Report
-        if: env.nightly == 'true'
+        if: env.nightly == true
         uses: actions/upload-artifact@v3
         with:
           name: nightly-coverage-report
