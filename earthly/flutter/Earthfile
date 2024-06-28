@@ -120,6 +120,19 @@ FORMAT:
         RUN flutter format --set-exit-if-changed .
     END
 
+# Dry-runs the publish script for publishable packages.
+PUBLISH_DRY_RUN:
+    FUNCTION
+
+    IF [ -f melos.yaml ]
+        RUN echo "Running melos publish --dry-run"
+        RUN melos publish --dry-run --yes
+    ELSE
+        RUN echo "Running dart pub publish --dry-run"
+        RUN dart pub publish --dry-run
+    END
+
+
 # Runs unit tests.
 UNIT_TESTS:
     FUNCTION
