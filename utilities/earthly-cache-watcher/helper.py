@@ -1,6 +1,6 @@
 import os
 
-def get_directory_size(directory):
+def get_directory_size(directory: str) -> int:
     total_size = 0
 
     if not os.path.isdir(directory):
