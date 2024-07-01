@@ -30,3 +30,12 @@ local:
     COPY +docs/ /usr/share/nginx/html
 
     SAVE IMAGE cat-ci-docs:latest
+
+nightly:
+    FROM +docs
+
+    DO docs-ci+PACKAGE
+
+    COPY +docs/ /usr/share/nginx/html
+
+    SAVE IMAGE cat-ci-docs:nightly
