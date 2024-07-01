@@ -198,10 +198,10 @@ class ChangeEventHandler(FileSystemEventHandler):
         ):
             self.trigger_max_cache_size()
 
-    def trigger_file_size_exceeded(self, file_path: str):
+    def trigger_file_size_exceeded(self, layer_name: str):
         logging.warning(" ".join([
-            f"{file_path} exceeds large file size criteria",
-            f"(size: {self.file_indexes[file_path]} bytes",
+            f"layer '{layer_name}' exceeds large file size criteria",
+            f"(size: {self.file_indexes[layer_name]} bytes",
             f"- limit: {large_file_size} bytes)"
         ]))
 
@@ -213,8 +213,8 @@ class ChangeEventHandler(FileSystemEventHandler):
             f"- limit: {max_time_window_growth_size} bytes)"
         ]))
 
-        for file_path, size in self.layer_growth_indexes.items():
-            logging.warning(f"{file_path} - {size} bytes within the interval")
+        for layer_name, size in self.layer_growth_indexes.items():
+            logging.warning(f"layer '{layer_name}' - {size} bytes within the interval")
 
     def trigger_max_cache_size(self):
         logging.warning(" ".join([
@@ -225,7 +225,6 @@ class ChangeEventHandler(FileSystemEventHandler):
 
     def drop(self):
         self.interval.drop()
-
 
 def main():
     global \
