@@ -7,6 +7,8 @@ import threading
 import time
 from collections.abc import Callable
 
+import helper
+
 from dotenv import dotenv_values
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
@@ -63,7 +65,8 @@ class ChangeEventHandler(FileSystemEventHandler):
 
     def __init__(self, interval: int):
         self.time_window_interval: int = interval
-        self.growth_indexes: dict[str, int] = {}
+        self.layer_growth_indexes: dict[str, int] = {}
+        self.layer_indexes: dict[str, int] = {}
         self.file_indexes: dict[str, int] = {}
         self.interval = Interval(interval, self.handle_interval_change)
 
@@ -80,10 +83,13 @@ class ChangeEventHandler(FileSystemEventHandler):
                 file_path = os.path.join(dir_abspath, filename)
                 try:
                     size = os.path.getsize(file_path)
-                    self.file_indexes[file_path] = size
+                    layer_name = helper.get_subdirectory_name(watch_dir, file_path)
+
+                    helper.add_or_init(self.file_indexes, file_path, size)
+                    helper.add_or_init(self.layer_indexes, layer_name, size)
 
                     # checks individual
-                    self.check_sizes(file_path, skip_sum_check=True)
+                    self.check_sizes(layer_name, skip_sum_check=True)
 
                     logging.debug(
                         f"initial file: {file_path} (size: {size} bytes)"
@@ -92,7 +98,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                     logging.error(f"error accessing file: {file_path} ({e})")
 
         # checks total
-        self.check_sizes(file_path="")
+        self.check_sizes(layer_name="")
 
     def on_any_event(self, event):
         """
@@ -114,7 +120,7 @@ class ChangeEventHandler(FileSystemEventHandler):
     def handle_interval_change(self):
         logging.debug("interval changed")
 
-        self.growth_indexes.clear()
+        self.layer_growth_indexes.clear()
 
     def handle_created(self, file_path: str):
         logging.debug(f"new file created: {file_path}")
@@ -122,13 +128,15 @@ class ChangeEventHandler(FileSystemEventHandler):
         if not os.path.isfile(file_path):
             return
 
+        layer_name = helper.get_subdirectory_name(watch_dir, file_path)
         current_size = os.path.getsize(file_path)
 
-        self.file_indexes[file_path] = current_size
-        self.growth_indexes[file_path] = current_size
+        helper.add_or_init(self.file_indexes, file_path, current_size)
+        helper.add_or_init(self.layer_indexes, layer_name, current_size)
+        helper.add_or_init(self.layer_growth_indexes, layer_name, current_size)
 
         # checks
-        self.check_sizes(file_path)
+        self.check_sizes(layer_name)
 
     def handle_modified(self, file_path: str):
         logging.debug(f"file modified: {file_path}")
@@ -136,25 +144,21 @@ class ChangeEventHandler(FileSystemEventHandler):
         if not os.path.isfile(file_path):
             return
 
+        layer_name = helper.get_subdirectory_name(watch_dir, file_path)
         current_size = os.path.getsize(file_path)
 
         if file_path not in self.file_indexes:
-            self.file_indexes[file_path] = current_size
-
-            logging.debug(f"new file created: {file_path}")
+            self.handle_created(file_path)
         elif current_size != self.file_indexes[file_path]:
             prev_size = self.file_indexes[file_path]
             diff_size = current_size - prev_size
 
-            self.file_indexes[file_path] = current_size
-
-            if file_path not in self.growth_indexes:
-                self.growth_indexes[file_path] = 0
-
-            self.growth_indexes[file_path] += max(diff_size, 0)
+            helper.add_or_init(self.file_indexes, file_path, current_size)
+            helper.add_or_init(self.layer_indexes, layer_name, diff_size)
+            helper.add_or_init(self.layer_growth_indexes, layer_name, diff_size)
 
             # checks
-            self.check_sizes(file_path)
+            self.check_sizes(layer_name)
 
             logging.debug(" ".join([
                 f"file modified: {file_path}",
@@ -167,20 +171,24 @@ class ChangeEventHandler(FileSystemEventHandler):
     def handle_deleted(self, file_path: str):
         logging.debug(f"file deleted: {file_path}")
 
+        layer_name = helper.get_subdirectory_name(watch_dir, file_path)
+        prev_size = self.file_indexes[file_path]
+
         if file_path in self.file_indexes:
             del self.file_indexes[file_path]
-        if file_path in self.growth_indexes:
-            del self.growth_indexes[file_path]
 
-    def check_sizes(self, file_path: str, skip_sum_check=False):
+        helper.add_or_init(self.layer_indexes, layer_name, -prev_size)
+        helper.add_or_init(self.layer_growth_indexes, layer_name, -prev_size)
+
+    def check_sizes(self, layer_name: str, skip_sum_check=False):
         if (
-            file_path in self.file_indexes
-            and self.file_indexes[file_path] >= large_file_size
+            layer_name in self.file_indexes
+            and self.file_indexes[layer_name] >= large_file_size
         ):
-            self.trigger_file_size_exceeded(file_path)
+            self.trigger_file_size_exceeded(layer_name)
         if (
             not skip_sum_check
-            and sum(self.growth_indexes.values())
+            and sum(self.layer_growth_indexes.values())
             >= max_time_window_growth_size
         ):
             self.trigger_interval_growth_exceeded()
@@ -201,11 +209,11 @@ class ChangeEventHandler(FileSystemEventHandler):
         logging.warning(" ".join([
             "the total amount of cache growth",
             f"within {time_window} secs exceeds the limit",
-            f"(size: {sum(self.growth_indexes.values())} bytes",
+            f"(size: {sum(self.layer_growth_indexes.values())} bytes",
             f"- limit: {max_time_window_growth_size} bytes)"
         ]))
 
-        for file_path, size in self.growth_indexes.items():
+        for file_path, size in self.layer_growth_indexes.items():
             logging.warning(f"{file_path} - {size} bytes within the interval")
 
     def trigger_max_cache_size(self):
