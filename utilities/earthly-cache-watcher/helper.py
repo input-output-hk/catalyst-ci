@@ -6,7 +6,7 @@ def get_directory_size(directory: str) -> int:
     if not os.path.isdir(directory):
         return 0
 
-    for dirpath, dirnames, filenames in os.walk(directory):
+    for dirpath, _dirnames, filenames in os.walk(directory):
         for filename in filenames:
             file_path = os.path.join(dirpath, filename)
             if os.path.isfile(file_path):
