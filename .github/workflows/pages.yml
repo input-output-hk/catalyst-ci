@@ -1,8 +1,15 @@
 # WARNING: If you modify this workflow, please update the documentation
 
 on:
+  schedule:
+    - cron: '10 * * * *'
   workflow_call:
     inputs:
+      nightly:
+        description: When set to true, the workflow will run with nightly targets
+        required: false
+        type: boolean
+        default: true
       earthfile:
         description: |
           The path to the folder containing the Earthfile that will be built.
@@ -103,3 +110,12 @@ jobs:
           target-folder: ${{ env.DEST_DIR }}
           branch: ${{ inputs.publish_branch }}
           folder: ${{ steps.build.outputs.artifact }}
+      - name: Build nightly
+        if: inputs.nightly == true
+        uses: input-output-hk/catalyst-ci/actions/run@master
+        id: nightly-build
+        with:
+          earthfile: ${{ inputs.earthfile }}
+          targets: nightly nightly-*
+          runner_address: ${{ secrets.earthly_runner_address }}
+          artifact: "true"

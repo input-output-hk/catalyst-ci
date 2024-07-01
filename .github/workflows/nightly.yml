@@ -1,172 +1,26 @@
+name: Nightly build
 
 on:
   schedule:
     - cron: '10 * * * *'
-  workflow_call:
-    inputs:
-      earthfile:
-        description: |
-          The path to the folder containing the Earthfile that will be built.
-          This path should be relative to the repository root.
-        required: true
-        type: string
-      target:
-        description: |
-          The target to run
-        required: false
-        type: string
-      aws_role_arn:
-        description: |
-          The ARN of the AWS role that will be assumed by the workflow. Only
-          required when configuring a remote Earthly runner.
-        required: false
-        type: string
-      aws_region:
-        description: |
-          The AWS region that will be used by the workflow. Only required when
-          configuring a remote Earthly runner.
-        required: false
-        type: string
-      ci_cli_version:
-        description: |
-          The version of the CI CLI to use.
-        required: false
-        type: string
-        default: latest
-      earthly_version:
-        description: The version of Earthly to use.
-        required: false
-        type: string
-        default: latest
-    secrets:
-      dockerhub_username:
-        description: The token to use for logging into the DockerHub registry.
-        required: false
-      dockerhub_token:
-        description: The token to use for logging into the DockerHub registry.
-        required: false
-      earthly_runner_address:
-        description: |
-          The address of the Earthly runner that will be used to build the
-          Earthfile.
-        required: false
-      earthly_runner_secret:
-        description: |
-          The ID of the AWS secret holding Earthly remote runner credentials.
-          This secret must contain the runner address and the necessary TLS
-          certificates required to authenticate with it. If omitted, a remote
-          Earthly runner will not be configured.
-        required: false
+
+permissions:
+  id-token: write
+  contents: write
+  packages: write
 
 jobs:
-  discover:
-    runs-on: ubuntu-latest
-    outputs:
-      json: ${{ steps.check.outputs.json }}
-      paths: ${{ steps.check.outputs.paths }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
-        with:
-          aws_role_arn: ${{ inputs.aws_role_arn }}
-          aws_region: ${{ inputs.aws_region }}
-          cli_version: ${{ inputs.ci_cli_version }}
-          dockerhub_token: ${{ secrets.dockerhub_token }}
-          dockerhub_username: ${{ secrets.dockerhub_username }}
-          earthly_version: ${{ inputs.earthly_version }}
-          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
-          runner_address: ${{ secrets.earthly_runner_address }}
-      - name: Discover Earthly files
-        uses: input-output-hk/catalyst-ci/actions/discover@master
-        id: discover
-        with:
-          targets: ${{ inputs.target }}
-      - name: Check for empty output
-        id: check
-        run: |
-          json=$(echo '${{ steps.discover.outputs.json }}' | jq -rc)
-          paths=$(echo '${{ steps.discover.outputs.paths }}' | jq -rc)
-          if [ "$output" == "null" ]; then
-            echo "json=[]" >> $GITHUB_OUTPUT
-            echo "paths=[]" >> $GITHUB_OUTPUT
-          else
-            echo "json=$json" >> $GITHUB_OUTPUT
-            echo "paths=$paths" >> $GITHUB_OUTPUT
-          fi
-
-  run:
-    runs-on: ubuntu-latest
-    needs: [discover]
-    if: needs.discover.outputs.paths != '[]'
-    strategy:
-      fail-fast: false
-      matrix:
-        earthfile: ${{ fromJson(needs.discover.outputs.paths) }}
-    steps:
-      - name: Get filtered targets
-        id: get_target
-        run: |
-          targets=$(echo '${{ needs.discover.outputs.json }}' | jq -r --arg key '${{ matrix.earthfile }}' '.[$key][]')
-          echo "Found targets: $targets"
-          targets_with_space=$(echo $targets | tr '\n' ' ')
-          echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
-      - uses: actions/checkout@v3
-
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
-        with:
-          aws_role_arn: ${{ inputs.aws_role_arn }}
-          aws_region: ${{ inputs.aws_region }}
-          cli_version: ${{ inputs.ci_cli_version }}
-          dockerhub_token: ${{ secrets.dockerhub_token }}
-          dockerhub_username: ${{ secrets.dockerhub_username }}
-          earthly_version: ${{ inputs.earthly_version }}
-          earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
-          runner_address: ${{ secrets.earthly_runner_address }}
-      
-      - name: Check nightly output
-        id: check-nightly
-        run: echo "nightly=${{ github.event.inputs.nightly }}" >> $GITHUB_ENV
-     
-      - name: Report tests if nightly return false
-        if: env.nightly == false
-        run: pytest --junitxml=report.xml
-
-      - name: Run nightly tests
-        if: env.nightly == true
-        run: pytest --tag=nightly --junitxml=nightly-report.xml
-
-      - name: Generate coverage report
-        if: env.nightly == true
-        run: |
-          coverage run -m pytest --tag=nightly
-          coverage xml -o nightly-coverage.xml
-
-      - name: Upload Test Report
-        if: env.nightly == true
-        uses: actions/upload-artifact@v3
-        with:
-          name: nightly-test-report
-          path: nightly-report.xml
-
-      - name: Upload Coverage Report
-        if: env.nightly == true
-        uses: actions/upload-artifact@v3
-        with:
-          name: nightly-coverage-report
-          path: nightly-coverage.xml
-
-      - name: Trigger CI with nightly tests
-        uses: actions/github-script@v3
-        with:
-          script: |
-            github.rest.actions.createWorkflowDispatch({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              workflow_id: 'ci.yml',
-              ref: 'master',
-              inputs: {
-                nightly: 'true'
-              }
-            })
+  ci:
+    uses: ./.github/workflows/ci.yml
+    with:
+      nightly: true
+      aws_ecr_registry: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
+      aws_role_arn: arn:aws:iam::332405224602:role/ci
+      aws_region: eu-central-1
+      ci_cli_version: 'local'
+      updater_version: 'local'
+    secrets:
+      dockerhub_token: ${{ secrets.DOCKERHUB_TOKEN }}
+      dockerhub_username: ${{ secrets.DOCKERHUB_USERNAME }}
+      earthly_runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
+      earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
