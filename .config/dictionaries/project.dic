@@ -45,6 +45,7 @@ idents
 jorm
 jormungandr
 junitreport
+junitxml
 Kroki
 kubeconfig
 lcov
