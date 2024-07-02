@@ -210,7 +210,7 @@ class ChangeEventHandler(FileSystemEventHandler):
     def trigger_file_size_exceeded(self, layer_name: str):
         logging.warning(" ".join([
             f"layer '{layer_name}' exceeds large layer size criteria",
-            f"(size: {self.file_indexes[layer_name]} bytes",
+            f"(size: {self.layer_indexes[layer_name]} bytes",
             f"- limit: {large_file_size} bytes)"
         ]))
 
