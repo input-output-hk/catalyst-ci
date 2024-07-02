@@ -104,7 +104,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 
         # check individual
         for layer_name, size in self.layer_indexes.items():
-            if size >= large_file_size:
+            if size >= large_layer_size:
                 self.trigger_file_size_exceeded(layer_name)
 
         logging.info("finished initializing")
@@ -192,7 +192,7 @@ class ChangeEventHandler(FileSystemEventHandler):
     def check_sizes(self, layer_name: str, skip_sum_check=False):
         if (
             layer_name in self.file_indexes
-            and self.file_indexes[layer_name] >= large_file_size
+            and self.file_indexes[layer_name] >= large_layer_size
         ):
             self.trigger_file_size_exceeded(layer_name)
         if (
@@ -211,7 +211,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         logging.warning(" ".join([
             f"layer '{layer_name}' exceeds large layer size criteria",
             f"(size: {self.layer_indexes[layer_name]} bytes",
-            f"- limit: {large_file_size} bytes)"
+            f"- limit: {large_layer_size} bytes)"
         ]))
 
     def trigger_interval_growth_exceeded(self):
@@ -241,7 +241,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 def main():
     global \
         watch_dir, \
-        large_file_size, \
+        large_layer_size, \
         max_cache_size, \
         time_window, \
         max_time_window_growth_size
@@ -250,7 +250,7 @@ def main():
 
     # init configs
     watch_dir = "."
-    large_file_size = 1073741824  # 1GB
+    large_layer_size = 1073741824  # 1GB
     max_cache_size = 536870912000  # 500GB
     time_window = 10  # 10 secs
     max_time_window_growth_size = 53687091200  # 50GB
@@ -263,7 +263,7 @@ def main():
         cfg = dotenv_values(default_config_path)
 
         watch_dir = str(cfg["watch_dir"])
-        large_file_size = int(cfg["large_file_size"])
+        large_layer_size = int(cfg["large_layer_size"])
         max_cache_size = int(cfg["max_cache_size"])
         time_window = int(cfg["time_window"])
         max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
@@ -271,7 +271,7 @@ def main():
         logging.info("cannot find the config file, use default config instead")
 
     logging.info(f"start watching directory {os.path.abspath(watch_dir)!r}")
-    logging.info(f"with `large_file_size` set to {large_file_size} bytes")
+    logging.info(f"with `large_layer_size` set to {large_layer_size} bytes")
     logging.info(f"with `max_cache_size` set to {max_cache_size} bytes")
     logging.info(f"with `time_window` set to {time_window} secs")
     logging.info(" ".join([

@@ -3,9 +3,9 @@ Description=Earthly Cache Watcher
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /path/to/watchdog/main.py <config-path?>
+ExecStart=/usr/bin/python3 /root/catalyst-ci/utilities/earthly-cache-watcher/main.py
 Restart=always
-User=your_username
+User=root
 
 [Install]
 WantedBy=multi-user.target
