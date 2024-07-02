@@ -64,9 +64,9 @@ class ChangeEventHandler(FileSystemEventHandler):
 
     def __init__(self, interval: int):
         self.time_window_interval: int = interval
-        self.layer_growth_indexes: dict[str, int] = {}
-        self.layer_indexes: dict[str, int] = {}
-        self.file_indexes: dict[str, int] = {}
+        self.layer_growth_index: dict[str, int] = {}
+        self.layer_index: dict[str, int] = {}
+        self.file_index: dict[str, int] = {}
         self.interval = Interval(interval, self.handle_interval_change)
 
         self.list_initial_sizes()
@@ -90,8 +90,8 @@ class ChangeEventHandler(FileSystemEventHandler):
                 try:
                     size = os.path.getsize(file_path)
 
-                    helper.add_or_init(self.file_indexes, file_path, size)
-                    helper.add_or_init(self.layer_indexes, layer_name, size)
+                    helper.add_or_init(self.file_index, file_path, size)
+                    helper.add_or_init(self.layer_index, layer_name, size)
 
                     logging.debug(
                         f"initial file: {file_path} (size: {size:,} bytes)"
@@ -103,7 +103,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.check_sizes(layer_name="")
 
         # check individual
-        for layer_name, size in self.layer_indexes.items():
+        for layer_name, size in self.layer_index.items():
             if size >= large_layer_size:
                 self.trigger_file_size_exceeded(layer_name)
 
@@ -129,88 +129,88 @@ class ChangeEventHandler(FileSystemEventHandler):
     def handle_interval_change(self):
         logging.debug("interval changed")
 
-        self.layer_growth_indexes.clear()
+        self.layer_growth_index.clear()
 
     def handle_created(self, file_path: str):
         logging.debug(f"new file created: {file_path}")
 
-        if not os.path.isfile(file_path):
-            return
+        try:
+            layer_name = helper.get_subdirectory_name(watch_dir, file_path)
+            size = os.path.getsize(file_path)
 
-        layer_name = helper.get_subdirectory_name(watch_dir, file_path)
-        current_size = os.path.getsize(file_path)
+            helper.add_or_init(self.file_index, file_path, size)
+            helper.add_or_init(self.layer_index, layer_name, size)
+            helper.add_or_init(self.layer_growth_index, layer_name, size)
 
-        helper.add_or_init(self.file_indexes, file_path, current_size)
-        helper.add_or_init(self.layer_indexes, layer_name, current_size)
-        helper.add_or_init(self.layer_growth_indexes, layer_name, current_size)
-
-        # checks
-        self.check_sizes(layer_name)
+            # checks
+            self.check_sizes(layer_name)
+        except OSError as e:
+            logging.error(f"error accessing file: {file_path} ({e})")
 
     def handle_modified(self, file_path: str):
         logging.debug(f"file modified: {file_path}")
 
-        if not os.path.isfile(file_path):
-            return
+        try:
+            layer_name = helper.get_subdirectory_name(watch_dir, file_path)
+            size = os.path.getsize(file_path)
 
-        layer_name = helper.get_subdirectory_name(watch_dir, file_path)
-        current_size = os.path.getsize(file_path)
+            if file_path not in self.file_index:
+                self.handle_created(file_path)
+            elif size != self.file_index[file_path]:
+                prev_size = self.file_index[file_path]
+                d_size = size - prev_size
 
-        if file_path not in self.file_indexes:
-            self.handle_created(file_path)
-        elif current_size != self.file_indexes[file_path]:
-            prev_size = self.file_indexes[file_path]
-            d_size = current_size - prev_size
+                helper.add_or_init(self.file_index, file_path, size)
+                helper.add_or_init(self.layer_index, layer_name, d_size)
+                helper.add_or_init(self.layer_growth_index, layer_name, d_size)
 
-            helper.add_or_init(self.file_indexes, file_path, current_size)
-            helper.add_or_init(self.layer_indexes, layer_name, d_size)
-            helper.add_or_init(self.layer_growth_indexes, layer_name, d_size)
+                # checks
+                self.check_sizes(layer_name)
 
-            # checks
-            self.check_sizes(layer_name)
-
-            logging.debug(" ".join([
-                f"file modified: {file_path}",
-                f"(size changed from {prev_size:,} bytes",
-                f"to {current_size:,} bytes)"
-            ]))
-        else:
-            logging.debug(f"file modified: {file_path} (size unchanged)")
+                logging.debug(" ".join([
+                    f"file modified: {file_path}",
+                    f"(size changed from {prev_size:,} bytes",
+                    f"to {size:,} bytes)"
+                ]))
+            else:
+                logging.debug(f"file modified: {file_path} (size unchanged)")
+        except OSError as e:
+            logging.error(f"error accessing file: {file_path} ({e})")
 
     def handle_deleted(self, file_path: str):
         logging.debug(f"file deleted: {file_path}")
 
-        if file_path in self.file_indexes:
+        if file_path in self.file_index:
             layer_name = helper.get_subdirectory_name(watch_dir, file_path)
-            prev_size = self.file_indexes[file_path]
+            prev_size = self.file_index[file_path]
 
-            del self.file_indexes[file_path]
+            del self.file_index[file_path]
 
-            helper.add_or_init(self.layer_indexes, layer_name, -prev_size)
-            helper.add_or_init(self.layer_growth_indexes, layer_name, -prev_size)
+            helper.add_or_init(self.layer_index, layer_name, -prev_size)
+            helper.add_or_init(self.layer_growth_index, layer_name, -prev_size)
 
     def check_sizes(self, layer_name: str, skip_sum_check=False):
         if (
-            layer_name in self.file_indexes
-            and self.file_indexes[layer_name] >= large_layer_size
+            layer_name in self.file_index
+            and self.file_index[layer_name] >= large_layer_size
         ):
             self.trigger_file_size_exceeded(layer_name)
         if (
             not skip_sum_check
-            and sum(self.layer_growth_indexes.values())
+            and sum(self.layer_growth_index.values())
             >= max_time_window_growth_size
         ):
             self.trigger_interval_growth_exceeded()
         if (
             not skip_sum_check
-            and sum(self.file_indexes.values()) >= max_cache_size
+            and sum(self.file_index.values()) >= max_cache_size
         ):
             self.trigger_max_cache_size()
 
     def trigger_file_size_exceeded(self, layer_name: str):
         logging.warning(" ".join([
             f"layer '{layer_name}' exceeds large layer size criteria",
-            f"(size: {self.layer_indexes[layer_name]:,} bytes",
+            f"(size: {self.layer_index[layer_name]:,} bytes",
             f"- limit: {large_layer_size:,} bytes)"
         ]))
 
@@ -218,11 +218,11 @@ class ChangeEventHandler(FileSystemEventHandler):
         logging.warning(" ".join([
             "the total amount of cache growth",
             f"within {time_window:,} secs exceeds the limit",
-            f"(size: {sum(self.layer_growth_indexes.values()):,} bytes",
+            f"(size: {sum(self.layer_growth_index.values()):,} bytes",
             f"- limit: {max_time_window_growth_size:,} bytes)"
         ]))
 
-        for layer_name, size in self.layer_growth_indexes.items():
+        for layer_name, size in self.layer_growth_index.items():
             logging.warning(" ".join([
                 f"layer '{layer_name}'",
                 f"- {size:,} bytes within the interval"
@@ -231,7 +231,7 @@ class ChangeEventHandler(FileSystemEventHandler):
     def trigger_max_cache_size(self):
         logging.warning(" ".join([
             "the total amount of cache exceeds the limit",
-            f"(size: {sum(self.file_indexes.values()):,} bytes",
+            f"(size: {sum(self.file_index.values()):,} bytes",
             f"- limit: {max_cache_size:,} bytes)"
         ]))
 
