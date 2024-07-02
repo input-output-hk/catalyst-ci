@@ -20,6 +20,7 @@ node_modules
 # Local Build Artefacts
 target/
 Cargo.lock
+coverage/
 
 # Python junk
 **/*.pyc

@@ -1,8 +1,15 @@
 # WARNING: If you modify this workflow, please update the documentation
 
 on:
+  schedule:
+    - cron: '10 * * * *'
   workflow_call:
     inputs:
+      nightly:
+        description: When set to true, the workflow will run with nightly targets
+        required: false
+        type: boolean
+        default: true
       privileged:
         description: |
           Whether the workflow should run earthly in privileged mode (earthly -P flag).
@@ -130,3 +137,4 @@ jobs:
           earthfile: ${{ matrix.earthfile }}
           runner_address: ${{ secrets.earthly_runner_address }}
           targets: ${{ steps.get_target.outputs.targets }}
+      

@@ -35,3 +35,15 @@ check:
 
     RUN npm run format:check
     RUN npm run lint
+
+nightly:
+    FROM +test
+
+    # Generate test report
+    RUN npm test -s --junitxml=test-report.xml
+
+    # Generate coverage report
+    RUN npm test -- --coverage
+
+    SAVE ARTIFACT ./test-report.xml AS LOCAL test-report/test-report.xml
+    SAVE ARTIFACT ./coverage/lcov-report AS LOCAL coverage-report
