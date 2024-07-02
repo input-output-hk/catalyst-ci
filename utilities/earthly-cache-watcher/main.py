@@ -94,7 +94,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                     helper.add_or_init(self.layer_indexes, layer_name, size)
 
                     logging.debug(
-                        f"initial file: {file_path} (size: {size} bytes)"
+                        f"initial file: {file_path} (size: {size:,} bytes)"
                     )
                 except OSError as e:
                     logging.error(f"error accessing file: {file_path} ({e})")
@@ -171,8 +171,8 @@ class ChangeEventHandler(FileSystemEventHandler):
 
             logging.debug(" ".join([
                 f"file modified: {file_path}",
-                f"(size changed from {prev_size} bytes",
-                f"to {current_size} bytes)"
+                f"(size changed from {prev_size:,} bytes",
+                f"to {current_size:,} bytes)"
             ]))
         else:
             logging.debug(f"file modified: {file_path} (size unchanged)")
@@ -210,29 +210,29 @@ class ChangeEventHandler(FileSystemEventHandler):
     def trigger_file_size_exceeded(self, layer_name: str):
         logging.warning(" ".join([
             f"layer '{layer_name}' exceeds large layer size criteria",
-            f"(size: {self.layer_indexes[layer_name]} bytes",
-            f"- limit: {large_layer_size} bytes)"
+            f"(size: {self.layer_indexes[layer_name]:,} bytes",
+            f"- limit: {large_layer_size:,} bytes)"
         ]))
 
     def trigger_interval_growth_exceeded(self):
         logging.warning(" ".join([
             "the total amount of cache growth",
-            f"within {time_window} secs exceeds the limit",
-            f"(size: {sum(self.layer_growth_indexes.values())} bytes",
-            f"- limit: {max_time_window_growth_size} bytes)"
+            f"within {time_window:,} secs exceeds the limit",
+            f"(size: {sum(self.layer_growth_indexes.values()):,} bytes",
+            f"- limit: {max_time_window_growth_size:,} bytes)"
         ]))
 
         for layer_name, size in self.layer_growth_indexes.items():
             logging.warning(" ".join([
                 f"layer '{layer_name}'",
-                f"- {size} bytes within the interval"
+                f"- {size:,} bytes within the interval"
             ]))
 
     def trigger_max_cache_size(self):
         logging.warning(" ".join([
             "the total amount of cache exceeds the limit",
-            f"(size: {sum(self.file_indexes.values())} bytes",
-            f"- limit: {max_cache_size} bytes)"
+            f"(size: {sum(self.file_indexes.values()):,} bytes",
+            f"- limit: {max_cache_size:,} bytes)"
         ]))
 
     def drop(self):
