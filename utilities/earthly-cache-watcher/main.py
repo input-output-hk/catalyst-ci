@@ -81,6 +81,10 @@ class ChangeEventHandler(FileSystemEventHandler):
                 dir_abspath = os.path.abspath(root)
                 file_path = os.path.join(dir_abspath, filename)
                 layer_name = helper.get_subdirectory_name(watch_dir, file_path)
+
+                if not os.path.isfile(file_path):
+                    continue
+
                 try:
                     size = os.path.getsize(file_path)
                     
