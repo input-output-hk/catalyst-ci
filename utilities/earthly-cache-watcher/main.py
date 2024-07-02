@@ -105,10 +105,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         # check individual
         for layer_name, size in self.layer_indexes.items():
             if size >= large_file_size:
-                logging.warning(" ".join([
-                    f"layer '{layer_name}'",
-                    f"- {size} bytes within the interval"
-                ]))
+                self.trigger_file_size_exceeded(layer_name)
 
         logging.info("finished initializing")
 
@@ -212,7 +209,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 
     def trigger_file_size_exceeded(self, layer_name: str):
         logging.warning(" ".join([
-            f"layer '{layer_name}' exceeds large file size criteria",
+            f"layer '{layer_name}' exceeds large layer size criteria",
             f"(size: {self.file_indexes[layer_name]} bytes",
             f"- limit: {large_file_size} bytes)"
         ]))
