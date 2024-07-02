@@ -1,18 +1,5 @@
 import os
 
-def get_directory_size(directory: str) -> int:
-    total_size = 0
-
-    if not os.path.isdir(directory):
-        return 0
-
-    for dirpath, _dirnames, filenames in os.walk(directory):
-        for filename in filenames:
-            file_path = os.path.join(dirpath, filename)
-            if os.path.isfile(file_path):
-                total_size += os.path.getsize(file_path)
-    return total_size
-
 def get_subdirectory_name(working_dir_path: str, path: str):
     """
     Extracts the direct subdirectory name from the given path within

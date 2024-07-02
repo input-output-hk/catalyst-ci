@@ -180,14 +180,14 @@ class ChangeEventHandler(FileSystemEventHandler):
     def handle_deleted(self, file_path: str):
         logging.debug(f"file deleted: {file_path}")
 
-        layer_name = helper.get_subdirectory_name(watch_dir, file_path)
-        prev_size = self.file_indexes[file_path]
-
         if file_path in self.file_indexes:
+            layer_name = helper.get_subdirectory_name(watch_dir, file_path)
+            prev_size = self.file_indexes[file_path]
+
             del self.file_indexes[file_path]
 
-        helper.add_or_init(self.layer_indexes, layer_name, -prev_size)
-        helper.add_or_init(self.layer_growth_indexes, layer_name, -prev_size)
+            helper.add_or_init(self.layer_indexes, layer_name, -prev_size)
+            helper.add_or_init(self.layer_growth_indexes, layer_name, -prev_size)
 
     def check_sizes(self, layer_name: str, skip_sum_check=False):
         if (
