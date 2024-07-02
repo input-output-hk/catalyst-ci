@@ -271,12 +271,12 @@ def main():
         logging.info("cannot find the config file, use default config instead")
 
     logging.info(f"start watching directory {os.path.abspath(watch_dir)!r}")
-    logging.info(f"with `large_layer_size` set to {large_layer_size} bytes")
-    logging.info(f"with `max_cache_size` set to {max_cache_size} bytes")
-    logging.info(f"with `time_window` set to {time_window} secs")
+    logging.info(f"with `large_layer_size` set to {large_layer_size:,} bytes")
+    logging.info(f"with `max_cache_size` set to {max_cache_size:,} bytes")
+    logging.info(f"with `time_window` set to {time_window:,} secs")
     logging.info(" ".join([
         "with `max_time_window_growth_size` set to",
-        f"{max_time_window_growth_size} bytes"
+        f"{max_time_window_growth_size:,} bytes"
     ]))
 
     # init watcher
