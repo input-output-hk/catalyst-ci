@@ -13,7 +13,7 @@ def get_directory_size(directory: str) -> int:
                 total_size += os.path.getsize(file_path)
     return total_size
 
-def get_subdirectory_name(working_dir_path: str, path: str) -> str | None:
+def get_subdirectory_name(working_dir_path: str, path: str):
     """
     Extracts the direct subdirectory name from the given path within the specified working directory.
 
