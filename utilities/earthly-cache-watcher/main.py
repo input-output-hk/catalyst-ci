@@ -63,7 +63,6 @@ class ChangeEventHandler(FileSystemEventHandler):
     """
 
     def __init__(self, interval: int):
-        self.time_window_interval: int = interval
         self.layer_growth_index: dict[str, int] = {}
         self.layer_index: dict[str, int] = {}
         self.file_index: dict[str, int] = {}
@@ -90,7 +89,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                 try:
                     size = os.path.getsize(file_path)
 
-                    helper.add_or_init(self.file_index, file_path, size)
+                    self.file_index[file_path] = size
                     helper.add_or_init(self.layer_index, layer_name, size)
 
                     logging.debug(
@@ -103,9 +102,8 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.check_sizes(layer_name="")
 
         # check individual
-        for layer_name, size in self.layer_index.items():
-            if size >= large_layer_size:
-                self.trigger_file_size_exceeded(layer_name)
+        for layer_name in self.layer_index.keys():
+            self.check_sizes(layer_name, skip_sum_check=True)
 
         logging.info("finished initializing")
 
@@ -138,7 +136,7 @@ class ChangeEventHandler(FileSystemEventHandler):
             layer_name = helper.get_subdirectory_name(watch_dir, file_path)
             size = os.path.getsize(file_path)
 
-            helper.add_or_init(self.file_index, file_path, size)
+            self.file_index[file_path] = size
             helper.add_or_init(self.layer_index, layer_name, size)
             helper.add_or_init(self.layer_growth_index, layer_name, size)
 
@@ -160,7 +158,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                 prev_size = self.file_index[file_path]
                 d_size = size - prev_size
 
-                helper.add_or_init(self.file_index, file_path, size)
+                self.file_index[file_path] = size
                 helper.add_or_init(self.layer_index, layer_name, d_size)
                 helper.add_or_init(self.layer_growth_index, layer_name, d_size)
 
@@ -189,25 +187,30 @@ class ChangeEventHandler(FileSystemEventHandler):
             helper.add_or_init(self.layer_index, layer_name, -prev_size)
             helper.add_or_init(self.layer_growth_index, layer_name, -prev_size)
 
+            if self.layer_index[layer_name] <= 0:
+                del self.layer_index[layer_name]
+
     def check_sizes(self, layer_name: str, skip_sum_check=False):
         if (
-            layer_name in self.file_index
-            and self.file_index[layer_name] >= large_layer_size
+            layer_name in self.layer_index
+            and self.layer_index[layer_name] >= large_layer_size
         ):
-            self.trigger_file_size_exceeded(layer_name)
+            self.trigger_layer_size_exceeded(layer_name)
+
         if (
             not skip_sum_check
             and sum(self.layer_growth_index.values())
             >= max_time_window_growth_size
         ):
             self.trigger_interval_growth_exceeded()
+
         if (
             not skip_sum_check
-            and sum(self.file_index.values()) >= max_cache_size
+            and sum(self.layer_index.values()) >= max_cache_size
         ):
             self.trigger_max_cache_size()
 
-    def trigger_file_size_exceeded(self, layer_name: str):
+    def trigger_layer_size_exceeded(self, layer_name: str):
         logging.warning(" ".join([
             f"layer '{layer_name}' exceeds large layer size criteria",
             f"(size: {self.layer_index[layer_name]:,} bytes",
@@ -231,7 +234,7 @@ class ChangeEventHandler(FileSystemEventHandler):
     def trigger_max_cache_size(self):
         logging.warning(" ".join([
             "the total amount of cache exceeds the limit",
-            f"(size: {sum(self.file_index.values()):,} bytes",
+            f"(size: {sum(self.layer_index.values()):,} bytes",
             f"- limit: {max_cache_size:,} bytes)"
         ]))
 
