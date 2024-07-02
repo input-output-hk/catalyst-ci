@@ -1,15 +1,8 @@
 # WARNING: If you modify this workflow, please update the documentation
 
-on:
-  schedule:
-    - cron: '10 * * * *'
+on: 
   workflow_call:
     inputs:
-      nightly:
-        description: When set to true, the workflow will run with nightly targets
-        required: false
-        type: boolean
-        default: true
       privileged:
         description: |
           Whether the workflow should run earthly in privileged mode (earthly -P flag).
