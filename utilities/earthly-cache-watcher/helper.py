@@ -15,15 +15,16 @@ def get_directory_size(directory: str) -> int:
 
 def get_subdirectory_name(working_dir_path: str, path: str):
     """
-    Extracts the direct subdirectory name from the given path within the specified working directory.
+    Extracts the direct subdirectory name from the given path within
+    the specified working directory.
 
     Parameters:
     working_dir_path (str): The absolute path of the current working directory.
-    path (str): The absolute path from which to extract the direct subdirectory name.
+    path (str): The absolute path from which to extract the direct subdir name.
 
     Returns:
-    str | None: The name of the direct subdirectory if the given path is within the working directory; 
-                otherwise, None.
+    str | None: The name of the direct subdirectory if the given path is within
+                the working directory; otherwise, None.
 
     Example:
     >>> working_dir = "/home/user/projects"
@@ -38,7 +39,10 @@ def get_subdirectory_name(working_dir_path: str, path: str):
     working_dir_path = os.path.abspath(working_dir_path)
     path = os.path.abspath(path)
 
-    if not os.path.commonpath([working_dir_path]) == os.path.commonpath([working_dir_path, path]):
+    path_lhs = os.path.commonpath([working_dir_path])
+    path_rhs = os.path.commonpath([working_dir_path, path])
+
+    if path_lhs != path_rhs:
         return None
     
     relative_path = os.path.relpath(path, working_dir_path)
@@ -49,7 +53,7 @@ def get_subdirectory_name(working_dir_path: str, path: str):
     return None
 
 def add_or_init(obj: dict[str, int], key: str, value: int):
-    if not key in obj:
+    if key not in obj:
         obj[key] = 0
 
     obj[key] += value

@@ -1,13 +1,12 @@
 # cspell: words dotenv levelname
 
+import helper
 import logging
 import os
 import sys
 import threading
 import time
 from collections.abc import Callable
-
-import helper
 
 from dotenv import dotenv_values
 from watchdog.events import FileSystemEventHandler
@@ -81,10 +80,10 @@ class ChangeEventHandler(FileSystemEventHandler):
             for filename in files:
                 dir_abspath = os.path.abspath(root)
                 file_path = os.path.join(dir_abspath, filename)
+                layer_name = helper.get_subdirectory_name(watch_dir, file_path)
                 try:
                     size = os.path.getsize(file_path)
-                    layer_name = helper.get_subdirectory_name(watch_dir, file_path)
-
+                    
                     helper.add_or_init(self.file_indexes, file_path, size)
                     helper.add_or_init(self.layer_indexes, layer_name, size)
 
@@ -148,11 +147,11 @@ class ChangeEventHandler(FileSystemEventHandler):
             self.handle_created(file_path)
         elif current_size != self.file_indexes[file_path]:
             prev_size = self.file_indexes[file_path]
-            diff_size = current_size - prev_size
+            d_size = current_size - prev_size
 
             helper.add_or_init(self.file_indexes, file_path, current_size)
-            helper.add_or_init(self.layer_indexes, layer_name, diff_size)
-            helper.add_or_init(self.layer_growth_indexes, layer_name, diff_size)
+            helper.add_or_init(self.layer_indexes, layer_name, d_size)
+            helper.add_or_init(self.layer_growth_indexes, layer_name, d_size)
 
             # checks
             self.check_sizes(layer_name)
@@ -211,7 +210,10 @@ class ChangeEventHandler(FileSystemEventHandler):
         ]))
 
         for layer_name, size in self.layer_growth_indexes.items():
-            logging.warning(f"layer '{layer_name}' - {size} bytes within the interval")
+            logging.warning(" ".join([
+                f"layer '{layer_name}'",
+                f"- {size} bytes within the interval"
+            ]))
 
     def trigger_max_cache_size(self):
         logging.warning(" ".join([
