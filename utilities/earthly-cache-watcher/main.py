@@ -102,7 +102,13 @@ class ChangeEventHandler(FileSystemEventHandler):
         # checks total
         self.check_sizes(layer_name="")
 
-        print(self.layer_indexes)
+        # check individual
+        for layer_name, size in self.layer_indexes.items():
+            if size >= large_file_size:
+                logging.warning(" ".join([
+                    f"layer '{layer_name}'",
+                    f"- {size} bytes within the interval"
+                ]))
 
         logging.info("finished initializing")
 
