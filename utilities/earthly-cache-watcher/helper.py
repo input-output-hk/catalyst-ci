@@ -39,10 +39,10 @@ def get_subdirectory_name(working_dir_path: str, path: str):
     working_dir_path = os.path.abspath(working_dir_path)
     path = os.path.abspath(path)
 
-    path_lhs = os.path.commonpath([working_dir_path])
-    path_rhs = os.path.commonpath([working_dir_path, path])
-
-    if path_lhs != path_rhs:
+    if (
+        os.path.commonpath([working_dir_path])
+        != os.path.commonpath([working_dir_path, path])
+    ):
         return None
     
     relative_path = os.path.relpath(path, working_dir_path)
