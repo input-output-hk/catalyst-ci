@@ -76,6 +76,8 @@ class ChangeEventHandler(FileSystemEventHandler):
         Lists initial file sizes during initialization.
         """
 
+        logging.info("initializing...")
+
         for root, _directories, files in os.walk(watch_dir):
             for filename in files:
                 dir_abspath = os.path.abspath(root)
@@ -87,7 +89,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 
                 try:
                     size = os.path.getsize(file_path)
-                    
+
                     helper.add_or_init(self.file_indexes, file_path, size)
                     helper.add_or_init(self.layer_indexes, layer_name, size)
 
@@ -99,6 +101,10 @@ class ChangeEventHandler(FileSystemEventHandler):
 
         # checks total
         self.check_sizes(layer_name="")
+
+        print(self.layer_indexes)
+
+        logging.info("finished initializing")
 
     def on_any_event(self, event):
         """
