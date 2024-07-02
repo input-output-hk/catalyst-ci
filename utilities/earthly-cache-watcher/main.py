@@ -88,9 +88,6 @@ class ChangeEventHandler(FileSystemEventHandler):
                     helper.add_or_init(self.file_indexes, file_path, size)
                     helper.add_or_init(self.layer_indexes, layer_name, size)
 
-                    # checks individual
-                    self.check_sizes(layer_name, skip_sum_check=True)
-
                     logging.debug(
                         f"initial file: {file_path} (size: {size} bytes)"
                     )
