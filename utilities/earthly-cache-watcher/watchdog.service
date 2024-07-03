@@ -3,7 +3,7 @@ Description=Earthly Cache Watcher
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/python3 /root/catalyst-ci/utilities/earthly-cache-watcher/main.py
+ExecStart=/usr/bin/python3 /root/catalyst-ci/utilities/earthly-cache-watcher/main.py /root/catalyst-ci/utilities/earthly-cache-watcher/default.config
 Restart=always
 User=root
 
