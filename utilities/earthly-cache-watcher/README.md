@@ -35,3 +35,25 @@ echo 'fs.inotify.max_user_watches=25000000' | sudo tee -a /etc/sysctl.conf
 ```
 
 Feel free to change the number of the parameter to fit your requirement.
+
+## Systemd Unit Installation
+
+Run the following commands to install the program as a unit in systemd service:
+
+```bash
+systemctl daemon-reload
+systemctl enable /path/to/your/watchdog.service
+systemctl start watchdog
+```
+
+To view the status and logs, use these two commands:
+
+```bash
+systemctl status watchdog
+```
+
+Or
+
+```bash
+journalctl -xeu watchdog.service
+```
