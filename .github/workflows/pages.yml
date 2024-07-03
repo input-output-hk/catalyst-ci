@@ -103,4 +103,3 @@ jobs:
           target-folder: ${{ env.DEST_DIR }}
           branch: ${{ inputs.publish_branch }}
           folder: ${{ steps.build.outputs.artifact }}
-    

@@ -1,6 +1,6 @@
 # WARNING: If you modify this workflow, please update the documentation
 
-on: 
+on:
   workflow_call:
     inputs:
       privileged:
@@ -130,4 +130,3 @@ jobs:
           earthfile: ${{ matrix.earthfile }}
           runner_address: ${{ secrets.earthly_runner_address }}
           targets: ${{ steps.get_target.outputs.targets }}
-      
