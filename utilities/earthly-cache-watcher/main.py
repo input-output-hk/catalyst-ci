@@ -67,8 +67,8 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.layer_growth_index: dict[str, int] = {}
         self.layer_index: dict[str, int] = {}
         self.file_index: dict[str, int] = {}
-        self.triggered_layers: Set[str] = {}
-        self.triggered_growth_layers: Set[str] = {}
+        self.triggered_layers: Set[str] = set()
+        self.triggered_growth_layers: Set[str] = set()
         self.interval = Interval(interval, self.handle_interval_change)
 
         self.list_initial_sizes()
