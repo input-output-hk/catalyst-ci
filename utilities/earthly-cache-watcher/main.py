@@ -7,6 +7,7 @@ import sys
 import threading
 import time
 from collections.abc import Callable
+from typing import Set
 
 from dotenv import dotenv_values
 from watchdog.events import FileSystemEventHandler
@@ -66,6 +67,8 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.layer_growth_index: dict[str, int] = {}
         self.layer_index: dict[str, int] = {}
         self.file_index: dict[str, int] = {}
+        self.triggered_layers: Set[str] = {}
+        self.triggered_growth_layers: Set[str] = {}
         self.interval = Interval(interval, self.handle_interval_change)
 
         self.list_initial_sizes()
@@ -130,6 +133,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         logging.debug("interval changed")
 
         self.layer_growth_index.clear()
+        self.triggered_growth_layers.clear()
 
     def handle_created(self, file_path: str):
         logging.debug(f"new file created: {file_path}")
@@ -180,9 +184,17 @@ class ChangeEventHandler(FileSystemEventHandler):
     def handle_moved(self, src_path: str, dest_path: str):
         logging.debug(f"file moved: {src_path}")
 
+        src_layer_name = helper.get_subdirectory_name(watch_dir, src_path)
+        dest_layer_name = helper.get_subdirectory_name(watch_dir, dest_path)
+
         if src_path in self.file_index:
-            self.file_index[dest_path] = self.file_index[src_path]
+            size = self.file_index[src_path]
+            self.file_index[dest_path] = size
             del self.file_index[src_path]
+
+            if src_layer_name != dest_layer_name:
+                helper.add_or_init(self.layer_index, src_layer_name, -size)
+                helper.add_or_init(self.layer_index, dest_layer_name, size)
 
     def handle_deleted(self, file_path: str):
         logging.debug(f"file deleted: {file_path}")
@@ -200,11 +212,11 @@ class ChangeEventHandler(FileSystemEventHandler):
                 del self.layer_index[layer_name]
 
     def check_sizes(self, layer_name: str, skip_sum_check=False):
-        if (
-            layer_name in self.layer_index
-            and self.layer_index[layer_name] >= large_layer_size
-        ):
-            self.trigger_layer_size_exceeded(layer_name)
+        if layer_name in self.layer_index:
+            if self.layer_index[layer_name] >= large_layer_size:
+                self.trigger_layer_size_exceeded(layer_name)
+            else:
+                self.triggered_layers.discard(layer_name)
 
         if (
             not skip_sum_check
@@ -220,6 +232,11 @@ class ChangeEventHandler(FileSystemEventHandler):
             self.trigger_max_cache_size()
 
     def trigger_layer_size_exceeded(self, layer_name: str):
+        if layer_name in self.triggered_layers:
+            return
+
+        self.triggered_layers.add(layer_name)
+
         logging.warning(" ".join([
             f"layer '{layer_name}' exceeds large layer size criteria",
             f"(size: {self.layer_index[layer_name]:,} bytes",
@@ -236,6 +253,11 @@ class ChangeEventHandler(FileSystemEventHandler):
 
         try:
             for layer_name, size in self.layer_growth_index.items():
+                if layer_name in self.triggered_growth_layers:
+                    continue
+
+                self.triggered_growth_layers.add(layer_name)
+
                 logging.warning(" ".join([
                     f"layer '{layer_name}'",
                     f"- {size:,} bytes within the interval"
