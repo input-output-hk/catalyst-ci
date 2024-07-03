@@ -244,26 +244,29 @@ class ChangeEventHandler(FileSystemEventHandler):
         ]))
 
     def trigger_interval_growth_exceeded(self):
-        logging.error(" ".join([
-            "the total amount of cache growth",
-            f"within {time_window:,} secs exceeds the limit",
-            f"(size: {sum(self.layer_growth_index.values()):,} bytes",
-            f"- limit: {max_time_window_growth_size:,} bytes)"
-        ]))
-
         try:
+            has_triggered_layer = False
             for layer_name, size in self.layer_growth_index.items():
                 if layer_name in self.triggered_growth_layers:
                     continue
 
+                has_triggered_layer = True
                 self.triggered_growth_layers.add(layer_name)
 
                 logging.error(" ".join([
                     f"layer '{layer_name}'",
                     f"- {size:,} bytes within the interval"
                 ]))
+
+            if has_triggered_layer:
+                logging.error(" ".join([
+                    "the total amount of cache growth",
+                    f"within {time_window:,} secs exceeds the limit",
+                    f"(size: {sum(self.layer_growth_index.values()):,} bytes",
+                    f"- limit: {max_time_window_growth_size:,} bytes)"
+                ]))
         except RuntimeError as e:
-            logging.error(f"An error occurred: {e}")
+            logging.error(f"an error occurred: {e}")
 
     def trigger_max_cache_size(self):
         logging.error(" ".join([
