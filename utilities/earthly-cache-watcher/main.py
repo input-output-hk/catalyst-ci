@@ -208,15 +208,18 @@ class ChangeEventHandler(FileSystemEventHandler):
             helper.add_or_init(self.layer_index, layer_name, -prev_size)
             helper.add_or_init(self.layer_growth_index, layer_name, -prev_size)
 
+            if self.layer_index[layer_name] < large_layer_size:
+                self.triggered_layers.discard(layer_name)
             if self.layer_index[layer_name] <= 0:
                 del self.layer_index[layer_name]
 
     def check_sizes(self, layer_name: str, skip_sum_check=False):
-        if layer_name in self.layer_index:
-            if self.layer_index[layer_name] >= large_layer_size:
-                self.trigger_layer_size_exceeded(layer_name)
-            else:
-                self.triggered_layers.discard(layer_name)
+        if (
+            layer_name in self.layer_index
+            and self.layer_index[layer_name]
+            >= large_layer_size
+        ):
+            self.trigger_layer_size_exceeded(layer_name)
 
         if (
             not skip_sum_check
