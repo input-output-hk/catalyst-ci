@@ -234,11 +234,14 @@ class ChangeEventHandler(FileSystemEventHandler):
             f"- limit: {max_time_window_growth_size:,} bytes)"
         ]))
 
-        for layer_name, size in self.layer_growth_index.items():
-            logging.warning(" ".join([
-                f"layer '{layer_name}'",
-                f"- {size:,} bytes within the interval"
-            ]))
+        try:
+            for layer_name, size in self.layer_growth_index.items():
+                logging.warning(" ".join([
+                    f"layer '{layer_name}'",
+                    f"- {size:,} bytes within the interval"
+                ]))
+        except RuntimeError as e:
+            logging.error(f"An error occurred: {e}")
 
     def trigger_max_cache_size(self):
         logging.warning(" ".join([
