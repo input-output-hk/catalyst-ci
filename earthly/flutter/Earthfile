@@ -28,7 +28,7 @@ flutter-base:
 
     ARG chrome_version = 126.0.6478.61
     ARG chrome_package_release = 1
-    ARG chromium_version =126.0.6478.56-1~deb12u1
+    ARG chromium_version = 126.0.6478.126-1~deb12u1
     DO installer+INSTALL_CHROME_LINUX64 --chrome_version=$chrome_version --chrome_package_release=$chrome_package_release --chromium_version=$chromium_version
     
     ARG edge_version = 125.0.2535.51
