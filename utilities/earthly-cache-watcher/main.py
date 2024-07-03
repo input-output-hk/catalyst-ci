@@ -237,14 +237,14 @@ class ChangeEventHandler(FileSystemEventHandler):
 
         self.triggered_layers.add(layer_name)
 
-        logging.warning(" ".join([
+        logging.error(" ".join([
             f"layer '{layer_name}' exceeds large layer size criteria",
             f"(size: {self.layer_index[layer_name]:,} bytes",
             f"- limit: {large_layer_size:,} bytes)"
         ]))
 
     def trigger_interval_growth_exceeded(self):
-        logging.warning(" ".join([
+        logging.error(" ".join([
             "the total amount of cache growth",
             f"within {time_window:,} secs exceeds the limit",
             f"(size: {sum(self.layer_growth_index.values()):,} bytes",
@@ -258,7 +258,7 @@ class ChangeEventHandler(FileSystemEventHandler):
 
                 self.triggered_growth_layers.add(layer_name)
 
-                logging.warning(" ".join([
+                logging.error(" ".join([
                     f"layer '{layer_name}'",
                     f"- {size:,} bytes within the interval"
                 ]))
@@ -266,7 +266,7 @@ class ChangeEventHandler(FileSystemEventHandler):
             logging.error(f"An error occurred: {e}")
 
     def trigger_max_cache_size(self):
-        logging.warning(" ".join([
+        logging.error(" ".join([
             "the total amount of cache exceeds the limit",
             f"(size: {sum(self.layer_index.values()):,} bytes",
             f"- limit: {max_cache_size:,} bytes)"
