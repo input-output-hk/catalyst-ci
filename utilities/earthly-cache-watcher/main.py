@@ -119,6 +119,8 @@ class ChangeEventHandler(FileSystemEventHandler):
             self.handle_created(event.src_path)
         elif event.event_type == "modified":
             self.handle_modified(event.src_path)
+        elif event.event_type == "moved":
+            self.handle_moved(event.src_path, event.dest_path)
         elif event.event_type == "deleted":
             self.handle_deleted(event.src_path)
 
@@ -174,6 +176,13 @@ class ChangeEventHandler(FileSystemEventHandler):
                 logging.debug(f"file modified: {file_path} (size unchanged)")
         except OSError as e:
             logging.error(f"error accessing file: {file_path} ({e})")
+
+    def handle_moved(self, src_path: str, dest_path: str):
+        logging.debug(f"file moved: {src_path}")
+
+        if src_path in self.file_index:
+            self.file_index[dest_path] = self.file_index[src_path]
+            del self.file_index[src_path]
 
     def handle_deleted(self, file_path: str):
         logging.debug(f"file deleted: {file_path}")
