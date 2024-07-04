@@ -55,6 +55,9 @@ async def scrape(client: ApiClient):
         for proposal in plan.proposals:
             proposal_title = proposals[proposal.proposal_id].proposal_title
             NUM_PROPOSAL_VOTES.labels(proposal_title).set(proposal.votes_cast)
-            PROPOSAL_VOTING_POWER_TOTAL.labels(proposal_title).set(
-                proposals_power[proposal.proposal_id]
-            )
+            if proposal.proposal_id in proposals_power:
+                PROPOSAL_VOTING_POWER_TOTAL.labels(proposal_title).set(
+                    proposals_power[proposal.proposal_id]
+                )
+            else:
+                PROPOSAL_VOTING_POWER_TOTAL.labels(proposal_title).set(0)
