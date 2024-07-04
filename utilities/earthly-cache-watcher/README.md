@@ -4,12 +4,6 @@
 
 Logs error when cache layers reach max its limit size.
 
-Logging example using `loguru`:
-
-```json
-{"text": "read config from '/root/catalyst-ci/utilities/earthly-cache-watcher/default.conf'\n", "record": {"elapsed": {"repr": "0:00:00.007240", "seconds": 0.00724}, "exception": null, "extra": {}, "file": {"name": "main.py", "path": "/root/catalyst-ci/utilities/earthly-cache-watcher/main.py"}, "function": "main", "level": {"icon": "ℹ️", "name": "INFO", "no": 20}, "line": 298, "message": "read config from '/root/catalyst-ci/utilities/earthly-cache-watcher/default.conf'", "module": "main", "name": "__main__", "process": {"id": 59917, "name": "MainProcess"}, "thread": {"id": 8615431168, "name": "MainThread"}, "time": {"repr": "2024-07-04 19:22:31.458044+07:00", "timestamp": 1720095751.458044}}}
-```
-
 ## Functionality
 
 * Watch files changes in a specified directory.
@@ -67,3 +61,49 @@ Or
 ```bash
 journalctl -xeu watchdog.service
 ```
+
+## Logging Example
+
+Logging example using `loguru`:
+
+```json
+{
+  "text": "read config from '/root/catalyst-ci/utilities/earthly-cache-watcher/default.conf'\n",
+  "record": {
+    "elapsed": {
+      "repr": "0:00:00.007240",
+      "seconds": 0.00724
+    },
+    "exception": null,
+    "extra": {},
+    "file": {
+      "name": "main.py",
+      "path": "/root/catalyst-ci/utilities/earthly-cache-watcher/main.py"
+    },
+    "function": "main",
+    "level": {
+      "icon": "ℹ️",
+      "name": "INFO",
+      "no": 20
+    },
+    "line": 298,
+    "message": "read config from '/root/catalyst-ci/utilities/earthly-cache-watcher/default.conf'",
+    "module": "main",
+    "name": "__main__",
+    "process": {
+      "id": 59917,
+      "name": "MainProcess"
+    },
+    "thread": {
+      "id": 8615431168,
+      "name": "MainThread"
+    },
+    "time": {
+      "repr": "2024-07-04 19:22:31.458044+07:00",
+      "timestamp": 1720095751.458044
+    }
+  }
+}
+```
+
+Notes: The logging result is prettified, the actual result is a single-lined message.
