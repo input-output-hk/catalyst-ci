@@ -1,5 +1,5 @@
-
 import os
+
 
 def get_subdirectory_name(working_dir_path: str, path: str):
     """
