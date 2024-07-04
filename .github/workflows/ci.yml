@@ -1,6 +1,11 @@
 on:
   workflow_call:
     inputs:
+      nightly:
+        description: When set to true, the workflow will run with the nightly setup
+        required: false
+        type: boolean
+        default: false
       aws_ecr_registry:
         description: |
             The AWS ECR registry that will be used to publish images
@@ -159,6 +164,20 @@ jobs:
       ci_cli_version: ${{ inputs.ci_cli_version }}
       earthfile: ./docs
       target: docs
+    secrets:
+      earthly_runner_address: ${{ secrets.earthly_runner_address }}
+      earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
+  nightly:
+    uses: ./.github/workflows/run.yml
+    if: inputs.nightly == true
+    needs: [build, check, package, test]
+    with:
+      aws_role_arn: ${{ inputs.aws_role_arn }}
+      aws_region: ${{ inputs.aws_region }}
+      ci_cli_version: ${{ inputs.ci_cli_version }}
+      earthly_version: ${{ inputs.earthly_version }}
+      target: nightly nightly-*
+      privileged: true
     secrets:
       earthly_runner_address: ${{ secrets.earthly_runner_address }}
       earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
