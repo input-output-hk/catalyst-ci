@@ -1,6 +1,5 @@
 # cspell: words dotenv levelname loguru
 
-import helper
 import os
 import sys
 import threading
@@ -12,6 +11,8 @@ from dotenv import dotenv_values
 from loguru import logger
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
+
+import helper
 
 logger.remove()  # Remove the default handler
 logger.add(sys.stdout, serialize=True, format="{message}")
@@ -101,7 +102,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.check_sizes(layer_name="")
 
         # check individual
-        for layer_name in self.layer_index.keys():
+        for layer_name in self.layer_index:
             self.check_sizes(layer_name, skip_sum_check=True)
 
         logger.info("finished initializing")
