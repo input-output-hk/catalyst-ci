@@ -1,7 +1,6 @@
-# cspell: words dotenv levelname
+# cspell: words dotenv levelname loguru
 
 import helper
-import logging
 import os
 import sys
 import threading
@@ -10,15 +9,12 @@ from collections.abc import Callable
 from typing import Set
 
 from dotenv import dotenv_values
+from loguru import logger
 from watchdog.events import FileSystemEventHandler
 from watchdog.observers import Observer
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="[%(levelname)s] %(asctime)s - %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-)
-
+logger.remove()  # Remove the default handler
+logger.add(sys.stdout, serialize=True, format="{message}")
 
 class Interval:
     """
@@ -78,7 +74,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         Lists initial file sizes during initialization.
         """
 
-        logging.info("initializing...")
+        logger.info("initializing...")
 
         for root, _directories, files in os.walk(watch_dir):
             for filename in files:
@@ -95,11 +91,11 @@ class ChangeEventHandler(FileSystemEventHandler):
                     self.file_index[file_path] = size
                     helper.add_or_init(self.layer_index, layer_name, size)
 
-                    logging.debug(
+                    logger.debug(
                         f"initial file: {file_path} (size: {size:,} bytes)"
                     )
                 except OSError as e:
-                    logging.error(f"error accessing file: {file_path} ({e})")
+                    logger.error(f"error accessing file: {file_path} ({e})")
 
         # checks total
         self.check_sizes(layer_name="")
@@ -108,7 +104,7 @@ class ChangeEventHandler(FileSystemEventHandler):
         for layer_name in self.layer_index.keys():
             self.check_sizes(layer_name, skip_sum_check=True)
 
-        logging.info("finished initializing")
+        logger.info("finished initializing")
 
     def on_any_event(self, event):
         """
@@ -127,16 +123,16 @@ class ChangeEventHandler(FileSystemEventHandler):
         elif event.event_type == "deleted":
             self.handle_deleted(event.src_path)
 
-        logging.debug(event.event_type)
+        logger.debug(event.event_type)
 
     def handle_interval_change(self):
-        logging.debug("interval changed")
+        logger.debug("interval changed")
 
         self.layer_growth_index.clear()
         self.triggered_growth_layers.clear()
 
     def handle_created(self, file_path: str):
-        logging.debug(f"new file created: {file_path}")
+        logger.debug(f"new file created: {file_path}")
 
         try:
             layer_name = helper.get_subdirectory_name(watch_dir, file_path)
@@ -149,10 +145,10 @@ class ChangeEventHandler(FileSystemEventHandler):
             # checks
             self.check_sizes(layer_name)
         except OSError as e:
-            logging.error(f"error accessing file: {file_path} ({e})")
+            logger.error(f"error accessing file: {file_path} ({e})")
 
     def handle_modified(self, file_path: str):
-        logging.debug(f"file modified: {file_path}")
+        logger.debug(f"file modified: {file_path}")
 
         try:
             layer_name = helper.get_subdirectory_name(watch_dir, file_path)
@@ -171,18 +167,18 @@ class ChangeEventHandler(FileSystemEventHandler):
                 # checks
                 self.check_sizes(layer_name)
 
-                logging.debug(" ".join([
+                logger.debug(" ".join([
                     f"file modified: {file_path}",
                     f"(size changed from {prev_size:,} bytes",
                     f"to {size:,} bytes)"
                 ]))
             else:
-                logging.debug(f"file modified: {file_path} (size unchanged)")
+                logger.debug(f"file modified: {file_path} (size unchanged)")
         except OSError as e:
-            logging.error(f"error accessing file: {file_path} ({e})")
+            logger.error(f"error accessing file: {file_path} ({e})")
 
     def handle_moved(self, src_path: str, dest_path: str):
-        logging.debug(f"file moved: {src_path}")
+        logger.debug(f"file moved: {src_path}")
 
         src_layer_name = helper.get_subdirectory_name(watch_dir, src_path)
         dest_layer_name = helper.get_subdirectory_name(watch_dir, dest_path)
@@ -197,7 +193,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                 helper.add_or_init(self.layer_index, dest_layer_name, size)
 
     def handle_deleted(self, file_path: str):
-        logging.debug(f"file deleted: {file_path}")
+        logger.debug(f"file deleted: {file_path}")
 
         if file_path in self.file_index:
             layer_name = helper.get_subdirectory_name(watch_dir, file_path)
@@ -240,11 +236,19 @@ class ChangeEventHandler(FileSystemEventHandler):
 
         self.triggered_layers.add(layer_name)
 
-        logging.error(" ".join([
-            f"layer '{layer_name}' exceeds large layer size criteria",
-            f"(size: {self.layer_index[layer_name]:,} bytes",
-            f"- limit: {large_layer_size:,} bytes)"
-        ]))
+        logger.error(
+            " ".join([
+                f"layer '{layer_name}' exceeds large layer size criteria",
+                f"(size: {self.layer_index[layer_name]:,} bytes",
+                f"- limit: {large_layer_size:,} bytes)"
+            ]),
+            extra={
+                "err_type": "layer_size_exceeded",
+                "layer": layer_name,
+                "size": self.layer_index[layer_name],
+                "limit": large_layer_size
+            }
+        )
 
     def trigger_interval_growth_exceeded(self):
         try:
@@ -256,27 +260,53 @@ class ChangeEventHandler(FileSystemEventHandler):
                 has_triggered_layer = True
                 self.triggered_growth_layers.add(layer_name)
 
-                logging.error(" ".join([
-                    f"layer '{layer_name}'",
-                    f"- {size:,} bytes within the interval"
-                ]))
+                logger.error(
+                    " ".join([
+                        f"layer '{layer_name}'",
+                        f"- {size:,} bytes within the interval"
+                    ]),
+                    extra={
+                        "err_type": "layer_list_growth_exceeded",
+                        "layer": layer_name,
+                        "size": size
+                    }
+                )
 
             if has_triggered_layer:
-                logging.error(" ".join([
-                    "the total amount of cache growth",
-                    f"within {time_window:,} secs exceeds the limit",
-                    f"(size: {sum(self.layer_growth_index.values()):,} bytes",
-                    f"- limit: {max_time_window_growth_size:,} bytes)"
-                ]))
+                size = sum(self.layer_growth_index.values())
+
+                logger.error(
+                    " ".join([
+                        "the total amount of cache growth",
+                        f"within {time_window:,} secs exceeds the limit",
+                        f"(size: {size:,} bytes",
+                        f"- limit: {max_time_window_growth_size:,} bytes)"
+                    ]),
+                    extra={
+                        "err_type": "interval_growth_exceeded",
+                        "size": size,
+                        "limit": max_time_window_growth_size,
+                        "within": time_window
+                    }
+                )
         except RuntimeError as e:
-            logging.error(f"an error occurred: {e}")
+            logger.error(f"an error occurred: {e}")
 
     def trigger_max_cache_size(self):
-        logging.error(" ".join([
-            "the total amount of cache exceeds the limit",
-            f"(size: {sum(self.layer_index.values()):,} bytes",
-            f"- limit: {max_cache_size:,} bytes)"
-        ]))
+        size = sum(self.layer_index.values())
+
+        logger.error(
+            " ".join([
+                "the total amount of cache exceeds the limit",
+                f"(size: {size:,} bytes",
+                f"- limit: {max_cache_size:,} bytes)"
+            ]),
+            extra={
+                "err_type": "max_cache_size_exceeded",
+                "size": size,
+                "limit": max_cache_size
+            }
+        )
 
     def drop(self):
         self.interval.drop()
@@ -299,7 +329,7 @@ def main():
     max_time_window_growth_size = 53687091200  # 50GB
 
     if os.path.isfile(default_config_path):
-        logging.info(
+        logger.info(
             f"read config from {os.path.abspath(default_config_path)!r}"
         )
 
@@ -311,13 +341,13 @@ def main():
         time_window = int(cfg["time_window"])
         max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
     else:
-        logging.info("cannot find the config file, use default config instead")
+        logger.info("cannot find the config file, use default config instead")
 
-    logging.info(f"start watching directory {os.path.abspath(watch_dir)!r}")
-    logging.info(f"with `large_layer_size` set to {large_layer_size:,} bytes")
-    logging.info(f"with `max_cache_size` set to {max_cache_size:,} bytes")
-    logging.info(f"with `time_window` set to {time_window:,} secs")
-    logging.info(" ".join([
+    logger.info(f"start watching directory {os.path.abspath(watch_dir)!r}")
+    logger.info(f"with `large_layer_size` set to {large_layer_size:,} bytes")
+    logger.info(f"with `max_cache_size` set to {max_cache_size:,} bytes")
+    logger.info(f"with `time_window` set to {time_window:,} secs")
+    logger.info(" ".join([
         "with `max_time_window_growth_size` set to",
         f"{max_time_window_growth_size:,} bytes"
     ]))
