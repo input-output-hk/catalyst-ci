@@ -15,7 +15,7 @@ from watchdog.observers import Observer
 import helper
 
 logger.remove()  # Remove the default handler
-logger.add(sys.stdout, serialize=True, format="{message}")
+logger.add(sys.stdout, level="INFO", serialize=True, format="{message}")
 
 class Interval:
     """
