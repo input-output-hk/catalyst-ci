@@ -52,11 +52,19 @@ def main():
                     strict=False,
                     log=False,
                 )
-                if not res1.ok() and not res2.ok():
+                res3 = vendor_files_check.toml_diff_check(
+                    "/stdcfgs/cargo_manifest/project.toml",
+                    cargo_toml_path,
+                    strict=False,
+                    log=False,
+                )
+                if not res1.ok() and not res2.ok() and not res3.ok():
                     res1.print(verbose_errors=True)
                     res2.print(verbose_errors=True)
+                    res3.print(verbose_errors=True)
                     results.add(res1)
                     results.add(res2)
+                    results.add(res3)
 
     results.add(
         vendor_files_check.toml_diff_check(
