@@ -19,7 +19,7 @@ bare_urls = "deny"
 unescaped_backticks = "deny"
 
 [lints.clippy]
-pedantic = "deny"
+pedantic = { level = "deny", priority = -1 }
 unwrap_used = "deny"
 expect_used = "deny"
 exit = "deny"
