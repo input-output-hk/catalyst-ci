@@ -2,6 +2,10 @@ VERSION 0.8
 
 run-me:
     FROM debian:bookworm-20240513-slim
+
+    RUN apt-get update \
+        && apt-get install -y apt-utils jq curl gzip
+
     DO +INSTALL_CHROME_LINUX64 --CHROMIUM_MAJOR_VERSION=126
 
 # Install Chrome/Chromium for testing and Chromedriver.
@@ -10,14 +14,10 @@ run-me:
 # Define a function to install Chrome or Chromium based on the target architecture
 INSTALL_CHROME_LINUX64:
     FUNCTION
-    ARG TARGETARCH
+    ARG TARGET_ARCH
     LET BLUE='\033[0;34m'
 
-      # Install necessary utilities
-    RUN apt-get update \
-        && apt-get install -y apt-utils jq curl gzip
-
-    IF [ "$TARGETARCH" = "amd64" ]
+    IF [ "$TARGET_ARCH" = "amd64" ]
         ARG CHROME_MAJOR_VERSION
 
         # Install Google Chrome

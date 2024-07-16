@@ -26,11 +26,11 @@ flutter-base:
 
     WORKDIR frontend
 
-    ARG chrome_version = 126
+    ARG CHROMIUM_MAJOR_VERSION = 126
+    ARG CHROME_MAJOR_VERSION = 126
     ARG chrome_package_release = 1
-    ARG chromium_version = 126
 
-    DO installer+INSTALL_CHROME_LINUX64 --chrome_version=$chrome_version --chrome_package_release=$chrome_package_release --chromium_version=$chromium_version
+    DO installer+INSTALL_CHROME_LINUX64 --CHROME_MAJOR_VERSION=$CHROME_MAJOR_VERSION --chrome_package_release=$chrome_package_release --CHROMIUM_MAJOR_VERSION=$CHROMIUM_MAJOR_VERSION
 
     ARG edge_version = 125.0.2535.51
     ARG edge_package_release = 1
@@ -113,7 +113,7 @@ ANALYZE:
 FORMAT:
     FUNCTION
 
-    IF [ -f melos.yaml ]
+    IF [ -f melos.yaml ]œ
         RUN echo "Running melos format"
         RUN melos run format-check
     ELSE
