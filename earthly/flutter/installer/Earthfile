@@ -1,49 +1,76 @@
 VERSION 0.8
 
-# cspell: words Chromedriver Edgedriver edgedriver msedgedriver Geckodriver geckodriver
+run-me:
+    FROM debian:bookworm-20240513-slim
+    DO +INSTALL_CHROME_LINUX64 --CHROMIUM_MAJOR_VERSION=126
 
 # Install Chrome/Chromium for testing and Chromedriver.
 # There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
 # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/1
+# Define a function to install Chrome or Chromium based on the target architecture
 INSTALL_CHROME_LINUX64:
     FUNCTION
     ARG TARGETARCH
-    LET BLUE ='\033[0;34m'
+    LET BLUE='\033[0;34m'
 
-    # https://googlechromelabs.github.io/chrome-for-testing/
+      # Install necessary utilities
+    RUN apt-get update \
+        && apt-get install -y apt-utils jq curl gzip
+
     IF [ "$TARGETARCH" = "amd64" ]
-        ARG --required chrome_version
-        ARG --required chrome_package_release
+        ARG CHROME_MAJOR_VERSION
+
         # Install Google Chrome
-        RUN printf "${BLUE} Installing Google Chrome..."
-        RUN curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${chrome_version}-${chrome_package_release}_amd64.deb \
+        RUN printf "${BLUE} Installing Google Chrome...\n"
+        # Find and install the latest Google Chrome version matching the major version
+        RUN printf "${BLUE} Finding the latest Google Chrome version...\n" \
+            && LATEST_VERSION=$(curl -sSL https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages.gz | gunzip -c | grep -A 7 "Package: google-chrome-stable" | grep -B 7 -E "Version: ${chrome_major_version}\.[0-9]+" | grep "Version:" | sort -V | tail -1 | awk '{print $2}') \
+            && DOWNLOAD_URL="https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${LATEST_VERSION}_amd64.deb" \
+            && curl -sSL -o /opt/chrome.deb ${DOWNLOAD_URL} \
             && apt install -y /opt/chrome.deb \
             && rm /opt/chrome.deb \
             && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
         RUN google-chrome --version
 
         # Install Chromedriver
-        RUN printf "${BLUE} Installing Chromedriver..."
+        RUN printf "${BLUE} Installing Chromedriver...\n"
         RUN mkdir -p /opt/chromedriver \
-            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${chrome_version}/linux64/chromedriver-linux64.zip \
+            && LATEST_CHROMEDRIVER_VERSION=$(curl -sSL https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_MAJOR_VERSION}) \
+            && curl -L https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip \
             -o /opt/chromedriver/chromedriver.zip \
-            && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
+            && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/ \
+            && rm /opt/chromedriver/chromedriver.zip
         RUN chromedriver --version
 
-    ELSE 
-        # Chromium source: https://packages.debian.org/source/bookworm/chromium
-        ARG --required chromium_version
+    ELSE
+        ARG CHROMIUM_MAJOR_VERSION
+
         # Install Chromium
-        RUN printf "${BLUE} Installing Chromium..."
-        RUN curl -sSL -o /opt/chromium.deb http://security.debian.org/debian-security/pool/updates/main/c/chromium/chromium_${chromium_version}_arm64.deb \
+        RUN printf "${BLUE} Installing Chromium...\n"
+
+        # Find and install the latest Chromium version matching the major version
+        RUN printf "${BLUE} Finding the latest Chromium version...\n" \
+            && curl -sSL 'https://packages.debian.org/source/bookworm/chromium' -o /opt/chromium_source.html \
+            && cat /opt/chromium_source.html \
+            && LATEST_VERSION=$(grep -oP "${CHROMIUM_MAJOR_VERSION}\.\d+\.\d+\.\d+-\d+~deb\d+u\d+" /opt/chromium_source.html | sort -V | tail -1) \
+            && echo "Latest version: ${LATEST_VERSION}" \
+            && DOWNLOAD_URL="http://security.debian.org/debian-security/pool/updates/main/c/chromium/chromium_${LATEST_VERSION}_arm64.deb" \
+            && echo "Download URL: ${DOWNLOAD_URL}" \
+            && curl -sSL -o /opt/chromium.deb ${DOWNLOAD_URL} \
+            && echo "Downloaded file information:" \
+            && ls -lh /opt/chromium.deb \
+            && dpkg-deb --info /opt/chromium.deb \
             && apt install -y /opt/chromium.deb \
             && rm /opt/chromium.deb \
             && mv /usr/bin/chromium /usr/bin/google-chrome
         RUN google-chrome --version
 
         # Install Chromium-driver
-        RUN printf "${BLUE} Installing Chromium-driver..."
-        RUN curl -sSL -o /opt/chrome-driver.deb http://security.debian.org/debian-security/pool/updates/main/c/chromium/chromium-driver_${chromium_version}_arm64.deb \
+        RUN printf "${BLUE} Finding the latest Chromium-driver version...\n" \
+            && LATEST_VERSION=$(curl -sSL 'http://security.debian.org/debian-security/dists/bookworm/updates/main/binary-arm64/Packages.gz' | gunzip -c | grep -A 7 "Package: chromium-driver" | grep -B 7 -E "Version: ${CHROMIUM_MAJOR_VERSION}\.[0-9]+" | grep "Version:" | sort -V | tail -1 | awk '{print $2}') \
+            && DOWNLOAD_URL="http://security.debian.org/debian-security/pool/updates/main/c/chromium/chromium-driver_${LATEST_VERSION}_arm64.deb" \
+            && curl -sSL -o /opt/chrome-driver.deb ${DOWNLOAD_URL} \
+            && file /opt/chrome-driver.deb \
             && apt install -y /opt/chrome-driver.deb \
             && rm /opt/chrome-driver.deb
         RUN chromedriver --version
@@ -53,7 +80,7 @@ INSTALL_CHROME_LINUX64:
 # There is no Edge version build for linux/arm64, installing only for amd64.
 INSTALL_EDGE_LINUX64:
     FUNCTION
-    ARG TARGETARCH
+
     LET BLUE ='\033[0;34m'
 
     IF [ "$TARGETARCH" = "amd64" ]
@@ -74,7 +101,7 @@ INSTALL_EDGE_LINUX64:
         RUN msedgedriver --version
     END
 
-# Install Firefox and Geckodriver. 
+# Install Firefox and Geckodriver.
 # Geckodriver supported versions:
 # https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html
 INSTALL_FIREFOX_LINUX64:
@@ -104,7 +131,7 @@ INSTALL_FIREFOX_LINUX64:
         RUN apt-get update && apt-get install -y -t mozilla firefox-esr=${firefox_version_arm64}
     END
     RUN firefox --version
-    
+
     RUN printf "${BLUE} Installing Geckodriver..."
     RUN mkdir -p /opt/geckodriver
     ARG --required gecko_version
