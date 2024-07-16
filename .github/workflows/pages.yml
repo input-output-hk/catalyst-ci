@@ -69,7 +69,6 @@ jobs:
             echo 'CLEAN_EXCLUDE<<EOF'
             echo "/branch/*"
             echo "/allure-action/*"
-            echo "/allure-action-nightly/*"
             echo EOF
             } >> "$GITHUB_ENV"
           else
