@@ -56,7 +56,7 @@ flutter-base-all-hosts:
 
 SETUP:
     FUNCTION
-    FROM +flutter-base
+    FROM  --no-cache +flutter-base
 
 # Runs melos bootstrap if melos.yaml file is present.
 BOOTSTRAP:
