@@ -8,6 +8,26 @@ run-me:
 
     DO +INSTALL_CHROME_LINUX64 --CHROMIUM_MAJOR_VERSION=126
 
+# Finds and install the latest Chromium or Chrome driver version matching the major version.
+INSTALL_CHROMIUM:
+    FUNCTION
+
+    ARG --required MAJOR_VERSION
+    ARG --required PACKAGE_TYPE
+    ARG PACKAGE_SUFFIX="arm64.deb"
+
+    RUN printf "${BLUE} Finding the latest ${PACKAGE_TYPE} version...\n" \
+        && curl -sSL 'https://packages.debian.org/bookworm/chromium' -o /opt/chromium_source.html \
+        && LATEST_VERSION=$(grep -oP '(?<=<meta name="Keywords" content="Debian,  bookworm, security, main, web, )[^"]+' /opt/chromium_source.html | grep -oP "${MAJOR_VERSION}\.\d+\.\d+\.\d+-\d+~deb\d+u\d+" | sort -V | tail -1) \
+        && echo "Latest version: ${LATEST_VERSION}" \
+        && DOWNLOAD_URL="http://security.debian.org/debian-security/pool/updates/main/c/chromium/${PACKAGE_TYPE}_${LATEST_VERSION}_${PACKAGE_SUFFIX}" \
+        && echo "Download URL: ${DOWNLOAD_URL}" \
+        && curl -sSL -o /opt/${PACKAGE_TYPE}.deb ${DOWNLOAD_URL} \
+        && echo "Downloaded file information:" \
+        && ls -lh /opt/${PACKAGE_TYPE}.deb \
+        && apt install -y /opt/${PACKAGE_TYPE}.deb \
+        && rm /opt/${PACKAGE_TYPE}.deb
+
 # Install Chrome/Chromium for testing and Chromedriver.
 # There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
 # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/1
@@ -43,36 +63,14 @@ INSTALL_CHROME_LINUX64:
         RUN chromedriver --version
 
     ELSE
-        ARG CHROMIUM_MAJOR_VERSION
+        ARG --required CHROMIUM_MAJOR_VERSION
 
         # Install Chromium
-        RUN printf "${BLUE} Installing Chromium...\n"
-
-        # Find and install the latest Chromium version matching the major version
-        RUN printf "${BLUE} Finding the latest Chromium version...\n" \
-            && curl -sSL 'https://packages.debian.org/source/bookworm/chromium' -o /opt/chromium_source.html \
-            && cat /opt/chromium_source.html \
-            && LATEST_VERSION=$(grep -oP "${CHROMIUM_MAJOR_VERSION}\.\d+\.\d+\.\d+-\d+~deb\d+u\d+" /opt/chromium_source.html | sort -V | tail -1) \
-            && echo "Latest version: ${LATEST_VERSION}" \
-            && DOWNLOAD_URL="http://security.debian.org/debian-security/pool/updates/main/c/chromium/chromium_${LATEST_VERSION}_arm64.deb" \
-            && echo "Download URL: ${DOWNLOAD_URL}" \
-            && curl -sSL -o /opt/chromium.deb ${DOWNLOAD_URL} \
-            && echo "Downloaded file information:" \
-            && ls -lh /opt/chromium.deb \
-            && dpkg-deb --info /opt/chromium.deb \
-            && apt install -y /opt/chromium.deb \
-            && rm /opt/chromium.deb \
-            && mv /usr/bin/chromium /usr/bin/google-chrome
-        RUN google-chrome --version
+        DO +INSTALL_CHROMIUM --MAJOR_VERSION=$CHROMIUM_MAJOR_VERSION --PACKAGE_TYPE="chromium"
+        RUN chromium --version
 
         # Install Chromium-driver
-        RUN printf "${BLUE} Finding the latest Chromium-driver version...\n" \
-            && LATEST_VERSION=$(curl -sSL 'http://security.debian.org/debian-security/dists/bookworm/updates/main/binary-arm64/Packages.gz' | gunzip -c | grep -A 7 "Package: chromium-driver" | grep -B 7 -E "Version: ${CHROMIUM_MAJOR_VERSION}\.[0-9]+" | grep "Version:" | sort -V | tail -1 | awk '{print $2}') \
-            && DOWNLOAD_URL="http://security.debian.org/debian-security/pool/updates/main/c/chromium/chromium-driver_${LATEST_VERSION}_arm64.deb" \
-            && curl -sSL -o /opt/chrome-driver.deb ${DOWNLOAD_URL} \
-            && file /opt/chrome-driver.deb \
-            && apt install -y /opt/chrome-driver.deb \
-            && rm /opt/chrome-driver.deb
+        DO +INSTALL_CHROMIUM --MAJOR_VERSION=$CHROMIUM_MAJOR_VERSION --PACKAGE_TYPE="chromium-driver"
         RUN chromedriver --version
     END
 
