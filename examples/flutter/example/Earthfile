@@ -6,7 +6,7 @@ IMPORT ../../../earthly/flutter AS flutter-ci
 
 # Set up the CI environment for Flutter app.
 builder:
-    DO --no-cache flutter-ci+SETUP
+    DO flutter-ci+SETUP
 
     COPY --dir . .
 

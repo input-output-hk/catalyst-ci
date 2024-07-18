@@ -1,13 +1,5 @@
 VERSION 0.8
 
-run-me:
-    FROM debian:bookworm-20240513-slim
-
-    RUN apt-get update \
-        && apt-get install -y apt-utils jq curl gzip
-
-    DO +INSTALL_CHROME_LINUX64 --CHROMIUM_MAJOR_VERSION=126
-
 # Finds and install the latest Chromium or Chrome driver version matching the major version.
 INSTALL_CHROMIUM:
     FUNCTION
@@ -31,7 +23,7 @@ INSTALL_CHROMIUM:
 # Install Chrome/Chromium for testing and Chromedriver.
 # There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
 # https://github.com/GoogleChromeLabs/chrome-for-testing/issues/1
-# Define a function to install Chrome or Chromium based on the target architecture
+# Define a function to install Chrome or Chromium based on the target architecture.
 INSTALL_CHROME_LINUX64:
     FUNCTION
     ARG TARGET_ARCH
@@ -40,9 +32,9 @@ INSTALL_CHROME_LINUX64:
     IF [ "$TARGET_ARCH" = "amd64" ]
         ARG CHROME_MAJOR_VERSION
 
-        # Install Google Chrome
+        # Install Google Chrome.
         RUN printf "${BLUE} Installing Google Chrome...\n"
-        # Find and install the latest Google Chrome version matching the major version
+        # Find and install the latest Google Chrome version matching the major version.
         RUN printf "${BLUE} Finding the latest Google Chrome version...\n" \
             && LATEST_VERSION=$(curl -sSL https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages.gz | gunzip -c | grep -A 7 "Package: google-chrome-stable" | grep -B 7 -E "Version: ${chrome_major_version}\.[0-9]+" | grep "Version:" | sort -V | tail -1 | awk '{print $2}') \
             && DOWNLOAD_URL="https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${LATEST_VERSION}_amd64.deb" \
@@ -52,7 +44,7 @@ INSTALL_CHROME_LINUX64:
             && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
         RUN google-chrome --version
 
-        # Install Chromedriver
+        # Install Chromedriver.
         RUN printf "${BLUE} Installing Chromedriver...\n"
         RUN mkdir -p /opt/chromedriver \
             && LATEST_CHROMEDRIVER_VERSION=$(curl -sSL https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_MAJOR_VERSION}) \
@@ -65,7 +57,7 @@ INSTALL_CHROME_LINUX64:
     ELSE
         ARG --required CHROMIUM_MAJOR_VERSION
 
-        # Install Chromium
+        # Install Chromium.
         DO +INSTALL_CHROMIUM --MAJOR_VERSION=$CHROMIUM_MAJOR_VERSION --PACKAGE_TYPE="chromium"
         RUN chromium --version
 
