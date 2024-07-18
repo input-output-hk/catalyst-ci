@@ -139,7 +139,7 @@ UNIT_TESTS:
 
     IF [ -f melos.yaml ]
         RUN echo "Running unit tests with melos."
-        RUN melos run test-report
+        RUN --no-cache melos run test-report
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
             SAVE ARTIFACT coverage AS LOCAL coverage
