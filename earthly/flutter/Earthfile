@@ -141,6 +141,7 @@ UNIT_TESTS:
         RUN melos run test-report
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
+            SAVE ARTIFACT coverage AS LOCAL coverage
         END
     ELSE
         RUN echo "Running flutter test"
