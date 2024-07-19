@@ -4,15 +4,11 @@ VERSION 0.8
 INSTALL_CHROMIUM:
     FUNCTION
 
-    ARG --required MAJOR_VERSION
     ARG --required PACKAGE_TYPE
-    ARG PACKAGE_SUFFIX="arm64.deb"
+    ARG DOWNLOAD_URL_SUFIX = "126.0.6478.126-1~deb12u1_arm64.deb"
 
-    RUN printf "${BLUE} Finding the latest ${PACKAGE_TYPE} version...\n" \
-        && curl -sSL 'https://packages.debian.org/bookworm/chromium' -o /opt/chromium_source.html \
-        && LATEST_VERSION=$(grep -oP '(?<=<meta name="Keywords" content="Debian,  bookworm, security, main, web, )[^"]+' /opt/chromium_source.html | grep -oP "${MAJOR_VERSION}\.\d+\.\d+\.\d+-\d+~deb\d+u\d+" | sort -V | tail -1) \
-        && echo "Latest version: ${LATEST_VERSION}" \
-        && DOWNLOAD_URL="http://security.debian.org/debian-security/pool/updates/main/c/chromium/${PACKAGE_TYPE}_${LATEST_VERSION}_${PACKAGE_SUFFIX}" \
+    RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
+        && DOWNLOAD_URL="http://security.debian.org/debian-security/pool/updates/main/c/chromium/${PACKAGE_TYPE}_${DOWNLOAD_URL_SUFIX}" \
         && echo "Download URL: ${DOWNLOAD_URL}" \
         && curl -sSL -o /opt/${PACKAGE_TYPE}.deb ${DOWNLOAD_URL} \
         && echo "Downloaded file information:" \
@@ -55,14 +51,12 @@ INSTALL_CHROME_LINUX64:
         RUN chromedriver --version
 
     ELSE
-        ARG --required CHROMIUM_MAJOR_VERSION
-
         # Install Chromium.
-        DO +INSTALL_CHROMIUM --MAJOR_VERSION=$CHROMIUM_MAJOR_VERSION --PACKAGE_TYPE="chromium"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium"
         RUN chromium --version
 
         # Install Chromium-driver
-        DO +INSTALL_CHROMIUM --MAJOR_VERSION=$CHROMIUM_MAJOR_VERSION --PACKAGE_TYPE="chromium-driver"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver"
         RUN chromedriver --version
     END
 
