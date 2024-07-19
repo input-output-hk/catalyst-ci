@@ -12,7 +12,7 @@ flutter-src:
     IF [ "$TARGETARCH" = "amd64" ]
         RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
             | tar -xJ -C /flutter
-    ELSE 
+    ELSE
         GIT CLONE --branch $version https://github.com/flutter/flutter.git /flutter
     END
     SAVE ARTIFACT /flutter flutter
@@ -30,7 +30,7 @@ flutter-base:
     ARG chrome_package_release = 1
     ARG chromium_version = 126.0.6478.126-1~deb12u1
     DO installer+INSTALL_CHROME_LINUX64 --chrome_version=$chrome_version --chrome_package_release=$chrome_package_release --chromium_version=$chromium_version
-    
+
     ARG edge_version = 125.0.2535.51
     ARG edge_package_release = 1
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
@@ -39,7 +39,7 @@ flutter-base:
     ARG firefox_version_arm64 = 115.12.0esr-1~deb12u1
     ARG gecko_version = 0.34.0
     DO installer+INSTALL_FIREFOX_LINUX64 --firefox_version_amd64=$firefox_version_amd64 --firefox_version_arm64=$firefox_version_arm64 --gecko_version=$gecko_version
-    
+
     COPY +flutter-src/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter config --no-analytics
@@ -49,7 +49,7 @@ flutter-base:
     RUN dart pub global activate melos
     RUN dart pub global activate junitreport
     RUN dart pub global activate coverage
-    
+
 flutter-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
 
@@ -142,6 +142,7 @@ UNIT_TESTS:
         RUN melos run test-report
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
+            SAVE ARTIFACT coverage AS LOCAL coverage
         END
     ELSE
         RUN echo "Running flutter test"
@@ -175,8 +176,8 @@ BUILD_WEB:
 license-checker-base:
     DO +SETUP
     COPY ./template_license_checker.yaml .
-    
-# Perform license check for Flutter project. 
+
+# Perform license check for Flutter project.
 LICENSE_CHECK:
     FUNCTION
 
