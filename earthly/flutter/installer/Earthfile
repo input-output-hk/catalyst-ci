@@ -33,16 +33,16 @@ INSTALL_CHROMIUM:
 # Define a function to install Chrome or Chromium based on the target architecture.
 INSTALL_CHROME_LINUX64:
     FUNCTION
-    ARG TARGET_ARCH="amd64"
+
+    ARG TARGET_ARCH=amd64
     LET BLUE='\033[0;34m'
 
-    # https://googlechromelabs.github.io/chrome-for-testing/
-    IF [ "$TARGETARCH" = "amd64" ]
-        ARG --required chrome_version
-        ARG --required chrome_package_release
-        # Install Google Chrome
+    IF [ "$TARGET_ARCH" = "amd64" ]
+        ARG CHROME_MAJOR_VERSION
+
+        # Install Google Chrome.
         RUN printf "${BLUE} Installing Google Chrome..."
-        RUN curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${chrome_version}-${chrome_package_release}_amd64.deb \
+        RUN curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_MAJOR_VERSION}-1_amd64.deb \
             && apt install -y /opt/chrome.deb \
             && rm /opt/chrome.deb \
             && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
@@ -51,7 +51,7 @@ INSTALL_CHROME_LINUX64:
         # Install Chromedriver
         RUN printf "${BLUE} Installing Chromedriver..."
         RUN mkdir -p /opt/chromedriver \
-            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${chrome_version}/linux64/chromedriver-linux64.zip \
+            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${CHROME_MAJOR_VERSION}/linux64/chromedriver-linux64.zip \
             -o /opt/chromedriver/chromedriver.zip \
             && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
         RUN chromedriver --version
@@ -62,7 +62,7 @@ INSTALL_CHROME_LINUX64:
         RUN chromium --version
 
         # Install Chromium-driver
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-drive" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium-drive.zip"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium-drive.zip"
         RUN chromedriver --version
     END
 
