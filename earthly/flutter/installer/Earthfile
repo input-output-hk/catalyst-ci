@@ -33,9 +33,8 @@ INSTALL_CHROMIUM:
 # Define a function to install Chrome or Chromium based on the target architecture.
 INSTALL_CHROME_LINUX64:
     FUNCTION
-    ARG TARGET_ARCH
+    ARG TARGET_ARCH="amd64"
     LET BLUE='\033[0;34m'
-
 
     IF [ "$TARGET_ARCH" = "amd64" ]
         ARG CHROME_MAJOR_VERSION
