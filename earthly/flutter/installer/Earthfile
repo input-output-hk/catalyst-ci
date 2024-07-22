@@ -1,20 +1,31 @@
 VERSION 0.8
 
-# Finds and install the latest Chromium or Chrome driver version matching the major version.
+# Installs the Chromium or Chrome driver.
 INSTALL_CHROMIUM:
     FUNCTION
 
     ARG --required PACKAGE_TYPE
-    ARG DOWNLOAD_URL_SUFIX = "126.0.6478.182-1~deb12u1_arm64.deb"
+    ARG --required DOWNLOAD_URL
 
     RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
-        && DOWNLOAD_URL="http://security.debian.org/debian-security/pool/updates/main/c/chromium/${PACKAGE_TYPE}_${DOWNLOAD_URL_SUFIX}" \
-        && echo "Download URL: ${DOWNLOAD_URL}" \
-        && curl -sSL -o /opt/${PACKAGE_TYPE}.deb ${DOWNLOAD_URL} \
+        && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
+        && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
         && echo "Downloaded file information:" \
-        && ls -lh /opt/${PACKAGE_TYPE}.deb \
-        && apt-get install -y /opt/${PACKAGE_TYPE}.deb \
-        && rm /opt/${PACKAGE_TYPE}.deb
+        && ls -lh /opt/${PACKAGE_TYPE}.zip \
+        && echo "Unzipping ${PACKAGE_TYPE} packages..." \
+        && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
+        && echo "Contents of /opt/${PACKAGE_TYPE} after unzipping:" \
+        && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
+        && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
+        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
+        && echo "Checking for missing dependencies..." \
+        && apt-get install -f -y \
+        && echo "Re-attempting to install ${PACKAGE_TYPE} and dependencies..." \
+        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb \
+        && echo "Cleaning up..." \
+        && rm /opt/${PACKAGE_TYPE}.zip \
+        && rm -r /opt/${PACKAGE_TYPE} \
+        && echo "${PACKAGE_TYPE} installation completed."
 
 # Install Chrome/Chromium for testing and Chromedriver.
 # There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
@@ -53,11 +64,11 @@ INSTALL_CHROME_LINUX64:
 
     ELSE
         # Install Chromium.
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium.zip"
         RUN chromium --version
 
         # Install Chromium-driver
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-drive" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium-drive.zip"
         RUN chromedriver --version
     END
 
