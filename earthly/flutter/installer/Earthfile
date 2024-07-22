@@ -34,7 +34,7 @@ INSTALL_CHROMIUM:
 INSTALL_CHROME_LINUX64:
     FUNCTION
 
-    ARG TARGET_ARCH=amd64
+    ARG TARGET_ARCH
     LET BLUE='\033[0;34m'
 
     IF [ "$TARGET_ARCH" = "amd64" ]
@@ -62,7 +62,7 @@ INSTALL_CHROME_LINUX64:
         RUN chromium --version
 
         # Install Chromium-driver
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium-drive.zip"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium-driver.zip"
         RUN chromedriver --version
     END
 
