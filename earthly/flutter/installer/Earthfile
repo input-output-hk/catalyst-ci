@@ -36,29 +36,24 @@ INSTALL_CHROME_LINUX64:
     ARG TARGET_ARCH="amd64"
     LET BLUE='\033[0;34m'
 
-    IF [ "$TARGET_ARCH" = "amd64" ]
-        ARG CHROME_MAJOR_VERSION
-
-        # Install Google Chrome.
-        RUN printf "${BLUE} Installing Google Chrome...\n"
-        # Find and install the latest Google Chrome version matching the major version.
-        RUN printf "${BLUE} Finding the latest Google Chrome version...\n" \
-            && LATEST_VERSION_CHROME=$(curl -sSL https://dl.google.com/linux/chrome/deb/dists/stable/main/binary-amd64/Packages.gz | gunzip -c | grep -A 7 "Package: google-chrome-stable" | grep -B 7 -E "Version: ${chrome_major_version}\.[0-9]+" | grep "Version:" | sort -V | tail -1 | awk '{print $2}') \
-            && DOWNLOAD_URL="https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${LATEST_VERSION_CHROME}_amd64.deb" \
-            && curl -sSL -o /opt/chrome.deb ${DOWNLOAD_URL} \
+    # https://googlechromelabs.github.io/chrome-for-testing/
+    IF [ "$TARGETARCH" = "amd64" ]
+        ARG --required chrome_version
+        ARG --required chrome_package_release
+        # Install Google Chrome
+        RUN printf "${BLUE} Installing Google Chrome..."
+        RUN curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${chrome_version}-${chrome_package_release}_amd64.deb \
             && apt install -y /opt/chrome.deb \
             && rm /opt/chrome.deb \
             && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
         RUN google-chrome --version
 
-        # Install Chromedriver.
-        RUN printf "${BLUE} Installing Chromedriver...\n"
+        # Install Chromedriver
+        RUN printf "${BLUE} Installing Chromedriver..."
         RUN mkdir -p /opt/chromedriver \
-            && LATEST_CHROMEDRIVER_VERSION=$(curl -sSL https://chromedriver.storage.googleapis.com/LATEST_RELEASE_${CHROME_MAJOR_VERSION}) \
-            && curl -L https://chromedriver.storage.googleapis.com/${LATEST_CHROMEDRIVER_VERSION}/chromedriver_linux64.zip \
+            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${chrome_version}/linux64/chromedriver-linux64.zip \
             -o /opt/chromedriver/chromedriver.zip \
-            && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/ \
-            && rm /opt/chromedriver/chromedriver.zip
+            && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
         RUN chromedriver --version
 
     ELSE
