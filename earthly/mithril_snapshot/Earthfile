@@ -79,8 +79,8 @@ mainnet:
 # Also, as this snapshot is used in CI, we only used a validated image here
 # This is slower, but guaranteed to be accurate.
 preprod:
-    FROM +base-snapshot-builder                
-    ARG digest="9968eaf76df2ad225cd8ef25e16fb78bc80fa796466183adf1924508c483506c"
+    FROM +base-snapshot-builder
+    ARG digest="63ddbfb8655e007eff6b90b3b66474c2800e743b99c1d2b42910eee7f58fb1a6"
 
     DO +DL_SNAPSHOT \
         --network=preprod \
