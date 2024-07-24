@@ -49,6 +49,7 @@ rust-base:
         fonts-liberation2        \
         graphviz \
         mold \
+        openssl \
         pkgconf \
         python3-pip \      
         python3-rich \
