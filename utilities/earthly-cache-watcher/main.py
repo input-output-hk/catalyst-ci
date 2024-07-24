@@ -97,7 +97,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                     )
                 except OSError as e:
                     if log_file_accessing_err:
-                        logger.error(f"error accessing file: {file_path} ({e})")
+                        logger.error(f"{e}: {file_path}")
 
         # checks total
         self.check_sizes(layer_name="")
@@ -148,7 +148,7 @@ class ChangeEventHandler(FileSystemEventHandler):
             self.check_sizes(layer_name)
         except OSError as e:
             if log_file_accessing_err:
-                logger.error(f"error accessing file: {file_path} ({e})")
+                logger.error(f"{e}: {file_path}")
 
     def handle_modified(self, file_path: str):
         logger.debug(f"file modified: {file_path}")
@@ -179,7 +179,7 @@ class ChangeEventHandler(FileSystemEventHandler):
                 logger.debug(f"file modified: {file_path} (size unchanged)")
         except OSError as e:
             if log_file_accessing_err:
-                logger.error(f"error accessing file: {file_path} ({e})")
+                logger.error(f"{e}: {file_path}")
 
     def handle_moved(self, src_path: str, dest_path: str):
         logger.debug(f"file moved: {src_path}")
