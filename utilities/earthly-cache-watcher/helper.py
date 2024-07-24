@@ -41,7 +41,5 @@ def get_subdirectory_name(working_dir_path: str, path: str):
     return None
 
 def add_or_init(obj: dict[str, int], key: str, value: int):
-    if key not in obj:
-        obj[key] = 0
-
+    obj.setdefault(key, 0)
     obj[key] += value

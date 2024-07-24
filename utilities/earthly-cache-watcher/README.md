@@ -2,13 +2,13 @@
 
 # Earthly Cache Watcher
 
-Logs error when cache layers reach max its limit size.
+Logs an error when cache layers reach their maximum size limit.
 
 ## Functionality
 
 * Watch files changes in a specified directory.
-* Trigger events when a whether an individual file or
-a watched directory grows exceeding the certain criteria.
+* Trigger events when either an individual file or
+a watched directory grows beyond certain criteria.
 * Main triggering criteria: single file size exceeds, watched directory size exceeds,
 watched directory growth in size within an interval exceeds.
 
