@@ -358,6 +358,7 @@ def main():
         "with `max_time_window_growth_size` set to",
         f"{max_time_window_growth_size:,} bytes"
     ]))
+    logger.info(f"with `log_file_accessing_err` set to {log_file_accessing_err} secs")
 
     # init watcher
     handler = ChangeEventHandler(time_window)
