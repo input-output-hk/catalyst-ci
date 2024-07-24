@@ -25,6 +25,7 @@ if reaches the criteria. (default: `536870912000` bytes)
 in size of `watch_dir`. (default: `10` secs)
 * `max_time_window_growth_size` - A criteria to determine within an interval to detect
 if `watch_dir` exceeds the size criteria. (default: `53687091200`)
+* `log_file_accessing_err` - Logs errors occurring during file access. (default: `True`)
 
 Typically, these configuration will be read from the specified file.
 

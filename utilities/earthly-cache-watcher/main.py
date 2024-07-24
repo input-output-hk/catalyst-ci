@@ -96,7 +96,8 @@ class ChangeEventHandler(FileSystemEventHandler):
                         f"initial file: {file_path} (size: {size:,} bytes)"
                     )
                 except OSError as e:
-                    logger.error(f"error accessing file: {file_path} ({e})")
+                    if log_file_accessing_err:
+                        logger.error(f"error accessing file: {file_path} ({e})")
 
         # checks total
         self.check_sizes(layer_name="")
@@ -146,7 +147,8 @@ class ChangeEventHandler(FileSystemEventHandler):
             # checks
             self.check_sizes(layer_name)
         except OSError as e:
-            logger.error(f"error accessing file: {file_path} ({e})")
+            if log_file_accessing_err:
+                logger.error(f"error accessing file: {file_path} ({e})")
 
     def handle_modified(self, file_path: str):
         logger.debug(f"file modified: {file_path}")
@@ -176,7 +178,8 @@ class ChangeEventHandler(FileSystemEventHandler):
             else:
                 logger.debug(f"file modified: {file_path} (size unchanged)")
         except OSError as e:
-            logger.error(f"error accessing file: {file_path} ({e})")
+            if log_file_accessing_err:
+                logger.error(f"error accessing file: {file_path} ({e})")
 
     def handle_moved(self, src_path: str, dest_path: str):
         logger.debug(f"file moved: {src_path}")
@@ -318,7 +321,8 @@ def main():
         large_layer_size, \
         max_cache_size, \
         time_window, \
-        max_time_window_growth_size
+        max_time_window_growth_size, \
+        log_file_accessing_err
 
     default_config_path = sys.argv[1] if len(sys.argv) > 1 else "default.conf"
 
@@ -328,6 +332,7 @@ def main():
     max_cache_size = 536870912000  # 500GB
     time_window = 10  # 10 secs
     max_time_window_growth_size = 53687091200  # 50GB
+    log_file_accessing_err = True
 
     if os.path.isfile(default_config_path):
         logger.info(
@@ -341,6 +346,7 @@ def main():
         max_cache_size = int(cfg["max_cache_size"])
         time_window = int(cfg["time_window"])
         max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
+        log_file_accessing_err = True if str(cfg["log_file_accessing_err"]) == "True" else False
     else:
         logger.info("cannot find the config file, use default config instead")
 
