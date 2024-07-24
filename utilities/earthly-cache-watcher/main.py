@@ -346,7 +346,7 @@ def main():
         max_cache_size = int(cfg["max_cache_size"])
         time_window = int(cfg["time_window"])
         max_time_window_growth_size = int(cfg["max_time_window_growth_size"])
-        log_file_accessing_err = True if str(cfg["log_file_accessing_err"]) == "True" else False
+        log_file_accessing_err = str(cfg["log_file_accessing_err"]) == "True"
     else:
         logger.info("cannot find the config file, use default config instead")
 
