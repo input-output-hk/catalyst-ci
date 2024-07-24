@@ -11,7 +11,7 @@ CARGO_BINSTALL_INSTALL:
     IF [ "$TARGETARCH" = "amd64" ]
         LET image = "https://github.com/cargo-bins/cargo-binstall/releases/download/v$version/cargo-binstall-x86_64-unknown-linux-musl.full.tgz"
     ELSE IF [ "$TARGETARCH" = "arm64" ]
-        LET image = "https://github.com/cargo-bins/cargo-binstall/releases/download/v$version/cargo-binstall-aarch64-unknown-linux-musl-full.tgz"
+        LET image = "https://github.com/cargo-bins/cargo-binstall/releases/download/v$version/cargo-binstall-aarch64-unknown-linux-musl.full.tgz"
     ELSE
         RUN --no-cache echo "Unsupported Platform $TARGETARCH"; exit 1 
     END
