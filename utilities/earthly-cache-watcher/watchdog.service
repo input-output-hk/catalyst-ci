@@ -1,0 +1,11 @@
+[Unit]
+Description=Earthly Cache Watcher
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /root/catalyst-ci/utilities/earthly-cache-watcher/main.py /root/catalyst-ci/utilities/earthly-cache-watcher/default.conf
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
