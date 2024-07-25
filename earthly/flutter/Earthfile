@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
-# Save Flutter source code as artifact.
+# flutter-src save Flutter source code as artifact.
 flutter-src:
     FROM busybox
     ARG version=3.22.1
@@ -17,7 +17,7 @@ flutter-src:
     END
     SAVE ARTIFACT /flutter flutter
 
-# Installs required tools and packages.
+# flutter-base installs required tools and packages.
 flutter-base:
     FROM debian:bookworm-20240513-slim
 
@@ -50,6 +50,7 @@ flutter-base:
     RUN dart pub global activate junitreport
     RUN dart pub global activate coverage
 
+# flutter-base-all-hosts installs required tools and packages for all hosts.
 flutter-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
 
@@ -172,7 +173,7 @@ BUILD_WEB:
         SAVE ARTIFACT web /web
     END
 
-# Base license checker setup.
+# license-checker-base base license checker setup.
 license-checker-base:
     DO +SETUP
     COPY ./template_license_checker.yaml .
