@@ -26,6 +26,9 @@ flutter-base:
 
     WORKDIR frontend
 
+    # TARGETARCH is the target processor architecture for which the target is being built.
+    # WARNING: The value of a builtin arg (earthly) and can never be overridden!
+    # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
     ARG TARGETARCH
     ARG CHROME_MAJOR_VERSION = 126.0.6478.61
 
