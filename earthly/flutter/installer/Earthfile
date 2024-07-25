@@ -6,6 +6,7 @@ INSTALL_CHROMIUM:
 
     ARG --required PACKAGE_TYPE
     ARG --required DOWNLOAD_URL
+    LET BLUE='\033[0;34m'
 
     RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
         && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
@@ -34,7 +35,7 @@ INSTALL_CHROMIUM:
 INSTALL_CHROME_LINUX64:
     FUNCTION
 
-    ARG TARGET_ARCH
+    ARG TARGET_ARCH = amd64
     LET BLUE='\033[0;34m'
 
     IF [ "$TARGET_ARCH" = "amd64" ]
