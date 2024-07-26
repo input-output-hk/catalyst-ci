@@ -35,10 +35,10 @@ INSTALL_CHROMIUM:
 INSTALL_CHROME_LINUX64:
     FUNCTION
 
-    ARG TARGET_ARCH = amd64
+    ARG TARGETARCH
     LET BLUE='\033[0;34m'
 
-    IF [ "$TARGET_ARCH" = "amd64" ]
+    IF [ "$TARGETARCH" = "amd64" ]
         ARG CHROME_MAJOR_VERSION
 
         # Install Google Chrome.
@@ -71,6 +71,7 @@ INSTALL_CHROME_LINUX64:
 # There is no Edge version build for linux/arm64, installing only for amd64.
 INSTALL_EDGE_LINUX64:
     FUNCTION
+    ARG TARGETARCH
 
     LET BLUE ='\033[0;34m'
 
