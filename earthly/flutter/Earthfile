@@ -19,8 +19,8 @@ flutter-src:
 
 # flutter-base installs required tools and packages.
 flutter-base:
-    RUN --no-cache
     FROM debian:bookworm-20240513-slim
+    RUN --no-cache
 
     RUN apt-get update --fix-missing
     RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
