@@ -4,7 +4,6 @@ IMPORT ./installer AS installer
 
 # flutter-src save Flutter source code as artifact.
 flutter-src:
-    RUN --no-cache
     FROM busybox
     ARG version=3.22.1
     ARG TARGETARCH
@@ -20,6 +19,7 @@ flutter-src:
 
 # flutter-base installs required tools and packages.
 flutter-base:
+    RUN --no-cache
     FROM debian:bookworm-20240513-slim
 
     RUN apt-get update --fix-missing
