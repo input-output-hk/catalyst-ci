@@ -29,7 +29,7 @@ rust-base:
     # This is our base Host toolset, and rustup.
     # Never use `rust-toolchain.toml` in CI as it breaks builds.
     # The only toolchain supported is the one installed here.
-    FROM rust:1.79.0-slim-bookworm
+    FROM rust:1.80.0-slim-bookworm
 
     WORKDIR /root
 
@@ -45,39 +45,19 @@ rust-base:
         cmake \
         colordiff \
         findutils \
-        fontconfig \        
+        fontconfig \
         fonts-liberation2        \
         graphviz \
         libssl-dev \
         mold \
         openssl \
         pkgconf \
-        python3-pip \      
+        python3-pip \
         python3-rich \
         python3-psycopg \
         ripgrep \
         wget \
         && rm -rf /var/lib/apt/lists/*
-    #RUN apk add --no-cache \
-    #        build-base \
-    #        mold \
-    #        clang \
-    #        py3-pip \      
-    #        py3-rich \
-    #        py3-psycopg \
-    #        ripgrep \
-    #        bash \
-    #        colordiff \
-    #        graphviz \
-    #        fontconfig \
-    #        ttf-liberation \
-    #        findutils \
-    #        pkgconfig \
-    #        openssl-dev \
-    #        openssl-libs-static \
-    #        cmake \
-    #        curl \
-    #        gcompat
 
     # Fix up font cache.
     RUN fc-cache -f
@@ -96,7 +76,8 @@ rust-base:
 
     # Ensure we have all the necessary targets
     RUN rustup target add wasm32-unknown-unknown
-    RUN rustup target add wasm32-wasip1 # wasm32-wasip2 not yet available
+    RUN rustup target add wasm32-wasip1
+    # RUN rustup target add wasm32-wasip2 # wasm32-wasip2 not yet available in stable
 
     RUN rustup target add wasm32-unknown-unknown --toolchain nightly
     RUN rustup target add wasm32-wasip1 --toolchain nightly 
