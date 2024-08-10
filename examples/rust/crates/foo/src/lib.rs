@@ -11,15 +11,6 @@ pub fn fmt_hello(name: &str, count: u8) -> String {
 mod tests {
     use super::*;
 
-    fn return_error() -> Result<(), String> {
-        Err("Some random error".to_string())
-    }
-
-    #[test]
-    fn test_return_error() {
-        return_error().unwrap();
-    }
-
     #[test]
     /// Prove we can say hello to Dave on a 3 count.
     fn test_hello_dave_3() {
