@@ -33,6 +33,9 @@ rust-base:
 
     WORKDIR /root
 
+    # Enables rust backtrace when something panics
+    ENV RUST_BACKTRACE=full
+
     # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
     #
