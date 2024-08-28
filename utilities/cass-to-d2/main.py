@@ -1,5 +1,19 @@
 import sys
 import os
+import re
+
+class Table:
+    def __init__(self) -> None:
+        self.name = ""
+        self.desc = ""
+        self.fields: list[Field] = []
+        self.pk: list[str] = []
+
+class Field:
+    def __init__(self) -> None:
+        self.name = ""
+        self.type = ""
+        self.comment = ""
 
 def extract_src(src_dir: str):
     if not os.path.isdir(src_dir):
@@ -12,7 +26,39 @@ def extract_src(src_dir: str):
         extract_file(os.path.join(src_dir, file))
 
 def extract_file(file_path: str):
-    print(file_path)
+    f = open(file_path, "r")
+    lines = f.readlines()
+
+    table = Table()
+
+    for line in lines:
+        if line.strip() == "":
+            continue
+        
+        # table description
+        if table.name == "" and line.startswith("--"):
+            table.desc += table.desc + ("" if table.desc == "" else " ") + line[2:].strip()
+        # table name
+        elif table.name == "" and "CREATE TABLE" in line:
+            tokens = [x for x in re.split(r'\s+', line) if x]
+            table.name = tokens[-2]
+        # table fields
+        elif table.name != "":
+            tokens = re.split(r'\s+', line.strip())
+
+            field = Field()
+
+            """ for i, token in enumerate(tokens):
+                if token == "--" or field.comment != "":
+                    field.comment += field.comment + ("" if field.comment == "" else " ") + token.strip()
+                elif i == 0:
+                    field.name = token
+                elif i == 1:
+                    field.type = token """
+            
+            print(tokens)
+
+    print(table.name)
 
 def main():
     if len(sys.argv) != 3:
