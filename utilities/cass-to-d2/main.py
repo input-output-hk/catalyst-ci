@@ -15,6 +15,9 @@ class Field:
         self.type = ""
         self.comment = ""
 
+    def is_only_comment(self):
+        return self.name == "" or self.type == ""
+
 def extract_src(src_dir: str):
     if not os.path.isdir(src_dir):
         raise Exception(f"'{src_dir}' is not directory.")
@@ -25,7 +28,7 @@ def extract_src(src_dir: str):
     for file in files:
         extract_file(os.path.join(src_dir, file))
 
-def extract_file(file_path: str):
+def extract_file(file_path: str) -> Table:
     f = open(file_path, "r")
     lines = f.readlines()
 
@@ -43,22 +46,39 @@ def extract_file(file_path: str):
             tokens = [x for x in re.split(r'\s+', line) if x]
             table.name = tokens[-2]
         # table fields
-        elif table.name != "":
+        elif table.name != "" and not line.startswith(")"):
             tokens = re.split(r'\s+', line.strip())
 
-            field = Field()
+            if len(tokens) == 0:
+                continue
 
-            """ for i, token in enumerate(tokens):
-                if token == "--" or field.comment != "":
-                    field.comment += field.comment + ("" if field.comment == "" else " ") + token.strip()
-                elif i == 0:
-                    field.name = token
-                elif i == 1:
-                    field.type = token """
-            
-            print(tokens)
+            if tokens[0] == "PRIMARY":
+                print("pk")
+            else:
+              field = Field()
 
-    print(table.name)
+              # get field name and type
+              comment_idx: None | int = None
+              for i, token in enumerate(tokens):
+                  if token == "--":
+                      comment_idx = i
+                      break
+                  elif i == 0:
+                      field.name = token
+                  elif i == 1:
+                      field.type = token
+
+              # join comments
+              comment_tokens: list[str] = []
+              if comment_idx != None:
+                  comment_tokens = tokens[(comment_idx + 1):]
+
+              field.comment = " ".join(comment_tokens)
+
+              # add to table
+              table.fields.append(field)
+  
+    return table
 
 def main():
     if len(sys.argv) != 3:
