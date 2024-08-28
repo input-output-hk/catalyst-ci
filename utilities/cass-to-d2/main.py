@@ -9,6 +9,9 @@ class Table:
         self.fields: list[Field] = []
         self.pk: list[str] = []
 
+    def to_d2_format() -> str:
+        return ""
+
 class Field:
     def __init__(self) -> None:
         self.name = ""
@@ -17,12 +20,15 @@ class Field:
 
     def is_only_comment(self):
         return self.name == "" or self.type == ""
+    
+    def to_d2_format() -> str:
+        return ""
 
 def extract_src(src_dir: str):
     if not os.path.isdir(src_dir):
         raise Exception(f"'{src_dir}' is not directory.")
     
-    # Get the list of files in the directory
+    # get the list of files in the directory
     files = [f for f in os.listdir(src_dir) if os.path.isfile(os.path.join(src_dir, f))]
 
     for file in files:
@@ -43,17 +49,20 @@ def extract_file(file_path: str) -> Table:
             table.desc += table.desc + ("" if table.desc == "" else " ") + line[2:].strip()
         # table name
         elif table.name == "" and "CREATE TABLE" in line:
-            tokens = [x for x in re.split(r'\s+', line) if x]
+            tokens = [x for x in re.split(r"\s+", line) if x]
             table.name = tokens[-2]
         # table fields
         elif table.name != "" and not line.startswith(")"):
-            tokens = re.split(r'\s+', line.strip())
+            tokens = re.split(r"\s+", line.strip())
 
             if len(tokens) == 0:
                 continue
 
             if tokens[0] == "PRIMARY":
-                print("pk")
+                matches = re.findall(r"\((.*?)\)", line.strip())
+                indexed_names = re.split(r",\s*", matches[0])
+
+                table.pk = indexed_names
             else:
               field = Field()
 
