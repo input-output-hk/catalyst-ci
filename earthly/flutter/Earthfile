@@ -5,7 +5,7 @@ IMPORT ./installer AS installer
 # flutter-src save Flutter source code as artifact.
 flutter-src:
     FROM busybox
-    ARG version=3.22.1
+    ARG version=3.24.1
     ARG TARGETARCH
 
     RUN mkdir -p /flutter
