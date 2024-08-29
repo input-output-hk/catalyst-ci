@@ -170,7 +170,7 @@ BUILD_WEB:
     WORKDIR $WORKDIR
     RUN flutter clean
     RUN flutter pub get
-    RUN flutter build web --web-renderer canvaskit --release --target $TARGET ---dart-define $SENTRY_DSN
+    RUN flutter build web --web-renderer canvaskit --release --target $TARGET ---dart-define SENTRY_DSN=$SENTRY_DSN
 
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
