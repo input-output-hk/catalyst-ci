@@ -165,11 +165,12 @@ BUILD_WEB:
     ARG WORKDIR
     ARG SAVE_LOCALLY=false
     ARG --required TARGET
+    ARG --required SENTRY_DSN
 
     WORKDIR $WORKDIR
     RUN flutter clean
     RUN flutter pub get
-    RUN flutter build web --web-renderer canvaskit --release --target $TARGET
+    RUN flutter build web --web-renderer canvaskit --release --target $TARGET ---dart-define $SENTRY_DSN
 
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
