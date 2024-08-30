@@ -1,9 +1,10 @@
 aarch
 bindgen
 buildkit
-cardano
-canvaskit
 camelcase
+canvaskit
+cardano
+Chromedriver
 codegen
 colordiff
 cowsay
@@ -15,6 +16,8 @@ dockerhub
 doublecircle
 Earthfile
 Earthfiles
+edgedriver
+Edgedriver
 errchkjson
 extldflags
 fira
@@ -24,6 +27,8 @@ fontawesome
 fontconfig
 fontname
 forcelabels
+geckodriver
+Geckodriver
 genpkey
 giga
 ginkgolinter
@@ -58,6 +63,7 @@ mithril
 mkdocs
 modcache
 mozallowfullscreen
+msedgedriver
 multirepo
 nextest
 nilnil
@@ -68,8 +74,8 @@ penwidth
 pkeyopt
 pkgs
 projectcatalyst
-pubspec
 pubout
+pubspec
 pymdownx
 PYTHONDONTWRITEBYTECODE
 rankdir
@@ -79,8 +85,8 @@ rustdoc
 rustdocflags
 rustflags
 rustfmt
-sanchonet
 rustup
+sanchonet
 sqlfluff
 stdcfgs
 subproject

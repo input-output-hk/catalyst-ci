@@ -2,10 +2,10 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
-# flutter-src - save Flutter source code as artifact.
+# flutter-src save Flutter source code as artifact.
 flutter-src:
     FROM busybox
-    ARG version=3.22.1
+    ARG version=3.24.1
     ARG TARGETARCH
 
     RUN mkdir -p /flutter
@@ -17,19 +17,22 @@ flutter-src:
     END
     SAVE ARTIFACT /flutter flutter
 
-# flutter-base - installs required tools and packages.
+# flutter-base installs required tools and packages.
 flutter-base:
     FROM debian:bookworm-20240513-slim
 
-    RUN apt-get update
-    RUN apt-get install -y git curl unzip bzip2 bash jq gpg lcov
+    RUN apt-get update --fix-missing
+    RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
 
     WORKDIR frontend
 
-    ARG chrome_version = 126.0.6478.61
-    ARG chrome_package_release = 1
-    ARG chromium_version = 126.0.6478.126-1~deb12u1
-    DO installer+INSTALL_CHROME_LINUX64 --chrome_version=$chrome_version --chrome_package_release=$chrome_package_release --chromium_version=$chromium_version
+    # TARGETARCH is the target processor architecture for which the target is being built.
+    # WARNING: The value of a builtin arg (earthly) and can never be overridden!
+    # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
+    ARG TARGETARCH
+    ARG CHROME_MAJOR_VERSION = 126.0.6478.61
+
+    DO installer+INSTALL_CHROME_LINUX64 --TARGET_ARCH=$TARGETARCH --CHROME_MAJOR_VERSION=$CHROME_MAJOR_VERSION
 
     ARG edge_version = 125.0.2535.51
     ARG edge_package_release = 1
@@ -49,7 +52,9 @@ flutter-base:
     RUN dart pub global activate melos
     RUN dart pub global activate junitreport
     RUN dart pub global activate coverage
+    RUN dart pub global activate combine_coverage
 
+# flutter-base-all-hosts installs required tools and packages for all hosts.
 flutter-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
 
@@ -140,6 +145,7 @@ UNIT_TESTS:
     IF [ -f melos.yaml ]
         RUN echo "Running unit tests with melos."
         RUN melos run test-report
+
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
             SAVE ARTIFACT coverage AS LOCAL coverage
@@ -172,7 +178,7 @@ BUILD_WEB:
         SAVE ARTIFACT web /web
     END
 
-# Base license checker setup.
+# license-checker-base base license checker setup.
 license-checker-base:
     DO +SETUP
     COPY ./template_license_checker.yaml .
