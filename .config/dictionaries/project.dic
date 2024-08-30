@@ -1,6 +1,7 @@
 aarch
 bindgen
 buildkit
+binstall
 camelcase
 canvaskit
 cardano
@@ -72,6 +73,7 @@ nixpkgs
 onsi
 penwidth
 pkeyopt
+pkgconf
 pkgs
 projectcatalyst
 pubout

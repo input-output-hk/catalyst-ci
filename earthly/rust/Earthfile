@@ -89,7 +89,7 @@ rust-base:
     RUN echo $PATH
     RUN echo $CARGO_HOME
  
-    # Install caro-binstall so we can speed up toolinstallation.
+    # Install cargo-binstall so we can speed up tool installation.
     DO rust-tools+CARGO_BINSTALL_INSTALL
 
     # CARGO_HOME, PATH and RUSTUP_HOME is already set by the base container.
