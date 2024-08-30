@@ -9,7 +9,22 @@ class Table:
         self.fields: list[Field] = []
         self.pk: list[str] = []
 
-    def to_d2_format() -> str:
+    def to_d2_format(self) -> str:
+        f_fields = []
+        for field in self.fields:
+          constraint_keys: list[str] = []
+
+          if field.name in self.pk:
+              constraint_keys.append("P")
+
+          f_fields.append(field.to_d2_format(constraint_keys))
+
+        "\n".join([
+            {self.name} + ": {",
+            "\n".join(f_fields),
+            "}"
+        ])
+        
         return ""
 
 class Field:
@@ -21,8 +36,10 @@ class Field:
     def is_only_comment(self):
         return self.name == "" or self.type == ""
     
-    def to_d2_format() -> str:
-        return ""
+    def to_d2_format(self, constraint_keys: str) -> str:
+        f_constraints = " {constraint:" + ", ".join(constraint_keys) + "}" if len(constraint_keys) else ""
+
+        return "\t\t" + self.name + f": ({self.type})" + f_constraints
 
 def extract_src(src_dir: str):
     if not os.path.isdir(src_dir):
