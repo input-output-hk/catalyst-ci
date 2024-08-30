@@ -35,6 +35,11 @@ inputs:
     description: Additional flags to pass to the Earthly target
     required: false
     default: ""
+  github_token:
+    description: Github token used to login to the Github API (defaults to runner token)
+    required: false
+    default: ${{ github.token }}
+    
 
 runs:
   using: composite
@@ -51,6 +56,10 @@ runs:
 
           if [[ -n "${{ inputs.earthly_satellite}}" ]]; then
             EARTHLY_FLAGS+=("--buildkit-host" "tcp://${{ inputs.earthly_satellite }}:8372")
+          fi
+
+          if [[ -n "${{ inputs.github_token}}" ]]; then
+            EARTHLY_FLAGS+=("--secret" "GITHUB_TOKEN=${{ inputs.github_token }}")
           fi
 
           if [[ "${{ inputs.publish }}" == "true" ]]; then
