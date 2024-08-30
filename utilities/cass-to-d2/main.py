@@ -12,6 +12,9 @@ class Table:
     def to_d2_format(self) -> str:
         f_fields = []
         for field in self.fields:
+          if field.is_only_comment():
+              continue
+
           constraint_keys: list[str] = []
 
           if field.name in self.pk:
@@ -19,13 +22,11 @@ class Table:
 
           f_fields.append(field.to_d2_format(constraint_keys))
 
-        "\n".join([
-            {self.name} + ": {",
+        return "\n".join([
+            self.name + ": {",
             "\n".join(f_fields),
             "}"
         ])
-        
-        return ""
 
 class Field:
     def __init__(self) -> None:
@@ -37,19 +38,18 @@ class Field:
         return self.name == "" or self.type == ""
     
     def to_d2_format(self, constraint_keys: str) -> str:
-        f_constraints = " {constraint:" + ", ".join(constraint_keys) + "}" if len(constraint_keys) else ""
+        f_constraints = " {constraint: " + ", ".join(constraint_keys) + "}" if len(constraint_keys) else ""
 
         return "\t\t" + self.name + f": ({self.type})" + f_constraints
 
-def extract_src(src_dir: str):
+def extract_src(src_dir: str) -> list[Table]:
     if not os.path.isdir(src_dir):
         raise Exception(f"'{src_dir}' is not directory.")
     
     # get the list of files in the directory
-    files = [f for f in os.listdir(src_dir) if os.path.isfile(os.path.join(src_dir, f))]
+    files = [os.path.join(src_dir, f) for f in os.listdir(src_dir) if os.path.isfile(os.path.join(src_dir, f))]
 
-    for file in files:
-        extract_file(os.path.join(src_dir, file))
+    return list(map(extract_file, files))
 
 def extract_file(file_path: str) -> Table:
     f = open(file_path, "r")
@@ -92,7 +92,7 @@ def extract_file(file_path: str) -> Table:
                   elif i == 0:
                       field.name = token
                   elif i == 1:
-                      field.type = token
+                      field.type = token.replace(",", "")
 
               # join comments
               comment_tokens: list[str] = []
@@ -115,7 +115,10 @@ def main():
     abs_src_dir = os.path.abspath(src_dir)
     abs_out_dir = os.path.abspath(out_dir)
 
-    extract_src(abs_src_dir)
+    tables = extract_src(abs_src_dir)
+
+    for table in tables:
+        print(table.to_d2_format())
 
 if __name__ == "__main__":
     main()
