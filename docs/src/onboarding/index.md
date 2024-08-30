@@ -49,7 +49,8 @@ environment.
 During a single run, the CI will go through multiple phases of discovery.
 In each of these discovery phases, a custom CLI provided by the `catalyst-ci` repository is executed.
 The CLI is responsible for recursively scanning the repository for `Earthfile`s and filtering them by target.
-The CLI will return a list of Earthfile path and a map where the key is the Earthfile path and the value is a list of filtered targets.
+The CLI will return a list of Earthfile path and a map where the key is the Earthfile path and
+the value is a list of filtered targets.
 For example, in the check phase of the CI, `check` and `check-*` will be executed.
 The wildcard `*` serves as a regular search term, representing one or more other characters.
 The output of the check phase may look like the following:
