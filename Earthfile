@@ -63,4 +63,4 @@ test:
 
     ENV GITHUB_TOKEN
 
-    echo "$GITHUB_TOKEN" | sha256sum
+    RUN echo "$GITHUB_TOKEN" | sha256sum
