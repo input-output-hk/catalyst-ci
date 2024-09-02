@@ -103,7 +103,11 @@ async function spawnCommand(
   token: string
 ): Promise<string> {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args)
+    const child = spawn(command, args, {
+      env: {
+        GITHUB_TOKEN: token
+      }
+    })
 
     let output = ''
 
