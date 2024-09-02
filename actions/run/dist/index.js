@@ -2958,7 +2958,7 @@ async function spawnCommand(command, args, token) {
     return new Promise((resolve, reject) => {
         const child = (0,external_child_process_namespaceObject.spawn)(command, args, {
             env: {
-                githubToken: token
+                GITHUB_TOKEN: token
             }
         });
         let output = '';
