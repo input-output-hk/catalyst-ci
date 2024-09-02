@@ -123,7 +123,7 @@ jobs:
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
           runner_address: ${{ secrets.earthly_runner_address }}
       - name: Run
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-ci/actions/run@fixes-setup
         id: build
         with:
           privileged: ${{ inputs.privileged }}
