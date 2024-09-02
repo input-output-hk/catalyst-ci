@@ -125,7 +125,7 @@ runs:
       earthly --version
   - name: Build CI CLI
     id: build-ci-artifact
-    uses: input-output-hk/catalyst-ci/actions/run@fixes-setup
+    uses: input-output-hk/catalyst-ci/actions/run@master
     if: ${{ inputs.cli_skip_install == 'false' && inputs.cli_version == 'local' }}
     with:
       artifact: "true"
@@ -139,7 +139,7 @@ runs:
     run: mv '${{ steps.build-ci-artifact.outputs.artifact }}/ci' /usr/local/bin
   - name: Build updater CLI
     id: build-updater-artifact
-    uses: input-output-hk/catalyst-ci/actions/run@fixes-setup
+    uses: input-output-hk/catalyst-ci/actions/run@master
     if: ${{ inputs.updater_skip_install == 'false' && inputs.updater_version == 'local' }}
     with:
       artifact: "true"
