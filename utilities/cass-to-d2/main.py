@@ -10,9 +10,16 @@ class Table:
         self.pk: list[str] = []
 
     def to_d2_format(self) -> str:
-        f_fields = []
+        # format tooltip
+        f_tooltip_lines: list[str] = []
+        if self.desc:
+            f_tooltip_lines.append(self.desc)
+
+        # format fields
+        f_field_lines: list[str] = []
         for field in self.fields:
           if field.is_only_comment():
+              f_tooltip_lines.append(f"-- {field.comment}")
               continue
 
           constraint_keys: list[str] = []
@@ -20,11 +27,17 @@ class Table:
           if field.name in self.pk:
               constraint_keys.append("P")
 
-          f_fields.append(field.to_d2_format(constraint_keys))
+          f_field_lines.append(field.to_d2_format(constraint_keys))
+          f_tooltip_lines.append(f"{field.name} -- {field.comment}")
 
         return "\n".join([
             self.name + ": {",
-            "\n".join(f_fields),
+            "\t\tshape: sql_table",
+            "\t\ttooltip: |md",
+            "\n\t\t\t\t".join(f_tooltip_lines),
+            "\t\t|",
+            "",
+            "\n".join(f_field_lines),
             "}"
         ])
 
