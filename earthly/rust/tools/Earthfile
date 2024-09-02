@@ -17,7 +17,7 @@ tool-cargo-machete:
 tool-refinery:
     FROM rust-ci+rust-base
     # --locked version is not compatible with the 1.80 rustc version
-    # because of the old `time` crate dependecy
+    # because of the old `time` crate dependency
     RUN cargo install refinery_cli --version=0.8.14
     SAVE ARTIFACT $CARGO_HOME/bin/refinery
 

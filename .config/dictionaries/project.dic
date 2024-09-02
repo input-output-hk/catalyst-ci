@@ -81,6 +81,7 @@ PYTHONDONTWRITEBYTECODE
 rankdir
 rivo
 runewidth
+rustc
 rustdoc
 rustdocflags
 rustflags
