@@ -3,6 +3,8 @@ import os
 import re
 
 class Table:
+    """ Represents a single table object, typically for a single CQL file. """
+
     def __init__(self, file_name: str) -> None:
         self.file_name = file_name
         self.name = ""
@@ -14,8 +16,7 @@ class Table:
         # format tooltip
         f_tooltip_lines: list[str] = []
         if self.desc:
-            f_tooltip_lines.append(f"\t\t-- {self.desc}")
-            f_tooltip_lines.append("\n")
+            f_tooltip_lines.append(f"-- {self.desc}\n")
 
         # format fields
         f_field_lines: list[str] = []
@@ -36,7 +37,7 @@ class Table:
             self.name + ": {",
             "\tshape: sql_table",
             "\ttooltip: |md",
-            "\n\t\t".join(f_tooltip_lines),
+            "\n".join([ f"\t\t{li}" for li in f_tooltip_lines ]),
             "\t|",
             "",
             "\n".join(f_field_lines),
@@ -44,6 +45,8 @@ class Table:
         ])
 
 class Field:
+    """ Represents a field inside a table. """
+
     def __init__(self) -> None:
         self.name = ""
         self.type = ""
@@ -57,21 +60,25 @@ class Field:
 
         return "\t" + self.name + f": {self.type}" + f_constraints
 
-def extract_src(src_dir: str) -> list[Table]:
+def parse_src(src_dir: str) -> list[Table]:
+    """ Reads the target directory and parses all the CQL files. """
+
     if not os.path.isdir(src_dir):
-        raise Exception(f"'{src_dir}' is not directory.")
+        raise Exception(f"'{src_dir}' is not a directory.")
     
-    # get the list of files in the directory
-    files = [os.path.join(src_dir, f) for f in os.listdir(src_dir) if os.path.isfile(os.path.join(src_dir, f))]
+    return [
+        parse_file(os.path.join(src_dir, f))
+        for f in os.listdir(src_dir)
+        if os.path.isfile(os.path.join(src_dir, f)) and f.endswith(".cql")
+    ]
 
-    return list(map(extract_file, files))
-
-def extract_file(file_path: str) -> Table:
-    f = open(file_path, "r")
-    lines = f.readlines()
+def parse_file(file_path: str) -> Table:
+    """ Reads a CQL file and parses the file. """
 
     table = Table(extract_filename_without_ext(file_path))
 
+    f = open(file_path, "r")
+    lines = f.readlines()
     for line in lines:
         if line.strip() == "":
             continue
@@ -141,7 +148,7 @@ def main():
     abs_src_dir = os.path.abspath(src_dir)
     abs_out_dir = os.path.abspath(out_dir)
 
-    tables = extract_src(abs_src_dir)
+    tables = parse_src(abs_src_dir)
 
     for table in tables:
         write_to_file(abs_out_dir, table.file_name, table.to_d2_format())
