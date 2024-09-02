@@ -1,6 +1,7 @@
 import sys
 import os
 import re
+from pathlib import Path
 
 class Table:
     """ Represents a single table object, typically for a single CQL file. """
@@ -28,7 +29,7 @@ class Table:
           constraint_keys: list[str] = []
 
           if field.name in self.pk:
-              constraint_keys.append("PK")
+              constraint_keys.append("K")
 
           f_field_lines.append(field.to_d2_format(constraint_keys))
           f_tooltip_lines.append(f"{field.name} -- {field.comment}")
@@ -134,9 +135,9 @@ def extract_filename_without_ext(path: str) -> str:
     return file_name
 
 def write_to_file(dir_path: str, file_name: str, content: str):
-    os.makedirs(os.path.dirname(dir_path), exist_ok=True)
+    Path(dir_path).mkdir(parents=True, exist_ok=True)
     
-    with open(f"{dir_path}/{file_name}.txt", "w") as file:
+    with open(f"{dir_path}/{file_name}.d2", "w") as file:
         file.write(content)
 
 def main():
