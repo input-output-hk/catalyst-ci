@@ -9,7 +9,7 @@ IMPORT ./earthly/spectral AS spectral-ci
 
 
 # check-markdown can be done remotely.
-check-markdown: 
+check-markdown:
     DO ./earthly/mdlint+CHECK
 
 # markdown-check-fix perform markdown check with fix in this repo.
@@ -54,6 +54,13 @@ edit-docs:
     RUN ./earthly/docs/dev/local.py cat-ci-docs:latest
 
 # check-lint-openapi - OpenAPI linting from a given directory
-check-lint-openapi: 
+check-lint-openapi:
     FROM spectral-ci+spectral-base
     DO spectral-ci+BUILD_SPECTRAL --dir="./examples/openapi" --file_type="json"
+
+test:
+    FROM ubuntu:latest
+
+    ENV GITHUB_TOKEN
+
+    echo "$GITHUB_TOKEN" | sha256sum
