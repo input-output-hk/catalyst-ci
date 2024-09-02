@@ -13,7 +13,7 @@ CARGO_BINSTALL_INSTALL:
     ELSE IF [ "$TARGETARCH" = "arm64" ]
         LET image = "https://github.com/cargo-bins/cargo-binstall/releases/download/v$version/cargo-binstall-aarch64-unknown-linux-musl.full.tgz"
     ELSE
-        RUN --no-cache echo "Unsupported Platform $TARGETARCH"; exit 1 
+        RUN --no-cache echo "Unsupported Platform $TARGETARCH"; exit 1
     END
 
     RUN wget -qO - $image | tar -xz -C /tmp; \
@@ -24,30 +24,37 @@ CARGO_BINSTALL_INSTALL:
 # Note, TOOLS do not benefit from the CARGO caching, and pollute it, so build without it.
 tool-cargo-nextest:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall cargo-nextest --version=0.9.72 --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall cargo-nextest --version=0.9.72 --locked --no-confirm; \
         cargo-nextest --version
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-nextest
 
 tool-cargo-machete:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall cargo-machete --version=0.6.2 --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall cargo-machete --version=0.6.2 --locked --no-confirm; \
         cargo-machete --version
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-machete
 
 tool-refinery:
     FROM rust-ci+rust-base
 
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall refinery_cli --version=0.8.14 --locked --no-confirm; \
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall refinery_cli --version=0.8.14 --locked --no-confirm; \
         refinery --version
     SAVE ARTIFACT $CARGO_HOME/bin/refinery
 
 tool-cargo-deny:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall cargo-deny --version=0.14.24 --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall cargo-deny --version=0.14.24 --locked --no-confirm; \
         cargo-deny --version
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-deny
 
@@ -60,50 +67,64 @@ tool-cargo-modules:
 
 tool-cargo-depgraph:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall cargo-depgraph --version=1.6.0 --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall cargo-depgraph --version=1.6.0 --locked --no-confirm; \
         cargo-depgraph --version
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-depgraph
 
 tool-cargo-llvm-cov:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall cargo-llvm-cov --version=0.6.11 --locked --no-confirm
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall cargo-llvm-cov --version=0.6.11 --locked --no-confirm
         # no immediate test
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-llvm-cov
 
 tool-wasm-tools:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall wasm-tools --version=1.214.0 --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall wasm-tools --version=1.214.0 --locked --no-confirm; \
         wasm-tools --version
     SAVE ARTIFACT $CARGO_HOME/bin/wasm-tools
 
 tool-cargo-expand:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall cargo-expand --version=1.0.88 --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall cargo-expand --version=1.0.88 --locked --no-confirm; \
         cargo-expand --version
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-expand
 
 tool-wit-bindgen:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall wit-bindgen-cli --version=0.28.0  --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall wit-bindgen-cli --version=0.28.0  --locked --no-confirm; \
         wit-bindgen -V
     SAVE ARTIFACT $CARGO_HOME/bin/wit-bindgen
 
 # We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
 tool-cargo-sweep:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall cargo-sweep --version=0.7.0 --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall cargo-sweep --version=0.7.0 --locked --no-confirm; \
         cargo-sweep --version
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-sweep
 
 tool-cargo-component:
     FROM rust-ci+rust-base
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-        cargo binstall cargo-component --version=0.14.0 --locked --no-confirm; \
+
+    ENV GITHUB_TOKEN
+
+    RUN cargo binstall cargo-component --version=0.14.0 --locked --no-confirm; \
         cargo-component --version
     SAVE ARTIFACT $CARGO_HOME/bin/cargo-component
