@@ -31,6 +31,8 @@ export async function run(): Promise<void> {
     args.push('--platform', platform)
   }
 
+  args.push('--secret', 'GITHUB_TOKEN')
+
   if (flags) {
     args.push(...flags.split(' '))
   }

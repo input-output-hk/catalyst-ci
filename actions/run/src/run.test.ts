@@ -34,7 +34,7 @@ describe('Run Action', () => {
         runnerPort: '',
         targets: 'target',
         targetFlags: '--flag1 test -f2 test2',
-        command: [['./earthfile+target', '--flag1', 'test', '-f2', 'test2']],
+        command: [['--secret', 'GITHUB_TOKEN', './earthfile+target', '--flag1', 'test', '-f2', 'test2']],
         imageOutput: '',
         artifactOutput: ''
       },
@@ -51,7 +51,7 @@ describe('Run Action', () => {
         runnerPort: '',
         targets: 'target',
         targetFlags: '',
-        command: [['--test', '--artifact', './earthfile+target/', 'out']],
+        command: [['--secret', 'GITHUB_TOKEN', '--test', '--artifact', './earthfile+target/', 'out']],
         imageOutput: '',
         artifactOutput: 'earthfile/out'
       },
@@ -69,7 +69,7 @@ describe('Run Action', () => {
         targets: 'target',
         targetFlags: '',
         command: [
-          ['--buildkit-host', 'tcp://localhost:8372', './earthfile+target']
+          ['--buildkit-host', 'tcp://localhost:8372','--secret', 'GITHUB_TOKEN', './earthfile+target']
         ],
         imageOutput: '',
         artifactOutput: ''
@@ -92,6 +92,8 @@ describe('Run Action', () => {
             '-P',
             '--platform',
             'linux/amd64',
+            '--secret',
+            'GITHUB_TOKEN',
             '--flag1',
             'test',
             '-f2',
@@ -116,8 +118,8 @@ describe('Run Action', () => {
         targets: 'target target-test',
         targetFlags: '',
         command: [
-          ['-P', '--platform', 'linux/amd64', './targets/earthfile+target'],
-          ['-P', '--platform', 'linux/amd64', './targets/earthfile+target-test']
+          ['-P', '--platform', 'linux/amd64','--secret', 'GITHUB_TOKEN', './targets/earthfile+target'],
+          ['-P', '--platform', 'linux/amd64','--secret', 'GITHUB_TOKEN', './targets/earthfile+target-test']
         ],
         imageOutput: '',
         artifactOutput: ''

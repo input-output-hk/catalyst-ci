@@ -2900,6 +2900,7 @@ async function run() {
     if (platform) {
         args.push('--platform', platform);
     }
+    args.push('--secret', 'GITHUB_TOKEN');
     if (flags) {
         args.push(...flags.split(' '));
     }
