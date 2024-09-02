@@ -15,10 +15,6 @@ inputs:
   flags:
     description: Additional flags to pass to the Earthly CLI
     required: false
-  github_token:
-    description: The GitHub token given to the runner
-    required: false
-    default: ${{ github.token }}
   platform:
     description: The platform to execute the earthfile target with (defaults to native)
     required: false
