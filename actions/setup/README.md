@@ -19,7 +19,7 @@ To see a full demonstration of this action, see the [release workflow](../../.gi
 
 ```yaml
 - name: Setup CI
-  uses: input-output-hk/catalyst-ci/actions/setup@expose-github-token-secret
+  uses: input-output-hk/catalyst-ci/actions/setup@master
   with:
     aws_ecr_registry: 1234567890.dkr.ecr.us-east-1.amazonaws.com
     aws_role_arn: arn:aws:iam::1234567890:role/github
