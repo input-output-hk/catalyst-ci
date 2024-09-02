@@ -122,7 +122,7 @@ runs:
   - name: Testing
     shell: bash
     run: |
-      command -v earthly
+      earthly --version
   - name: Build CI CLI
     id: build-ci-artifact
     uses: input-output-hk/catalyst-ci/actions/run@master
