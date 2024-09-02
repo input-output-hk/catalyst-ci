@@ -192,7 +192,7 @@ describe('Run Action', () => {
         command.map(cmd => {
           expect(spawn).toHaveBeenCalledWith('earthly', cmd, {
             env: {
-              GITHUB_TOKEN: github_token,
+              GITHUB_TOKEN: github_token
             }
           })
         })

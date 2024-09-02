@@ -97,11 +97,15 @@ function parseImage(output: string): string {
   return ''
 }
 
-async function spawnCommand(command: string, args: string[], token: string): Promise<string> {
+async function spawnCommand(
+  command: string,
+  args: string[],
+  token: string
+): Promise<string> {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       env: {
-        GITHUB_TOKEN: token,
+        GITHUB_TOKEN: token
       }
     })
 
