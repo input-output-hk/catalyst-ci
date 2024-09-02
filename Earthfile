@@ -57,10 +57,3 @@ edit-docs:
 check-lint-openapi:
     FROM spectral-ci+spectral-base
     DO spectral-ci+BUILD_SPECTRAL --dir="./examples/openapi" --file_type="json"
-
-test:
-    FROM ubuntu:latest
-
-    ENV GITHUB_TOKEN
-
-    RUN echo "$GITHUB_TOKEN" | sha256sum
