@@ -26,6 +26,7 @@ describe('Run Action', () => {
         artifactPath: '',
         earthfile: './earthfile',
         flags: '',
+        githubToken: 'token',
         platform: '',
         privileged: '',
         output: '',
@@ -42,6 +43,7 @@ describe('Run Action', () => {
         artifactPath: 'out',
         earthfile: './earthfile',
         flags: '--test',
+        githubToken: 'token',
         platform: '',
         privileged: '',
         output: 'Artifact +target/artifact output as out\n',
@@ -58,6 +60,7 @@ describe('Run Action', () => {
         artifactPath: '',
         earthfile: './earthfile',
         flags: '',
+        githubToken: 'token',
         platform: '',
         privileged: '',
         output: '',
@@ -76,6 +79,7 @@ describe('Run Action', () => {
         artifactPath: '',
         earthfile: './earthfile',
         flags: '--flag1 test -f2 test2',
+        githubToken: 'token',
         platform: 'linux/amd64',
         privileged: 'true',
         output: 'Image +docker output as image1:tag1\n',
@@ -103,6 +107,7 @@ describe('Run Action', () => {
         artifactPath: '',
         earthfile: './targets/earthfile',
         flags: '',
+        githubToken: 'token',
         platform: 'linux/amd64',
         privileged: 'true',
         output: '',
@@ -124,6 +129,7 @@ describe('Run Action', () => {
         artifactPath,
         earthfile,
         flags,
+        githubToken,
         platform,
         privileged,
         output,
@@ -145,6 +151,8 @@ describe('Run Action', () => {
               return earthfile
             case 'flags':
               return flags
+            case 'githubToken':
+              return githubToken
             case 'platform':
               return platform
             case 'privileged':
@@ -182,7 +190,12 @@ describe('Run Action', () => {
 
         expect(spawn).toHaveBeenCalledTimes(command.length)
         command.map(cmd => {
-          expect(spawn).toHaveBeenCalledWith('earthly', cmd)
+          expect(spawn).toHaveBeenCalledWith('earthly', cmd, {
+            env: {
+              ...process.env,
+              GITHUB_TOKEN: githubToken
+            }
+          })
         })
         expect(stdoutSpy).toHaveBeenCalledWith('stdout')
         expect(stderrSpy).toHaveBeenCalledWith(output)
