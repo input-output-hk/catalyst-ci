@@ -141,6 +141,7 @@ runs:
       artifact: "true"
       artifact_path: "tmp"
       earthfile: ./tools/updater
+      gitub_token: ${{ github.token }}
       targets: release
       runner_address: ${{ inputs.runner_address }}
   - name: Move updater CLI
