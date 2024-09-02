@@ -119,10 +119,6 @@ runs:
     if: ${{ inputs.earthly_runner_secret != '' && inputs.earthly_skip_install != 'true' }}
     with:
       secret: ${{ inputs.earthly_runner_secret }}
-  - name: Testing
-    shell: bash
-    run: |
-      earthly --version
   - name: Build CI CLI
     id: build-ci-artifact
     uses: input-output-hk/catalyst-ci/actions/run@master
