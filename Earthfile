@@ -61,4 +61,4 @@ check-lint-openapi:
 test:
     FROM ubuntu:latest
 
-    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN echo "$GIHUB_TOKEN" | sha256sum
+    RUN --secret GITHUB_TOKEN=GITHUB_TOKEN echo "$GITHUB_TOKEN" | sha256sum
