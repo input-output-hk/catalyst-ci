@@ -7,6 +7,7 @@ export async function run(): Promise<void> {
   const artifactPath = core.getInput('artifact_path')
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
+  const githubToken = core.getInput('githubToken')
   const platform = core.getInput('platform')
   const privileged = core.getBooleanInput('privileged')
   const runnerAddress = core.getInput('runner_address')
@@ -61,7 +62,7 @@ export async function run(): Promise<void> {
     }
 
     core.info(`Running command: ${command} ${argsSpawn.join(' ')}`)
-    const output = await spawnCommand(command, argsSpawn)
+    const output = await spawnCommand(command, argsSpawn, githubToken)
     const imageOutput = parseImage(output)
     if (imageOutput) {
       core.info(`Found image: ${imageOutput}`)
@@ -96,9 +97,17 @@ function parseImage(output: string): string {
   return ''
 }
 
-async function spawnCommand(command: string, args: string[]): Promise<string> {
+async function spawnCommand(
+  command: string,
+  args: string[],
+  token: string
+): Promise<string> {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args)
+    const child = spawn(command, args, {
+      env: {
+        GITHUB_TOKEN: token
+      }
+    })
 
     let output = ''
 

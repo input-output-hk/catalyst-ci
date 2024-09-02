@@ -36,8 +36,9 @@ build-web:
 
     ARG WORKDIR=/frontend
     ARG --required TARGET
+    ARG --required SENTRY_DSN
 
-    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET
+    DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET --SENTRY_DSN=$SENTRY_DSN
 
 # Check the licenses of the Flutter dependencies.
 check-license:
