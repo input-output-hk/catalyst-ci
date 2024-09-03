@@ -2881,6 +2881,7 @@ async function run() {
     const artifactPath = core.getInput('artifact_path');
     const earthfile = core.getInput('earthfile');
     const flags = core.getInput('flags');
+    const githubToken = core.getInput('githubToken');
     const platform = core.getInput('platform');
     const privileged = core.getBooleanInput('privileged');
     const runnerAddress = core.getInput('runner_address');
@@ -2899,6 +2900,7 @@ async function run() {
     if (platform) {
         args.push('--platform', platform);
     }
+    args.push('--secret', 'GITHUB_TOKEN');
     if (flags) {
         args.push(...flags.split(' '));
     }
@@ -2924,7 +2926,7 @@ async function run() {
             argsSpawn.push(...targetFlags.split(' '));
         }
         core.info(`Running command: ${command} ${argsSpawn.join(' ')}`);
-        const output = await spawnCommand(command, argsSpawn);
+        const output = await spawnCommand(command, argsSpawn, githubToken);
         const imageOutput = parseImage(output);
         if (imageOutput) {
             core.info(`Found image: ${imageOutput}`);
@@ -2953,9 +2955,14 @@ function parseImage(output) {
     }
     return '';
 }
-async function spawnCommand(command, args) {
+async function spawnCommand(command, args, token) {
     return new Promise((resolve, reject) => {
-        const child = (0,external_child_process_namespaceObject.spawn)(command, args);
+        const child = (0,external_child_process_namespaceObject.spawn)(command, args, {
+            env: {
+                ...process.env,
+                GITHUB_TOKEN: token
+            }
+        });
         let output = '';
         child.stdout.on('data', (data) => {
             process.stdout.write(data);

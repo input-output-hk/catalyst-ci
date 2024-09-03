@@ -162,14 +162,16 @@ UNIT_TESTS:
 BUILD_WEB:
     FUNCTION
 
-    ARG WORKDIR
-    ARG SAVE_LOCALLY=false
     ARG --required TARGET
+    ARG BUILD_MODE='--release'
+    ARG SAVE_LOCALLY=false
+    ARG SENTRY_DSN
+    ARG WORKDIR
 
     WORKDIR $WORKDIR
     RUN flutter clean
     RUN flutter pub get
-    RUN flutter build web --web-renderer canvaskit --release --target $TARGET
+    RUN flutter build web --web-renderer canvaskit $BUILD_MODE --target $TARGET --dart-define SENTRY_DSN=$SENTRY_DSN
 
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]

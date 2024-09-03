@@ -54,11 +54,11 @@ runs:
           EARTHLY_FLAGS=()
           TARGET_FLAGS=()
 
-          if [[ -n "${{ inputs.earthly_satellite}}" ]]; then
+          if [[ -n "${{ inputs.earthly_satellite }}" ]]; then
             EARTHLY_FLAGS+=("--buildkit-host" "tcp://${{ inputs.earthly_satellite }}:8372")
           fi
 
-          if [[ -n "${{ inputs.github_token}}" ]]; then
+          if [[ -n "${{ inputs.github_token }}" ]]; then
             EARTHLY_FLAGS+=("--secret" "GITHUB_TOKEN=${{ inputs.github_token }}")
           fi
 
