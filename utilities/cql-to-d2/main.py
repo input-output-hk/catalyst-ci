@@ -7,7 +7,7 @@ from pathlib import Path
 class Table:
     """Represents a single table object, typically for a single CQL file."""
 
-    def __init__(self, file_name: str) -> None:
+    def __init__(self, file_name: str):
         self.file_name = file_name
         self.name = ""
         self.desc = ""
