@@ -159,9 +159,7 @@ def write_to_file(dir_path: str, file_name: str, content: str):
 
 def main():
     if len(sys.argv) != 3:
-        raise Exception(
-            "Requires two arguments to execute <src-dir> and <out-dir>."
-        )
+        raise Exception("Requires <src-dir> and <out-dir> to execute.")
 
     [_, src_dir, out_dir] = sys.argv
 
