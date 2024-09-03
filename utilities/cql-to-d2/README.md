@@ -2,13 +2,13 @@
 
 Converts Cassandra schemas to D2 diagram entity `sql_table`.
 
-### How to use it
+## How to use it
 
 ```bash
 python3 main.py <input-dir> <output-dir>
 ```
 
-### A valid CQL file
+## A valid CQL file
 
 * Make sure that a CQL file is fundamentally syntactically correct.
 * One table per one CQL file.
