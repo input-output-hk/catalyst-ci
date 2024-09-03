@@ -13,7 +13,7 @@ wasm-c-base:
         apk add --no-cache \
             py3-rich \
             clang=17.0.6-r1 \
-            lld=17.0.6-r1 \
+            lld=17.0.6-r0 \
             wasi-sdk=21-r0
 
     COPY rust-tools+tool-wasm-tools/wasm-tools /bin
