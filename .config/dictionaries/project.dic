@@ -21,6 +21,7 @@ edgedriver
 Edgedriver
 errchkjson
 extldflags
+findutils
 fira
 fmtchk
 fmtfix
