@@ -1,6 +1,6 @@
-import sys
 import os
 import re
+import sys
 from pathlib import Path
 
 
@@ -88,7 +88,7 @@ def parse_file(file_path: str) -> Table:
 
     table = Table(extract_filename_without_ext(file_path))
 
-    f = open(file_path, "r")
+    f = open(file_path)
     lines = f.readlines()
     for line in lines:
         if line.strip() == "":
@@ -133,7 +133,7 @@ def parse_file(file_path: str) -> Table:
 
                 # join comments
                 comment_tokens: list[str] = []
-                if comment_idx != None:
+                if comment_idx is not None:
                     comment_tokens = tokens[(comment_idx + 1) :]
 
                 field.comment = " ".join(comment_tokens)
@@ -160,7 +160,7 @@ def write_to_file(dir_path: str, file_name: str, content: str):
 def main():
     if len(sys.argv) != 3:
         raise Exception(
-            "The command requires two arguments to execute <src-dir> and <out-dir>."
+            "Requires two arguments to execute <src-dir> and <out-dir>."
         )
 
     [_, src_dir, out_dir] = sys.argv
