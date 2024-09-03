@@ -12,9 +12,9 @@ wasm-c-base:
     RUN apk update && \
         apk add --no-cache \
             py3-rich \
-            clang=17.0.5-r0 \
-            lld=17.0.5-r0 \
-            wasi-sdk=20-r3
+            clang=17.0.6-r1 \
+            lld=17.0.6-r1 \
+            wasi-sdk=21-r0
 
     COPY rust-tools+tool-wasm-tools/wasm-tools /bin
     COPY rust-tools+tool-wit-bindgen/wit-bindgen /bin
