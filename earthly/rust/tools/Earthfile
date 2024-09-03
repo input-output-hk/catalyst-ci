@@ -79,3 +79,6 @@ tool-cargo-sweep:
 
 tool-cargo-component:
     DO +CARGO_BINSTALL --package=cargo-component --version=0.15.0
+
+tool-wasm-pack:
+    DO +CARGO_BINSTALL --package=wasm-pack --version=0.13.0
