@@ -88,58 +88,58 @@ def parse_file(file_path: str) -> Table:
 
     table = Table(extract_filename_without_ext(file_path))
 
-    f = open(file_path)
-    lines = f.readlines()
-    for line in lines:
-        if line.strip() == "":
-            continue
-
-        # table description
-        if table.name == "" and line.startswith("--"):
-            table.desc += (
-                table.desc
-                + ("" if table.desc == "" else " ")
-                + line[2:].strip()
-            )
-        # table name
-        elif table.name == "" and "CREATE TABLE" in line:
-            tokens = [x for x in re.split(r"\s+", line) if x]
-            table.name = tokens[-2]
-        # table fields
-        elif table.name != "" and not line.startswith(")"):
-            tokens = re.split(r"\s+", line.strip())
-
-            if len(tokens) == 0:
+    with open(file_path) as f:
+        lines = f.readlines()
+        for line in lines:
+            if line.strip() == "":
                 continue
 
-            if tokens[0] == "PRIMARY":
-                matches = re.findall(r"\((.*?)\)", line.strip())
-                indexed_names = re.split(r",\s*", matches[0])
+            # table description
+            if table.name == "" and line.startswith("--"):
+                table.desc += (
+                    table.desc
+                    + ("" if table.desc == "" else " ")
+                    + line[2:].strip()
+                )
+            # table name
+            elif table.name == "" and "CREATE TABLE" in line:
+                tokens = [x for x in re.split(r"\s+", line) if x]
+                table.name = tokens[-2]
+            # table fields
+            elif table.name != "" and not line.startswith(")"):
+                tokens = re.split(r"\s+", line.strip())
 
-                table.pk = indexed_names
-            else:
-                field = Field()
+                if len(tokens) == 0:
+                    continue
 
-                # get field name and type
-                comment_idx: None | int = None
-                for i, token in enumerate(tokens):
-                    if token == "--":
-                        comment_idx = i
-                        break
-                    elif i == 0:
-                        field.name = token
-                    elif i == 1:
-                        field.type = token.replace(",", "")
+                if tokens[0] == "PRIMARY":
+                    matches = re.findall(r"\((.*?)\)", line.strip())
+                    indexed_names = re.split(r",\s*", matches[0])
 
-                # join comments
-                comment_tokens: list[str] = []
-                if comment_idx is not None:
-                    comment_tokens = tokens[(comment_idx + 1) :]
+                    table.pk = indexed_names
+                else:
+                    field = Field()
 
-                field.comment = " ".join(comment_tokens)
+                    # get field name and type
+                    comment_idx: None | int = None
+                    for i, token in enumerate(tokens):
+                        if token == "--":
+                            comment_idx = i
+                            break
+                        elif i == 0:
+                            field.name = token
+                        elif i == 1:
+                            field.type = token.replace(",", "")
 
-                # add to table
-                table.fields.append(field)
+                    # join comments
+                    comment_tokens: list[str] = []
+                    if comment_idx is not None:
+                        comment_tokens = tokens[(comment_idx + 1) :]
+
+                    field.comment = " ".join(comment_tokens)
+
+                    # add to table
+                    table.fields.append(field)
 
     return table
 
