@@ -6,7 +6,7 @@ IMPORT ../../utilities/scripts AS scripts
 # cspell: words libgcc ruff
 
 python-base:
-    FROM python:3.12-alpine3.19
+    FROM python:3.12-alpine3.20
 
     # Install necessary packages 
     RUN apk add --no-cache \

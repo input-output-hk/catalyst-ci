@@ -29,7 +29,7 @@ rust-base:
     # This is our base Host toolset, and rustup.
     # Never use `rust-toolchain.toml` in CI as it breaks builds.
     # The only toolchain supported is the one installed here.
-    FROM rust:1.78-alpine3.19
+    FROM rust:1.80.0-slim-bookworm
 
     WORKDIR /root
 
@@ -41,24 +41,26 @@ rust-base:
     #
     # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
     #       if that crate is removed, these dependencies can also be removed.
-    RUN apk add --no-cache \
-            build-base \
-            mold \
-            clang \
-            py3-pip \
-            py3-rich \
-            py3-psycopg \
-            ripgrep \
-            bash \
-            colordiff \
-            graphviz \
-            fontconfig \
-            ttf-liberation \
-            findutils \
-            pkgconfig \
-            openssl-dev \
-            openssl-libs-static \
-            cmake
+    RUN apt-get update && apt-get install -y \
+        bash \
+        build-essential \
+        clang \
+        cmake \
+        colordiff \
+        findutils \
+        fontconfig \
+        fonts-liberation2        \
+        graphviz \
+        libssl-dev \
+        mold \
+        openssl \
+        pkgconf \
+        python3-pip \
+        python3-rich \
+        python3-psycopg \
+        ripgrep \
+        wget \
+        && rm -rf /var/lib/apt/lists/*
 
     # Fix up font cache.
     RUN fc-cache -f
@@ -77,10 +79,18 @@ rust-base:
 
     # Ensure we have all the necessary targets
     RUN rustup target add wasm32-unknown-unknown
-    RUN rustup target add wasm32-wasip1 # wasm32-wasip2 not yet available
+    RUN rustup target add wasm32-wasip1
+    # RUN rustup target add wasm32-wasip2 # wasm32-wasip2 not yet available in stable
 
     RUN rustup target add wasm32-unknown-unknown --toolchain nightly
-    RUN rustup target add wasm32-wasip1 --toolchain nightly # wasm32-wasip2 not yet available
+    RUN rustup target add wasm32-wasip1 --toolchain nightly 
+    RUN rustup target add wasm32-wasip2 --toolchain nightly
+
+    RUN echo $PATH
+    RUN echo $CARGO_HOME
+ 
+    # Install cargo-binstall so we can speed up tool installation.
+    DO rust-tools+CARGO_BINSTALL_INSTALL
 
     # CARGO_HOME, PATH and RUSTUP_HOME is already set by the base container.
     # Do not change them.
@@ -91,6 +101,7 @@ COPY_TOOL:
 
     ARG --required tool
     COPY rust-tools+tool-$tool/$tool $CARGO_HOME/bin/$tool
+
 
 # rust-base-plus-tools : Add all tools we use for rust builds to the base builder image.
 #   Not called directly, used by other targets.
@@ -109,6 +120,7 @@ rust-base-plus-tools:
     DO +COPY_TOOL --tool="wit-bindgen"
     DO +COPY_TOOL --tool="cargo-sweep"
     DO +COPY_TOOL --tool="cargo-component"
+    DO +COPY_TOOL --tool="wasm-pack"
 
 # installer - fully setup our Rust caching.
 installer:

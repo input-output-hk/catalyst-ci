@@ -86,7 +86,7 @@ jobs:
       json: ${{ steps.check.outputs.json }}
       paths: ${{ steps.check.outputs.paths }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:
@@ -136,7 +136,7 @@ jobs:
           echo "Found targets: $targets"
           targets_with_space=$(echo $targets | tr '\n' ' ')
           echo "targets=$targets_with_space" >> $GITHUB_OUTPUT
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
         with:

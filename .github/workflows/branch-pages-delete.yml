@@ -72,7 +72,7 @@ jobs:
           echo "Clean up for branch ${{ env.GIT_BRANCH }} at ${{ env.DEST_DIR_DOCS }} and ${{ env.DEST_DIR_TESTS }}"
 
       - name: Get current published documentation
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: gh-pages
 

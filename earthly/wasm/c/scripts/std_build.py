@@ -39,7 +39,8 @@ def clang_wasm_compile(results: exec_manager.Results, c_files: str):
     results.add(
         exec_manager.cli_run(
             " ".join([
-                "clang",
+                "/opt/wasi-sdk/bin/clang",
+                "--sysroot=/opt/wasi-sdk/share/wasi-sysroot",
                 bindings_src,
                 c_files,
                 "-Oz",

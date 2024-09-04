@@ -14,7 +14,7 @@ deps:
     # This is all the tooling needed to build the docs.
 
     # Install extra packages we will need to support plugins.
-    RUN apk add --no-cache \    
+    RUN apk add --no-cache \
         bash \
         graphviz \
         fontconfig \

@@ -29,7 +29,8 @@ CREATE USER :"dbUser" WITH PASSWORD :'dbUserPw'; -- noqa: PRS
 -- Privileges for this user/role.
 ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO public;
 
--- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS TO :"dbUser"; -- noqa: PRS
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS 
+-- TO :"dbUser"; -- noqa: PRS
 
 -- Create the database.
 CREATE DATABASE :"dbName" WITH OWNER :"dbUser"; -- noqa: PRS
