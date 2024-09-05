@@ -4,6 +4,10 @@ import sys
 from pathlib import Path
 
 
+RE_PARENS = r"\((.*?)\)"
+RE_COMMAS = r",\s*"
+RE_SPACES = r"\s+"
+
 class Table:
     """Represents a single table object, typically for a single CQL file."""
 
@@ -17,6 +21,14 @@ class Table:
         self.desc_keys: list[str] = []
         self.static_keys: list[str] = []
 
+    def alter_clustering_order(self, col_name: str, desc: bool):
+        if desc and col_name in self.asc_keys:
+            self.asc_keys.remove(col_name)
+            self.desc_keys.append(col_name)
+        if not desc and col_name in self.desc_keys:
+            self.desc_keys.remove(col_name)
+            self.asc_keys.append(col_name)
+            
     def to_d2_format(self) -> str:
         # format tooltip
         f_tooltip_lines: list[str] = []
@@ -110,22 +122,22 @@ def parse_file(file_path: str) -> Table:
                 )
             # table name
             elif table.name == "" and "CREATE TABLE" in line:
-                tokens = [x for x in re.split(r"\s+", line) if x]
+                tokens = [x for x in re.split(RE_SPACES, line) if x]
                 table.name = tokens[-2]
             # table fields
             elif table.name != "" and not line.startswith(")"):
-                tokens = re.split(r"\s+", line.strip())
+                tokens = re.split(RE_SPACES, line.strip())
 
                 if len(tokens) == 0:
                     continue
 
                 if tokens[0] == "PRIMARY":
-                    pk_str = re.findall(r"\((.*?)\)", line.strip())
-                    partition_key_str = re.findall(r"\((.*?)\)", pk_str[0])
-                    indexed_names = re.split(r",\s*", pk_str[0])
+                    pk_str = re.findall(RE_PARENS, line.strip())
+                    partition_key_str = re.findall(RE_PARENS, pk_str[0])
+                    indexed_names = re.split(RE_COMMAS, pk_str[0])
 
                     if len(partition_key_str):
-                        table.pk = re.split(r",\s*", partition_key_str[0])
+                        table.pk = re.split(RE_COMMAS, partition_key_str[0])
                         table.asc_keys = indexed_names[len(table.pk):]
                     else:
                         table.pk = indexed_names[0]
@@ -153,6 +165,20 @@ def parse_file(file_path: str) -> Table:
 
                     # add to table
                     table.fields.append(field)
+            # table options
+            elif table.name != "" and line.startswith(")"):
+                ordering_str: list[str] = re.findall(RE_PARENS, line.strip())
+
+                if len(ordering_str):
+                    ordering_items: list[str] = re.findall(RE_COMMAS, ordering_str[0]) if "," in ordering_str else ordering_str
+
+                    for item in ordering_items:
+                        [ col_name, ordering_type ] = re.split(RE_SPACES, item)
+
+                        if ordering_type == "ASC":
+                            table.alter_clustering_order(col_name, False)
+                        elif ordering_type == "DESC":
+                            table.alter_clustering_order(col_name, True)
 
     return table
 
