@@ -13,6 +13,9 @@ class Table:
         self.desc = ""
         self.fields: list[Field] = []
         self.pk: list[str] = []
+        self.asc_keys: list[str] = []
+        self.desc_keys: list[str] = []
+        self.static_keys: list[str] = []
 
     def to_d2_format(self) -> str:
         # format tooltip
@@ -31,6 +34,10 @@ class Table:
 
             if field.name in self.pk:
                 constraint_keys.append("K")
+            if field.name in self.asc_keys:
+                constraint_keys.append("P↑")
+            if field.name in self.desc_keys:
+                constraint_keys.append("P↓")
 
             f_field_lines.append(field.to_d2_format(constraint_keys))
             f_tooltip_lines.append(f"{field.name} -- {field.comment}")
@@ -113,10 +120,16 @@ def parse_file(file_path: str) -> Table:
                     continue
 
                 if tokens[0] == "PRIMARY":
-                    matches = re.findall(r"\((.*?)\)", line.strip())
-                    indexed_names = re.split(r",\s*", matches[0])
+                    pk_str = re.findall(r"\((.*?)\)", line.strip())
+                    partition_key_str = re.findall(r"\((.*?)\)", pk_str[0])
+                    indexed_names = re.split(r",\s*", pk_str[0])
 
-                    table.pk = indexed_names
+                    if len(partition_key_str):
+                        table.pk = re.split(r",\s*", partition_key_str[0])
+                        table.asc_keys = indexed_names[len(table.pk):]
+                    else:
+                        table.pk = indexed_names[0]
+                        table.asc_keys = indexed_names[1:]
                 else:
                     field = Field()
 

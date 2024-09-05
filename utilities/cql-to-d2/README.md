@@ -12,3 +12,4 @@ python3 main.py <input-dir> <output-dir>
 
 * Make sure that a CQL file is fundamentally syntactically correct.
 * One table per one CQL file.
+* items inside `PRIMARY KEY` must not empty.
