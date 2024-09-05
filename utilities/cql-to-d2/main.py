@@ -8,6 +8,7 @@ RE_PARENS = r"\((.*?)\)"
 RE_COMMAS = r",\s*"
 RE_SPACES = r"\s+"
 
+
 class Table:
     """Represents a single table object, typically for a single CQL file."""
 
@@ -28,7 +29,7 @@ class Table:
         if not desc and col_name in self.desc_keys:
             self.desc_keys.remove(col_name)
             self.asc_keys.append(col_name)
-            
+
     def to_d2_format(self) -> str:
         # format tooltip
         f_tooltip_lines: list[str] = []
@@ -138,7 +139,7 @@ def parse_file(file_path: str) -> Table:
 
                     if len(partition_key_str):
                         table.pk = re.split(RE_COMMAS, partition_key_str[0])
-                        table.asc_keys = indexed_names[len(table.pk):]
+                        table.asc_keys = indexed_names[len(table.pk) :]
                     else:
                         table.pk = indexed_names[0]
                         table.asc_keys = indexed_names[1:]
@@ -170,10 +171,14 @@ def parse_file(file_path: str) -> Table:
                 ordering_str: list[str] = re.findall(RE_PARENS, line.strip())
 
                 if len(ordering_str):
-                    ordering_items: list[str] = re.findall(RE_COMMAS, ordering_str[0]) if "," in ordering_str else ordering_str
+                    ordering_items: list[str] = (
+                        re.findall(RE_COMMAS, ordering_str[0])
+                        if "," in ordering_str
+                        else ordering_str
+                    )
 
                     for item in ordering_items:
-                        [ col_name, ordering_type ] = re.split(RE_SPACES, item)
+                        [col_name, ordering_type] = re.split(RE_SPACES, item)
 
                         if ordering_type == "ASC":
                             table.alter_clustering_order(col_name, False)
