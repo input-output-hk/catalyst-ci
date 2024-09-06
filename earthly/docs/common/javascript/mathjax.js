@@ -1,3 +1,5 @@
+// cspell: words arithmatex
+
 window.MathJax = {
     tex: {
       inlineMath: [ ["\\(","\\)"] ],

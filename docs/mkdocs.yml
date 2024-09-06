@@ -1,6 +1,6 @@
 INHERIT: std-theme.yml
 
-# cspell: words fontawesome
+# cspell: words fontawesome mathjax
 
 # Project Information
 site_name: Project Catalyst - CI Documentation
