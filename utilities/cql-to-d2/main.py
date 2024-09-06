@@ -2,12 +2,14 @@ import os
 import re
 import sys
 from pathlib import Path
+from enum import Enum
 
 
 RE_PARENS = r"\((.*?)\)"
 RE_COMMAS = r",\s*"
 RE_SPACES = r"\s+"
 
+DataContainerType = Enum("DataContainerType", ["NONE", "LIST", "MAP", "SET", "TUPLE", "UDT"])
 
 class Table:
     """Represents a single table object, typically for a single CQL file."""
@@ -75,6 +77,7 @@ class Field:
     def __init__(self) -> None:
         self.name = ""
         self.type = ""
+        self.container_type = DataContainerType.NONE
         self.comment = ""
 
     def is_only_comment(self):
@@ -171,11 +174,7 @@ def parse_file(file_path: str) -> Table:
                 ordering_str: list[str] = re.findall(RE_PARENS, line.strip())
 
                 if len(ordering_str):
-                    ordering_items: list[str] = (
-                        re.findall(RE_COMMAS, ordering_str[0])
-                        if "," in ordering_str
-                        else ordering_str
-                    )
+                    ordering_items: list[str] = re.split(RE_COMMAS, ordering_str[0])
 
                     for item in ordering_items:
                         [col_name, ordering_type] = re.split(RE_SPACES, item)

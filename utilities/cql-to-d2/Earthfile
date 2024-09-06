@@ -9,15 +9,9 @@ check:
 
     DO python-ci+CHECK
 
-# convert - converts cql files into d2 diagram entity files
-convert:
-    FROM python-ci+python-base
-
-    ARG --required input
-    ARG --required output
+src:
+    FROM scratch
 
     COPY . .
 
-    RUN python3 main.py $input $output
-
-    SAVE ARTIFACT $output
+    SAVE ARTIFACT main.py
