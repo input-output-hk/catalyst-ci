@@ -120,12 +120,14 @@ class Field:
             constraint_keys.append("++")
             self.types.append("bigint")
 
+        # format constraints
         f_constraints = (
             " {constraint: [" + "; ".join(constraint_keys) + "]}"
             if len(constraint_keys)
             else ""
         )
 
+        # check for udt
         if (
             len(self.types) == 1
             and self.container_type == DataContainerType.NONE
@@ -133,6 +135,7 @@ class Field:
         ):
             self.container_type = DataContainerType.UDT
 
+        # format col name according to its type container
         f_name = self.name
         if self.container_type == DataContainerType.LIST:
             f_name = f'"[{self.name}]"'
