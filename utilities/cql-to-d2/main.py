@@ -83,21 +83,20 @@ class Field:
         self.is_counter = False
 
     def is_only_comment(self):
-        return self.name == "" or len(self.types) == 0
+        return self.name == "" or (len(self.types) == 0 and self.is_counter == False)
 
     def to_d2_format(self, constraint_keys: list[str]) -> str:
         if self.is_static:
             constraint_keys.append("S")
         if self.is_counter:
             constraint_keys.append("++")
+            self.types.append("bigint")
 
         f_constraints = (
             " {constraint: [" + "; ".join(constraint_keys) + "]}"
             if len(constraint_keys)
             else ""
         )
-
-        # TODO: counter columns
 
         f_name = self.name
         if self.container_type == DataContainerType.LIST:
@@ -190,19 +189,22 @@ def parse_file(file_path: str) -> Table:
                         else:
                             type_tokens.append(token)
 
-                    # process type tokens
+                    # join type tokens
                     type_str = re.sub(r",$", "", " ".join(type_tokens))
                     generics_items: list[str] = re.findall(RE_GERERIC, type_str)
 
                     if type_str.endswith(" static"):
                         field.is_static = True
                         type_str = type_str.replace(" static", "")
+                    if type_str.startswith("counter"):
+                        field.is_counter = True
+                        type_str = type_str.replace("counter", "")
                         
                     if len(generics_items) > 0:
                         field.container_type = str_to_container_type(type_str.split("<")[0])
                         field.types = re.split(RE_COMMAS, generics_items[0])
                     else:
-                        field.types = [ type_str ]
+                        field.types = [] if type_str == "" else [ type_str ]
 
                     # join comments
                     comment_tokens: list[str] = []

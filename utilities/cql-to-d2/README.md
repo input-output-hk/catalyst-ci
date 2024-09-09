@@ -15,4 +15,5 @@ python3 main.py <input-dir> <output-dir>
 * Secondary index is not supported.
 * User defined type (UDT) is not supported.
 * One table per one CQL file.
-* items inside `PRIMARY KEY` must not empty.
+* Items inside `PRIMARY KEY` must not be empty.
+* In-line primary key is not supported.
