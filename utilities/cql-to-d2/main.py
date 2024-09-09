@@ -19,7 +19,7 @@ class Table:
         self.name = ""
         self.desc = ""
         self.fields: list[Field] = []
-        self.cluster_keys: list[str] = []
+        self.clustering_keys: list[str] = []
         self.asc_keys: list[str] = []
         self.desc_keys: list[str] = []
 
@@ -46,7 +46,7 @@ class Table:
 
             constraint_keys: list[str] = []
 
-            if field.name in self.cluster_keys:
+            if field.name in self.clustering_keys:
                 constraint_keys.append("K")
             if field.name in self.asc_keys:
                 constraint_keys.append("P↑")
@@ -146,10 +146,10 @@ def parse_file(file_path: str) -> Table:
                     indexed_names = re.split(RE_COMMAS, pk_str[0])
 
                     if len(partition_key_str):
-                        table.cluster_keys = re.split(RE_COMMAS, partition_key_str[0])
-                        table.asc_keys = indexed_names[len(table.cluster_keys) :]
+                        table.clustering_keys = re.split(RE_COMMAS, partition_key_str[0])
+                        table.asc_keys = indexed_names[len(table.clustering_keys) :]
                     else:
-                        table.cluster_keys = indexed_names[0]
+                        table.clustering_keys = indexed_names[0]
                         table.asc_keys = indexed_names[1:]
                 else:
                     field = Field()
