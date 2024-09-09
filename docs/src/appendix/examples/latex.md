@@ -1,10 +1,10 @@
 ---
-icon: material/functions
+icon: $\LaTeX{}$
 ---
 
 <!-- cspell: words infty -->
 
-# LaTex
+# LaTex formulas
 
 Simple formula as a separate block:
 \begin{equation}
