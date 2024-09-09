@@ -1,7 +1,3 @@
----
-icon: $\LaTeX{}$
----
-
 <!-- cspell: words infty -->
 
 # LaTex formulas
