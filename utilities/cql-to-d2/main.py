@@ -1,16 +1,18 @@
 import os
 import re
 import sys
-from pathlib import Path
 from enum import Enum
-
+from pathlib import Path
 
 RE_PARENS = r"\((.*?)\)"
 RE_GERERIC = r"<(.*)>"
 RE_COMMAS = r",\s*"
 RE_SPACES = r"\s+"
 
-DataContainerType = Enum("DataContainerType", ["NONE", "LIST", "MAP", "SET", "TUPLE", "UDT"])
+DataContainerType = Enum(
+    "DataContainerType", ["NONE", "LIST", "MAP", "SET", "TUPLE", "UDT"]
+)
+
 
 class Table:
     """Represents a single table object, typically for a single CQL file."""
@@ -85,7 +87,9 @@ class Field:
         self.is_counter = False
 
     def is_only_comment(self):
-        return self.name == "" or (len(self.types) == 0 and self.is_counter == False)
+        return self.name == "" or (
+            len(self.types) == 0 and not self.is_counter
+        )
 
     def to_d2_format(self, constraint_keys: list[str]) -> str:
         if self.is_static:
@@ -102,17 +106,18 @@ class Field:
 
         f_name = self.name
         if self.container_type == DataContainerType.LIST:
-            f_name = f"\"[{self.name}]\""
+            f_name = f'"[{self.name}]"'
         if self.container_type == DataContainerType.SET:
-            f_name = "\"{" + self.name + "}\""
+            f_name = '"{' + self.name + '}"'
         if self.container_type == DataContainerType.MAP:
-            f_name = f"\"<{self.name}>\""
+            f_name = f'"<{self.name}>"'
         if self.container_type == DataContainerType.TUPLE:
-            f_name = f"\"({self.name})\""
+            f_name = f'"({self.name})"'
         if self.container_type == DataContainerType.UDT:
-            f_name = f"\"*{self.name}*\""
+            f_name = f'"*{self.name}*"'
 
         return f"\t{f_name}: ({', '.join(self.types)})" + f_constraints
+
 
 def str_to_container_type(s: str) -> DataContainerType:
     try:
@@ -170,8 +175,12 @@ def parse_file(file_path: str) -> Table:
                     indexed_names = re.split(RE_COMMAS, pk_str[0])
 
                     if len(partition_key_str):
-                        table.clustering_keys = re.split(RE_COMMAS, partition_key_str[0])
-                        table.asc_keys = indexed_names[len(table.clustering_keys) :]
+                        table.clustering_keys = re.split(
+                            RE_COMMAS, partition_key_str[0]
+                        )
+                        table.asc_keys = indexed_names[
+                            len(table.clustering_keys) :
+                        ]
                     else:
                         table.clustering_keys = indexed_names[0]
                         table.asc_keys = indexed_names[1:]
@@ -193,7 +202,9 @@ def parse_file(file_path: str) -> Table:
 
                     # join type tokens
                     type_str = re.sub(r",$", "", " ".join(type_tokens))
-                    generics_items: list[str] = re.findall(RE_GERERIC, type_str)
+                    generics_items: list[str] = re.findall(
+                        RE_GERERIC, type_str
+                    )
 
                     if type_str.endswith(" static"):
                         field.is_static = True
@@ -201,12 +212,14 @@ def parse_file(file_path: str) -> Table:
                     if type_str.startswith("counter"):
                         field.is_counter = True
                         type_str = type_str.replace("counter", "")
-                        
+
                     if len(generics_items) > 0:
-                        field.container_type = str_to_container_type(type_str.split("<")[0])
+                        field.container_type = str_to_container_type(
+                            type_str.split("<")[0]
+                        )
                         field.types = re.split(RE_COMMAS, generics_items[0])
                     else:
-                        field.types = [] if type_str == "" else [ type_str ]
+                        field.types = [] if type_str == "" else [type_str]
 
                     # join comments
                     comment_tokens: list[str] = []
@@ -222,7 +235,9 @@ def parse_file(file_path: str) -> Table:
                 ordering_str: list[str] = re.findall(RE_PARENS, line.strip())
 
                 if len(ordering_str):
-                    ordering_items: list[str] = re.split(RE_COMMAS, ordering_str[0])
+                    ordering_items: list[str] = re.split(
+                        RE_COMMAS, ordering_str[0]
+                    )
 
                     for item in ordering_items:
                         [col_name, ordering_type] = re.split(RE_SPACES, item)
@@ -233,6 +248,7 @@ def parse_file(file_path: str) -> Table:
                             table.alter_clustering_order(col_name, True)
 
     return table
+
 
 def extract_filename_without_ext(path: str) -> str:
     base_name = os.path.basename(path)
