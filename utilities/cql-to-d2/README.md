@@ -12,5 +12,7 @@ python3 main.py <input-dir> <output-dir>
 
 * Make sure that a CQL file is fundamentally syntactically correct.
 * Only unquoted name is supported.
+* Secondary index is not supported.
+* User defined type (UDT) is not supported.
 * One table per one CQL file.
 * items inside `PRIMARY KEY` must not empty.

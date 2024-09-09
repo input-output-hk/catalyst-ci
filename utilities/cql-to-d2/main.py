@@ -6,6 +6,7 @@ from enum import Enum
 
 
 RE_PARENS = r"\((.*?)\)"
+RE_GERERIC = r"<(.*)>"
 RE_COMMAS = r",\s*"
 RE_SPACES = r"\s+"
 
@@ -75,27 +76,48 @@ class Field:
 
     def __init__(self) -> None:
         self.name = ""
-        self.type = ""
+        self.types: list[str] = []
         self.container_type = DataContainerType.NONE
         self.comment = ""
         self.is_static = False
+        self.is_counter = False
 
     def is_only_comment(self):
-        return self.name == "" or self.type == ""
+        return self.name == "" or len(self.types) == 0
 
-    def to_d2_format(self, constraint_keys: str) -> str:
+    def to_d2_format(self, constraint_keys: list[str]) -> str:
+        if self.is_static:
+            constraint_keys.append("S")
+        if self.is_counter:
+            constraint_keys.append("++")
+
         f_constraints = (
             " {constraint: [" + "; ".join(constraint_keys) + "]}"
             if len(constraint_keys)
             else ""
         )
 
-        return "\t" + self.name + f": {self.type}" + f_constraints
-    
-class FieldData:
-    def __init__(self) -> None:
-        self.container_type = DataContainerType.NONE
-        self.containing_types: list[FieldData] = []
+        # TODO: counter columns
+
+        f_name = self.name
+        if self.container_type == DataContainerType.LIST:
+            f_name = f"[{self.name}]"
+        if self.container_type == DataContainerType.SET:
+            f_name = "{" + self.name + "}"
+        if self.container_type == DataContainerType.MAP:
+            f_name = f"<{self.name}>"
+        if self.container_type == DataContainerType.TUPLE:
+            f_name = f"({self.name})"
+        if self.container_type == DataContainerType.UDT:
+            f_name = f"*{self.name}*"
+
+        return f"\t{f_name}: {', '.join(self.types)}" + f_constraints
+
+def str_to_container_type(s: str) -> DataContainerType:
+    try:
+        return DataContainerType[s.upper()]
+    except KeyError:
+        return DataContainerType.NONE
 
 
 def parse_src(src_dir: str) -> list[Table]:
@@ -133,13 +155,14 @@ def parse_file(file_path: str) -> Table:
             elif table.name == "" and "CREATE TABLE" in line:
                 tokens = [x for x in re.split(RE_SPACES, line) if x]
                 table.name = tokens[-2]
-            # table fields
+            # table body
             elif table.name != "" and not line.startswith(")"):
                 tokens = re.split(RE_SPACES, line.strip())
 
                 if len(tokens) == 0:
                     continue
 
+                # primary definition line
                 if tokens[0] == "PRIMARY":
                     pk_str = re.findall(RE_PARENS, line.strip())
                     partition_key_str = re.findall(RE_PARENS, pk_str[0])
@@ -151,19 +174,35 @@ def parse_file(file_path: str) -> Table:
                     else:
                         table.clustering_keys = indexed_names[0]
                         table.asc_keys = indexed_names[1:]
+                # data column definition line
                 else:
                     field = Field()
 
                     # get field name and type
                     comment_idx: None | int = None
+                    type_tokens: list[str] = []
                     for i, token in enumerate(tokens):
                         if token == "--":
                             comment_idx = i
                             break
                         elif i == 0:
                             field.name = token
-                        elif i == 1:
-                            field.type = token.replace(",", "")
+                        else:
+                            type_tokens.append(token)
+
+                    # process type tokens
+                    type_str = re.sub(r",$", "", " ".join(type_tokens))
+                    generics_items: list[str] = re.findall(RE_GERERIC, type_str)
+
+                    if type_str.endswith(" static"):
+                        field.is_static = True
+                        type_str = type_str.replace(" static", "")
+                        
+                    if len(generics_items) > 0:
+                        field.container_type = str_to_container_type(type_str.split("<")[0])
+                        field.types = re.split(RE_COMMAS, generics_items[0])
+                    else:
+                        field.types = [ type_str ]
 
                     # join comments
                     comment_tokens: list[str] = []
@@ -190,7 +229,6 @@ def parse_file(file_path: str) -> Table:
                             table.alter_clustering_order(col_name, True)
 
     return table
-
 
 def extract_filename_without_ext(path: str) -> str:
     base_name = os.path.basename(path)
