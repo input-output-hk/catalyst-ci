@@ -2,6 +2,8 @@
 icon: material/functions
 ---
 
+<!-- cspell: words infty -->
+
 # LaTex
 
 Simple formula as a separate block:
