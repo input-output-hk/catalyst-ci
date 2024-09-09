@@ -1,0 +1,26 @@
+VERSION 0.8
+
+IMPORT ../../utilities/cql-to-d2 AS cql-to-d2-utils
+
+scylladb-base:
+    FROM scylladb/scylla:6.1.1
+
+    WORKDIR /root
+
+    RUN apt-get update && apt-get install -y python3 pipx
+
+    RUN pipx ensurepath
+    RUN pipx install poetry
+
+# cql-to-d2 - converts cql files into d2 diagram entity files
+cql-to-d2:
+    FROM +scylladb-base
+
+    ARG --required input
+    ARG --required output
+
+    COPY cql-to-d2-utils+src/main.py .
+
+    RUN python3 main.py $input $output
+
+    SAVE ARTIFACT $output
