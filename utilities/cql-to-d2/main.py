@@ -22,7 +22,6 @@ class Table:
         self.pk: list[str] = []
         self.asc_keys: list[str] = []
         self.desc_keys: list[str] = []
-        self.static_keys: list[str] = []
 
     def alter_clustering_order(self, col_name: str, desc: bool):
         if desc and col_name in self.asc_keys:
@@ -79,6 +78,7 @@ class Field:
         self.type = ""
         self.container_type = DataContainerType.NONE
         self.comment = ""
+        self.is_static = False
 
     def is_only_comment(self):
         return self.name == "" or self.type == ""
@@ -91,6 +91,11 @@ class Field:
         )
 
         return "\t" + self.name + f": {self.type}" + f_constraints
+    
+class FieldData:
+    def __init__(self) -> None:
+        self.container_type = DataContainerType.NONE
+        self.containing_types: list[FieldData] = []
 
 
 def parse_src(src_dir: str) -> list[Table]:
