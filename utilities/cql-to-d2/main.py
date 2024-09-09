@@ -55,7 +55,9 @@ class Table:
                 constraint_keys.append("P↓")
 
             f_field_lines.append(field.to_d2_format(constraint_keys))
-            f_tooltip_lines.append(f"{field.name} -- {field.comment}")
+
+            if field.comment != "":
+                f_tooltip_lines.append(f"{field.name} -- {field.comment}")
 
         return "\n".join(
             [
@@ -100,17 +102,17 @@ class Field:
 
         f_name = self.name
         if self.container_type == DataContainerType.LIST:
-            f_name = f"[{self.name}]"
+            f_name = f"\"[{self.name}]\""
         if self.container_type == DataContainerType.SET:
-            f_name = "{" + self.name + "}"
+            f_name = "\"{" + self.name + "}\""
         if self.container_type == DataContainerType.MAP:
-            f_name = f"<{self.name}>"
+            f_name = f"\"<{self.name}>\""
         if self.container_type == DataContainerType.TUPLE:
-            f_name = f"({self.name})"
+            f_name = f"\"({self.name})\""
         if self.container_type == DataContainerType.UDT:
-            f_name = f"*{self.name}*"
+            f_name = f"\"*{self.name}*\""
 
-        return f"\t{f_name}: {', '.join(self.types)}" + f_constraints
+        return f"\t{f_name}: ({', '.join(self.types)})" + f_constraints
 
 def str_to_container_type(s: str) -> DataContainerType:
     try:
