@@ -9,6 +9,28 @@ RE_GERERIC = r"<(.*)>"
 RE_COMMAS = r",\s*"
 RE_SPACES = r"\s+"
 
+PRIMITIVE_TYPES = [
+    "ascii",
+    "bigint",
+    "blob",
+    "boolean",
+    "date",
+    "decimal",
+    "double",
+    "float",
+    "inet",
+    "int",
+    "smallint",
+    "text",
+    "time",
+    "timestamp",
+    "timeuuid",
+    "tinyint",
+    "uuid",
+    "varchar",
+    "varint",
+]
+
 DataContainerType = Enum(
     "DataContainerType", ["NONE", "LIST", "MAP", "SET", "TUPLE", "UDT"]
 )
@@ -103,6 +125,13 @@ class Field:
             if len(constraint_keys)
             else ""
         )
+
+        if (
+            len(self.types) == 1
+            and self.container_type == DataContainerType.NONE
+            and self.types[0] not in PRIMITIVE_TYPES
+        ):
+            self.container_type = DataContainerType.UDT
 
         f_name = self.name
         if self.container_type == DataContainerType.LIST:
