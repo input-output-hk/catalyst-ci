@@ -22,4 +22,5 @@ src:
 
     COPY . .
 
+    SAVE ARTIFACT tests
     SAVE ARTIFACT main.py

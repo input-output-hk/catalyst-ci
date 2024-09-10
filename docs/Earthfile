@@ -1,6 +1,7 @@
 VERSION 0.8
 
 IMPORT ../earthly/docs AS docs-ci
+IMPORT ../utilities/cql-to-d2 AS cql-to-d2-ci
 IMPORT .. AS cat-ci
 IMPORT ../examples/postgresql AS postgresql-ci
 
@@ -11,6 +12,10 @@ src:
 
     # Now copy into that any artifacts we pull from the builds.
     COPY --dir cat-ci+repo-docs/repo includes
+
+    # Copy D2 contents to display in the docs.
+    COPY cql-to-d2-ci+src/tests/input/test_1.cql src/appendix/examples/diagrams/sample_d2.cql
+    COPY cql-to-d2-ci+src/tests/expected_output/test_1.d2 src/appendix/examples/diagrams/sample_d2.d2
 
     # Copy docs we build in the postgres example.
     COPY --dir postgresql-ci+build/docs src/appendix/examples/built_docs/postgresql
