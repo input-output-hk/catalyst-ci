@@ -2,7 +2,7 @@
 icon: material/draw
 ---
 
-# Coverting CQL to D2
+# Converting CQL to D2
 
 This is the guide how to use the earthly target
 to convert a CQL schema file into D2 diagram entity.
