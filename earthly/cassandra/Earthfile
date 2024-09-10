@@ -1,3 +1,5 @@
+# cspell: words scylladb ensurepath
+
 VERSION 0.8
 
 IMPORT ../../utilities/cql-to-d2 AS cql-to-d2-utils
