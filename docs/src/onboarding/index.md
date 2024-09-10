@@ -12,16 +12,16 @@ that we use.
 
 <!-- markdownlint-disable max-one-sentence-per-line -->
 !!! Note
-    This section will talk about concepts related to [Earthly](https://earthly.dev).
+    This section will discuss concepts related to [Earthly](https://earthly.dev).
     If you are not familiar with Earthly, please head over [to the appendix](../appendix/earthly.md) to learn more about it before
     continuing.
 <!-- markdownlint-enable max-one-sentence-per-line -->
 
 The CI process works through a discovery mechanism that identifies `Earthfile`s in a repository and filters them by target.
 During every run, the CI will automatically discover and execute a select number of reserved targets.
-Each of these targets serves a single purpose and together they are responsible for executing the entire release process.
+Each of these targets serves a single purpose, and together they are responsible for executing the entire release process.
 
-The CI process is designed to be modular and reusable across a variety of different requirements.
+The CI process is designed to be modular and reusable across various different requirements.
 By default, if a specific target is not found in the discovery phase, it simply passes and moves on to the next one.
 This allows slowly building out a repository and only implementing the targets that make sense at that time.
 
@@ -29,12 +29,12 @@ The discovery and execution nature of the CI allows developers to contractually 
 happen to be working within.
 For example, a developer can introduce a new `Earthfile` into the `service-a` subdirectory of a mono-repo and begin using the
 reserved target names to interact with the CI.
-This promotes self-service and establishes a clear boundary of ownership whereby developers only need to be concerned about
+This promotes self-service and establishes a clear boundary of ownership, whereby developers only need to be concerned about
 maintaining a single file in their subproject.
 
-The CI process is well-documented and troubleshooting unexpected errors only requires knowledge of **Earthly**
+The CI process is well-documented, and troubleshooting unexpected errors only requires knowledge of **Earthly**
 and **GitHub Actions**.
-All of the code is contained in a single [open-source repository](https://github.com/input-output-hk/catalyst-ci) and contributions
+All the code is contained in a single [open-source repository](https://github.com/input-output-hk/catalyst-ci) and contributions
 are welcome.
 The remainder of the overview section will focus on discussing some of these concepts in more detail.
 
@@ -49,10 +49,11 @@ environment.
 During a single run, the CI will go through multiple phases of discovery.
 In each of these discovery phases, a custom CLI provided by the `catalyst-ci` repository is executed.
 The CLI is responsible for recursively scanning the repository for `Earthfile`s and filtering them by target.
-The CLI will return a list of Earthfile path and a map where key is the Earthfile path and the value is a list of filtered target.
+The CLI will return a list of Earthfile path and a map where the key is the Earthfile path and
+the value is a list of filtered targets.
 For example, in the check phase of the CI, `check` and `check-*` will be executed.
 The wildcard `*` serves as a regular search term, representing one or more other characters.
-The output of the check phase may looks like the following:
+The output of the check phase may look like the following:
 **Map:**
 
 ```json
@@ -83,8 +84,8 @@ This can be easily seen from the GitHub Actions UI.
 
 After each discovery phase, a list of targets will be executed by the CI.
 Execution is handled by Earthly and usually occurs on a remote Earthly runner that maximizes the benefits of caching.
-The exact steps that get executed by the target is defined by the developer.
-While most targets generally have a clearly defined scope, the overall goal is to enable adaptability by offloading the logic to the
+The exact steps that are executed by the target are defined by the developer.
+While most targets generally have a clearly defined scope, the goal is to enable adaptability by offloading the logic to the
 developer who is more aware of their immediate context.
 
 Some targets have additional processing beyond simply executing the target and returning.
@@ -123,10 +124,10 @@ However, as a short introduction, here is a brief summary of each one:
    unhealthy code.
 1. `build` - This stage is expected to build any artifacts provided by a given subproject.
    The primary purpose of this target is to validate that things are building without error.
-   It also ensures that builds are cached prior to executing subsequent steps that typically depend on these builds.
+   It also ensures that builds are cached before executing subsequent steps that typically depend on these builds.
 1. `package` - This stage is expected to package multiple artifacts into a single package.
-   It is typically used outside of the scope of a single subproject and instead combines outputs from multiple subprojects into a
-   single deliverable.
+   It is typically used outside the scope of a single subproject,
+   and instead combines outputs from multiple subprojects into a single deliverable.
    As such, it typically doesn't appear within the scope of a single subproject and is instead found in `Earthfile`s at higher
    points in the repository hierarchy.
 1. `test` - This stage is expected to run tests that prove the subproject, or multiple subprojects, are working as expected.
@@ -235,3 +236,59 @@ repository to ask questions specific to the CI process.
 You are now equipped and ready to start using the Catalyst CI!
 We are very open-source friendly and will review all feedback/PRs made against the repository.
 So please be encouraged to contribute.
+
+## Authentication
+
+Catalyst CI uses a number of services that require API authentication.
+The CI can in-theory be used without it.
+However, this is not recommended and is untested as it results in throttling which can randomly break builds.
+
+**Note: Never commit the `.secret` file to any repo, and never add secrets to the `.secret.template` file.**
+
+### Docker HUB
+
+CI pulls many images from docker hub, if you are not properly authenticated, this can result in throttling.
+
+To authenticate:
+
+1. Create an account at [Docker Hub](https://hub.docker.com/)
+2. Use the credentials from that account to login locally with `docker login`.
+
+If you are not properly authenticated, running `earthly` for any target will warn:
+
+```text
+Warning: you are not logged into registry-1.docker.io, you may experience rate-limiting when pulling images.
+```
+
+### GitHub Token
+
+Some CI functions require API access to Github.
+While those API's can be used without authentication it is easy to hit rate limits which fail builds.
+
+To Authenticate, go to [Github](https://github.com/settings/tokens/new) and create a new personal access token.
+The Token only requires `public_repo` and `read:packages` permissions.
+
+Like So:
+
+![github-token-creation](./images/github-token.png)
+
+Copy the token, and create a `.secret` file in the root of the repo with:
+
+```sh
+cp .secret.template .secret
+```
+
+and paste your new token into that file.  
+This step needs to be repeated for every repo using catalyst-ci.
+
+You also need docker to login to ghcr.io using this same token:
+
+```sh
+docker login ghcr.io -u <GITHUB_USERNAME> -p <GITHUB_TOKEN>
+```
+
+Some operation may fail, and you will see the following warning message if you are not properly authenticated with GitHub.
+
+```text
+Warning: you are not logged into ghcr.io, you may experience rate-limiting when pulling images
+```

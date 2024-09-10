@@ -6,18 +6,21 @@ IMPORT ../../../utilities/scripts AS scripts
 # cspell: words bindgen autodrop mexec
 
 wasm-c-base:
-    FROM alpine:3.19
+    # This image comes from: 
+    # https://github.com/WebAssembly/wasi-sdk/pkgs/container/wasi-sdk
+    FROM ghcr.io/webassembly/wasi-sdk:sha-754aec3
     WORKDIR /root
 
-    RUN apk update && \
-        apk add --no-cache \
-            py3-rich \
-            clang=17.0.5-r0 \
-            lld=17.0.5-r0 \
-            wasi-sdk=20-r3
+    RUN apt-get update && apt-get install -y \
+        bash \
+        build-essential \
+        python3-pip \
+        && rm -rf /var/lib/apt/lists/*
 
     COPY rust-tools+tool-wasm-tools/wasm-tools /bin
     COPY rust-tools+tool-wit-bindgen/wit-bindgen /bin
+
+    RUN pip install rich==13.8.0
 
     # Universal build scripts.
     COPY --dir scripts /scripts

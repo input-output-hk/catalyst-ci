@@ -8,32 +8,35 @@ IMPORT ../../utilities/scripts AS scripts
 # cspell: words psycopg dbviz
 
 postgres-base:
-    FROM postgres:16.1-alpine3.19
+    FROM postgres:16.4-bookworm
 
     WORKDIR /root
 
     # Install necessary packages 
     # Expand this list as needed, rather than adding more tools in later containers.
-    RUN apk add --no-cache \
-            ripgrep \
-            bash \
-            colordiff \
-            musl-dev \
-            curl \
-            gcc \
-            py3-pip \
-            py3-rich \
-            py3-psycopg \
-            graphviz \
-            fontconfig \
-            ttf-liberation
+    RUN apt-get update && apt-get install -y \
+        bash \
+        build-essential \
+        clang \
+        cmake \
+        colordiff \
+        findutils \
+        fontconfig \
+        fonts-liberation2        \
+        graphviz \
+        libssl-dev \
+        mold \
+        openssl \
+        pkgconf \
+        python3-pip \
+        python3-rich \
+        python3-psycopg \
+        ripgrep \
+        wget \
+        sqlfluff \
+        && rm -rf /var/lib/apt/lists/*
 
-    # Fix up font cache
-    RUN fc-cache -f
-
-    # Install SQLFluff
-    # Not provided by Alpine, so we force pip3 to install it system wide (--break-system-packages)
-    RUN pip3 install sqlfluff==2.3.5 --break-system-packages
+    # Install SQLFluff - Check
     RUN sqlfluff version
 
     # Get refinery

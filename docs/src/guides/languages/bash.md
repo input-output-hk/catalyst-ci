@@ -40,13 +40,13 @@ All that needs to happen is the following be added to the `Earthfile` in the roo
 ```Earthfile
 # Internal: shell-check - test all bash files against our shell check rules.
 shell-check:
-    FROM alpine:3.19
+    FROM alpine:3.20
 
     DO github.com/input-output-hk/catalyst-ci/earthly/bash:vx.y.z+SHELLCHECK --src=.
 
 # check all repo wide checks are run from here
 check:
-    FROM alpine:3.19
+    FROM alpine:3.20
 
     # Lint all bash files.
     BUILD +shell-check

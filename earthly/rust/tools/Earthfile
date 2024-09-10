@@ -2,65 +2,83 @@ VERSION 0.8
 
 IMPORT .. AS rust-ci
 
-# Note, TOOLS do not benefit from the CARGO caching, and pollute it, so build without it.
+# Install the cargo-binstall tool for installing Rust binaries.
+CARGO_BINSTALL_INSTALL:
+    FUNCTION
 
-tool-cargo-nextest:
+    ARG TARGETARCH
+    ARG version=1.7.4
+
+    IF [ "$TARGETARCH" = "amd64" ]
+        LET image = "https://github.com/cargo-bins/cargo-binstall/releases/download/v$version/cargo-binstall-x86_64-unknown-linux-musl.full.tgz"
+    ELSE IF [ "$TARGETARCH" = "arm64" ]
+        LET image = "https://github.com/cargo-bins/cargo-binstall/releases/download/v$version/cargo-binstall-aarch64-unknown-linux-musl.full.tgz"
+    ELSE
+        RUN --no-cache echo "Unsupported Platform $TARGETARCH"; exit 1
+    END
+
+    RUN wget -qO - $image | tar -xz -C /tmp; \
+        mv /tmp/cargo-binstall $CARGO_HOME/bin/; \
+        cargo-binstall -V
+
+# Install a rust binary tool with cargo-binstall.
+CARGO_BINSTALL:
+    FUNCTION
+    ARG package
+    ARG version
+    ARG executable="$package"
+    ARG test_param="--version"
+
     FROM rust-ci+rust-base
-    RUN cargo install cargo-nextest --version=0.9.70 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-nextest
+    IF [ "$test_param" = "NONE" ]
+        RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
+            cargo binstall "$package" --version="$version" --locked --no-confirm
+    ELSE
+        RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
+            cargo binstall "$package" --version="$version" --locked --no-confirm; \
+            "$executable" "$test_param"
+    END
+    SAVE ARTIFACT $CARGO_HOME/bin/"$executable"
+
+
+
+# Note, TOOLS do not benefit from the CARGO caching, and pollute it, so build without it.
+tool-cargo-nextest:
+    DO +CARGO_BINSTALL --package=cargo-nextest --version=0.9.77
 
 tool-cargo-machete:
-    FROM rust-ci+rust-base
-    RUN cargo install cargo-machete --version=0.6.2 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-machete
+    DO +CARGO_BINSTALL --package=cargo-machete --version=0.6.2
 
 tool-refinery:
-    FROM rust-ci+rust-base
-    RUN cargo install refinery_cli --version=0.8.14 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/refinery
+    DO +CARGO_BINSTALL --package=refinery_cli --version=0.8.14 --executable=refinery
 
 tool-cargo-deny:
-    FROM rust-ci+rust-base
-    RUN cargo install cargo-deny --version=0.14.22 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-deny
+    DO +CARGO_BINSTALL --package=cargo-deny --version=0.16.1
 
 tool-cargo-modules:
-    FROM rust-ci+rust-base
-    RUN cargo install cargo-modules --version=0.15.5 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-modules
+    DO +CARGO_BINSTALL --package=cargo-modules --version=0.17.0 --test_param="--help"
 
 tool-cargo-depgraph:
-    FROM rust-ci+rust-base
-    RUN cargo install cargo-depgraph --version=1.6.0 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-depgraph
+    DO +CARGO_BINSTALL --package=cargo-depgraph --version=1.6.0
 
 tool-cargo-llvm-cov:
-    FROM rust-ci+rust-base
-    RUN cargo install cargo-llvm-cov --version=0.6.9 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-llvm-cov
+    DO +CARGO_BINSTALL --package=cargo-llvm-cov --version=0.6.11 --test_param="NONE"
 
 tool-wasm-tools:
-    FROM rust-ci+rust-base
-    RUN cargo install wasm-tools --version=1.206.0 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/wasm-tools
+    DO +CARGO_BINSTALL --package=wasm-tools --version=1.216.0
 
 tool-cargo-expand:
-    FROM rust-ci+rust-base
-    RUN cargo install cargo-expand --version=1.0.85 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-expand
+    DO +CARGO_BINSTALL --package=cargo-expand --version=1.0.90
 
 tool-wit-bindgen:
-    FROM rust-ci+rust-base
-    RUN cargo install wit-bindgen-cli --version=0.24.0 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/wit-bindgen
+    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.30.0 --executable="wit-bindgen" --test_param="-V"
 
 # We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
 tool-cargo-sweep:
-    FROM rust-ci+rust-base
-    RUN cargo install cargo-sweep@0.7.0 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-sweep
+    DO +CARGO_BINSTALL --package=cargo-sweep --version=0.7.0
 
 tool-cargo-component:
-    FROM rust-ci+rust-base
-    RUN cargo install cargo-component@0.11.0 --locked
-    SAVE ARTIFACT $CARGO_HOME/bin/cargo-component
+    DO +CARGO_BINSTALL --package=cargo-component --version=0.15.0
+
+tool-wasm-pack:
+    DO +CARGO_BINSTALL --package=wasm-pack --version=0.13.0
