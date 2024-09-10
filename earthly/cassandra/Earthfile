@@ -21,6 +21,17 @@ cql-to-d2:
 
     COPY cql-to-d2-utils+src/main.py .
 
-    RUN python3 main.py $input $output
+    COPY $input ./src
+
+    RUN python3 main.py ./src $output
 
     SAVE ARTIFACT $output
+
+example:
+    FROM scylladb/scylla:6.1.1
+
+    COPY . .
+
+    COPY (+cql-to-d2/output --input="./input" --output="./output") ./output
+
+    RUN ls ./output

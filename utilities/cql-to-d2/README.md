@@ -20,6 +20,12 @@ The target is `cql-to-d2`. Make sure you include the required arguments.
 After using the target,
 you can save the artifact (output) according to your output path.
 
+```earthly
+COPY (+cql-to-d2/<output> --input="./<input>" --output="./<output>") ./<save-dir>
+```
+
+And include this line to your target.
+
 ## A valid CQL file and limitations
 
 * Make sure that a CQL file is fundamentally syntactically correct.
