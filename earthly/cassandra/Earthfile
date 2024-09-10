@@ -19,21 +19,19 @@ cql-to-d2:
     FROM +scylladb-base
 
     ARG --required input
-    ARG --required output
 
     COPY cql-to-d2-utils+src/main.py .
 
     COPY $input ./src
 
-    RUN python3 main.py ./src $output
+    RUN python3 main.py ./src ./diagrams
 
-    SAVE ARTIFACT $output
+    SAVE ARTIFACT ./diagrams
 
-example:
-    FROM scylladb/scylla:6.1.1
-
-    COPY . .
-
-    COPY (+cql-to-d2/output --input="./input" --output="./output") ./output
-
-    RUN ls ./output
+CQL_TO_D2:
+    FUNCTION
+    
+    ARG --required input
+    ARG --required output
+    
+    COPY (+cql-to-d2/diagrams --input=$input) $output
