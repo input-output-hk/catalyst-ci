@@ -4,8 +4,10 @@ icon: material/draw
 
 # D2 Diagrams
 
-This is the guide how to use the earthly target,
+This is the guide how to use the earthly target
 to convert a CQL schema file into D2 diagram entity.
+
+Following is the sample of using the target:
 
 ```earthly
 VERSION 0.8
