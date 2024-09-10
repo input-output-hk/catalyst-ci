@@ -2,7 +2,8 @@
 
 Converts Cassandra schemas to D2 diagram entity `sql_table`.
 The program accepts two arguments `<src-dir>` and `<out-dir>`.
-So it reads the whole directory. The files with `.cql` extension will be read.
+So it reads the whole directory.
+The files with `.cql` extension will be read.
 And transform individually into the D2 diagram entity, `.d2` extension file.
 If the `<out-dir>` does not exist,
 then the directory will be created automatically.
@@ -16,7 +17,8 @@ python3 main.py <input-dir> <output-dir>
 ## How to use it as an Earthly target
 
 You can simply refer the target to `earthly/cassandra` in this repository.
-The target is `cql-to-d2`. Make sure you include the required arguments.
+The target is `cql-to-d2`.
+Make sure you include the required arguments.
 After using the target,
 you can save the artifact (output) according to your output path.
 
