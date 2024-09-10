@@ -1,3 +1,5 @@
+# cspell: words timeuuid tinyint
+
 import os
 import re
 import sys
@@ -5,7 +7,7 @@ from enum import Enum
 from pathlib import Path
 
 RE_PARENS = r"\((.*?)\)"
-RE_GERERIC = r"<(.*)>"
+RE_GENERIC = r"<(.*)>"
 RE_COMMAS = r",\s*"
 RE_SPACES = r"\s+"
 
@@ -235,7 +237,7 @@ def parse_file(file_path: str) -> Table:
                     # join type tokens
                     type_str = re.sub(r",$", "", " ".join(type_tokens))
                     generics_items: list[str] = re.findall(
-                        RE_GERERIC, type_str
+                        RE_GENERIC, type_str
                     )
 
                     if type_str.endswith(" static"):

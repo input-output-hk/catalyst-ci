@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS chebotko_table (
+CREATE TABLE IF NOT EXISTS sample_table (
     column_name_1 int,
     column_name_2 int,
     column_name_3 int,
