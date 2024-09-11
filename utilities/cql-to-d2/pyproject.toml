@@ -1,0 +1,34 @@
+[tool.poetry]
+name = "cql-to-d2"
+version = "0.1.0"
+description = "A CQL schema coverter to D2 diagram"
+authors = ["Catalyst Team"]
+license = "MIT"
+readme = "README.md"
+
+
+[tool.poetry.dependencies]
+python = "^3.12.4"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.14"
+
+[tool.ruff]
+line-length = 79
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle
+    "F",   # Pyflakes
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "SIM", # flake8-simplify
+    "I",   # isort
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

@@ -1,0 +1,26 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
+
+check:
+    FROM python-ci+python-base
+
+    COPY . .
+
+    DO python-ci+CHECK
+
+test:
+    FROM python-ci+python-base
+
+    COPY . .
+
+    RUN python3 main.py tests/input tests/output
+    RUN cmp -s tests/expected_output/test_1.d2 tests/output/test_1.d2 && echo "Results are identical." || { echo "Results are different."; exit 1; }
+
+src:
+    FROM scratch
+
+    COPY . .
+
+    SAVE ARTIFACT tests
+    SAVE ARTIFACT main.py
