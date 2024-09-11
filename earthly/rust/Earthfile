@@ -295,6 +295,7 @@ SETUP:
 
 # SYNC_STD_CFG : Syncs the standard config files locally.
 SYNC_STD_CFG:
+    FUNCTION
     FROM rust-ci+installer
 
     SAVE ARTIFACT /stdcfgs/cargo_config.toml AS LOCAL .cargo/config.toml
