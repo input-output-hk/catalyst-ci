@@ -24,7 +24,7 @@ CLEAN:
     FUNCTION
     
     COPY .config/dictionaries/project.dic project.dic
-    RUN sort -d -f project.dic > new.dic
+    RUN sort -u -d -f project.dic > new.dic
     IF ! diff -q project.dic new.dic
         SAVE ARTIFACT new.dic AS LOCAL .config/dictionaries/project.dic
     END
