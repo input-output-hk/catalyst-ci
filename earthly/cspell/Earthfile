@@ -1,5 +1,6 @@
 VERSION 0.8
 
+# CHECK: Check spelling in all files that are not explicitly excluded.
 CHECK:
     # Spell checking all docs and code is done with cspell
     # See: cspell.org
@@ -11,9 +12,17 @@ CHECK:
     # Unlikely to need to change this.
     ARG cfg_file=cspell.json
 
-    FROM ghcr.io/streetsidesoftware/cspell:8.0.0
+    FROM ghcr.io/streetsidesoftware/cspell:8.13.3
     WORKDIR /work
 
     COPY $src .
     
     RUN cspell-cli lint . --dot
+
+# CLEAN: Cleanup the project dictionary.
+CLEAN:
+    COPY .config/dictionaries/project.dic project.dic
+    RUN sort -d -f project.dic > new.dic
+    IF ! diff -q project.dic new.dic
+        SAVE ARTIFACT new.dic AS LOCAL .config/dictionaries/project.dic
+    END
