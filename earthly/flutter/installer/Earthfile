@@ -33,6 +33,7 @@ INSTALL_CHROME_LINUX64:
 
     ARG TARGET_ARCH = amd64
     LET BLUE='\033[0;34m'
+    LET BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers/chrome/"
 
     IF [ "$TARGET_ARCH" = "amd64" ]
         ARG CHROME_MAJOR_VERSION
@@ -55,11 +56,11 @@ INSTALL_CHROME_LINUX64:
 
     ELSE
         # Install Chromium.
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="https://github.com/input-output-hk/catalyst-storage/raw/ad0c8c8408bcef39342715b23712c9e9ef051207/web-browsers/chrome/chromium.zip"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}chromium.zip"
         RUN chromium --version
 
         # Install Chromium-driver
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="https://github.com/input-output-hk/catalyst-storage/raw/ad0c8c8408bcef39342715b23712c9e9ef051207/web-browsers/chrome/chromium-driver.zip"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}chromium-driver.zip"
         RUN chromedriver --version
     END
 
@@ -94,20 +95,20 @@ INSTALL_EDGE_LINUX64:
 INSTALL_FIREFOX_LINUX64:
     FUNCTION
     ARG TARGETARCH
-    LET BLUE='\033[0;34m'
-    LET GITHUB_BASE_URL="https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers/firefox"
+    LET PLATFORM = ""
+    LET BLUE = '\033[0;34m'
+    LET BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers/firefox/"
 
     RUN printf "${BLUE} Installing Firefox..."
 
     IF [ "$TARGETARCH" = "amd64" ]
-        SET PLATFORM="linux64"
-        SET ARCH="amd64"
+        SET PLATFORM = "linux64"
+        LET FIREFOX_URL = "${BASE_URL}firefox-esr_115.15.0esr-1~deb12u1_amd64.deb"
     ELSE
-        SET PLATFORM="linux-aarch64"
-        SET ARCH="arm64"
+        SET PLATFORM = "linux-aarch64"
+        LET FIREFOX_URL = "${BASE_URL}firefox-esr_115.15.0esr-1~deb12u1_arm64.deb"
     END
 
-    LET FIREFOX_URL="${GITHUB_BASE_URL}/firefox-esr_115.15.0esr-1~deb12u1_${ARCH}.deb"
     RUN curl -L ${FIREFOX_URL} -o /tmp/firefox.deb \
         && apt-get update \
         && apt-get --fix-broken install -y /tmp/firefox.deb \
@@ -115,9 +116,10 @@ INSTALL_FIREFOX_LINUX64:
 
     RUN firefox --version
 
+    # https://github.com/mozilla/geckodriver/releases
     RUN printf "${BLUE} Installing Geckodriver..."
     RUN mkdir -p /opt/geckodriver
-    LET GECKODRIVER_URL="${GITHUB_BASE_URL}/geckodriver-v0.35.0-${PLATFORM}.tar.gz"
+    LET GECKODRIVER_URL = "${BASE_URL}geckodriver-v0.35.0-${PLATFORM}.tar.gz"
     RUN curl -sL ${GECKODRIVER_URL} | tar -xz -C /opt/geckodriver/
-    RUN ln -s /opt/geckodriver/geckodriver /usr/local/bin/geckodriver
-    RUN geckodriver --versions
+    RUN ln -s /opt/geckodriver/geckodriver /usr/bin/geckodriver
+    RUN geckodriver --version
