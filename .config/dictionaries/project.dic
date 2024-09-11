@@ -18,7 +18,6 @@ doublecircle
 Earthfile
 Earthfiles
 Edgedriver
-edgedriver
 errchkjson
 extldflags
 findutils
@@ -30,7 +29,6 @@ fontconfig
 fontname
 forcelabels
 Geckodriver
-geckodriver
 genpkey
 giga
 ginkgolinter
@@ -40,7 +38,6 @@ GOCACHE
 gofmt
 goimports
 GOLANGCI
-golangci
 golines
 golint
 gomega
