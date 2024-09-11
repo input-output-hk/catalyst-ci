@@ -59,11 +59,11 @@ INSTALL_CHROME_LINUX64:
 
     ELSE
         # Install Chromium.
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium.zip"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="https://github.com/input-output-hk/catalyst-storage/raw/ad0c8c8408bcef39342715b23712c9e9ef051207/web-browsers/chrome/chromium.zip"
         RUN chromium --version
 
         # Install Chromium-driver
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium-driver.zip"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="https://github.com/input-output-hk/catalyst-storage/raw/ad0c8c8408bcef39342715b23712c9e9ef051207/web-browsers/chrome/chromium-driver.zip"
         RUN chromedriver --version
     END
 
@@ -92,7 +92,7 @@ INSTALL_EDGE_LINUX64:
         RUN msedgedriver --version
     END
 
-# Install Firefox and Geckodriver.
+# Install Firefox and Geckodriver from hardcoded GitHub-hosted locations.
 # Geckodriver supported versions:
 # https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html
 INSTALL_FIREFOX_LINUX64:
@@ -102,31 +102,29 @@ INSTALL_FIREFOX_LINUX64:
     LET BLUE ='\033[0;34m'
 
     RUN printf "${BLUE} Installing Firefox..."
-    WAIT
-        RUN install -d -m 0755 /etc/apt/keyrings
-        RUN curl -fSsL https://packages.mozilla.org/apt/repo-signing-key.gpg \
-            | tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
-        RUN echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" \
-            | tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
-        RUN echo "Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n\n" \
-            | tee /etc/apt/preferences.d/mozilla > /dev/null
-    END
 
     IF [ "$TARGETARCH" = "amd64" ]
         SET PLATFORM = linux64
-        ARG --required firefox_version_amd64
-        RUN apt-get update && apt-get install -y -t mozilla firefox=${firefox_version_amd64}
+        LET FIREFOX_URL = "https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers/firefox/firefox-esr_115.15.0esr-1~deb12u1_amd64.deb"
+        RUN curl -L ${FIREFOX_URL} -o /tmp/firefox.deb \
+            && apt-get update \
+            && apt-get install -y /tmp/firefox.deb \
+            && rm /tmp/firefox.deb
     ELSE
         SET PLATFORM = linux-aarch64
-        ARG --required firefox_version_arm64
-        RUN apt-get update && apt-get install -y -t mozilla firefox-esr=${firefox_version_arm64}
+        LET FIREFOX_URL = "https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers/firefox/firefox-esr_115.15.0esr-1~deb12u1_arm64.deb"
+        RUN curl -L ${FIREFOX_URL} -o /tmp/firefox.deb \
+            && apt-get update \
+            && apt-get install -y /tmp/firefox.deb \
+            && rm /tmp/firefox.deb
     END
     RUN firefox --version
 
+# https://github.com/mozilla/geckodriver/releases
     RUN printf "${BLUE} Installing Geckodriver..."
     RUN mkdir -p /opt/geckodriver
-    ARG --required gecko_version
-    RUN curl -sL https://github.com/mozilla/geckodriver/releases/download/v${gecko_version}/geckodriver-v${gecko_version}-${PLATFORM}.tar.gz \
+    LET GECKODRIVER_URL = "https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers/firefox/geckodriver-v0.35.0-${PLATFORM}.tar.gz"
+    RUN curl -sL ${GECKODRIVER_URL} \
         | tar -xz -C /opt/geckodriver/
     RUN ln -s /opt/geckodriver/geckodriver /usr/local/bin/geckodriver
     RUN geckodriver --version

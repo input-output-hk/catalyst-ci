@@ -34,14 +34,11 @@ flutter-base:
 
     DO installer+INSTALL_CHROME_LINUX64 --TARGET_ARCH=$TARGETARCH --CHROME_MAJOR_VERSION=$CHROME_MAJOR_VERSION
 
+    DO installer+INSTALL_FIREFOX_LINUX64
+
     ARG edge_version = 125.0.2535.51
     ARG edge_package_release = 1
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
-
-    ARG firefox_version_amd64 = 126.0~build2
-    ARG firefox_version_arm64 = 115.12.0esr-1~deb12u1
-    ARG gecko_version = 0.34.0
-    DO installer+INSTALL_FIREFOX_LINUX64 --firefox_version_amd64=$firefox_version_amd64 --firefox_version_arm64=$firefox_version_arm64 --gecko_version=$gecko_version
 
     COPY +flutter-src/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
