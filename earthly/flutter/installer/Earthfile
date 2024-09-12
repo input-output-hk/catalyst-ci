@@ -117,6 +117,10 @@ INSTALL_CHROMIUM:
         && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
         && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
         && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
+        && echo "Checking for missing dependencies..." \
+        && apt-get install -f -y \
+        && echo "Re-attempting to install ${PACKAGE_TYPE} and dependencies..." \
+        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb \
         && echo "Cleaning up..." \
         && rm /opt/${PACKAGE_TYPE}.zip \
         && rm -r /opt/${PACKAGE_TYPE} \
