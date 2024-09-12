@@ -16,14 +16,14 @@ INSTALL_CHROME_LINUX64:
     IF [ "$TARGET_ARCH" = "amd64" ]
         ARG CHROME_MAJOR_VERSION
 
-    RUN printf "${BLUE} Installing Google Chrome..." \
-        && curl -sSL -o /opt/chrome.zip "${BASE_URL}chrome_amd64.zip" \
-        && unzip /opt/chrome.zip -d /opt/chrome \
-        && dpkg -i /opt/chrome/google-chrome-stable_current_amd64.deb || true \
-        && dpkg -i /opt/chrome/*.deb || true \
-        && rm -rf /opt/chrome.zip /opt/chrome \
-        && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
-    RUN google-chrome --version
+    # RUN printf "${BLUE} Installing Google Chrome..." \
+    #     && curl -sSL -o /opt/chrome.zip "${BASE_URL}chrome_amd64.zip" \
+    #     && unzip /opt/chrome.zip -d /opt/chrome \
+    #     && dpkg -i /opt/chrome/google-chrome-stable_current_amd64.deb || true \
+    #     && dpkg -i /opt/chrome/*.deb || true \
+    #     && rm -rf /opt/chrome.zip /opt/chrome \
+    #     && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+    # RUN google-chrome --version
 
     RUN printf "${BLUE} Installing Chromedriver..." \
         && mkdir -p /opt/chromedriver \
