@@ -48,12 +48,13 @@ INSTALL_CHROME_LINUX64:
 INSTALL_FIREFOX_LINUX64:
     FUNCTION
 
+    ARG TARGETARCH
     LET PLATFORM = ""
     LET BLUE = '\033[0;34m'
 
     RUN printf "${BLUE} Installing Firefox..."
 
-    IF [ TARGETARCH = amd64 ]
+    IF [ "$TARGETARCH" = "amd64" ]
         SET PLATFORM = "linux64"
         LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_amd64.deb"
     ELSE
@@ -82,9 +83,10 @@ INSTALL_FIREFOX_LINUX64:
 INSTALL_EDGE_LINUX64:
     FUNCTION
 
+    ARG TARGETARCH
     LET BLUE ='\033[0;34m'
 
-    IF [ TARGETARCH = amd64 ]
+    IF [ "$TARGETARCH" = "amd64" ]
         ARG --required edge_version
         ARG --required edge_package_release
 
