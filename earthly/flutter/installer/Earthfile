@@ -28,10 +28,9 @@ INSTALL_CHROME_LINUX64:
     RUN printf "${BLUE} Installing Chromedriver..." \
         && mkdir -p /opt/chromedriver \
         && curl -L "${BASE_URL}chromedriver-linux64.zip" \
-        -o /opt/chromedriver/chromedriver-linux64.zip \
-        && unzip -j /opt/chromedriver/chromedriver-linux64.zip -d /usr/local/bin/ \
-        && rm -rf /opt/chromedriver
-    RUN chromedriver --version
+        -o /opt/chromedriver/chromedriver.zip \
+        && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
+        RUN chromedriver --version
 
     ELSE
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}chromium.zip"
