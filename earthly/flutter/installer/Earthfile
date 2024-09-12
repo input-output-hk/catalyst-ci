@@ -31,8 +31,7 @@ INSTALL_CHROME_LINUX64:
         -o /opt/chromedriver/chromedriver.zip \
         && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/ \
         && rm -rf /opt/chromedriver
-
-RUN chromedriver --version
+    RUN chromedriver --version
 
     ELSE
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}chromium.zip"
