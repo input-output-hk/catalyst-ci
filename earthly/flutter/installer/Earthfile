@@ -11,12 +11,13 @@ ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw
 INSTALL_CHROME_LINUX64:
     FUNCTION
 
+    ARG TARGETARCH
     LET BLUE='\033[0;34m'
 
     # TARGETARCH is the target processor architecture for which the target is being built.
     # WARNING: The value of a builtin arg (earthly) and can never be overridden!
     # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
-    IF [ TARGETARCH = amd64 ]
+    IF [ "$TARGETARCH" = "amd64" ]
         RUN printf "${BLUE} Installing Google Chrome..." \
             && curl -sSL -o /opt/chrome.zip "${BASE_URL}/chrome/chrome_amd64.zip" \
             && unzip /opt/chrome.zip -d /opt/chrome \
