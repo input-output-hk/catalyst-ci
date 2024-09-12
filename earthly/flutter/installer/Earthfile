@@ -21,7 +21,6 @@ INSTALL_CHROME_LINUX64:
         && unzip /opt/chrome.zip -d /opt/chrome \
         && dpkg -i /opt/chrome/google-chrome-stable_current_amd64.deb || true \
         && dpkg -i /opt/chrome/*.deb || true \
-        && apt-get install -f -y \
         && rm -rf /opt/chrome.zip /opt/chrome \
         && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
     RUN google-chrome --version
