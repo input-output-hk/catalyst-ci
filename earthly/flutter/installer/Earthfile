@@ -98,7 +98,7 @@ INSTALL_EDGE_LINUX64:
         RUN msedgedriver --version
     END
 
-# Installs the Chromium or Chrome driver.
+# Installs the Chromium or Chromium driver.
 INSTALL_CHROMIUM:
     FUNCTION
 
@@ -118,9 +118,6 @@ INSTALL_CHROMIUM:
         && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
         && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
         && echo "Checking for missing dependencies..." \
-        && apt-get install -f -y \
-        && echo "Re-attempting to install ${PACKAGE_TYPE} and dependencies..." \
-        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb \
         && echo "Cleaning up..." \
         && rm /opt/${PACKAGE_TYPE}.zip \
         && rm -r /opt/${PACKAGE_TYPE} \
