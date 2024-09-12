@@ -1,28 +1,6 @@
 VERSION 0.8
 
-# Installs the Chromium or Chrome driver.
-INSTALL_CHROMIUM:
-    FUNCTION
-
-    ARG --required PACKAGE_TYPE
-    ARG --required DOWNLOAD_URL
-    LET BLUE='\033[0;34m'
-
-    RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
-        && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
-        && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
-        && echo "Downloaded file information:" \
-        && ls -lh /opt/${PACKAGE_TYPE}.zip \
-        && echo "Unzipping ${PACKAGE_TYPE} packages..." \
-        && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
-        && echo "Contents of /opt/${PACKAGE_TYPE} after unzipping:" \
-        && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
-        && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
-        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
-        && echo "Cleaning up..." \
-        && rm /opt/${PACKAGE_TYPE}.zip \
-        && rm -r /opt/${PACKAGE_TYPE} \
-        && echo "${PACKAGE_TYPE} installation completed."
+#TODO(minikin): https://github.com/input-output-hk/catalyst-storage/issues/1
 
 # Install Chrome/Chromium for testing and Chromedriver.
 # There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
@@ -38,55 +16,31 @@ INSTALL_CHROME_LINUX64:
     IF [ "$TARGET_ARCH" = "amd64" ]
         ARG CHROME_MAJOR_VERSION
 
-        # Install Google Chrome.
-        RUN printf "${BLUE} Installing Google Chrome..."
-        RUN curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_MAJOR_VERSION}-1_amd64.deb \
-            && apt install -y /opt/chrome.deb \
-            && rm /opt/chrome.deb \
-            && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
-        RUN google-chrome --version
+    RUN printf "${BLUE} Installing Google Chrome..." \
+        && curl -sSL -o /opt/chrome.zip "${BASE_URL}chrome_amd64.zip" \
+        && unzip /opt/chrome.zip -d /opt/chrome \
+        && dpkg -i /opt/chrome/google-chrome-stable_current_amd64.deb || true \
+        && dpkg -i /opt/chrome/*.deb || true \
+        && apt-get install -f -y \
+        && rm -rf /opt/chrome.zip /opt/chrome \
+        && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+    RUN google-chrome --version
 
-        # Install Chromedriver
-        RUN printf "${BLUE} Installing Chromedriver..."
-        RUN mkdir -p /opt/chromedriver \
-            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${CHROME_MAJOR_VERSION}/linux64/chromedriver-linux64.zip \
-            -o /opt/chromedriver/chromedriver.zip \
-            && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
-        RUN chromedriver --version
+    RUN printf "${BLUE} Installing Chromedriver..." \
+        && mkdir -p /opt/chromedriver \
+        && curl -L "${BASE_URL}chromedriver-linux64.zip" \
+        -o /opt/chromedriver/chromedriver.zip \
+        && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/ \
+        && rm -rf /opt/chromedriver
+
+RUN chromedriver --version
 
     ELSE
-        # Install Chromium.
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}chromium.zip"
         RUN chromium --version
 
-        # Install Chromium-driver
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}chromium-driver.zip"
         RUN chromedriver --version
-    END
-
-# Install Edge and EdgeDriver.
-# There is no Edge version build for linux/arm64, installing only for amd64.
-INSTALL_EDGE_LINUX64:
-    FUNCTION
-
-    LET BLUE ='\033[0;34m'
-
-    IF [ "$TARGETARCH" = "amd64" ]
-        ARG --required edge_version
-        ARG --required edge_package_release
-
-        RUN printf "${BLUE} Installing Edge..."
-        RUN curl -LO https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
-        RUN apt-get update && apt-get install -y ./microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
-        RUN microsoft-edge-stable --version
-
-        # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
-        RUN printf "${BLUE} Installing Edgedriver..."
-        RUN mkdir -p /opt/edgedriver
-        RUN curl -L https://msedgedriver.azureedge.net/{$edge_version}/edgedriver_linux64.zip \
-            -o /opt/edgedriver/edgedriver.zip
-        RUN unzip /opt/edgedriver/edgedriver.zip -d /usr/local/bin/
-        RUN msedgedriver --version
     END
 
 # Install Firefox and Geckodriver from hardcoded GitHub-hosted locations.
@@ -123,3 +77,53 @@ INSTALL_FIREFOX_LINUX64:
     RUN curl -sL ${GECKODRIVER_URL} | tar -xz -C /opt/geckodriver/
     RUN ln -s /opt/geckodriver/geckodriver /usr/bin/geckodriver
     RUN geckodriver --version
+
+# TODO(minikin): https://github.com/input-output-hk/catalyst-ci/issues/308
+# Install Edge and EdgeDriver.
+# There is no Edge version build for linux/arm64, installing only for amd64.
+INSTALL_EDGE_LINUX64:
+    FUNCTION
+
+    LET BLUE ='\033[0;34m'
+
+    IF [ "$TARGETARCH" = "amd64" ]
+        ARG --required edge_version
+        ARG --required edge_package_release
+
+        RUN printf "${BLUE} Installing Edge..."
+        RUN curl -LO https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
+        RUN apt-get update && apt-get install -y ./microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
+        RUN microsoft-edge-stable --version
+
+        # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
+        RUN printf "${BLUE} Installing Edgedriver..."
+        RUN mkdir -p /opt/edgedriver
+        RUN curl -L https://msedgedriver.azureedge.net/{$edge_version}/edgedriver_linux64.zip \
+            -o /opt/edgedriver/edgedriver.zip
+        RUN unzip /opt/edgedriver/edgedriver.zip -d /usr/local/bin/
+        RUN msedgedriver --version
+    END
+
+# Installs the Chromium or Chrome driver.
+INSTALL_CHROMIUM:
+    FUNCTION
+
+    ARG --required PACKAGE_TYPE
+    ARG --required DOWNLOAD_URL
+    LET BLUE='\033[0;34m'
+
+    RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
+        && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
+        && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
+        && echo "Downloaded file information:" \
+        && ls -lh /opt/${PACKAGE_TYPE}.zip \
+        && echo "Unzipping ${PACKAGE_TYPE} packages..." \
+        && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
+        && echo "Contents of /opt/${PACKAGE_TYPE} after unzipping:" \
+        && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
+        && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
+        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
+        && echo "Cleaning up..." \
+        && rm /opt/${PACKAGE_TYPE}.zip \
+        && rm -r /opt/${PACKAGE_TYPE} \
+        && echo "${PACKAGE_TYPE} installation completed."
