@@ -13,21 +13,21 @@ INSTALL_CHROME_LINUX64:
     LET BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers/chrome/"
 
     IF [ "$TARGET_ARCH" = "amd64" ]
-    RUN printf "${BLUE} Installing Google Chrome..." \
-        && curl -sSL -o /opt/chrome.zip "${BASE_URL}chrome_amd64.zip" \
-        && unzip /opt/chrome.zip -d /opt/chrome \
-        && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
-        && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
-        && rm -rf /opt/chrome.zip /opt/chrome \
-        && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
-        RUN google-chrome --version
+        RUN printf "${BLUE} Installing Google Chrome..." \
+            && curl -sSL -o /opt/chrome.zip "${BASE_URL}chrome_amd64.zip" \
+            && unzip /opt/chrome.zip -d /opt/chrome \
+            && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
+            && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
+            && rm -rf /opt/chrome.zip /opt/chrome \
+            && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
+            RUN google-chrome --version
 
-    RUN printf "${BLUE} Installing Chromedriver..." \
-        && mkdir -p /opt/chromedriver \
-        && curl -L "${BASE_URL}chromedriver-linux64.zip" \
-        -o /opt/chromedriver/chromedriver.zip \
-        && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
-        RUN chromedriver --version
+        RUN printf "${BLUE} Installing Chromedriver..." \
+            && mkdir -p /opt/chromedriver \
+            && curl -L "${BASE_URL}chromedriver-linux64.zip" \
+            -o /opt/chromedriver/chromedriver.zip \
+            && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
+            RUN chromedriver --version
 
     ELSE
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}chromium.zip"
