@@ -15,8 +15,8 @@ INSTALL_CHROME_LINUX64:
     LET BLUE='\033[0;34m'
 
     # TARGETARCH is the target processor architecture for which the target is being built.
-    # WARNING: The value of a builtin arg (earthly) and can never be overridden!
-    # Moreover you must provide it as ARG e.g `ARG TARGETARCH` in your funtion to use it.
+    # WARNING: The value of a built-in arg (earthly) can never be overridden!
+    # You must provide it as ARG, e.g., `ARG TARGETARCH` in your function to use it.
     # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
     IF [ "$TARGETARCH" = "amd64" ]
         RUN printf "${BLUE} Installing Google Chrome..." \
