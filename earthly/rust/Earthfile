@@ -291,3 +291,16 @@ SETUP:
     # The ONLY toolchain we support is the one in the installer.
     # DO NOT copy the `rust-toolchain.toml` file into CI as it breaks
     # the toolchain on some targets and leads to build failure.
+
+
+# SYNC_STD_CFG : Syncs the standard config files locally.
+SYNC_STD_CFG:
+    FUNCTION
+    FROM +installer
+
+    SAVE ARTIFACT /stdcfgs/cargo_config.toml AS LOCAL .cargo/config.toml
+    SAVE ARTIFACT /stdcfgs/clippy.toml AS LOCAL clippy.toml
+    SAVE ARTIFACT /stdcfgs/nextest.toml AS LOCAL .config/nextest.toml
+    SAVE ARTIFACT /stdcfgs/deny.toml AS LOCAL deny.toml
+    SAVE ARTIFACT /stdcfgs/rustfmt.toml AS LOCAL rustfmt.toml
+    SAVE ARTIFACT /stdcfgs/rust-toolchain.toml AS LOCAL rust-toolchain.toml

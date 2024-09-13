@@ -1,7 +1,7 @@
 aarch
 bindgen
-buildkit
 binstall
+buildkit
 camelcase
 canvaskit
 cardano
@@ -17,7 +17,6 @@ dockerhub
 doublecircle
 Earthfile
 Earthfiles
-edgedriver
 Edgedriver
 errchkjson
 extldflags
@@ -29,7 +28,6 @@ fontawesome
 fontconfig
 fontname
 forcelabels
-geckodriver
 Geckodriver
 genpkey
 giga
@@ -39,7 +37,6 @@ glightbox
 GOCACHE
 gofmt
 goimports
-golangci
 GOLANGCI
 golines
 golint
