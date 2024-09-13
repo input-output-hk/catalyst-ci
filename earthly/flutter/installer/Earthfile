@@ -26,7 +26,7 @@ INSTALL_CHROME_LINUX64:
             && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
             && echo "Checking for missing dependencies..." \
             && apt-get install -f -y \
-            && echo "Re-attempting to install ${PACKAGE_TYPE} and dependencies..." \
+            && echo "Re-attempting to install Google Chrome and dependencies..." \
             && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
             && rm -rf /opt/chrome.zip /opt/chrome \
             && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
