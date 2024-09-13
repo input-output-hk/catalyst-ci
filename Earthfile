@@ -18,6 +18,11 @@ markdown-check-fix:
 
     DO mdlint-ci+MDLINT_LOCALLY --src=$(echo ${PWD}) --fix=--fix
 
+# Make sure the project dictionary is properly sorted.
+clean-spelling-list:
+    FROM debian:stable-slim
+    DO cspell-ci+CLEAN
+
 # check-spelling Check spelling in this repo inside a container.
 check-spelling:
     DO cspell-ci+CHECK

@@ -33,11 +33,12 @@ postgres-base:
         python3-psycopg \
         ripgrep \
         wget \
-        sqlfluff \
+        pipx \
         && rm -rf /var/lib/apt/lists/*
 
     # Install SQLFluff - Check
-    RUN sqlfluff version
+    ENV PATH="/root/.local/bin:${PATH}"
+    RUN pipx install sqlfluff==3.1.1 && sqlfluff version
 
     # Get refinery
     COPY rust-tools+tool-refinery/refinery /bin

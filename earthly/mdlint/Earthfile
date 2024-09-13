@@ -35,7 +35,7 @@ MDLINT_LOCALLY:
     RUN docker run \
         --rm \
         -v $src:/workdir \
-        davidanson/markdownlint-cli2-rules:v0.11.0 \
+        davidanson/markdownlint-cli2-rules:v0.14.0 \
         "**/*.md" \
         --config $cfg_file \
         $fix
@@ -61,7 +61,7 @@ CHECK:
     # Unlikely this ever needs to be changed.
     ARG cfg_file=.markdownlint-cli2.jsonc
 
-    FROM davidanson/markdownlint-cli2-rules:v0.11.0 
+    FROM davidanson/markdownlint-cli2-rules:v0.14.0 
 
     # Status line for what we are about to do.
     RUN echo Linting Markdown Recursively from: $src
