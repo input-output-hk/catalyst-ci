@@ -1,32 +1,8 @@
 VERSION 0.8
 
-# Installs the Chromium or Chrome driver.
-INSTALL_CHROMIUM:
-    FUNCTION
+ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers"
 
-    ARG --required PACKAGE_TYPE
-    ARG --required DOWNLOAD_URL
-    LET BLUE='\033[0;34m'
-
-    RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
-        && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
-        && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
-        && echo "Downloaded file information:" \
-        && ls -lh /opt/${PACKAGE_TYPE}.zip \
-        && echo "Unzipping ${PACKAGE_TYPE} packages..." \
-        && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
-        && echo "Contents of /opt/${PACKAGE_TYPE} after unzipping:" \
-        && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
-        && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
-        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
-        && echo "Checking for missing dependencies..." \
-        && apt-get install -f -y \
-        && echo "Re-attempting to install ${PACKAGE_TYPE} and dependencies..." \
-        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb \
-        && echo "Cleaning up..." \
-        && rm /opt/${PACKAGE_TYPE}.zip \
-        && rm -r /opt/${PACKAGE_TYPE} \
-        && echo "${PACKAGE_TYPE} installation completed."
+#TODO(minikin): https://github.com/input-output-hk/catalyst-storage/issues/1
 
 # Install Chrome/Chromium for testing and Chromedriver.
 # There is no Chrome-for-testing build for linux/arm64, using Chromium instead.
@@ -35,43 +11,84 @@ INSTALL_CHROMIUM:
 INSTALL_CHROME_LINUX64:
     FUNCTION
 
-    ARG TARGET_ARCH = amd64
+    ARG TARGETARCH
     LET BLUE='\033[0;34m'
 
-    IF [ "$TARGET_ARCH" = "amd64" ]
-        ARG CHROME_MAJOR_VERSION
-
-        # Install Google Chrome.
-        RUN printf "${BLUE} Installing Google Chrome..."
-        RUN curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${CHROME_MAJOR_VERSION}-1_amd64.deb \
-            && apt install -y /opt/chrome.deb \
-            && rm /opt/chrome.deb \
+    # TARGETARCH is the target processor architecture for which the target is being built.
+    # WARNING: The value of a built-in arg (earthly) can never be overridden!
+    # You must provide it as ARG, e.g., `ARG TARGETARCH` in your function to use it.
+    # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
+    IF [ "$TARGETARCH" = "amd64" ]
+        RUN printf "${BLUE} Installing Google Chrome..." \
+            && curl -sSL -o /opt/chrome.zip "${BASE_URL}/chrome/chrome_amd64.zip" \
+            && unzip /opt/chrome.zip -d /opt/chrome \
+            && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
+            && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
+            && echo "Checking for missing dependencies..." \
+            && apt-get install -f -y \
+            && echo "Re-attempting to install Google Chrome and dependencies..." \
+            && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
+            && rm -rf /opt/chrome.zip /opt/chrome \
             && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
-        RUN google-chrome --version
+            RUN google-chrome --version
 
-        # Install Chromedriver
-        RUN printf "${BLUE} Installing Chromedriver..."
-        RUN mkdir -p /opt/chromedriver \
-            && curl -L https://storage.googleapis.com/chrome-for-testing-public/${CHROME_MAJOR_VERSION}/linux64/chromedriver-linux64.zip \
+        RUN printf "${BLUE} Installing Chromedriver..." \
+            && mkdir -p /opt/chromedriver \
+            && curl -L "${BASE_URL}/chrome/chromedriver-linux64.zip" \
             -o /opt/chromedriver/chromedriver.zip \
             && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
-        RUN chromedriver --version
+            RUN chromedriver --version
 
     ELSE
-        # Install Chromium.
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium.zip"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium.zip"
         RUN chromium --version
 
-        # Install Chromium-driver
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="https://iog-catalyst-cache.s3.eu-central-1.amazonaws.com/chromium-driver.zip"
+        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium-driver.zip"
         RUN chromedriver --version
     END
 
+# Install Firefox and Geckodriver from hardcoded GitHub-hosted locations.
+# Geckodriver supported versions:
+# https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html
+INSTALL_FIREFOX_LINUX64:
+    FUNCTION
+
+    ARG TARGETARCH
+    LET PLATFORM = ""
+    LET BLUE = '\033[0;34m'
+
+    RUN printf "${BLUE} Installing Firefox..."
+
+    IF [ "$TARGETARCH" = "amd64" ]
+        SET PLATFORM = "linux64"
+        LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_amd64.deb"
+    ELSE
+        SET PLATFORM = "linux-aarch64"
+        LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_arm64.deb"
+    END
+
+    RUN curl -L ${FIREFOX_URL} -o /tmp/firefox.deb \
+        && apt-get update \
+        && apt-get --fix-broken install -y /tmp/firefox.deb \
+        && rm /tmp/firefox.deb
+
+    RUN firefox --version
+
+    # https://github.com/mozilla/geckodriver/releases
+    RUN printf "${BLUE} Installing Geckodriver..."
+    RUN mkdir -p /opt/geckodriver
+    LET GECKODRIVER_URL = "${BASE_URL}/firefox/geckodriver-v0.35.0-${PLATFORM}.tar.gz"
+    RUN curl -sL ${GECKODRIVER_URL} | tar -xz -C /opt/geckodriver/
+    RUN ln -s /opt/geckodriver/geckodriver /usr/bin/geckodriver
+    RUN geckodriver --version
+
+# TODO(minikin): https://github.com/input-output-hk/catalyst-ci/issues/308
 # Install Edge and EdgeDriver.
 # There is no Edge version build for linux/arm64, installing only for amd64.
 INSTALL_EDGE_LINUX64:
     FUNCTION
 
+    ARG TARGETARCH
     LET BLUE ='\033[0;34m'
 
     IF [ "$TARGETARCH" = "amd64" ]
@@ -92,41 +109,27 @@ INSTALL_EDGE_LINUX64:
         RUN msedgedriver --version
     END
 
-# Install Firefox and Geckodriver.
-# Geckodriver supported versions:
-# https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html
-INSTALL_FIREFOX_LINUX64:
+# Installs the Chromium or Chromium driver.
+INSTALL_CHROMIUM:
     FUNCTION
-    ARG TARGETARCH
-    LET PLATFORM = ""
-    LET BLUE ='\033[0;34m'
 
-    RUN printf "${BLUE} Installing Firefox..."
-    WAIT
-        RUN install -d -m 0755 /etc/apt/keyrings
-        RUN curl -fSsL https://packages.mozilla.org/apt/repo-signing-key.gpg \
-            | tee /etc/apt/keyrings/packages.mozilla.org.asc > /dev/null
-        RUN echo "deb [signed-by=/etc/apt/keyrings/packages.mozilla.org.asc] https://packages.mozilla.org/apt mozilla main" \
-            | tee -a /etc/apt/sources.list.d/mozilla.list > /dev/null
-        RUN echo "Package: *\nPin: origin packages.mozilla.org\nPin-Priority: 1000\n\n" \
-            | tee /etc/apt/preferences.d/mozilla > /dev/null
-    END
+    ARG --required PACKAGE_TYPE
+    ARG --required DOWNLOAD_URL
+    LET BLUE='\033[0;34m'
 
-    IF [ "$TARGETARCH" = "amd64" ]
-        SET PLATFORM = linux64
-        ARG --required firefox_version_amd64
-        RUN apt-get update && apt-get install -y -t mozilla firefox=${firefox_version_amd64}
-    ELSE
-        SET PLATFORM = linux-aarch64
-        ARG --required firefox_version_arm64
-        RUN apt-get update && apt-get install -y -t mozilla firefox-esr=${firefox_version_arm64}
-    END
-    RUN firefox --version
-
-    RUN printf "${BLUE} Installing Geckodriver..."
-    RUN mkdir -p /opt/geckodriver
-    ARG --required gecko_version
-    RUN curl -sL https://github.com/mozilla/geckodriver/releases/download/v${gecko_version}/geckodriver-v${gecko_version}-${PLATFORM}.tar.gz \
-        | tar -xz -C /opt/geckodriver/
-    RUN ln -s /opt/geckodriver/geckodriver /usr/local/bin/geckodriver
-    RUN geckodriver --version
+    RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
+        && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
+        && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
+        && echo "Downloaded file information:" \
+        && ls -lh /opt/${PACKAGE_TYPE}.zip \
+        && echo "Unzipping ${PACKAGE_TYPE} packages..." \
+        && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
+        && echo "Contents of /opt/${PACKAGE_TYPE} after unzipping:" \
+        && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
+        && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
+        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
+        && echo "Checking for missing dependencies..." \
+        && echo "Cleaning up..." \
+        && rm /opt/${PACKAGE_TYPE}.zip \
+        && rm -r /opt/${PACKAGE_TYPE} \
+        && echo "${PACKAGE_TYPE} installation completed."

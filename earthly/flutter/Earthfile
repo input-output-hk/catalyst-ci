@@ -26,22 +26,12 @@ flutter-base:
 
     WORKDIR frontend
 
-    # TARGETARCH is the target processor architecture for which the target is being built.
-    # WARNING: The value of a builtin arg (earthly) and can never be overridden!
-    # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
-    ARG TARGETARCH
-    ARG CHROME_MAJOR_VERSION = 126.0.6478.61
-
-    DO installer+INSTALL_CHROME_LINUX64 --TARGET_ARCH=$TARGETARCH --CHROME_MAJOR_VERSION=$CHROME_MAJOR_VERSION
+    DO installer+INSTALL_CHROME_LINUX64
+    DO installer+INSTALL_FIREFOX_LINUX64
 
     ARG edge_version = 125.0.2535.51
     ARG edge_package_release = 1
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
-
-    ARG firefox_version_amd64 = 126.0~build2
-    ARG firefox_version_arm64 = 115.12.0esr-1~deb12u1
-    ARG gecko_version = 0.34.0
-    DO installer+INSTALL_FIREFOX_LINUX64 --firefox_version_amd64=$firefox_version_amd64 --firefox_version_arm64=$firefox_version_arm64 --gecko_version=$gecko_version
 
     COPY +flutter-src/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
@@ -189,12 +179,8 @@ license-checker-base:
 LICENSE_CHECK:
     FUNCTION
 
-    # Argument for the name of license checker config file
     ARG license_checker_file="license_checker.yaml"
-    # Check whether the license config files are the same
     RUN diff $license_checker_file ./template_license_checker.yaml
-    # Install license_checker
     RUN dart pub global activate license_checker
-    # Generate pubspec.yaml file
     RUN flutter pub get
     RUN lic_ck check-licenses --config $license_checker_file -i
