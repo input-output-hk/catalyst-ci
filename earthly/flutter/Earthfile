@@ -21,8 +21,6 @@ flutter-src:
 flutter-base:
     FROM debian:bookworm-20240513-slim
 
-    RUN --no-cache
-
     RUN apt-get update --fix-missing
     RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
 
