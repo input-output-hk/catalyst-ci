@@ -30,22 +30,22 @@ flutter-base:
     WORKDIR frontend
 
     DO installer+INSTALL_CHROME_LINUX64
-    # DO installer+INSTALL_FIREFOX_LINUX64
+    DO installer+INSTALL_FIREFOX_LINUX64
 
-    # ARG edge_version = 125.0.2535.51
-    # ARG edge_package_release = 1
-    # DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
+    ARG edge_version = 125.0.2535.51
+    ARG edge_package_release = 1
+    DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
 
-    # COPY +flutter-src/flutter /usr/local
-    # ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
-    # RUN flutter config --no-analytics
-    # RUN flutter --version
-    # RUN flutter doctor -v
-    # RUN flutter config --enable-web
-    # RUN dart pub global activate melos
-    # RUN dart pub global activate junitreport
-    # RUN dart pub global activate coverage
-    # RUN dart pub global activate combine_coverage
+    COPY +flutter-src/flutter /usr/local
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    RUN flutter config --no-analytics
+    RUN flutter --version
+    RUN flutter doctor -v
+    RUN flutter config --enable-web
+    RUN dart pub global activate melos
+    RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
+    RUN dart pub global activate combine_coverage
 
 # flutter-base-all-hosts installs required tools and packages for all hosts.
 flutter-base-all-hosts:
