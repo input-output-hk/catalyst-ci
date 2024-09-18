@@ -20,6 +20,8 @@ flutter-src:
 # flutter-base installs required tools and packages.
 flutter-base:
     FROM debian:bookworm-20240513-slim
+
+    # TODO(minikin): we invalidate cache here to get the latest packages.
     RUN --no-cache
 
     RUN apt-get update --fix-missing
@@ -51,7 +53,7 @@ flutter-base-all-hosts:
 
 SETUP:
     FUNCTION
-    FROM --no-cache +flutter-base
+    FROM +flutter-base
 
 # Runs melos bootstrap if melos.yaml file is present.
 BOOTSTRAP:
