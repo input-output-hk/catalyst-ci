@@ -13,6 +13,8 @@ INSTALL_CHROME_LINUX64:
 
     ARG TARGETARCH
     LET BLUE='\033[0;34m'
+    # TODO(minikin): we invalidate cache here to get the latest packages until we have a better solution.
+    RUN --no-cache
 
     # TARGETARCH is the target processor architecture for which the target is being built.
     # WARNING: The value of a built-in arg (earthly) can never be overridden!
