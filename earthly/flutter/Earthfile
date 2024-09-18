@@ -2,6 +2,12 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
+base-setup:
+    FROM debian:bookworm-20240513-slim
+    RUN apt-get update --fix-missing
+    RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
+    WORKDIR frontend
+
 # flutter-src save Flutter source code as artifact.
 flutter-src:
     FROM busybox
@@ -17,16 +23,17 @@ flutter-src:
     END
     SAVE ARTIFACT /flutter flutter
 
+  # TODO(minikin): we invalidate cache here to get the latest packages until we have a better solution.
+install-chrome:
+    FROM +base-setup
+    RUN --no-cache
+    DO installer+INSTALL_CHROME_LINUX64
+
 # flutter-base installs required tools and packages.
 flutter-base:
-    FROM debian:bookworm-20240513-slim
+    FROM +base-setup
 
-    RUN apt-get update --fix-missing
-    RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
-
-    WORKDIR frontend
-
-    DO installer+INSTALL_CHROME_LINUX64
+    FROM +install-chrome
     DO installer+INSTALL_FIREFOX_LINUX64
 
     ARG edge_version = 125.0.2535.51
@@ -43,6 +50,7 @@ flutter-base:
     RUN dart pub global activate junitreport
     RUN dart pub global activate coverage
     RUN dart pub global activate combine_coverage
+
 
 # flutter-base-all-hosts installs required tools and packages for all hosts.
 flutter-base-all-hosts:
