@@ -76,12 +76,9 @@ jobs:
         with:
           ref: gh-pages
 
-      - name: Remove branches draft docs and test reports
-        run: |
-          rm -rf ${{ env.DEST_DIR_DOCS }}
-          rm -rf ${{ env.DEST_DIR_TESTS}}
-
-      - name: Save updated docs and test reports
-        uses: stefanzweifel/git-auto-commit-action@v4
+      - uses: EndBug/add-and-commit@v9
         with:
-          commit_message: Removed draft docs and test reports for ${{ env.GIT_BRANCH }}
+          message: Removed draft docs and test reports for ${{ env.GIT_BRANCH }}
+          remove: |
+            - '-r ${{ env.DEST_DIR_DOCS }}'
+            - '-r ${{ env.DEST_DIR_TESTS }}''
