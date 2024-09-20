@@ -76,9 +76,10 @@ jobs:
         with:
           ref: gh-pages
 
-      - uses: EndBug/add-and-commit@v9
+      - name: Remove draft docs and re-publish
+        uses: EndBug/add-and-commit@v9
         with:
           message: Removed draft docs and test reports for ${{ env.GIT_BRANCH }}
           remove: |
             - '-r ${{ env.DEST_DIR_DOCS }}'
-            - '-r ${{ env.DEST_DIR_TESTS }}''
+            - '-r ${{ env.DEST_DIR_TESTS }}'
