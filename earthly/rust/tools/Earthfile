@@ -44,7 +44,7 @@ CARGO_BINSTALL:
 
 # Note, TOOLS do not benefit from the CARGO caching, and pollute it, so build without it.
 tool-cargo-nextest:
-    DO +CARGO_BINSTALL --package=cargo-nextest --version=0.9.77
+    DO +CARGO_BINSTALL --package=cargo-nextest --version=0.9.78
 
 tool-cargo-machete:
     DO +CARGO_BINSTALL --package=cargo-machete --version=0.6.2
@@ -62,23 +62,23 @@ tool-cargo-depgraph:
     DO +CARGO_BINSTALL --package=cargo-depgraph --version=1.6.0
 
 tool-cargo-llvm-cov:
-    DO +CARGO_BINSTALL --package=cargo-llvm-cov --version=0.6.11 --test_param="NONE"
+    DO +CARGO_BINSTALL --package=cargo-llvm-cov --version=0.6.13 --test_param="NONE"
 
 tool-wasm-tools:
-    DO +CARGO_BINSTALL --package=wasm-tools --version=1.216.0
+    DO +CARGO_BINSTALL --package=wasm-tools --version=1.217.0
 
 tool-cargo-expand:
     DO +CARGO_BINSTALL --package=cargo-expand --version=1.0.90
 
 tool-wit-bindgen:
-    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.30.0 --executable="wit-bindgen" --test_param="-V"
+    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.32.0 --executable="wit-bindgen" --test_param="-V"
 
 # We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
 tool-cargo-sweep:
     DO +CARGO_BINSTALL --package=cargo-sweep --version=0.7.0
 
 tool-cargo-component:
-    DO +CARGO_BINSTALL --package=cargo-component --version=0.15.0
+    DO +CARGO_BINSTALL --package=cargo-component --version=0.16.0
 
 tool-wasm-pack:
     DO +CARGO_BINSTALL --package=wasm-pack --version=0.13.0
