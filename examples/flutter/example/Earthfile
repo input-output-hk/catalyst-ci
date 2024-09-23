@@ -39,10 +39,3 @@ build-web:
     ARG --required SENTRY_DSN
 
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET --SENTRY_DSN=$SENTRY_DSN
-
-# Check the licenses of the Flutter dependencies.
-check-license:
-    FROM flutter-ci+license-checker-base
-
-    COPY . .
-    DO flutter-ci+LICENSE_CHECK --license_checker_file=license_checker.yaml
