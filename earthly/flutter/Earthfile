@@ -46,6 +46,7 @@ flutter-base:
     RUN dart pub global activate junitreport
     RUN dart pub global activate coverage
     RUN dart pub global activate combine_coverage
+    RUN dart pub global activate license_checker
 
 # flutter-base-all-hosts installs required tools and packages for all hosts.
 flutter-base-all-hosts:
@@ -172,18 +173,3 @@ BUILD_WEB:
     ELSE
         SAVE ARTIFACT web /web
     END
-
-# license-checker-base base license checker setup.
-license-checker-base:
-    DO +SETUP
-    COPY ./template_license_checker.yaml .
-
-# Perform license check for Flutter project.
-LICENSE_CHECK:
-    FUNCTION
-
-    ARG license_checker_file="license_checker.yaml"
-    RUN diff $license_checker_file ./template_license_checker.yaml
-    RUN dart pub global activate license_checker
-    RUN flutter pub get
-    RUN lic_ck check-licenses --config $license_checker_file -i
