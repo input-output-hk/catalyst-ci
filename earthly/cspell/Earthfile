@@ -16,13 +16,13 @@ CHECK:
     WORKDIR /work
 
     COPY $src .
-    
-    RUN cspell-cli lint . --dot
+
+    RUN cspell-cli --quiet lint . --dot
 
 # CLEAN: Cleanup the project dictionary.
 CLEAN:
     FUNCTION
-    
+
     COPY .config/dictionaries/project.dic project.dic
     RUN sort -u -d -f project.dic > new.dic
     IF ! diff -q project.dic new.dic
