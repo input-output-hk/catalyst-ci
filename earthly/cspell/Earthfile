@@ -16,8 +16,8 @@ CHECK:
     WORKDIR /work
 
     COPY $src .
-    
-    RUN cspell-cli lint . --dot
+
+    RUN cspell-cli --quiet --fail-fast lint . --dot
 
 # CLEAN: Cleanup the project dictionary.
 CLEAN:
