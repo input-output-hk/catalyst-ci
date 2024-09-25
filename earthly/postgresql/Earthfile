@@ -134,7 +134,7 @@ FORMAT:
 
 # Internal: Integration Test container image
 integration-test:
-    FROM earthly/dind:alpine-3.18-docker-23.0.6-r7
+    FROM earthly/dind:alpine-3.20-docker-26.1.5-r0
 
     RUN apk add --no-cache \
             bash \

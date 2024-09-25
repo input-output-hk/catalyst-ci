@@ -193,7 +193,7 @@ publish-example:
     # This target is called by CI when publishing images. It should use the
     # `SAVE IMAGE` command to save the image which is then picked up by the CI.
     # Note that we start from a "fresh" base image.
-    FROM alpine:3.20
+    FROM alpine:3.20.3
     WORKDIR /app
     ARG tag=latest  # Prefer to use `latest` by default, the CI will override this.
 
