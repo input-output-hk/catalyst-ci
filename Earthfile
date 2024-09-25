@@ -29,7 +29,7 @@ check-spelling:
 
 # check-bash - test all bash files lint properly according to shellcheck.
 check-bash:
-    FROM alpine:3.20
+    FROM alpine:3.20.3
 
     DO bash-ci+SHELLCHECK --src=.
 

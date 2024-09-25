@@ -184,7 +184,7 @@ build:
 
 docker:
     # Here we inherit from a "fresh" minimal alpine version
-    FROM alpine:3.20
+    FROM alpine:3.20.3
     WORKDIR /app
 
     # By default, we'll output this image with the 'latest' tag, but this can be
