@@ -1,6 +1,13 @@
 VERSION 0.8
 
-ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/main/web-browsers"
+# cspell: words Rxxxx
+
+# DO NOT USE `main` branch.
+# When updating the artifacts, update them in `main` and then create a sequentially numbered branch from it called `Rxxxx`
+# Then replace that Release version number in the path below.
+# This ensures that the tools are properly cached, and will also be re-installed when the upstream artifact is updated.
+# If a branch is no longer used by CI, delete it.
+ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/R0001/web-browsers"
 
 #TODO(minikin): https://github.com/input-output-hk/catalyst-storage/issues/1
 
