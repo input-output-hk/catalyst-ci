@@ -1,6 +1,6 @@
 VERSION 0.8
 
-# cspell : words Rxxxx
+# cspell: words Rxxxx
 
 # DO NOT USE `main` branch.
 # When updating the artifacts, update them in `main` and then create a sequentially numbered branch from it called `Rxxxx`
