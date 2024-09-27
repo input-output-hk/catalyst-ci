@@ -37,14 +37,14 @@ INSTALL_CHROME_LINUX64:
             && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
             && rm -rf /opt/chrome.zip /opt/chrome \
             && mv /usr/bin/google-chrome-stable /usr/bin/google-chrome
-            RUN google-chrome --version
+        RUN google-chrome --version
 
         RUN printf "${BLUE} Installing Chromedriver..." \
             && mkdir -p /opt/chromedriver \
             && curl -L "${BASE_URL}/chrome/chromedriver-linux64.zip" \
             -o /opt/chromedriver/chromedriver.zip \
             && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
-            RUN chromedriver --version
+        RUN chromedriver --version
 
     ELSE
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium.zip"
