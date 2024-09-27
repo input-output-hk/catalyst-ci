@@ -1,5 +1,7 @@
 VERSION 0.8
 
+# cspell: words noninteractive
+
 IMPORT ./installer AS installer
 
 # flutter-src save Flutter source code as artifact.
@@ -21,7 +23,7 @@ flutter-src:
 flutter-base:
     FROM debian:bookworm-20240513-slim
 
-    ENV DEBIAN_FRONTEND noninteractive
+    ENV DEBIAN_FRONTEND=noninteractive
 
     RUN apt-get update --fix-missing
     RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
