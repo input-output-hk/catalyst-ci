@@ -94,7 +94,7 @@ jobs:
           runner_address: ${{ secrets.earthly_runner_address }}
           artifact: "true"
       - name: Publish docs
-        uses: JamesIves/github-pages-deploy-action@v4
+        uses: JamesIves/github-pages-deploy-action@v4.6.4
         with:
           clean: true
           clean-exclude: |
