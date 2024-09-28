@@ -50,12 +50,12 @@ flutter-base:
     RUN dart pub global activate license_checker
 
 # flutter-base-all-hosts installs required tools and packages for all hosts.
-flutter-base-all-hosts:
+build-flutter-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
 
 # Test that we can actually build the flutter base image.
-build-flutter-base:
-    FROM +flutter-base
+#build-flutter-base:
+#    FROM +flutter-base
 
 SETUP:
     FUNCTION
