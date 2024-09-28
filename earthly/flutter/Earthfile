@@ -51,7 +51,6 @@ flutter-base:
 
 # test-flutter-base-all-hosts : installs required tools and packages for all hosts.
 test-flutter-base-all-hosts:
-    RUN exit 1
     BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
 
 SETUP:
