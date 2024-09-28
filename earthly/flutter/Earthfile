@@ -49,9 +49,13 @@ flutter-base:
     RUN dart pub global activate combine_coverage
     RUN dart pub global activate license_checker
 
-# test-flutter-base-all-hosts : installs required tools and packages for all hosts.
-test-flutter-base-all-hosts:
-    BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
+# test-flutter-base-amd64 : installs required tools and packages for amd64.
+test-flutter-base-amd64:
+    BUILD --platform=linux/amd64 +flutter-base
+
+# test-flutter-base-arm64 : installs required tools and packages for arm64.
+test-flutter-base-arm64:
+    BUILD --platform=linux/arm64 +flutter-base
 
 SETUP:
     FUNCTION
