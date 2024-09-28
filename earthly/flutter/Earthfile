@@ -1,5 +1,7 @@
 VERSION 0.8
 
+# cspell: words noninteractive
+
 IMPORT ./installer AS installer
 
 # flutter-src save Flutter source code as artifact.
@@ -20,6 +22,8 @@ flutter-src:
 # flutter-base installs required tools and packages.
 flutter-base:
     FROM debian:bookworm-20240513-slim
+
+    ENV DEBIAN_FRONTEND=noninteractive
 
     RUN apt-get update --fix-missing
     RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
@@ -48,6 +52,10 @@ flutter-base:
 # flutter-base-all-hosts installs required tools and packages for all hosts.
 flutter-base-all-hosts:
     BUILD --platform=linux/amd64 --platform=linux/arm64 +flutter-base
+
+# Test that we can actually build the flutter base image.
+build-flutter-base:
+    FROM +flutter-base
 
 SETUP:
     FUNCTION
