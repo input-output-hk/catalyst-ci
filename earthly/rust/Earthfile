@@ -4,7 +4,7 @@ VERSION 0.8
 # the Rust library from Earthly can only be imported in this Earthfile.
 # FUNCTIONs or targets in that Earthfile MUST be shimmed here.
 # No other earthfile should reference the rust library in the earthly/lib repo.
-IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
+IMPORT github.com/earthly/lib/rust:3.0.3 AS rust
 
 # Local Earthfile reference imports
 IMPORT ./tools AS rust-tools
@@ -139,7 +139,9 @@ installer:
     # Call `+INIT` before copying the source file to avoid installing dependencies every time source code changes. 
     # This parametrization will be used in future calls to functions of the library
     # Init using the common cat-ci cache prefix.
-    DO rust+INIT --keep_fingerprints=true
+    ARG keep_fingerprints=true
+    ARG sweep_days=4
+    DO rust+INIT --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days
 
     # Set the mount cache env vars
     DO rust+SET_CACHE_MOUNTS_ENV
@@ -213,9 +215,11 @@ EXECUTE:
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         set -e; \
         rm -f fail; \
-        $cmd $args1 $args2 $args3 $args4 $args5 $args6 || touch fail; \
+        $cmd $args1 $args2 $args3 $args4 $args5 $args6; \
         cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
-        cargo sweep -r -i
+        cargo sweep -r -i; \
+        $EARTHLY_FUNCTIONS_HOME/copy-output.sh "$output";
+    RUN $EARTHLY_FUNCTIONS_HOME/rename-output.sh        
         
 
     # We always want to save these (if requested) even if the command fails.
@@ -244,11 +248,6 @@ EXECUTE:
     IF [ "$docs" != "false" ]
         DO rust+COPY_OUTPUT --output="doc/.*"
         SAVE ARTIFACT target/doc doc
-    END
-
-    # This output is ONLY saved on successful command execution.
-    IF [ "$output" != "" ]
-        DO rust+COPY_OUTPUT --output=$output
     END
 
 # CARGO : Shim so we use the correct upstream RUST library consistently
@@ -289,9 +288,8 @@ CARGO:
 COPY_OUTPUT:
     FUNCTION
     ARG --required output
-    ARG TMP_FOLDER="/tmp/earthly/lib/rust"
 
-    DO rust+COPY_OUTPUT --output=$output --TMP_FOLDER=$TMP_FOLDER
+    DO rust+COPY_OUTPUT --output=$output
 
 # SETUP : Common Rust setup.
 SETUP:
