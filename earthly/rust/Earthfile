@@ -294,7 +294,9 @@ COPY_OUTPUT:
 # SETUP : Common Rust setup.
 SETUP:
     FUNCTION
-    FROM +installer
+    ARG keep_fingerprints=true
+    ARG sweep_days=4
+    FROM +installer --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days
 
     # The ONLY toolchain we support is the one in the installer.
     # DO NOT copy the `rust-toolchain.toml` file into CI as it breaks
