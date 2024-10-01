@@ -303,7 +303,8 @@ SETUP:
     ARG TARGETARCH
 	ARG TARGETOS
 	ARG TARGETVARIANT    
-    ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#${TARGETOS}#${TARGETARC}#${TARGETVARIANT}#earthly-cargo-cache"
+    ARG CACHE_VERSION="00001" # Bumping this causes the old cache to be dropped.
+    ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#${TARGETOS}#${TARGETARCH}${TARGETVARIANT}#earthly-cargo-cache#${CACHE_VERSION}"
 
     FROM +installer --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days --cache_prefix=$cache_prefix
 
