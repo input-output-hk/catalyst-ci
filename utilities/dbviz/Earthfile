@@ -8,9 +8,10 @@ IMPORT ./../../earthly/rust AS rust-ci
 builder:
     DO rust-ci+SETUP
 
-    COPY --dir .cargo .config src .
-    COPY Cargo.toml .
-    COPY clippy.toml deny.toml rustfmt.toml .
+    COPY --keep-ts --dir \
+        .cargo .config Cargo.toml clippy.toml deny.toml rustfmt.toml \
+        src \
+        .
 
 ## -----------------------------------------------------------------------------
 ##
