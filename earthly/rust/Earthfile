@@ -141,7 +141,8 @@ installer:
     # Init using the common cat-ci cache prefix.
     ARG keep_fingerprints=true
     ARG sweep_days=4
-    DO rust+INIT --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days
+    ARG --required cache_prefix
+    DO rust+INIT --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days --cache_prefix=$cache_prefix
 
     # Set the mount cache env vars
     DO rust+SET_CACHE_MOUNTS_ENV
@@ -296,7 +297,13 @@ SETUP:
     FUNCTION
     ARG keep_fingerprints=true
     ARG sweep_days=4
-    FROM +installer --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days
+
+    # $EARTHLY_CACHE_PREFIX - MUST BE DONE IN A FUNCTION, OR IT PRODUCES THE WRONG VALUE
+    ARG EARTHLY_TARGET_PROJECT_NO_TAG #https://docs.earthly.dev/docs/earthfile/builtin-args
+    ARG OS_RELEASE=$(md5sum /etc/os-release | cut -d ' ' -f 1)
+    ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#${OS_RELEASE}#earthly-cargo-cache"
+
+    FROM +installer --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days --cache_prefix=$cache_prefix
 
     # The ONLY toolchain we support is the one in the installer.
     # DO NOT copy the `rust-toolchain.toml` file into CI as it breaks
