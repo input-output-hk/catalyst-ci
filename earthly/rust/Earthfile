@@ -300,7 +300,10 @@ SETUP:
 
     # $EARTHLY_CACHE_PREFIX - MUST BE DONE IN A FUNCTION, OR IT PRODUCES THE WRONG VALUE
     ARG EARTHLY_TARGET_PROJECT_NO_TAG #https://docs.earthly.dev/docs/earthfile/builtin-args
-    ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#earthly-cargo-cache"
+    ARG TARGETARCH
+	ARG TARGETOS
+	ARG TARGETVARIANT    
+    ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#${TARGETOS}#${TARGETARC}#${TARGETVARIANT}#earthly-cargo-cache"
 
     FROM +installer --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days --cache_prefix=$cache_prefix
 
