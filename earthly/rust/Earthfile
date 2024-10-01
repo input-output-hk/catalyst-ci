@@ -295,7 +295,7 @@ COPY_OUTPUT:
 # SETUP : Common Rust setup.
 SETUP:
     FUNCTION
-    ARG keep_fingerprints=true
+    ARG keep_fingerprints=false
     ARG sweep_days=4
 
     # $EARTHLY_CACHE_PREFIX - MUST BE DONE IN A FUNCTION, OR IT PRODUCES THE WRONG VALUE
