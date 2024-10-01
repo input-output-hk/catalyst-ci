@@ -1,5 +1,7 @@
 VERSION 0.8
 
+# cspell: words tomljson
+
 # To ensure all consumers of `catalyst-ci` use the correct upstream,
 # the Rust library from Earthly can only be imported in this Earthfile.
 # FUNCTIONs or targets in that Earthfile MUST be shimmed here.
