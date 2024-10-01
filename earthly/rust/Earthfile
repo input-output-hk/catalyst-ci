@@ -314,3 +314,16 @@ SYNC_STD_CFG:
     SAVE ARTIFACT /stdcfgs/deny.toml AS LOCAL deny.toml
     SAVE ARTIFACT /stdcfgs/rustfmt.toml AS LOCAL rustfmt.toml
     SAVE ARTIFACT /stdcfgs/rust-toolchain.toml AS LOCAL rust-toolchain.toml
+
+# FINGERPRINT_SRC  : Generates a fingerprint of the source.
+FINGERPRINT_SRC:
+    FUNCTION
+
+    ARG WHENCE=..
+    ARG DIR=build
+    ARG FINGERPRINT=src_fingerprint.txt
+
+    RUN cd $WHENCE; \
+        tar -C ./ -cf - --sort=name --mtime='UTC 2019-01-01' --group=0 --owner=0 --numeric-owner $DIR \
+        | sha256sum  > $FINGERPRINT
+    RUN cat $WHENCE/$FINGERPRINT
