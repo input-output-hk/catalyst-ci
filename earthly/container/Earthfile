@@ -1,0 +1,26 @@
+VERSION 0.8
+
+IMPORT ../python AS python
+IMPORT ../../utilities/scripts AS scripts
+
+main-builder:
+    FROM debian:stable-slim
+
+    ARG --required tool
+
+    WORKDIR /root
+
+    RUN apt-get update && \
+        apt-get install -y \
+        openssl \
+        wget \
+        curl \ 
+        graphviz \
+        bash \
+        build-essential \
+        && rm -rf /var/lib/apt/lists/*
+
+    IF [ "$tool" = "python" ]
+        COPY python+script/scripts scripts
+        DO python+ADD_PYTHON_TOOLS
+    END
