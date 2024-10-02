@@ -1,9 +1,50 @@
-# Common Python UDCs and Builders.
 VERSION 0.8
 
 IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words libgcc ruff
+
+# script: Copy the python scripts directory 
+script:
+    FROM scratch
+    COPY --dir scripts scripts
+    SAVE ARTIFACT /scripts scripts
+
+ADD_PYTHON_TOOLS:
+    FUNCTION
+
+    # Install additional Python tools
+    RUN apt-get update && \
+        apt-get install -y \
+        python3.10 \
+        python3-pip \
+        python3-venv \
+        && rm -rf /var/lib/apt/lists/*
+
+    RUN python3 --version
+    RUN pip3 --version
+    
+    RUN python3 -m venv /opt/venv
+    ENV PATH="/opt/venv/bin:$PATH"
+    ENV PYTHONDONTWRITEBYTECODE=1  # Prevents .pyc file creation
+
+    # Install Poetry
+    ENV POETRY_HOME="/opt/poetry"
+    RUN mkdir -p $POETRY_HOME && \
+        curl -sSL https://install.python-poetry.org | python3 - && \
+        ln -s "$POETRY_HOME/bin/poetry" /usr/local/bin/poetry
+
+    # Adjust Poetry's configuration to optimize performance
+    RUN poetry config installer.max-workers 10
+
+    RUN pip3 install ruff==0.6.8
+    RUN pip install rich==13.9.1
+
+    # Add common scripts for use within the container
+    DO scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_PYTHON_SCRIPTS
+
+# ------- delete below this line -------
 
 python-base:
     FROM python:3.12-alpine3.20
@@ -60,7 +101,7 @@ CHECK:
     FUNCTION
 
     # Execute the check script
-    RUN /scripts/std_checks.py
+    RUN scripts/std_checks.py
 
 LINT_PYTHON:
     # Linting all Python code is done with ruff
