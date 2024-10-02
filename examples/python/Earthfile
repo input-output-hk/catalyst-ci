@@ -1,20 +1,14 @@
 VERSION 0.8
 
 IMPORT ../../earthly/python AS python-ci
-
-# Assuming the detailed setup from the second snippet is defined in relevant Earthly targets.
+IMPORT ../../earthly/container AS container
 
 builder:
-    FROM python-ci+python-base
-
+    FROM container+main-builder --tool=python
+    
     COPY --dir poetry.lock pyproject.toml Readme.md src .
 
 check:
     FROM +builder
 
     DO python-ci+CHECK
-
-python-linter:
-    FROM +builder
-    
-    DO python-ci+LINT_PYTHON
