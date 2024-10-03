@@ -320,7 +320,6 @@ SETUP:
 # SYNC_STD_CFG : Syncs the standard config files locally.
 SYNC_STD_CFG:
     FUNCTION
-    FROM +installer
 
     SAVE ARTIFACT /stdcfgs/cargo_config.toml AS LOCAL .cargo/config.toml
     SAVE ARTIFACT /stdcfgs/clippy.toml AS LOCAL clippy.toml
