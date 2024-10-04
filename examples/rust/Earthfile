@@ -1,12 +1,13 @@
 VERSION 0.8
 
 IMPORT ./../../earthly/rust AS rust-ci
+IMPORT ./../../earthly/container AS container
 
 # cspell: words USERARCH toolsets
 
 # builder : Set up our target toolchains, and copy our files.
 builder:
-    DO rust-ci+SETUP
+    FROM container+main-builder --tool=rust
 
     COPY --keep-ts --dir \
         .cargo .config Cargo.toml clippy.toml deny.toml rustfmt.toml \

@@ -1,6 +1,7 @@
 VERSION 0.8
 
 IMPORT ../python AS python
+IMPORT ../rust AS rust
 IMPORT ../../utilities/scripts AS scripts
 
 main-builder:
@@ -24,3 +25,4 @@ main-builder:
         COPY python+script/scripts scripts
         DO python+ADD_PYTHON_TOOLS
     END
+    DO rust+ADD_RUST_TOOLS
