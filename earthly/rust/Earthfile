@@ -355,10 +355,9 @@ REMOVE_SOURCE_FINGERPRINTS:
         source_libs=$(find . -name Cargo.toml -exec bash -c '/tmp/tomljson {} | /tmp/jq -r .package.name; printf "\n"' \;) ; \
         fingerprint_folders=$(find target -name .fingerprint) ; \
         for fingerprint_folder in $fingerprint_folders; do \
-           echo $fingerprint_folder;  \
-           mkdir -p $fingerprint_folder; \
-           cd $fingerprint_folder; \
-           for source_lib in $source_libs; do \
-             find . -maxdepth 1 -regex "\./$source_lib-[^-]+" -exec bash -c 'echo "deleting $(readlink -f {})"; rm -rf {}' \; ; \
-           done \
+            if cd $fingerprint_folder ; then \
+                for source_lib in $source_libs; do \
+                    find . -maxdepth 1 -regex "\./$source_lib-[^-]+" -exec bash -c 'echo "deleting $(readlink -f {})"; rm -rf {}' \; ; \
+                done \
+            fi; \
          done;
