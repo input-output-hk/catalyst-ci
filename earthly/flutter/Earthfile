@@ -143,18 +143,24 @@ UNIT_TESTS:
 
     IF [ -f melos.yaml ]
         RUN echo "Running unit tests with melos."
-        RUN melos run test-report
+
+        # We always want to save the test_reports and coverage
+        # therefore we must defer the error reported here until later.
+        RUN melos run test-report || touch fail
 
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
             SAVE ARTIFACT coverage AS LOCAL coverage
         END
+
+        # Defer the failure to here.
+        IF [ -f fail ]
+            RUN echo "Error occurred when running: melos run test-report"
+            RUN exit 1
+        END
     ELSE
         RUN echo "Running flutter test"
         RUN flutter test
-        WAIT
-            SAVE ARTIFACT test_reports AS LOCAL test_reports
-        END
     END
 
 # Build web app and save artifacts locally if needed.
