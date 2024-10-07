@@ -146,7 +146,13 @@ UNIT_TESTS:
 
         # We always want to save the test_reports and coverage
         # therefore we must defer the error reported here until later.
-        RUN melos run test-report || touch fail
+        RUN melos run test-report > melos-output.txt 2>&1 || touch fail
+
+        # If not failed then print the output immediately,
+        # if it has failed then it's printed at the end of the function when exiting.
+        IF [ ! -f fail ]
+            RUN cat melos-output.txt
+        END
 
         WAIT
             SAVE ARTIFACT test_reports AS LOCAL test_reports
@@ -155,8 +161,9 @@ UNIT_TESTS:
 
         # Defer the failure to here.
         IF [ -f fail ]
-            RUN echo "Error occurred when running: melos run test-report"
-            RUN exit 1
+            RUN echo "Error occurred when running: melos run test-report"; \
+                cat melos-output.txt; \
+                exit 1
         END
     ELSE
         RUN echo "Running flutter test"
