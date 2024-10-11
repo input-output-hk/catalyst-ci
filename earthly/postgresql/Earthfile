@@ -2,10 +2,9 @@
 VERSION 0.8
 
 IMPORT ../rust/tools AS rust-tools
-IMPORT ../../utilities/dbviz AS dbviz
 IMPORT ../../utilities/scripts AS scripts
 
-# cspell: words psycopg dbviz
+# cspell: words psycopg
 
 postgres-base:
     FROM postgres:16.4-bookworm
@@ -43,10 +42,6 @@ postgres-base:
     # Get refinery
     COPY rust-tools+tool-refinery/refinery /bin
 
-    # Get dbviz
-    COPY dbviz+build/dbviz /bin
-    RUN dbviz --help
-
     # Copy our set SQL files
     COPY --dir sql /sql
 
@@ -56,7 +51,11 @@ postgres-base:
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
 
+    # Copy templates to the working directory
+    COPY --dir templates /templates
+
     SAVE ARTIFACT /scripts /scripts
+    SAVE ARTIFACT /templates /templates
 
 # Common build setup steps.
 # Arguments:
@@ -82,8 +81,13 @@ BUILDER:
 
 # DOCS - FUNCTION to build the docs, needs to be run INSIDE the BUILDER like so:
 # 
-# 1. Create a ./docs/diagrams.json which has the options needed to run to generate the docs to /docs
-# 2. Define the following targets in your earthfile
+# This function uses SchemaSpy to generate database documentation.
+# SchemaSpy creates detailed, browsable ER diagrams and schema documentation.
+#
+# To use this function:
+# 1. Ensure your migrations are in the ./migrations directory
+# 2. Have a refinery.toml file to configure the migrations
+# 3. Define the following targets in your earthfile:
 #
 # builder:
 #    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+BUILDER --sqlfluff_cfg=./../../+repo-config/repo/.sqlfluff
@@ -93,25 +97,46 @@ BUILDER:
 #
 #    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+BUILD --image_name=<name>
 #    DO github.com/input-output-hk/catalyst-ci/earthly/postgresql:<ver>+DOCS
+#
+# The generated documentation will be saved in the ./docs artifact.
 DOCS:
     FUNCTION
 
-    ARG diagrams=./diagrams.json
     ARG migrations=./migrations
     ARG refinery_toml=./refinery.toml
 
+    FROM +docs-base
+      
     USER postgres:postgres
     WORKDIR /docs
 
-    COPY $diagrams ./diagrams.json
     COPY --dir $migrations .
     COPY --dir $refinery_toml .
 
-    RUN /scripts/std_docs.py ./diagrams.json
+    RUN /scripts/std_docs.py
+    # Pull templates artifact from postgres-base
+    COPY +postgres-base/templates/schema.md ./docs/schema.md
 
-    SAVE ARTIFACT docs /docs
+    SAVE ARTIFACT docs ./docs
 
+docs-base:
+    FROM +postgres-base
 
+    # Define ARGs for versions specific to docs
+    ARG SCHEMASPY_VERSION=6.2.4
+    ARG POSTGRESQL_JDBC_VERSION=42.7.4
+    ARG OPENJDK_VERSION=21
+
+    WORKDIR /
+        
+    # Setup SchemaSpy requirements, commands combined to reduce layers
+    RUN echo "deb http://ftp.de.debian.org/debian sid main" > /etc/apt/sources.list && \
+        apt-get update && \
+        apt-get install -y \
+            openjdk-${OPENJDK_VERSION}-jre-headless && \
+        wget -O /bin/schemaspy.jar https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar && \
+        wget -O /bin/postgresql.jar https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar && \
+        apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Linter checks for sql files
 CHECK:
@@ -170,4 +195,5 @@ BUILD:
 
     # Push the container...
     SAVE IMAGE ${image_name}:latest
+
 
