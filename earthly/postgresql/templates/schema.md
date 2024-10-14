@@ -4,7 +4,7 @@ hide:
   - navigation
   - toc
 ---
-
+<!-- markdownlint-disable -->
 <!--
   This HTML block configures the page to display a full-width iframe containing the database schema,
   positioned below the header and above the footer removing the second scrollbar.
@@ -17,7 +17,6 @@ hide:
   The hide metadata removes the navigation and table of contents from the markdown page.
 -->
 
-<!-- markdownlint-disable no-inline-html -->
 <style>
   iframe {
     position: fixed;
@@ -35,7 +34,6 @@ hide:
     var iframe = document.getElementById('schemaFrame');
     var header = document.querySelector('header');
     var footer = document.querySelector('footer');
-    
     function adjustIframePosition() {
       var headerHeight = header.offsetHeight;
       var footerHeight = footer.offsetHeight;
@@ -45,7 +43,6 @@ hide:
 
     iframe.onload = function() {
       adjustIframePosition();
-      
       // Prevent default link behavior inside iframe to avoid page reloads
       iframe.contentWindow.addEventListener('click', function(e) {
         if (e.target.tagName === 'A') {
