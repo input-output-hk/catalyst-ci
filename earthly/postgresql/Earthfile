@@ -83,7 +83,7 @@ BUILDER:
 # DOCS - FUNCTION to build the docs, needs to be run INSIDE the BUILDER like so:
 # 
 # This function uses SchemaSpy to generate database documentation.
-# SchemaSpy creates detailed, browsable ER diagrams and schema documentation.
+# SchemaSpy creates detailed, Discoverable ER diagrams and schema documentation.
 #
 # To use this function:
 # 1. Ensure your migrations are in the ./migrations directory
@@ -134,7 +134,7 @@ docs-base:
 
     RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# seperate target to download and cache schemaspy and postgresql jdbc jars, avoids nework calls on every run
+# separate target to download and cache schemaspy and postgresql JDBC jars, avoids network calls on every run
 schemaspy-artifacts:
     FROM alpine:3.20.3
     ARG SCHEMASPY_VERSION=6.2.4
