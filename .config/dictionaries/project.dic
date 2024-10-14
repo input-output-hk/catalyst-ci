@@ -87,6 +87,7 @@ rustflags
 rustfmt
 rustup
 sanchonet
+schemaspy
 sqlfluff
 stdcfgs
 subproject

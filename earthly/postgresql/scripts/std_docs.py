@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-# cspell: words dbmigrations dbhost dbuser dbuserpw Tsvg
+# cspell: words dbmigrations dbhost dbuser dbuserpw Tsvg pgsql11
 
 from typing import Optional
 import python.exec_manager as exec_manager
