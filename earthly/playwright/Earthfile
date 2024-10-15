@@ -1,0 +1,12 @@
+VERSION 0.8
+
+SETUP:
+    FUNCTION
+    ARG workdir
+    FROM mcr.microsoft.com/playwright:v1.45.2-jammy
+    WORKDIR $workdir
+
+    RUN apt-get update && apt-get install -y \
+        libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb python3.11 python3-pip && \
+        apt-get clean && \
+        rm -rf /var/lib/apt/lists/*

@@ -1,10 +1,12 @@
 VERSION 0.8
 
+# cspell: words tomljson
+
 # To ensure all consumers of `catalyst-ci` use the correct upstream,
 # the Rust library from Earthly can only be imported in this Earthfile.
 # FUNCTIONs or targets in that Earthfile MUST be shimmed here.
 # No other earthfile should reference the rust library in the earthly/lib repo.
-IMPORT github.com/earthly/lib/rust:3.0.2 AS rust
+IMPORT github.com/earthly/lib/rust:3.0.3 AS rust
 
 # Local Earthfile reference imports
 IMPORT ./tools AS rust-tools
@@ -139,7 +141,10 @@ installer:
     # Call `+INIT` before copying the source file to avoid installing dependencies every time source code changes. 
     # This parametrization will be used in future calls to functions of the library
     # Init using the common cat-ci cache prefix.
-    DO rust+INIT --keep_fingerprints=true
+    ARG keep_fingerprints=false
+    ARG sweep_days=4
+    ARG --required cache_prefix
+    DO rust+INIT --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days --cache_prefix=$cache_prefix
 
     # Set the mount cache env vars
     DO rust+SET_CACHE_MOUNTS_ENV
@@ -195,8 +200,10 @@ EXECUTE:
     ARG docs="false"
     ARG ALLOW_DEBUG_TARGET="false"
     DO rust+SET_CACHE_MOUNTS_ENV
+
     IF [ "$EARTHLY_KEEP_FINGERPRINTS" = "false" ]
-       DO rust+REMOVE_SOURCE_FINGERPRINTS
+
+       DO +REMOVE_SOURCE_FINGERPRINTS
     END
 
     # target/debug should not be present, so purge it just in case.
@@ -213,9 +220,11 @@ EXECUTE:
     RUN --mount=$EARTHLY_RUST_CARGO_HOME_CACHE --mount=$EARTHLY_RUST_TARGET_CACHE \
         set -e; \
         rm -f fail; \
-        $cmd $args1 $args2 $args3 $args4 $args5 $args6 || touch fail; \
+        $cmd $args1 $args2 $args3 $args4 $args5 $args6; \
         cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
-        cargo sweep -r -i
+        cargo sweep -r -i; \
+        $EARTHLY_FUNCTIONS_HOME/copy-output.sh "$output";
+    RUN $EARTHLY_FUNCTIONS_HOME/rename-output.sh        
         
 
     # We always want to save these (if requested) even if the command fails.
@@ -244,11 +253,6 @@ EXECUTE:
     IF [ "$docs" != "false" ]
         DO rust+COPY_OUTPUT --output="doc/.*"
         SAVE ARTIFACT target/doc doc
-    END
-
-    # This output is ONLY saved on successful command execution.
-    IF [ "$output" != "" ]
-        DO rust+COPY_OUTPUT --output=$output
     END
 
 # CARGO : Shim so we use the correct upstream RUST library consistently
@@ -289,14 +293,24 @@ CARGO:
 COPY_OUTPUT:
     FUNCTION
     ARG --required output
-    ARG TMP_FOLDER="/tmp/earthly/lib/rust"
 
-    DO rust+COPY_OUTPUT --output=$output --TMP_FOLDER=$TMP_FOLDER
+    DO rust+COPY_OUTPUT --output=$output
 
 # SETUP : Common Rust setup.
 SETUP:
     FUNCTION
-    FROM +installer
+    ARG keep_fingerprints=false
+    ARG sweep_days=4
+
+    # $EARTHLY_CACHE_PREFIX - MUST BE DONE IN A FUNCTION, OR IT PRODUCES THE WRONG VALUE
+    ARG EARTHLY_TARGET_PROJECT_NO_TAG #https://docs.earthly.dev/docs/earthfile/builtin-args
+    ARG TARGETARCH
+    ARG TARGETOS
+	  ARG TARGETVARIANT    
+    ARG CACHE_VERSION="00001" # Bumping this causes the old cache to be dropped.
+    ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#${TARGETOS}#${TARGETARCH}${TARGETVARIANT}#earthly-cargo-cache#${CACHE_VERSION}"
+
+    FROM +installer --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days --cache_prefix=$cache_prefix
 
     # The ONLY toolchain we support is the one in the installer.
     # DO NOT copy the `rust-toolchain.toml` file into CI as it breaks
@@ -306,7 +320,6 @@ SETUP:
 # SYNC_STD_CFG : Syncs the standard config files locally.
 SYNC_STD_CFG:
     FUNCTION
-    FROM +installer
 
     SAVE ARTIFACT /stdcfgs/cargo_config.toml AS LOCAL .cargo/config.toml
     SAVE ARTIFACT /stdcfgs/clippy.toml AS LOCAL clippy.toml
@@ -314,3 +327,37 @@ SYNC_STD_CFG:
     SAVE ARTIFACT /stdcfgs/deny.toml AS LOCAL deny.toml
     SAVE ARTIFACT /stdcfgs/rustfmt.toml AS LOCAL rustfmt.toml
     SAVE ARTIFACT /stdcfgs/rust-toolchain.toml AS LOCAL rust-toolchain.toml
+
+# FINGERPRINT_SRC  : Generates a fingerprint of the source.
+FINGERPRINT_SRC:
+    FUNCTION
+
+    ARG WHENCE=..
+    ARG DIR=build
+    ARG FINGERPRINT=src_fingerprint.txt
+
+    RUN cd $WHENCE; \
+        tar -C ./ -cf - --sort=name --mtime='UTC 2019-01-01' --group=0 --owner=0 --numeric-owner $DIR \
+        | sha256sum  > $FINGERPRINT
+    RUN cat $WHENCE/$FINGERPRINT
+
+REMOVE_SOURCE_FINGERPRINTS:
+    FUNCTION
+    DO rust+CHECK_INITED
+    COPY rust+get-tomljson/tomljson /tmp/tomljson
+    COPY rust+get-jq/jq /tmp/jq
+    RUN  if [ ! -n "$EARTHLY_RUST_TARGET_CACHE" ]; then \
+      echo "+SET_CACHE_MOUNTS_ENV has not been called yet in this build environment" ; \
+      exit 1; \
+    fi;
+    RUN --mount=$EARTHLY_RUST_TARGET_CACHE \
+        set -e;\
+        source_libs=$(find . -name Cargo.toml -exec bash -c '/tmp/tomljson {} | /tmp/jq -r .package.name; printf "\n"' \;) ; \
+        fingerprint_folders=$(find target -name .fingerprint) ; \
+        for fingerprint_folder in $fingerprint_folders; do \
+            if cd $fingerprint_folder ; then \
+                for source_lib in $source_libs; do \
+                    find . -maxdepth 1 -regex "\./$source_lib-[^-]+" -exec bash -c 'echo "deleting $(readlink -f {})"; rm -rf {}' \; ; \
+                done \
+            fi; \
+         done;

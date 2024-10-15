@@ -53,7 +53,15 @@ Kroki
 kubeconfig
 lcov
 ldflags
+libasound
+libatk
+libatspi
+libdrm
+libgbm
 libgcc
+libnss
+libxkbcommon
+libxshmfence
 lintfix
 markdownlint
 mattn
@@ -111,6 +119,7 @@ wasmtime
 webkitallowfullscreen
 WORKDIR
 xerrors
+xvfb
 zstd
 zstdcat
 JDBC
