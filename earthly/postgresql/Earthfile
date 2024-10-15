@@ -10,6 +10,9 @@ IMPORT ../java AS java
 postgres-base:
     FROM postgres:16.4-bookworm
 
+    ARG SCHEMASPY_VERSION=6.2.4
+    ARG POSTGRESQL_JDBC_VERSION=42.7.4
+
     WORKDIR /root
 
     # Install necessary packages 
@@ -34,8 +37,10 @@ postgres-base:
         ripgrep \
         wget \
         pipx \
-        && rm -rf /var/lib/apt/lists/*
-
+        && rm -rf /var/lib/apt/lists/* \
+        && wget -O /bin/schemaspy.jar https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar \
+        && wget -O /bin/postgresql.jar https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
+   
     # Install SQLFluff - Check
     ENV PATH="/root/.local/bin:${PATH}"
     RUN pipx install sqlfluff==3.1.1 && sqlfluff version
@@ -54,6 +59,9 @@ postgres-base:
 
     # Copy templates to the working directory
     COPY --dir templates /templates
+
+    # Use the cached java installation from the java Earthfile
+    DO java+COPY_DEPS
 
     SAVE ARTIFACT /scripts /scripts
     SAVE ARTIFACT /templates /templates
@@ -106,7 +114,7 @@ DOCS:
     ARG migrations=./migrations
     ARG refinery_toml=./refinery.toml
 
-    FROM +docs-base
+    FROM +postgres-base
       
     USER postgres:postgres
     WORKDIR /docs
@@ -119,32 +127,6 @@ DOCS:
     COPY +postgres-base/templates/schema.md ./docs/schema.md
 
     SAVE ARTIFACT docs ./docs
-
-docs-base:
-    FROM +postgres-base
-
-    WORKDIR /
-
-    # Copy the JAR files from the SCHEMASPY_ARTIFACTS target
-    COPY +schemaspy-artifacts/schemaspy.jar /bin/schemaspy.jar
-    COPY +schemaspy-artifacts/postgresql.jar /bin/postgresql.jar
-
-    # Use the cached java installation from the java Earthfile
-    DO java+COPY_DEPS
-
-    RUN apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# separate target to download and cache schemaspy and postgresql JDBC jars, avoids network calls on every run
-schemaspy-artifacts:
-    FROM alpine:3.20.3
-    ARG SCHEMASPY_VERSION=6.2.4
-    ARG POSTGRESQL_JDBC_VERSION=42.7.4
-    WORKDIR /build
-    RUN apk add --no-cache wget && \
-        wget -O schemaspy.jar https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar && \
-        wget -O postgresql.jar https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
-    SAVE ARTIFACT schemaspy.jar /schemaspy.jar
-    SAVE ARTIFACT postgresql.jar /postgresql.jar
 
 # Linter checks for sql files
 CHECK:

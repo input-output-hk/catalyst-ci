@@ -1,8 +1,6 @@
 VERSION 0.8
 
-# Base image for Java used in other targets to avoid using apt update / get-installs
-# Network operations are not cached: Earthly doesn’t cache network 
-# operations (like apt-get update or wget) because network resources can change over time. 
+# Base image for Java used in other targets to avoid improve caching
 java-base:
     FROM openjdk:21-jdk-slim
 
