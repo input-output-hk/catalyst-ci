@@ -1,0 +1,15 @@
+VERSION 0.8
+
+# Base image for Java used in other targets to avoid improve caching
+java-base:
+    FROM openjdk:21-jdk-slim
+
+    SAVE ARTIFACT /usr/local/openjdk-21 /java
+
+COPY_DEPS:
+    FUNCTION
+    COPY +java-base/java /usr/local/openjdk-21
+
+    # Set environment variables for Java
+    ENV JAVA_HOME=/usr/local/openjdk-21
+    ENV PATH=$JAVA_HOME/bin:$PATH
