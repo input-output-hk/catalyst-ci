@@ -37,13 +37,18 @@ postgres-base:
         ripgrep \
         wget \
         pipx \
-        && rm -rf /var/lib/apt/lists/* \
-        && wget -O /bin/schemaspy.jar https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar \
-        && wget -O /bin/postgresql.jar https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
-   
+        && rm -rf /var/lib/apt/lists/*
+
+    # Use the cached java installation from the java Earthfile
+    DO java+COPY_DEPS
+
     # Install SQLFluff - Check
     ENV PATH="/root/.local/bin:${PATH}"
     RUN pipx install sqlfluff==3.1.1 && sqlfluff version
+
+    # Install SchemaSpy and required Postgresql JDBC driver
+    RUN wget -O /bin/postgresql.jar https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
+    RUN wget -O /bin/schemaspy.jar https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar
 
     # Get refinery
     COPY rust-tools+tool-refinery/refinery /bin
@@ -59,9 +64,6 @@ postgres-base:
 
     # Copy templates to the working directory
     COPY --dir templates /templates
-
-    # Use the cached java installation from the java Earthfile
-    DO java+COPY_DEPS
 
     SAVE ARTIFACT /scripts /scripts
     SAVE ARTIFACT /templates /templates
