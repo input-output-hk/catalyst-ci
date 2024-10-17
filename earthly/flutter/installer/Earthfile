@@ -99,9 +99,8 @@ INSTALL_EDGE_LINUX64:
     LET BLUE ='\033[0;34m'
 
     IF [ "$TARGETARCH" = "amd64" ]
-        ARG --required edge_version
-        ARG --required edge_package_release
-
+        ARG edge_version = 125.0.2535.51
+        ARG edge_package_release = 1
         RUN printf "${BLUE} Installing Edge..."
         RUN curl -LO https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
         RUN apt-get update && apt-get install -y ./microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb

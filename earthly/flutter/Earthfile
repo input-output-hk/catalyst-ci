@@ -10,19 +10,18 @@ ADD_FLUTTER_TOOLS:
     ARG TARGETARCH
 
     ENV DEBIAN_FRONTEND=noninteractive
-
-    RUN apt-get update --fix-missing
-    RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
-
     WORKDIR frontend
 
-    DO installer+INSTALL_CHROME_LINUX64
-    DO installer+INSTALL_FIREFOX_LINUX64
+    RUN apt-get update --fix-missing && apt-get install -y \
+        apt-utils \
+        gzip \
+        unzip \
+        bzip2 \
+        jq \ 
+        gpg \
+        lcov 
 
-    ARG edge_version = 125.0.2535.51
-    ARG edge_package_release = 1
-    DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
-
+    # Install Flutter
     IF [ "$TARGETARCH" = "amd64" ]
         RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
             | tar -xJ -C /usr/local
@@ -30,7 +29,9 @@ ADD_FLUTTER_TOOLS:
         GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local
     END
 
+    RUN git config --global --add safe.directory /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+
     RUN flutter config --no-analytics
     RUN flutter --version
     RUN flutter doctor -v
@@ -40,6 +41,11 @@ ADD_FLUTTER_TOOLS:
     RUN dart pub global activate coverage
     RUN dart pub global activate combine_coverage
     RUN dart pub global activate license_checker
+
+    # Install browsers
+    DO installer+INSTALL_CHROME_LINUX64
+    DO installer+INSTALL_FIREFOX_LINUX64
+    DO installer+INSTALL_EDGE_LINUX64
 
 # Runs melos bootstrap if melos.yaml file is present.
 BOOTSTRAP:
@@ -101,7 +107,7 @@ FORMAT:
         RUN melos run format-check
     ELSE
         RUN echo "Running flutter format"
-        RUN flutter format --set-exit-if-changed .
+        RUN dart format --set-exit-if-changed .
     END
 
 # Dry-runs the publish script for publishable packages.

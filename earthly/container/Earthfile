@@ -20,11 +20,12 @@ main-builder:
         graphviz \
         bash \
         build-essential \
+        git \
         && rm -rf /var/lib/apt/lists/*
 
     IF [ "$tool" = "python" ]
         COPY python+script/scripts scripts
         DO python+ADD_PYTHON_TOOLS
     END
-    # DO rust+ADD_RUST_TOOLS
+    DO rust+ADD_RUST_TOOLS
     DO flutter+ADD_FLUTTER_TOOLS
