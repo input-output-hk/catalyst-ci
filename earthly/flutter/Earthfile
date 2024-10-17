@@ -4,24 +4,10 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
-# flutter-src save Flutter source code as artifact.
-flutter-src:
-    FROM busybox
+ADD_FLUTTER_TOOLS:
+    FUNCTION
     ARG version=3.24.1
     ARG TARGETARCH
-
-    RUN mkdir -p /flutter
-    IF [ "$TARGETARCH" = "amd64" ]
-        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
-            | tar -xJ -C /flutter
-    ELSE
-        GIT CLONE --branch $version https://github.com/flutter/flutter.git /flutter
-    END
-    SAVE ARTIFACT /flutter flutter
-
-# flutter-base installs required tools and packages.
-flutter-base:
-    FROM debian:bookworm-20240513-slim
 
     ENV DEBIAN_FRONTEND=noninteractive
 
@@ -37,7 +23,13 @@ flutter-base:
     ARG edge_package_release = 1
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
 
-    COPY +flutter-src/flutter /usr/local
+    IF [ "$TARGETARCH" = "amd64" ]
+        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
+            | tar -xJ -C /usr/local
+    ELSE IF [ "$TARGETARCH" = "arm64" ]
+        GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local
+    END
+
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
     RUN flutter config --no-analytics
     RUN flutter --version
@@ -48,18 +40,6 @@ flutter-base:
     RUN dart pub global activate coverage
     RUN dart pub global activate combine_coverage
     RUN dart pub global activate license_checker
-
-# test-flutter-base-amd64 : installs required tools and packages for amd64.
-test-flutter-base-amd64:
-    BUILD --platform=linux/amd64 +flutter-base
-
-# test-flutter-base-arm64 : installs required tools and packages for arm64.
-test-flutter-base-arm64:
-    BUILD --platform=linux/arm64 +flutter-base
-
-SETUP:
-    FUNCTION
-    FROM +flutter-base
 
 # Runs melos bootstrap if melos.yaml file is present.
 BOOTSTRAP:
@@ -178,3 +158,63 @@ BUILD_WEB:
     ELSE
         SAVE ARTIFACT web /web
     END
+
+
+# -------------delete below this line----------------
+# flutter-src save Flutter source code as artifact.
+flutter-src:
+    FROM busybox
+    ARG version=3.24.1
+    ARG TARGETARCH
+
+    RUN mkdir -p /flutter
+    IF [ "$TARGETARCH" = "amd64" ]
+        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
+            | tar -xJ -C /flutter
+    ELSE
+        GIT CLONE --branch $version https://github.com/flutter/flutter.git /flutter
+    END
+    SAVE ARTIFACT /flutter flutter
+
+# flutter-base installs required tools and packages.
+flutter-base:
+    FROM debian:bookworm-20240513-slim
+
+    ENV DEBIAN_FRONTEND=noninteractive
+
+    RUN apt-get update --fix-missing
+    RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
+
+    WORKDIR frontend
+
+    DO installer+INSTALL_CHROME_LINUX64
+    DO installer+INSTALL_FIREFOX_LINUX64
+
+    ARG edge_version = 125.0.2535.51
+    ARG edge_package_release = 1
+    DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
+
+    COPY +flutter-src/flutter /usr/local
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    RUN flutter config --no-analytics
+    RUN flutter --version
+    RUN flutter doctor -v
+    RUN flutter config --enable-web
+    RUN dart pub global activate melos
+    RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
+    RUN dart pub global activate combine_coverage
+    RUN dart pub global activate license_checker
+
+# test-flutter-base-amd64 : installs required tools and packages for amd64.
+test-flutter-base-amd64:
+    BUILD --platform=linux/amd64 +flutter-base
+
+# test-flutter-base-arm64 : installs required tools and packages for arm64.
+test-flutter-base-arm64:
+    BUILD --platform=linux/arm64 +flutter-base
+
+SETUP:
+    FUNCTION
+    FROM +flutter-base
+
