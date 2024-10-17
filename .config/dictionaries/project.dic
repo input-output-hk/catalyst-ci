@@ -95,6 +95,7 @@ rustflags
 rustfmt
 rustup
 sanchonet
+schemaspy
 sqlfluff
 stdcfgs
 subproject
@@ -121,3 +122,4 @@ xerrors
 xvfb
 zstd
 zstdcat
+JDBC
