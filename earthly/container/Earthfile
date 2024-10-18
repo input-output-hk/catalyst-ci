@@ -9,8 +9,6 @@ IMPORT ../../utilities/scripts AS scripts
 main-builder:
     FROM debian:stable-slim
 
-    ARG --required tool
-
     WORKDIR /root
 
     RUN apt-get update && \
@@ -24,10 +22,7 @@ main-builder:
         git \
         && rm -rf /var/lib/apt/lists/*
 
-    IF [ "$tool" = "python" ]
-        COPY python+script/scripts scripts
-        DO python+ADD_PYTHON_TOOLS
-    END
+    DO python+ADD_PYTHON_TOOLS
     DO rust+ADD_RUST_TOOLS
     DO flutter+ADD_FLUTTER_TOOLS
     DO go+ADD_GO_TOOLS

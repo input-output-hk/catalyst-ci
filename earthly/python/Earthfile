@@ -13,36 +13,54 @@ script:
 ADD_PYTHON_TOOLS:
     FUNCTION
 
-    # Install additional Python tools
+    # Install Python tools
     RUN apt-get update && \
         apt-get install -y \
-        python3.10 \
-        python3-pip \
+        python3 \
         python3-venv \
         && rm -rf /var/lib/apt/lists/*
 
     RUN python3 --version
-    RUN pip3 --version
     
+    # Create a virtual environment
     RUN python3 -m venv /opt/venv
     ENV PATH="/opt/venv/bin:$PATH"
+    
     ENV PYTHONDONTWRITEBYTECODE=1  # Prevents .pyc file creation
 
     # Install Poetry
-    ENV POETRY_HOME="/opt/poetry"
-    RUN mkdir -p $POETRY_HOME && \
-        curl -sSL https://install.python-poetry.org | python3 - && \
-        ln -s "$POETRY_HOME/bin/poetry" /usr/local/bin/poetry
+    # ENV POETRY_HOME="/opt/poetry"
+    # RUN mkdir -p $POETRY_HOME && \
+    #     curl -sSL https://install.python-poetry.org | python3 - && \
+    #     ln -s "$POETRY_HOME/bin/poetry" /usr/local/bin/poetry
+
+
+    # Install Linter and other tools
+    RUN python3 -m pip install ruff==0.7.0
+    RUN python3 -m pip install poetry==1.8.4
+    # RUN python3 -m pip install rich==13.9.1
 
     # Adjust Poetry's configuration to optimize performance
     RUN poetry config installer.max-workers 10
-
-    RUN pip3 install ruff==0.6.8
-    RUN pip install rich==13.9.1
-
-    # Add common scripts for use within the container
+    
+    # Scripts
+    COPY +script/scripts scripts
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
+
+CHECK:
+    FUNCTION
+
+    # Execute the check script
+    RUN scripts/std_checks.py
+
+LINT:
+    FUNCTION
+
+    # Where we want to run the `lint` from. Use `.` to check the whole repo.
+    ARG src=.
+    RUN ruff check
+
 
 # ------- delete below this line -------
 
@@ -97,27 +115,4 @@ BUILDER:
     # Install it all with poetry
     RUN poetry install $opts    
 
-CHECK:
-    FUNCTION
-
-    # Execute the check script
-    RUN scripts/std_checks.py
-
-LINT_PYTHON:
-    # Linting all Python code is done with ruff
-    # See: https://github.com/charliermarsh/ruff
-    FUNCTION
-
-    # Where we want to run the `lint` from. Use `.` to check the whole repo.
-    ARG src=.
-
-    FROM python:3.9
-    WORKDIR /work
-
-    # Install ruff
-    RUN pip install ruff
-
-    COPY $src .
-    
-    RUN ruff .
 

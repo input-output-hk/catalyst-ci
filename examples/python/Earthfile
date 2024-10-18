@@ -4,11 +4,16 @@ IMPORT ../../earthly/python AS python-ci
 IMPORT ../../earthly/container AS container
 
 builder:
-    FROM container+main-builder --tool=python
+    FROM container+main-builder
     
-    COPY --dir poetry.lock pyproject.toml Readme.md src .
+    COPY --dir pyproject.toml src .
+    RUN poetry install
+    RUN poetry build
 
 check:
     FROM +builder
-
     DO python-ci+CHECK
+
+lint:
+    FROM +builder
+    DO python-ci+LINT
