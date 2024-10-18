@@ -10,7 +10,7 @@ ADD_FLUTTER_TOOLS:
     ARG TARGETARCH
 
     ENV DEBIAN_FRONTEND=noninteractive
-    WORKDIR frontend
+    # WORKDIR frontend
 
     RUN apt-get update --fix-missing && apt-get install -y \
         apt-utils \
