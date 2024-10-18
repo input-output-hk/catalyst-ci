@@ -3,6 +3,7 @@ VERSION 0.8
 IMPORT ../python AS python
 IMPORT ../rust AS rust
 IMPORT ../flutter AS flutter
+IMPORT ../go AS go
 IMPORT ../../utilities/scripts AS scripts
 
 main-builder:
@@ -29,3 +30,4 @@ main-builder:
     END
     DO rust+ADD_RUST_TOOLS
     DO flutter+ADD_FLUTTER_TOOLS
+    DO go+ADD_GO_TOOLS
