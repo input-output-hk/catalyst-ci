@@ -1,0 +1,32 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
+
+check:
+    FROM python-ci+python-base
+
+    COPY . .
+
+    DO python-ci+CHECK
+
+VALIDATE_PROJECTS_FIELDS:
+    FUNCTION
+
+    FROM python-ci+python-base
+
+    COPY . .
+
+    # Set environment variables
+    ENV ORG_NAME=input-output-hk
+    ENV PROJECT_NUMBER=102
+    ARG PR_NUMBER
+
+
+    RUN python3 main.py
+
+    # Check the validation results
+    RUN if [ -f ".github/project_validation_results.txt" ]; then \
+            echo "Validation failed. See results:" && \
+            cat .github/project_validation_results.txt && \
+            exit 1; \
+        fi
