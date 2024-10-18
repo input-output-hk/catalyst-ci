@@ -4,11 +4,8 @@ IMPORT ../../earthly/python AS python-ci
 IMPORT ../../earthly/container AS container
 
 builder:
-    FROM container+main-builder
-    
-    COPY --dir pyproject.toml src .
-    RUN poetry install
-    RUN poetry build
+    FROM container+main-builder    
+    COPY --dir pyproject.toml src . 
 
 check:
     FROM +builder
@@ -16,4 +13,4 @@ check:
 
 lint:
     FROM +builder
-    DO python-ci+LINT
+    DO python-ci+LINT --src=./src

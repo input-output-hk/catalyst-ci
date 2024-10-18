@@ -10,6 +10,11 @@ script:
     COPY --dir scripts scripts
     SAVE ARTIFACT /scripts scripts
 
+ruff-toml:
+    FROM scratch
+    COPY ruff.toml ruff.toml
+    SAVE ARTIFACT /ruff.toml ruff.toml
+
 ADD_PYTHON_TOOLS:
     FUNCTION
 
@@ -48,6 +53,7 @@ ADD_PYTHON_TOOLS:
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
 
+
 CHECK:
     FUNCTION
 
@@ -56,10 +62,11 @@ CHECK:
 
 LINT:
     FUNCTION
-
-    # Where we want to run the `lint` from. Use `.` to check the whole repo.
     ARG src=.
-    RUN ruff check
+
+    # COPY ruff config
+    COPY +ruff-toml/ruff.toml .
+    RUN ruff check $src
 
 
 # ------- delete below this line -------
