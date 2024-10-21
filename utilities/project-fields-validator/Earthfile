@@ -9,20 +9,20 @@ check:
 
     DO python-ci+CHECK
 
-VALIDATE_PROJECTS_FIELDS:
-    FUNCTION
-
+validate-pr:
     FROM python-ci+python-base
 
     COPY . .
+
+    RUN pip install requests
 
     # Set environment variables
     ENV ORG_NAME=input-output-hk
     ENV PROJECT_NUMBER=102
     ARG PR_NUMBER
+    ARG GITHUB_TOKEN
 
-
-    RUN python3 main.py
+    RUN --secret GITHUB_TOKEN python3 main.py
 
     # Check the validation results
     RUN if [ -f ".github/project_validation_results.txt" ]; then \
