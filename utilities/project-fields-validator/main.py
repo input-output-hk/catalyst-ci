@@ -235,7 +235,7 @@ class ProjectFieldsValidator:
                         break
             except (KeyError, TypeError):
                 continue
-                
+
         return field_values
 
     @staticmethod
