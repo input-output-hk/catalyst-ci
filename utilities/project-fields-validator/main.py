@@ -2,137 +2,305 @@ import os
 import sys
 import requests
 import json
+from typing import Optional, List, Dict, Any
 
-def run_query(query, variables):
-    headers = {"Authorization": f"Bearer {os.environ['GITHUB_TOKEN']}"}
-    request = requests.post('https://api.github.com/graphql', json={'query': query, 'variables': variables}, headers=headers)
-    if request.status_code == 200:
-        return request.json()
-    else:
-        print(f"Query failed with status code: {request.status_code}")
-        print(f"Response: {request.text}")
-        raise Exception(f"Query failed with status code: {request.status_code}")
+class ProjectFieldsValidator:
+    def __init__(self, github_token: str):
+        self.github_token = github_token
+        self.headers = {
+            "Authorization": f"Bearer {github_token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+        self.required_fields = ['Status', 'Area', 'Priority', 'Estimate', 'Iteration', 'Start', 'End']
 
-def get_pr_related_items(org_name, project_number, pr_number):
-    query = """
-    query($org: String!, $number: Int!, $prNumber: Int!) {
-      organization(login: $org) {
-        projectV2(number: $number) {
-          items(first: 100) {
-            nodes {
+    def run_query(self, query: str, variables: Dict[str, Any]) -> Dict[str, Any]:
+        """Execute a GraphQL query against GitHub's API."""
+        response = requests.post(
+            'https://api.github.com/graphql',
+            json={'query': query, 'variables': variables},
+            headers=self.headers
+        )
+
+        if response.status_code != 200:
+            print(f"Query failed with status code: {response.status_code}")
+            print(f"Response: {response.text}")
+            raise Exception(f"Query failed with status code: {response.status_code}")
+
+        return response.json()
+
+    def get_pr_details(self, org_name: str, repo_name: str, pr_number: int) -> Dict[str, Any]:
+        """Get PR details including assignees."""
+        query = """
+        query($org: String!, $repo: String!, $number: Int!) {
+          repository(owner: $org, name: $repo) {
+            pullRequest(number: $number) {
               id
-              content {
-                ... on PullRequest {
-                  number
-                  title
-                  url
+              author {
+                login
+              }
+              assignees(first: 10) {
+                nodes {
+                  login
                 }
               }
-              fieldValues(first: 20) {
+            }
+          }
+        }
+        """
+
+        variables = {
+            "org": org_name,
+            "repo": repo_name,
+            "number": pr_number
+        }
+
+        result = self.run_query(query, variables)
+        return result['data']['repository']['pullRequest']
+
+    def assign_pr(self, org_name: str, repo_name: str, pr_number: int, assignee: str):
+        """Assign PR to a user using REST API."""
+        url = f"https://api.github.com/repos/{org_name}/{repo_name}/issues/{pr_number}/assignees"
+        data = {"assignees": [assignee]}
+
+        response = requests.post(url, json=data, headers=self.headers)
+
+        if response.status_code == 201:
+            print(f"✅ PR assigned to @{assignee}")
+        else:
+            print(f"❌ Failed to assign PR to @{assignee}")
+            print(f"Response: {response.text}")
+
+    def get_project_items(self, org_name: str, project_number: int) -> List[Dict[str, Any]]:
+        """Fetch all items from the project."""
+        query = """
+        query($org: String!, $projectNumber: Int!, $cursor: String) {
+          organization(login: $org) {
+            projectV2(number: $projectNumber) {
+              items(first: 100, after: $cursor) {
+                pageInfo {
+                  hasNextPage
+                  endCursor
+                }
                 nodes {
-                  ... on ProjectV2ItemFieldTextValue {
-                    field {
-                      ... on ProjectV2FieldCommon {
+                  id
+                  content {
+                    ... on PullRequest {
+                      number
+                      title
+                      url
+                      author {
+                        login
+                      }
+                      repository {
                         name
                       }
                     }
-                    text
                   }
-                  ... on ProjectV2ItemFieldDateValue {
-                    field {
-                      ... on ProjectV2FieldCommon {
+                  fieldValues(first: 20) {
+                    nodes {
+                      ... on ProjectV2ItemFieldTextValue {
+                        field {
+                          ... on ProjectV2FieldCommon {
+                            name
+                          }
+                        }
+                        text
+                      }
+                      ... on ProjectV2ItemFieldDateValue {
+                        field {
+                          ... on ProjectV2FieldCommon {
+                            name
+                          }
+                        }
+                        date
+                      }
+                      ... on ProjectV2ItemFieldSingleSelectValue {
+                        field {
+                          ... on ProjectV2FieldCommon {
+                            name
+                          }
+                        }
                         name
                       }
-                    }
-                    date
-                  }
-                  ... on ProjectV2ItemFieldSingleSelectValue {
-                    field {
-                      ... on ProjectV2FieldCommon {
-                        name
+                      ... on ProjectV2ItemFieldNumberValue {
+                        field {
+                          ... on ProjectV2FieldCommon {
+                            name
+                          }
+                        }
+                        number
+                      }
+                      ... on ProjectV2ItemFieldIterationValue {
+                        field {
+                          ... on ProjectV2FieldCommon {
+                            name
+                          }
+                        }
+                        title
+                        startDate
+                        duration
                       }
                     }
-                    name
                   }
                 }
               }
             }
           }
         }
-      }
-      repository(owner: $org, name: "catalyst-voices") {
-        pullRequest(number: $prNumber) {
-          number
-          title
-          url
-        }
-      }
-    }
-    """
-    variables = {
-        "org": org_name,
-        "number": project_number,
-        "prNumber": pr_number
-    }
-    result = run_query(query, variables)
-    print(f"API Response: {json.dumps(result, indent=2)}")
-    if 'data' not in result:
-        print(f"Error in API response: {result.get('errors', 'Unknown error')}")
-        return []
+        """
 
-    pr_info = result['data']['repository']['pullRequest']
-    print(f"Found PR: #{pr_info['number']} - {pr_info['title']} ({pr_info['url']})")
+        all_items = []
+        cursor = None
+        page = 1
+        max_pages = 100
+        total_items = 0
 
-    items = result['data']['organization']['projectV2']['items']['nodes']
-    pr_items = [item for item in items if item['content'] and isinstance(item['content'], dict) and item['content'].get('number') == pr_number]
+        sys.stdout.write("\rFetching project items...")
+        sys.stdout.flush()
 
-    if not pr_items:
-        print(f"PR #{pr_number} exists but is not linked to the project. Please add it to the project.")
-    return pr_items
+        while page <= max_pages:
+            variables = {
+                "org": org_name,
+                "projectNumber": project_number,
+                "cursor": cursor
+            }
 
-def validate_item(item):
-    required_fields = ['Status', 'Area', 'Priority', 'Estimate', 'Iteration', 'Start', 'End']
-    field_values = {}
-    for field_value in item['fieldValues']['nodes']:
-        field_name = field_value['field']['name']
-        if 'text' in field_value:
-            field_values[field_name] = field_value['text']
-        elif 'date' in field_value:
-            field_values[field_name] = field_value['date']
-        elif 'name' in field_value:
-            field_values[field_name] = field_value['name']
+            try:
+                result = self.run_query(query, variables)
+                project_data = result['data']['organization']['projectV2']['items']
+                page_items = project_data['nodes']
 
-    empty_fields = [field for field in required_fields if not field_values.get(field)]
-    return empty_fields
+                valid_items = [
+                    item for item in page_items 
+                    if item['content'] and isinstance(item['content'], dict)
+                ]
 
+                all_items.extend(valid_items)
+                total_items += len(valid_items)
+
+                sys.stdout.write(f"\rFetching project items... {total_items} found")
+                sys.stdout.flush()
+
+                page_info = project_data['pageInfo']
+                if not page_info['hasNextPage']:
+                    break
+
+                cursor = page_info['endCursor']
+                page += 1
+
+            except Exception as e:
+                print(f"\nError fetching page {page}: {str(e)}")
+                break
+
+        print("\n")
+        return all_items
+
+    def validate_item(self, item: Dict[str, Any]) -> List[str]:
+        """Validate required fields for an item."""
+        try:
+            field_values = {}
+
+            for field_value in item['fieldValues']['nodes']:
+                if not isinstance(field_value, dict) or 'field' not in field_value:
+                    continue
+                try:
+                    field_name = field_value['field']['name']
+                except (KeyError, TypeError):
+                    continue
+
+                if 'text' in field_value:
+                    field_values[field_name] = field_value['text']
+                elif 'date' in field_value:
+                    field_values[field_name] = field_value['date']
+                elif 'name' in field_value:
+                    field_values[field_name] = field_value['name']
+                elif 'number' in field_value:
+                    field_values[field_name] = str(field_value['number'])
+                elif 'title' in field_value and field_name == 'Iteration':
+                    field_values[field_name] = field_value['title']
+
+            print("\nCurrent field values:")
+            print("="*50)
+            for field in self.required_fields:
+                value = field_values.get(field, '❌ empty')
+                print(f"  • {field}: {value}")
+
+            return [field for field in self.required_fields if not field_values.get(field)]
+
+        except Exception as e:
+            print(f"\nError validating fields: {str(e)}")
+            return self.required_fields
+
+    def print_validation_results(self, empty_fields: List[str]) -> None:
+        """Print validation results in a formatted way."""
+        print("\n" + "="*50)
+        print("Validation Results:")
+        print("="*50)
+
+        if not empty_fields:
+            print("✅ All required fields are filled. Validation passed!")
+        else:
+            print("❌ Validation failed. The following fields need to be filled:")
+            for field in empty_fields:
+                print(f"  • {field}")
+            print("\nPlease fill in these fields in the project board.")
+
+        print("="*50)
 
 def main():
-    org_name = os.environ['ORG_NAME']
+    github_token = os.environ['GITHUB_TOKEN']
+    github_repository = os.environ['GITHUB_REPOSITORY']
+    pr_number = int(os.environ['GITHUB_EVENT_NUMBER'])
     project_number = int(os.environ['PROJECT_NUMBER'])
-    pr_number = int(os.environ['PR_NUMBER'])
 
-    items = get_pr_related_items(org_name, project_number, pr_number)
+    org_name, repo_name = github_repository.split('/')
 
-    if not items:
-        print(f"No project items found for PR #{pr_number}")
-        sys.exit(0)
+    print(f"\nValidating PR #{pr_number} in {github_repository}")
+    print(f"Project number: {project_number}")
+    print("="*50)
 
-    validation_errors = []
-    for item in items:
-        empty_fields = validate_item(item)
-        if empty_fields:
-            error_message = f"PR #{pr_number}, Item ID: {item['id']}, Empty fields: {', '.join(empty_fields)}"
-            validation_errors.append(error_message)
-            print(f"Validation Error: {error_message}")  # Print to console
+    validator = ProjectFieldsValidator(github_token)
 
-    if validation_errors:
-        with open('.github/project_validation_results.txt', 'w') as f:
-            for error in validation_errors:
-                f.write(f"{error}\n")
-        print("Validation failed. See results in .github/project_validation_results.txt")
+    try:
+        pr_details = validator.get_pr_details(org_name, repo_name, pr_number)
+        author = pr_details['author']['login']
+        assignees = [node['login'] for node in pr_details['assignees']['nodes']]
+
+        if not assignees:
+            print(f"\nAssigning PR to author @{author}")
+            validator.assign_pr(org_name, repo_name, pr_number, author)
+
+
+        project_items = validator.get_project_items(org_name, project_number)
+
+        pr_items = [
+            item for item in project_items
+            if (item['content'].get('number') == pr_number and
+                item['content'].get('repository', {}).get('name') == repo_name)
+        ]
+
+        if not pr_items:
+            print(f"\nWarning: PR #{pr_number} is not linked to project #{project_number}")
+            print("Please add it to the project using the following steps:")
+            print("1. Go to the project board")
+            print("2. Click '+ Add items'")
+            print("3. Search for this PR")
+            print("4. Click 'Add selected items'")
+            sys.exit(0)
+
+        validation_errors = set()
+        for item in pr_items:
+            empty_fields = validator.validate_item(item)
+            validation_errors.update(empty_fields)
+
+        validator.print_validation_results(list(validation_errors))
+
+        if validation_errors:
+            sys.exit(1)
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
         sys.exit(1)
-    else:
-        print(f"Validation passed for PR #{pr_number}")
 
 if __name__ == "__main__":
     main()

@@ -17,10 +17,10 @@ validate-pr:
     RUN pip install requests
 
     # Set environment variables
-    ENV ORG_NAME=input-output-hk
     ENV PROJECT_NUMBER=102
-    ARG PR_NUMBER
     ARG GITHUB_TOKEN
+    ARG GITHUB_REPOSITORY
+    ARG GITHUB_EVENT_NUMBER
 
     RUN --secret GITHUB_TOKEN python3 main.py
 
