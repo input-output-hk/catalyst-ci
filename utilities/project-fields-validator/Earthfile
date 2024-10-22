@@ -22,3 +22,8 @@ validate-pr:
     ARG GITHUB_EVENT_NUMBER
 
     RUN --secret GITHUB_TOKEN python3 main.py
+
+VALIDATE_PROJECT_FIELDS:
+    FUNCTION
+
+    FROM +validate-pr
