@@ -16,7 +16,6 @@ validate-pr:
 
     RUN pip install requests
 
-    # Set environment variables
     ENV PROJECT_NUMBER=102
     ARG GITHUB_TOKEN
     ARG GITHUB_REPOSITORY
