@@ -23,10 +23,3 @@ validate-pr:
     ARG GITHUB_EVENT_NUMBER
 
     RUN --secret GITHUB_TOKEN python3 main.py
-
-    # Check the validation results
-    RUN if [ -f ".github/project_validation_results.txt" ]; then \
-            echo "Validation failed. See results:" && \
-            cat .github/project_validation_results.txt && \
-            exit 1; \
-        fi
