@@ -11,6 +11,20 @@ extends:
 - 'https://unpkg.com/@stoplight/spectral-documentation@1.3.1/dist/ruleset.mjs'
 - 'https://unpkg.com/@stoplight/spectral-owasp-ruleset@1.4.3/dist/ruleset.mjs'
 
+formats: ["oas3", "json-schema-2020-12"]
+
+rules: 
+  api-path:
+    message: "Invalid API path - should be /api/draft/* or /api/v<number>/*"
+    given: "$.paths"
+    severity: error
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        # Match paths that start with /api/draft/* or /api/v<number>/*
+        match: "^/api/(draft|v\\d+)/.*$"
+
 # Ignoring rules example
 # rules:
 #   docs-tags: off
