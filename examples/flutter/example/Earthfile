@@ -1,12 +1,12 @@
 VERSION 0.8
 
 IMPORT ../../../earthly/flutter AS flutter-ci
-
+IMPORT ../../../earthly/container AS container
 # To see more available functions, navigate to earthly/flutter/Earthfile.
 
 # Set up the CI environment for Flutter app.
 builder:
-    DO flutter-ci+SETUP
+    FROM container+main-builder --tool=flutter
 
     COPY --dir . .
 
@@ -26,11 +26,11 @@ format:
 unit-tests:
     FROM +builder
 
-    DO flutter-ci+UNIT_TEST
+    DO flutter-ci+UNIT_TESTS
 
 # Build the Flutter app for the web.
 # Assuming that we have a main.dart file in lib folder and we run `build-web` in folder
-# with pubspec.yaml file: earthly +build-web --TARGET=lib/main.dart
+# with pubspec.yaml file: earthly +build-web --TARGET=lib/main.dart --SENTRY_DSN=<your_sentry_dsn>
 build-web:
     FROM +builder
 

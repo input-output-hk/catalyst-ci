@@ -15,6 +15,205 @@ IMPORT ../../utilities/scripts AS scripts
 # cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset pkgconfig wasip
+script:
+    FROM scratch
+    COPY --dir scripts /scripts
+    COPY --dir stdcfgs /stdcfgs
+
+    SAVE ARTIFACT /scripts scripts
+    SAVE ARTIFACT /stdcfgs stdcfgs
+
+ADD_RUST_TOOLS:
+    FUNCTION
+
+    ARG TARGETPLATFORM
+    ARG TARGETOS
+    ARG TARGETARCH
+    ARG TARGETVARIANT
+    ARG USERPLATFORM
+    ARG USEROS
+    ARG USERARCH
+    ARG USERVARIANT
+
+    ARG keep_fingerprints=false
+    ARG sweep_days=4
+
+    # $EARTHLY_CACHE_PREFIX - MUST BE DONE IN A FUNCTION, OR IT PRODUCES THE WRONG VALUE
+    ARG EARTHLY_TARGET_PROJECT_NO_TAG #https://docs.earthly.dev/docs/earthfile/builtin-args
+    ARG CACHE_VERSION="00001" # Bumping this causes the old cache to be dropped.
+    ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#${TARGETOS}#${TARGETARCH}${TARGETVARIANT}#earthly-cargo-cache#${CACHE_VERSION}"
+
+    # Enables rust backtrace when something panics
+    ENV RUST_BACKTRACE=full
+
+        # Install necessary packages
+    # Expand this list as needed, rather than adding more tools in later containers.
+    #
+    # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
+    #       if that crate is removed, these dependencies can also be removed.
+    RUN apt-get update && apt-get install -y \
+        build-essential \
+        clang \
+        cmake \
+        colordiff \
+        findutils \
+        fontconfig \
+        fonts-liberation2        \
+        libssl-dev \
+        mold \
+        openssl \
+        pkgconf \
+        python3-pip \
+        python3-rich \
+        python3-psycopg \
+        ripgrep \
+        ca-certificates \
+        gcc \
+        libc6-dev \
+        && rm -rf /var/lib/apt/lists/*
+
+
+    DO +RUST_INSTALL
+
+    # Fix up font cache.
+    RUN fc-cache -f
+
+    # Make sure we have cargo.
+    RUN rustup component add cargo
+
+    # Make sure we have the clippy linter.
+    RUN rustup component add clippy
+
+    # Needed to generate code coverage.
+    RUN rustup component add llvm-tools-preview
+
+    # Install a nightly toolchain which matches.
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
+
+    # Ensure we have all the necessary targets
+    RUN rustup target add wasm32-unknown-unknown
+    RUN rustup target add wasm32-wasip1
+    # RUN rustup target add wasm32-wasip2 # wasm32-wasip2 not yet available in stable - Try again in 1.82
+    RUN rustup target add x86_64-unknown-linux-gnu
+    RUN rustup target add x86_64-apple-darwin
+    RUN rustup target add x86_64-pc-windows-gnu
+    RUN rustup target add aarch64-unknown-linux-gnu
+    RUN rustup target add aarch64-apple-darwin
+
+    RUN rustup target add wasm32-unknown-unknown --toolchain nightly
+    RUN rustup target add wasm32-wasip1 --toolchain nightly 
+    RUN rustup target add wasm32-wasip2 --toolchain nightly
+    RUN rustup target add x86_64-unknown-linux-gnu --toolchain nightly
+    RUN rustup target add x86_64-apple-darwin --toolchain nightly
+    RUN rustup target add x86_64-pc-windows-gnu --toolchain nightly
+    RUN rustup target add aarch64-unknown-linux-gnu --toolchain nightly
+    RUN rustup target add aarch64-apple-darwin --toolchain nightly
+
+    RUN echo $PATH
+    RUN echo $CARGO_HOME
+ 
+
+
+    # CARGO_HOME, PATH and RUSTUP_HOME is already set by the base container.
+    # Do not change them.
+
+    DO +INSTALL_TOOLS
+
+    DO rust+INIT --keep_fingerprints=$keep_fingerprints --sweep_days=$sweep_days --cache_prefix=$cache_prefix
+
+    # # Set the mount cache env vars
+    DO rust+SET_CACHE_MOUNTS_ENV
+    # COPY +script/scripts scripts
+
+    # # Universal build scripts we will always need and are not target dependent.
+    # COPY --dir scripts /scripts
+    COPY +script/scripts /scripts
+    # # Copy our common scripts so we can use them inside the container.
+    DO scripts+ADD_BASH_SCRIPTS
+    DO scripts+ADD_PYTHON_SCRIPTS
+
+    COPY +script/stdcfgs /stdcfgs
+
+    # RUN false
+
+    # Standardized Rust configs.
+    # Build will refuse to proceed if the projects rust configs do not match these.
+    # This is to enforce consistent compiler and tool configuration on local setup and CI builds.
+    # COPY --dir stdcfgs /stdcfgs
+
+RUST_INSTALL:
+    FUNCTION
+
+    ARG TARGETARCH
+
+    LABEL org.opencontainers.image.source=https://github.com/rust-lang/docker-rust
+
+    ENV RUSTUP_HOME=/usr/local/rustup 
+    ENV CARGO_HOME=/usr/local/cargo 
+    ENV PATH=/usr/local/cargo/bin:$PATH 
+    ENV RUST_VERSION=1.81.0
+
+    IF [ "$TARGETARCH" = "amd64" ]
+        LET PLATFORM = "x86_64-unknown-linux-gnu"
+        LET RUSTUP_SHA = "6aeece6993e902708983b209d04c0d1dbb14ebb405ddb87def578d41f920f56d"
+    ELSE IF [ "$TARGETARCH" = "arm64" ]
+        LET PLATFORM = "aarch64-unknown-linux-gnu"
+        LET RUSTUP_SHA = "1cffbf51e63e634c746f741de50649bbbcbd9dbe1de363c9ecef64e278dba2b2"
+    ELSE
+        RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
+    END
+
+    LET URL = "https://static.rust-lang.org/rustup/archive/1.27.1/${PLATFORM}/rustup-init"
+    RUN wget $URL && echo "${RUSTUP_SHA} *rustup-init" | sha256sum -c - \
+        && chmod +x rustup-init \
+        && ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host $PLATFORM \
+        && rm rustup-init \
+        && chmod -R a+w $RUSTUP_HOME $CARGO_HOME \
+        && rustup --version && cargo --version && rustc --version \
+        && rm -rf /var/lib/apt/lists/*
+
+    # RUN set -eux;  \
+    #     dpkgArch="$(dpkg--print-architecture)"; \
+    #     case "${dpkgArch##*-}" in \
+    #         amd64) rustArch='x86_64-unknown-linux-gnu'; rustupSha256='6aeece6993e902708983b209d04c0d1dbb14ebb405ddb87def578d41f920f56d' ;; \
+    #         armhf) rustArch='armv7-unknown-linux-gnueabihf'; rustupSha256='3c4114923305f1cd3b96ce3454e9e549ad4aa7c07c03aec73d1a785e98388bed' ;; \
+    #         arm64) rustArch='aarch64-unknown-linux-gnu'; rustupSha256='1cffbf51e63e634c746f741de50649bbbcbd9dbe1de363c9ecef64e278dba2b2' ;; \
+    #         i386) rustArch='i686-unknown-linux-gnu'; rustupSha256='0a6bed6e9f21192a51f83977716466895706059afb880500ff1d0e751ada5237' ;; \
+    #         ppc64el) rustArch='powerpc64le-unknown-linux-gnu'; rustupSha256='079430f58ad4da1d1f4f5f2f0bd321422373213246a93b3ddb53dad627f5aa38' ;; \
+    #         s390x) rustArch='s390x-unknown-linux-gnu'; rustupSha256='e7f89da453c8ce5771c28279d1a01d5e83541d420695c74ec81a7ec5d287c51c' ;; \
+    #         *) echo >&2 "unsupported architecture: ${dpkgArch}"; exit 1 ;; \
+    #     esac; \
+    #     url="https://static.rust-lang.org/rustup/archive/1.27.1/${rustArch}/rustup-init"; \
+    #     wget "$url"; \
+    #     echo "${rustupSha256} *rustup-init" | sha256sum -c -; \
+    #     chmod +x rustup-init; \
+    #     ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host ${rustArch}; \
+    #     rm rustup-init; \
+    #     chmod -R a+w $RUSTUP_HOME $CARGO_HOME; \
+    #     rustup --version; \
+    #     cargo --version; \
+    #     rustc --version; \
+    #     rm -rf /var/lib/apt/lists/*;
+    # RUN false
+    # RUN echo $url
+INSTALL_TOOLS:
+    FUNCTION
+    # Install cargo-binstall so we can speed up tool installation.
+    DO rust-tools+CARGO_BINSTALL_INSTALL
+
+    DO +COPY_TOOL --tool="cargo-nextest"
+    DO +COPY_TOOL --tool="cargo-machete"
+    DO +COPY_TOOL --tool="refinery"
+    DO +COPY_TOOL --tool="cargo-deny"
+    DO +COPY_TOOL --tool="cargo-modules"
+    DO +COPY_TOOL --tool="cargo-depgraph"
+    DO +COPY_TOOL --tool="cargo-llvm-cov"
+    DO +COPY_TOOL --tool="wasm-tools"
+    DO +COPY_TOOL --tool="cargo-expand"
+    DO +COPY_TOOL --tool="wit-bindgen"
+    DO +COPY_TOOL --tool="cargo-sweep"
+    DO +COPY_TOOL --tool="cargo-component"
+    DO +COPY_TOOL --tool="wasm-pack"
 
 # rust-base : Base Rustup build container.
 #   Not called directly, used by other targets.

@@ -1,0 +1,28 @@
+VERSION 0.8
+
+IMPORT ../python AS python
+IMPORT ../rust AS rust
+IMPORT ../flutter AS flutter
+IMPORT ../go AS go
+IMPORT ../../utilities/scripts AS scripts
+
+main-builder:
+    FROM debian:stable-slim
+
+    WORKDIR /root
+
+    RUN apt-get update && \
+        apt-get install -y \
+        openssl \
+        wget \
+        curl \ 
+        graphviz \
+        bash \
+        build-essential \
+        git \
+        && rm -rf /var/lib/apt/lists/*
+
+    DO python+ADD_PYTHON_TOOLS
+    DO rust+ADD_RUST_TOOLS
+    DO flutter+ADD_FLUTTER_TOOLS
+    DO go+ADD_GO_TOOLS
