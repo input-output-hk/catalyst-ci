@@ -24,6 +24,16 @@ rules:
       functionOptions:
         # Match paths that start with /api/draft/* or /api/v<number>/*
         match: "^/api/(draft|v\\d+)/.*$"
+  api-content-type:
+    message: "Content type must not be text/plain"
+    given: "$.paths[*][*].responses[*].content"
+    severity: error
+    then:
+      field: "@key"
+      function: pattern
+      functionOptions:
+        # Match content type that is not text/plain
+        match: "^(?!text/plain).*"
 
 # Ignoring rules example
 # rules:
