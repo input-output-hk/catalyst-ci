@@ -1,0 +1,21 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
+
+test:
+    FROM python-ci+python-base
+    COPY . .
+    DO python-ci+CHECK
+
+validate-pr:
+    FROM python-ci+python-base
+    COPY . .
+    RUN pip install requests
+
+    ENV PROJECT_NUMBER=102
+
+    RUN --secret GITHUB_TOKEN python3 main.py
+
+VALIDATE_PROJECT_FIELDS:
+    FUNCTION
+    FROM +validate-pr
