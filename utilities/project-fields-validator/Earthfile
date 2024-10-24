@@ -10,20 +10,12 @@ test:
 validate-pr:
     FROM python-ci+python-base
     COPY . .
-    RUN pip install requests jq
+    RUN pip install requests
 
     ENV PROJECT_NUMBER=102
     ARG GITHUB_TOKEN
 
-    # Extract PR info from GitHub event context
-    RUN --secret GITHUB_TOKEN \
-        if [ -f "$GITHUB_EVENT_PATH" ]; then \
-            PR_NUMBER=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH"); \
-            REPO=$(jq --raw-output .repository.full_name "$GITHUB_EVENT_PATH"); \
-            export GITHUB_EVENT_NUMBER=$PR_NUMBER; \
-            export GITHUB_REPOSITORY=$REPO; \
-        fi && \
-        python3 main.py
+    RUN --secret GITHUB_TOKEN python3 main.py
 
 VALIDATE_PROJECT_FIELDS:
     FUNCTION
