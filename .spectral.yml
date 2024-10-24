@@ -34,6 +34,17 @@ rules:
       functionOptions:
         # Match content type that is not text/plain
         match: "^(?!text/plain).*"
+  api-content-type-json-object:
+    message: "Content type application/json must be object"
+    given: "$.paths[*][*].responses[*].content['application/json'].schema.type"
+    severity: error
+    then:
+      field: "@value"
+      function: pattern
+      functionOptions:
+        # Match content type application/json should be object
+        match: "object"
+
 
 # Ignoring rules example
 # rules:

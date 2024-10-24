@@ -43,8 +43,7 @@
 						"content": {
 							"application/json": {
 								"schema": {
-									"type": "array",
-									"maxItems": 1000,
+									"type": "object",
 									"items": {
 										"$ref": "#/components/schemas/User"
 									}
@@ -64,8 +63,22 @@
 						},
 						"content": {
 							"application/json": {
-								"example": {
-									"message": "Invalid request payload"
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Invalid request payload"
+										},
+										"message": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Invalid request payload"
+										}
+									}
 								}
 							}
 						}
@@ -82,8 +95,22 @@
 						},
 						"content": {
 							"application/json": {
-								"example": {
-									"message": "Invalid request payload"
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Unauthorized"
+										},
+										"message": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "You are not authorized to access this resource."
+										}
+									}
 								}
 							}
 						}
@@ -103,8 +130,22 @@
 						},
 						"content": {
 							"application/json": {
-								"example": {
-									"message": "Invalid request payload"
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Too Many Requests"
+										},
+										"message": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "You have exceeded the rate limit. Please try again later."
+										}
+									}
 								}
 							}
 						}
@@ -121,8 +162,22 @@
 						},
 						"content": {
 							"application/json": {
-								"example": {
-									"message": "Invalid request payload"
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Internal Server Error"
+										},
+										"message": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "An unexpected error occurred on the server."
+										}
+									}
 								}
 							}
 						}
@@ -174,8 +229,22 @@
 						},
 						"content": {
 							"application/json": {
-								"example": {
-									"message": "Invalid request payload"
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Invalid request payload"
+										},
+										"message": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Invalid request payload"
+										}
+									}
 								}
 							}
 						}
@@ -192,8 +261,22 @@
 						},
 						"content": {
 							"application/json": {
-								"example": {
-									"message": "Invalid request payload"
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Unauthorized"
+										},
+										"message": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "You are not authorized to access this resource."
+										}
+									}
 								}
 							}
 						}
@@ -213,8 +296,22 @@
 						},
 						"content": {
 							"application/json": {
-								"example": {
-									"message": "Invalid request payload"
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Too Many Requests"
+										},
+										"message": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "You have exceeded the rate limit. Please try again later."
+										}
+									}
 								}
 							}
 						}
@@ -231,8 +328,22 @@
 						},
 						"content": {
 							"application/json": {
-								"example": {
-									"message": "Invalid request payload"
+								"schema": {
+									"type": "object",
+									"properties": {
+										"error": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "Internal Server Error"
+										},
+										"message": {
+											"type": "string",
+											"maxLength": 100,
+											"pattern": "^[0-9a-zA-Z].*$",
+											"example": "An unexpected error occurred on the server."
+										}
+									}
 								}
 							}
 						}
@@ -315,7 +426,7 @@
 	},
 	"security": [
 		{
-    "apiKey": ["your-api-key"]
+			"apiKey": ["your-api-key"]
 		}
 	]
 }
