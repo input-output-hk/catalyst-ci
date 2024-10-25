@@ -38,7 +38,7 @@ jobs:
           earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
       - name: Run Project Fields Validation
-        uses: input-output-hk/catalyst-ci/actions/run@feat/validate-project-fields-in-prs-and-issues
+        uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: false
         with:
@@ -48,9 +48,3 @@ jobs:
           target_flags: --GITHUB_REPOSITORY="${{ github.repository }}" --GITHUB_EVENT_NUMBER="${{ github.event.number || '0' }}"
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: false
-
-      # - name: test
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   run: |
-      #     earthly --secret GITHUB_TOKEN --allow-privileged ./utilities/project-fields-validator+validate-project-fields --GITHUB_REPOSITORY="input-output-hk/catalyst-ci" --GITHUB_EVENT_NUMBER="334"
