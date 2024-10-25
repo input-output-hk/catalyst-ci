@@ -38,7 +38,7 @@ jobs:
           earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
       - name: Run Project Fields Validation
-        uses: input-output-hk/catalyst-ci/actions/run@master
+        uses: input-output-hk/catalyst-ci/actions/run@feat/validate-project-fields-in-prs-and-issues
         if: always()
         continue-on-error: false
         with:
