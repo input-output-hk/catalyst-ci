@@ -61,4 +61,4 @@ edit-docs:
 # check-lint-openapi - OpenAPI linting from a given directory
 check-lint-openapi:
     FROM spectral-ci+spectral-base
-    DO spectral-ci+BUILD_SPECTRAL --dir="./examples/openapi" --file_type="json"
+    DO spectral-ci+BUILD_SPECTRAL --dir="./examples/openapi"
