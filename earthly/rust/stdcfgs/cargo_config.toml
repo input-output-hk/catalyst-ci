@@ -80,7 +80,6 @@ docs = "doc --release --no-deps --document-private-items --bins --lib --examples
 testunit = "nextest run --release --bins --lib --tests --no-fail-fast -P ci"
 testcov = "llvm-cov nextest --release --bins --lib --tests --no-fail-fast -P ci"
 testdocs = "test --doc --release"
-benches = "bench --all-targets --no-fail-fast"
 
 # Rust formatting, MUST be run with +nightly
 fmtchk = "fmt -- --check -v --color=always"
