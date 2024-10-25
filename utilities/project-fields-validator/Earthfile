@@ -13,7 +13,7 @@ validate-project-fields:
 
     RUN pip install requests
 
-    ARG --required PROJECT_NUMBER
+    ARG PROJECT_NUMBER=102
     ARG --required GITHUB_REPOSITORY
     ARG --required GITHUB_EVENT_NUMBER
 
@@ -23,13 +23,13 @@ validate-project-fields:
 
     RUN --secret GITHUB_TOKEN python3 main.py
 
-VALIDATE_PROJECT_FIELDS:
-    FUNCTION
+# VALIDATE_PROJECT_FIELDS:
+#     FUNCTION
 
-    ARG PROJECT_NUMBER = 102
-    ARG --required GITHUB_REPOSITORY
-    ARG --required GITHUB_EVENT_NUMBER
+#     ARG PROJECT_NUMBER = 102
+#     ARG --required GITHUB_REPOSITORY
+#     ARG --required GITHUB_EVENT_NUMBER
 
-    FROM +validate-project-fields --PROJECT_NUMBER=${PROJECT_NUMBER} \
-                                  --GITHUB_REPOSITORY=${GITHUB_REPOSITORY} \
-                                  --GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
+#     FROM +validate-project-fields --PROJECT_NUMBER=${PROJECT_NUMBER} \
+#                                   --GITHUB_REPOSITORY=${GITHUB_REPOSITORY} \
+#                                   --GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
