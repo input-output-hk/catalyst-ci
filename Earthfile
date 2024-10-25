@@ -61,4 +61,6 @@ edit-docs:
 # check-lint-openapi - OpenAPI linting from a given directory
 check-lint-openapi:
     FROM spectral-ci+spectral-base
-    DO spectral-ci+BUILD_SPECTRAL --dir="./examples/openapi"
+    COPY --dir ./examples/openapi .
+    COPY ./.spectral.yml .
+    DO spectral-ci+BUILD_SPECTRAL --dir=./openapi --rule_set=.spectral.yml

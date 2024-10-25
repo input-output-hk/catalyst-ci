@@ -8,17 +8,13 @@ spectral-base:
 
 BUILD_SPECTRAL:
     FUNCTION
-
-    # Specify the directory to lint
-    ARG dir = .
     
+    # Directory to lint
+    ARG dir = .
     # Rule set for spectral
-    ARG rule_set=.spectral.yml
-
-    COPY --dir $dir .
-    COPY $rule_set .
+    ARG rule_set = .spectral.yml
 
     RUN spectral \
         lint \
-        "**/*.{yml,json}" \
-        --ruleset $rule_set \
+        $dir/"**/*.{yml,json}" \
+        --ruleset $rule_set 
