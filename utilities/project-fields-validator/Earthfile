@@ -22,4 +22,4 @@ validate-project-fields:
     ENV GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
     ENV GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
 
-    RUN --secret GITHUB_TOKEN python3 main.py
+    RUN --secret GITHUB_TOKEN=${GITHUB_TOKEN} python3 main.py
