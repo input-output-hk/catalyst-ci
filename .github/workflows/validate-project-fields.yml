@@ -39,8 +39,6 @@ jobs:
 
       - name: Run Project Fields Validation
         uses: input-output-hk/catalyst-ci/actions/run@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: always()
         continue-on-error: false
         with:
