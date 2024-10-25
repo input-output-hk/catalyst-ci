@@ -1,4 +1,4 @@
-name: Validate Projects Fields
+name: Validate Project Fields
 
 on:
   pull_request:
