@@ -39,14 +39,12 @@ jobs:
 
       - name: Run Project Fields Validation
         uses: input-output-hk/catalyst-ci/actions/run@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         if: always()
         continue-on-error: false
         with:
           earthfile: ./utilities/project-fields-validator
           flags: --allow-privileged
           targets: validate-project-fields
-          target_flags: --GITHUB_REPOSITORY="${{ github.repository }}" --GITHUB_EVENT_NUMBER="${{ github.event.number || '0' }}"
+          target_flags: --GITHUB_TOKEN ${{ secrets.GITHUB_TOKEN }} --GITHUB_REPOSITORY="${{ github.repository }}" --GITHUB_EVENT_NUMBER="${{ github.event.number || '0' }}"
           runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
           artifact: false
