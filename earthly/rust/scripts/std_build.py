@@ -87,7 +87,7 @@ def cargo_llvm_cov(
 
 def cargo_bench(flags: str, verbose: bool = False) -> exec_manager.Result:
     return exec_manager.cli_run(
-        "cargo bench " + f"{flags} ",
+        "cargo bench --all-targets --no-fail-fast" + f"{flags} ",
         name="Benchmarks all run to completion check",
         verbose=verbose,
     )
