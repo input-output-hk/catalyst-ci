@@ -7,15 +7,29 @@ test:
     COPY . .
     DO python-ci+CHECK
 
-validate-pr:
+validate-project-fields:
     FROM python-ci+python-base
     COPY . .
+
     RUN pip install requests
 
-    ENV PROJECT_NUMBER=102
+    ARG --required PROJECT_NUMBER
+    ARG --required GITHUB_REPOSITORY
+    ARG --required GITHUB_EVENT_NUMBER
+
+    ENV PROJECT_NUMBER=${PROJECT_NUMBER}
+    ENV GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+    ENV GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
 
     RUN --secret GITHUB_TOKEN python3 main.py
 
 VALIDATE_PROJECT_FIELDS:
     FUNCTION
-    FROM +validate-pr
+
+    ARG PROJECT_NUMBER = 102
+    ARG --required GITHUB_REPOSITORY
+    ARG --required GITHUB_EVENT_NUMBER
+
+    FROM +validate-project-fields --PROJECT_NUMBER=${PROJECT_NUMBER} \
+                                  --GITHUB_REPOSITORY=${GITHUB_REPOSITORY} \
+                                  --GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
