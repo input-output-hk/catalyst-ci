@@ -7,7 +7,7 @@ export async function run(): Promise<void> {
   const artifactPath = core.getInput('artifact_path')
   const earthfile = core.getInput('earthfile')
   const flags = core.getInput('flags')
-  const githubToken = core.getInput('githubToken')
+  const githubToken = core.getInput('github_token')
   const platform = core.getInput('platform')
   const privileged = core.getBooleanInput('privileged')
   const runnerAddress = core.getInput('runner_address')

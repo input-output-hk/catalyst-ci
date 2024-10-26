@@ -192,7 +192,7 @@ describe('Run Action', () => {
               return earthfile
             case 'flags':
               return flags
-            case 'githubToken':
+            case 'github_token':
               return githubToken
             case 'platform':
               return platform
