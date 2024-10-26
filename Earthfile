@@ -57,10 +57,4 @@ edit-docs:
     LOCALLY
 
     RUN ./earthly/docs/dev/local.py cat-ci-docs:latest
-
-# check-lint-openapi - OpenAPI linting from a given directory
-check-lint-openapi:
-    FROM spectral-ci+spectral-base
-    COPY --dir ./examples/openapi .
-    COPY ./.spectral.yml .
-    DO spectral-ci+BUILD_SPECTRAL --dir=./openapi --rule_set=.spectral.yml
+    
