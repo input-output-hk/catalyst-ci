@@ -5,6 +5,7 @@ from typing import Optional, List, Dict, Any, Set
 from enum import Enum
 import requests
 from requests.exceptions import RequestException
+import json
 
 class FieldType(Enum):
     TEXT = "text"
@@ -21,13 +22,18 @@ class ProjectField:
 
 class GitHubAPIError(Exception):
     """Exception for GitHub API errors"""
-    pass
+    def __init__(self, message: str, response_data: Optional[Dict] = None):
+        super().__init__(message)
+        self.response_data = response_data
 
 class ProjectFieldsValidator:
     BASE_URL = "https://api.github.com"
     GRAPHQL_URL = f"{BASE_URL}/graphql"
 
     def __init__(self, github_token: str):
+        if not github_token:
+            raise ValueError("GitHub token is required but was empty")
+
         self.headers = {
             "Authorization": f"Bearer {github_token}",
             "Accept": "application/vnd.github.v3+json"
@@ -47,9 +53,25 @@ class ProjectFieldsValidator:
         try:
             response = requests.request(method, url, headers=self.headers, **kwargs)
             response.raise_for_status()
-            return response.json()
+
+            print(f"\nAPI Response Status: {response.status_code}")
+
+            try:
+                data = response.json()
+
+                if 'errors' in data:
+                    error_messages = '; '.join(error.get('message', 'Unknown error') for error in data['errors'])
+                    raise GitHubAPIError(f"GraphQL API errors: {error_messages}", data)
+
+                if 'data' in data and data['data'] is None:
+                    raise GitHubAPIError("API returned null data", data)
+
+                return data
+            except json.JSONDecodeError as e:
+                raise GitHubAPIError(f"Failed to parse API response: {str(e)}")
+
         except RequestException as e:
-            raise GitHubAPIError(f"GitHub API request failed: {str(e)}") from e
+            raise GitHubAPIError(f"GitHub API request failed: {str(e)}")
 
     def run_query(self, query: str, variables: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a GraphQL query against GitHub's API."""
@@ -78,7 +100,22 @@ class ProjectFieldsValidator:
           }
         }
         """
-        result = self.run_query(query, {"org": org_name, "repo": repo_name, "number": pr_number})
+
+        print(f"\nFetching PR details for {org_name}/{repo_name}#{pr_number}")
+
+        result = self.run_query(query, {
+            "org": org_name,
+            "repo": repo_name,
+            "number": pr_number
+        })
+
+        if not result.get('data'):
+            raise GitHubAPIError("No data returned from API", result)
+        if not result['data'].get('repository'):
+            raise GitHubAPIError("Repository not found", result)
+        if not result['data']['repository'].get('pullRequest'):
+            raise GitHubAPIError(f"PR #{pr_number} not found", result)
+
         return result['data']['repository']['pullRequest']
 
     def assign_pr(self, org_name: str, repo_name: str, pr_number: int, assignee: str) -> None:
@@ -183,23 +220,34 @@ class ProjectFieldsValidator:
                 "cursor": cursor
             }
 
-            result = self.run_query(query, variables)
-            project_data = result['data']['organization']['projectV2']['items']
-            valid_items = [
-                item for item in project_data['nodes']
-                if item.get('content') and isinstance(item['content'], dict)
-            ]
+            try:
+                result = self.run_query(query, variables)
+                if not result.get('data', {}).get('organization', {}).get('projectV2'):
+                    raise GitHubAPIError("Could not access project data", result)
 
-            all_items.extend(valid_items)
-            total_items += len(valid_items)
+                project_data = result['data']['organization']['projectV2']['items']
+                valid_items = [
+                    item for item in project_data['nodes']
+                    if item.get('content') and isinstance(item['content'], dict)
+                ]
 
-            sys.stdout.write(f"\rFetching project items... {total_items} found")
-            sys.stdout.flush()
+                all_items.extend(valid_items)
+                total_items += len(valid_items)
 
-            if not project_data['pageInfo']['hasNextPage']:
-                break
+                sys.stdout.write(f"\rFetching project items... {total_items} found")
+                sys.stdout.flush()
 
-            cursor = project_data['pageInfo']['endCursor']
+                if not project_data['pageInfo']['hasNextPage']:
+                    break
+
+                cursor = project_data['pageInfo']['endCursor']
+
+            except GitHubAPIError as e:
+                print(f"\nError fetching project items: {str(e)}")
+                if e.response_data:
+                    print("\nAPI Response data:")
+                    print(json.dumps(e.response_data, indent=2))
+                raise
 
         print("\n")
         return all_items
@@ -270,19 +318,27 @@ def main():
             'PROJECT_NUMBER': clean_env_var(os.environ.get('PROJECT_NUMBER'))
         }
 
-        # Validate environment variables
+        debug_vars = env_vars.copy()
+        debug_vars['GITHUB_TOKEN'] = '[REDACTED]' if env_vars['GITHUB_TOKEN'] else None
+        print("\nEnvironment variables:")
+        for key, value in debug_vars.items():
+            print(f"{key}: {value}")
+
         missing_vars = [k for k, v in env_vars.items() if not v]
         if missing_vars:
             raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
         try:
             pr_number = int(env_vars['GITHUB_EVENT_NUMBER'])
-            project_number = int(env_vars['PROJECT_NUMBER'])
+            project_number = int(env_vars.get('PROJECT_NUMBER', '102'))  # Default to 102 if not set
         except ValueError as e:
             raise ValueError(f"Invalid numeric value in environment variables: {str(e)}")
 
         github_repository = env_vars['GITHUB_REPOSITORY']
-        org_name, repo_name = github_repository.split('/')
+        try:
+            org_name, repo_name = github_repository.split('/')
+        except ValueError:
+            raise ValueError(f"Invalid repository format: {github_repository}. Expected format: owner/repo")
 
         print(f"\nValidating PR #{pr_number} in {github_repository}")
         print(f"Project number: {project_number}")
@@ -290,39 +346,46 @@ def main():
 
         validator = ProjectFieldsValidator(env_vars['GITHUB_TOKEN'])
 
-        pr_details = validator.get_pr_details(org_name, repo_name, pr_number)
-        author = pr_details['author']['login']
-        assignees = [node['login'] for node in pr_details['assignees']['nodes']]
+        try:
+            pr_details = validator.get_pr_details(org_name, repo_name, pr_number)
+            author = pr_details['author']['login']
+            assignees = [node['login'] for node in pr_details['assignees']['nodes']]
 
-        if not assignees:
-            print(f"\nAssigning PR to author @{author}")
-            validator.assign_pr(org_name, repo_name, pr_number, author)
+            if not assignees:
+                print(f"\nAssigning PR to author @{author}")
+                validator.assign_pr(org_name, repo_name, pr_number, author)
 
-        # Get and validate project items
-        project_items = validator.get_project_items(org_name, project_number)
-        pr_items = [
-            item for item in project_items
-            if (item['content'].get('number') == pr_number and
-                item['content'].get('repository', {}).get('name') == repo_name)
-        ]
+            project_items = validator.get_project_items(org_name, project_number)
+            pr_items = [
+                item for item in project_items
+                if (item['content'].get('number') == pr_number and
+                    item['content'].get('repository', {}).get('name') == repo_name)
+            ]
 
-        if not pr_items:
-            print(f"\nWarning: PR #{pr_number} is not linked to project #{project_number}")
-            print("Please add it to the project using the following steps:")
-            print("1. Go to the project board")
-            print("2. Click '+ Add items'")
-            print("3. Search for this PR")
-            print("4. Click 'Add selected items'")
-            sys.exit(0)
+            if not pr_items:
+                print(f"\nWarning: PR #{pr_number} is not linked to project #{project_number}")
+                print("Please add it to the project using the following steps:")
+                print("1. Go to the project board")
+                print("2. Click '+ Add items'")
+                print("3. Search for this PR")
+                print("4. Click 'Add selected items'")
+                sys.exit(0)
 
-        validation_errors = set()
-        for item in pr_items:
-            empty_fields = validator.validate_item(item)
-            validation_errors.update(empty_fields)
+            validation_errors = set()
+            for item in pr_items:
+                empty_fields = validator.validate_item(item)
+                validation_errors.update(empty_fields)
 
-        validator.print_validation_results(validation_errors)
+            validator.print_validation_results(validation_errors)
 
-        if validation_errors:
+            if validation_errors:
+                sys.exit(1)
+
+        except GitHubAPIError as e:
+            print(f"\nError accessing GitHub API: {str(e)}")
+            if e.response_data:
+                print("\nAPI Response data:")
+                print(json.dumps(e.response_data, indent=2))
             sys.exit(1)
 
     except ValueError as e:
@@ -330,6 +393,8 @@ def main():
         sys.exit(1)
     except Exception as e:
         print(f"Error: {str(e)}")
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 if __name__ == "__main__":
