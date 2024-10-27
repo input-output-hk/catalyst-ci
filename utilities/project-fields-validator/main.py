@@ -6,6 +6,7 @@ from enum import Enum
 import requests
 from requests.exceptions import RequestException
 import json
+import traceback
 
 class FieldType(Enum):
     TEXT = "text"
@@ -393,7 +394,6 @@ def main():
         sys.exit(1)
     except Exception as e:
         print(f"Error: {str(e)}")
-        import traceback
         traceback.print_exc()
         sys.exit(1)
 
