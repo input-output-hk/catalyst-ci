@@ -255,13 +255,19 @@ class ProjectFieldsValidator:
 
         print("="*50)
 
+def clean_env_var(var: str) -> str:
+    """Clean environment variable by removing quotes and extra whitespace"""
+    if var is None:
+        return None
+    return var.strip().strip('"\'')
+
 def main():
     try:
         env_vars = {
-            'GITHUB_TOKEN': os.environ.get('GITHUB_TOKEN'),
-            'GITHUB_REPOSITORY': os.environ.get('GITHUB_REPOSITORY'),
-            'GITHUB_EVENT_NUMBER': os.environ.get('GITHUB_EVENT_NUMBER'),
-            'PROJECT_NUMBER': os.environ.get('PROJECT_NUMBER')
+            'GITHUB_TOKEN': clean_env_var(os.environ.get('GITHUB_TOKEN')),
+            'GITHUB_REPOSITORY': clean_env_var(os.environ.get('GITHUB_REPOSITORY')),
+            'GITHUB_EVENT_NUMBER': clean_env_var(os.environ.get('GITHUB_EVENT_NUMBER')),
+            'PROJECT_NUMBER': clean_env_var(os.environ.get('PROJECT_NUMBER'))
         }
 
         # Validate environment variables
@@ -269,9 +275,13 @@ def main():
         if missing_vars:
             raise ValueError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
+        try:
+            pr_number = int(env_vars['GITHUB_EVENT_NUMBER'])
+            project_number = int(env_vars['PROJECT_NUMBER'])
+        except ValueError as e:
+            raise ValueError(f"Invalid numeric value in environment variables: {str(e)}")
+
         github_repository = env_vars['GITHUB_REPOSITORY']
-        pr_number = int(env_vars['GITHUB_EVENT_NUMBER'])
-        project_number = int(env_vars['PROJECT_NUMBER'])
         org_name, repo_name = github_repository.split('/')
 
         print(f"\nValidating PR #{pr_number} in {github_repository}")
@@ -315,6 +325,9 @@ def main():
         if validation_errors:
             sys.exit(1)
 
+    except ValueError as e:
+        print(f"Configuration error: {str(e)}")
+        sys.exit(1)
     except Exception as e:
         print(f"Error: {str(e)}")
         sys.exit(1)
