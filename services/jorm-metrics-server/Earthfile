@@ -48,7 +48,9 @@ publish:
 
     WORKDIR /app
 
-    ENV tag=latest
+    ARG container="jorm-metrics-server"
+    ARG tag="latest"
+
     ENV PATH=/app/.venv/bin:$PATH
 
     COPY +build/venv .
@@ -56,4 +58,4 @@ publish:
 
     ENTRYPOINT ["python", "-m", "jorm_metrics_server.main"]
 
-    SAVE IMAGE jorm-metrics-server:$tag
+    SAVE IMAGE ${container}:${tag}

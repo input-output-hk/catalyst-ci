@@ -51,9 +51,11 @@ release:
 publish:
     FROM debian:bookworm-slim
     WORKDIR /workspace
-    ARG tag=latest
+
+    ARG container="jorm-fetcher"
+    ARG tag="latest"
 
     COPY +build/fetcher /usr/local/bin/fetcher
 
     ENTRYPOINT ["/usr/local/bin/fetcher"]
-    SAVE IMAGE --push ci-fetcher:${tag}
+    SAVE IMAGE --push ${container}:${tag}
