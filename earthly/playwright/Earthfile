@@ -3,7 +3,7 @@ VERSION 0.8
 SETUP:
     FUNCTION
     ARG workdir
-    FROM mcr.microsoft.com/playwright:v1.45.2-jammy
+    FROM mcr.microsoft.com/playwright:v1.48.0-jammy
     WORKDIR $workdir
 
     RUN apt-get update && apt-get install -y \
