@@ -1,0 +1,8 @@
+VERSION 0.8
+IMPORT ../../earthly/spectral AS spectral-ci
+
+# check-lint-openapi - OpenAPI linting from a given directory
+check-lint-openapi:
+    FROM spectral-ci+spectral-base
+    COPY . .
+    DO spectral-ci+LINT --dir=. --rule_set=.spectral.yml
