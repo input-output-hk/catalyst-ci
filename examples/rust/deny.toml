@@ -1,4 +1,4 @@
-# cspell: words msvc, wasip, rustls, libssh
+# cspell: words msvc, wasip, rustls, libssh, reqwest, tinyvec, Leay, webpki
 
 [graph]
 # cargo-deny is really only ever intended to run on the "normal" tier-1 targets
