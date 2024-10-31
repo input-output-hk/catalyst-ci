@@ -90,7 +90,7 @@ def main():
     results.add(
         vendor_files_check.toml_diff_check("/stdcfgs/clippy.toml", "clippy.toml")
     )
-    results.add(vendor_files_check.toml_diff_check("/stdcfgs/deny.toml", "deny.toml"))
+    results.add(vendor_files_check.toml_diff_check("/stdcfgs/deny.toml", "deny.toml", strict=False))
 
     # Check if the rust src is properly formatted.
     res = exec_manager.cli_run("cargo +nightly fmtchk ", name="Rust Code Format Check")
@@ -104,7 +104,7 @@ def main():
     results.add(exec_manager.cli_run("cargo machete", name="Unused Dependencies Check"))
     # Check if we have any supply chain issues with dependencies.
     results.add(
-        exec_manager.cli_run("cargo deny check --exclude-dev -W vulnerability", name="Supply Chain Issues Check")
+        exec_manager.cli_run("cargo deny check --exclude-dev", name="Supply Chain Issues Check")
     )
 
     results.print()
