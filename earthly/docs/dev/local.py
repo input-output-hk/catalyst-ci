@@ -90,10 +90,10 @@ class DocsContainer:
             DocContainerNotFoundError: If the container with the specified name is not found.
         """
         # Make sure the container target is up-to-date
-        # try:
-        #     run_command(["earthly", self.target])
-        # except ProcessRunError as exc:
-        #     raise DocBuildError from exc
+        try:
+            run_command(["earthly", self.target])
+        except ProcessRunError as exc:
+            raise DocBuildError from exc
 
         try:
             # Get the container image ID
