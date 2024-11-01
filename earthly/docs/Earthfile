@@ -73,7 +73,7 @@ local-docs:
     FROM scratch
 
     COPY dev .
-    SAVE ARTIFACT dev
+    SAVE ARTIFACT /dev
 
 # SYNC_STD_CFG : Syncs the standard config files locally.
 SYNC_LOCAL_DOCS:
