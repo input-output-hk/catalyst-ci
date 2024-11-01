@@ -54,6 +54,9 @@ allow-git = [
     "https://github.com/input-output-hk/catalyst-mithril.git",
     "https://github.com/bytecodealliance/wasmtime",
     "https://github.com/aldanor/hdf5-rust",
+    "https://github.com/txpipe/vrf",
+    "https://github.com/txpipe/kes",
+    "https://github.com/txpipe/curve25519-dalek",
 ]
 
 [licenses]
