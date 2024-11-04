@@ -112,7 +112,8 @@ COPY_TOOL:
     FUNCTION
 
     ARG --required tool
-    COPY rust-tools+tool-$tool/$tool $CARGO_HOME/bin/$tool
+    ARG bin = $tool
+    COPY rust-tools+tool-$tool/$bin $CARGO_HOME/bin/$bin
 
 
 # rust-base-plus-tools : Add all tools we use for rust builds to the base builder image.
@@ -133,7 +134,7 @@ rust-base-plus-tools:
     DO +COPY_TOOL --tool="cargo-sweep"
     DO +COPY_TOOL --tool="cargo-component"
     DO +COPY_TOOL --tool="wasm-pack"
-    DO +COPY_TOOL --tool="flutter-rust-bridge"
+    DO +COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
 
 # installer - fully setup our Rust caching.
 installer:
