@@ -39,6 +39,7 @@ flutter-base:
 
     COPY +flutter-src/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    ENV CI="true"
     RUN flutter config --no-analytics
     RUN flutter --version
     RUN flutter doctor -v
