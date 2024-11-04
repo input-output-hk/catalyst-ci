@@ -1,5 +1,7 @@
 VERSION 0.8
 
+# cspell: words cddlc
+
 cddl-base:
     FROM ruby:3.3.0-alpine
 
