@@ -16,7 +16,8 @@ builder:
         wget \
         tar \
         xz-utils \
-        git
+        git \
+        build-essential
 
     DO flutter-ci+INSTALL_FLUTTER
     DO rust-ci+INSTALL_RUST
