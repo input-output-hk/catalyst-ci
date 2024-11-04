@@ -428,7 +428,7 @@ INSTALL_RUST:
     RUN rustup target add aarch64-unknown-linux-gnu --toolchain nightly
     RUN rustup target add aarch64-apple-darwin --toolchain nightly
 
-# Install neccessary tools for Rust.
+# Install necessary tools for Rust.
 INSTALL_TOOLS:
     FUNCTION
     # Install cargo-binstall so we can speed up tool installation.
