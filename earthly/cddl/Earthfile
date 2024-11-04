@@ -1,0 +1,6 @@
+VERSION 0.8
+
+cddl-base:
+    FROM ruby:3.3.0-alpine
+
+    RUN gem install cddlc
