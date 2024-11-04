@@ -8,6 +8,8 @@ IMPORT ../rust AS rust-ci
 builder:
     FROM debian:stable-slim
 
+    WORKDIR /work
+
     RUN apt-get update \
         && apt-get install -y \
         apt-utils \
@@ -22,3 +24,13 @@ builder:
     DO rust-ci+COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
 
     RUN flutter_rust_bridge_codegen --version
+
+# Generated necessary files for running Flutter web.
+code-generator-web:
+    FROM +builder
+    RUN flutter_rust_bridge_codegen generate
+    RUN flutter_rust_bridge_codegen build-web
+
+    SAVE ARTIFACT ./web/pkg pkg
+    SAVE ARTIFACT ./rust/src/frb_generated.rs frb_generated
+    SAVE ARTIFACT ./lib/src lib_src
