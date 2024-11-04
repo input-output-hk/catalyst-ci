@@ -82,3 +82,6 @@ tool-cargo-component:
 
 tool-wasm-pack:
     DO +CARGO_BINSTALL --package=wasm-pack --version=0.13.0
+
+tool-flutter-rust-bridge:
+    DO +CARGO_BINSTALL --package=flutter_rust_bridge --version=2.5.1
