@@ -1,0 +1,24 @@
+VERSION 0.8
+
+IMPORT ../flutter AS flutter-ci
+IMPORT ../rust AS rust-ci
+
+# This will be refactored in the future
+# TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
+builder:
+    FROM debian:stable-slim
+
+    RUN apt-get update \
+        && apt-get install -y \
+        apt-utils \
+        wget \
+        tar \
+        xz-utils \
+        git
+
+    DO flutter-ci+INSTALL_FLUTTER
+    DO rust-ci+INSTALL_RUST
+
+    DO rust-ci+COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
+
+    RUN flutter_rust_bridge_codegen --version
