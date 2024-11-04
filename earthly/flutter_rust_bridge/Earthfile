@@ -20,10 +20,7 @@ builder:
 
     DO flutter-ci+INSTALL_FLUTTER
     DO rust-ci+INSTALL_RUST
-
-    DO rust-ci+COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
-
-    RUN flutter_rust_bridge_codegen --version
+    DO rust-ci+INSTALL_TOOLS
 
 # Generated necessary files for running Flutter web.
 CODE_GENERATOR_WEB:

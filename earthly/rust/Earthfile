@@ -16,40 +16,6 @@ IMPORT ../../utilities/scripts AS scripts
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset pkgconfig wasip
 
-# TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
-# Installing Rust
-# Code reference from [rust1.81.0-slim-bookworm](https://github.com/rust-lang/docker-rust/blob/63f877a36f8ba9d9b4b35cd49df3327264510886/stable/bookworm/slim/Dockerfile)
-INSTALL_RUST:
-    FUNCTION
-
-    ARG TARGETARCH
-
-    ENV RUSTUP_HOME=/usr/local/rustup 
-    ENV CARGO_HOME=/usr/local/cargo 
-    ENV PATH=/usr/local/cargo/bin:$PATH 
-    ENV RUST_VERSION=1.81.0
-
-    IF [ "$TARGETARCH" = "amd64" ]
-        LET PLATFORM = "x86_64-unknown-linux-gnu"
-        LET RUSTUP_SHA = "6aeece6993e902708983b209d04c0d1dbb14ebb405ddb87def578d41f920f56d"
-    ELSE IF [ "$TARGETARCH" = "arm64" ]
-        LET PLATFORM = "aarch64-unknown-linux-gnu"
-        LET RUSTUP_SHA = "1cffbf51e63e634c746f741de50649bbbcbd9dbe1de363c9ecef64e278dba2b2"
-    ELSE
-        RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
-    END
-
-    LET URL = "https://static.rust-lang.org/rustup/archive/1.27.1/${PLATFORM}/rustup-init"
-    RUN wget $URL && echo "${RUSTUP_SHA} *rustup-init" | sha256sum -c - \
-        && chmod +x rustup-init \
-        && ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host $PLATFORM \
-        && rm rustup-init \
-        && chmod -R a+w $RUSTUP_HOME $CARGO_HOME \
-        && rustup --version \
-        && cargo --version \
-        && rustc --version \
-        && rm -rf /var/lib/apt/lists/*
-
 # rust-base : Base Rustup build container.
 #   Not called directly, used by other targets.
 rust-base:
@@ -396,3 +362,90 @@ REMOVE_SOURCE_FINGERPRINTS:
                 done \
             fi; \
          done;
+    
+# TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
+# Installing Rust
+# Code reference from [rust1.81.0-slim-bookworm](https://github.com/rust-lang/docker-rust/blob/63f877a36f8ba9d9b4b35cd49df3327264510886/stable/bookworm/slim/Dockerfile)
+INSTALL_RUST:
+    FUNCTION
+
+    ARG TARGETARCH
+
+    ENV RUSTUP_HOME=/usr/local/rustup 
+    ENV CARGO_HOME=/usr/local/cargo 
+    ENV PATH=/usr/local/cargo/bin:$PATH 
+    ENV RUST_VERSION=1.81.0
+
+    IF [ "$TARGETARCH" = "amd64" ]
+        LET PLATFORM = "x86_64-unknown-linux-gnu"
+        LET RUSTUP_SHA = "6aeece6993e902708983b209d04c0d1dbb14ebb405ddb87def578d41f920f56d"
+    ELSE IF [ "$TARGETARCH" = "arm64" ]
+        LET PLATFORM = "aarch64-unknown-linux-gnu"
+        LET RUSTUP_SHA = "1cffbf51e63e634c746f741de50649bbbcbd9dbe1de363c9ecef64e278dba2b2"
+    ELSE
+        RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
+    END
+
+    LET URL = "https://static.rust-lang.org/rustup/archive/1.27.1/${PLATFORM}/rustup-init"
+    RUN wget $URL && echo "${RUSTUP_SHA} *rustup-init" | sha256sum -c - \
+        && chmod +x rustup-init \
+        && ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host $PLATFORM \
+        && rm rustup-init \
+        && chmod -R a+w $RUSTUP_HOME $CARGO_HOME \
+        && rustup --version \
+        && cargo --version \
+        && rustc --version \
+        && rm -rf /var/lib/apt/lists/*
+
+      # Make sure we have cargo.
+    RUN rustup component add cargo
+
+    # Make sure we have the clippy linter.
+    RUN rustup component add clippy
+
+    # Needed to generate code coverage.
+    RUN rustup component add llvm-tools-preview
+
+    # Install a nightly toolchain which matches.
+    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
+
+    # Ensure we have all the necessary targets
+    RUN rustup target add wasm32-unknown-unknown
+    RUN rustup target add wasm32-wasip1
+    # RUN rustup target add wasm32-wasip2 # wasm32-wasip2 not yet available in stable - Try again in 1.82
+    RUN rustup target add x86_64-unknown-linux-gnu
+    RUN rustup target add x86_64-apple-darwin
+    RUN rustup target add x86_64-pc-windows-gnu
+    RUN rustup target add aarch64-unknown-linux-gnu
+    RUN rustup target add aarch64-apple-darwin
+
+    RUN rustup target add wasm32-unknown-unknown --toolchain nightly
+    RUN rustup target add wasm32-wasip1 --toolchain nightly 
+    RUN rustup target add wasm32-wasip2 --toolchain nightly
+    RUN rustup target add x86_64-unknown-linux-gnu --toolchain nightly
+    RUN rustup target add x86_64-apple-darwin --toolchain nightly
+    RUN rustup target add x86_64-pc-windows-gnu --toolchain nightly
+    RUN rustup target add aarch64-unknown-linux-gnu --toolchain nightly
+    RUN rustup target add aarch64-apple-darwin --toolchain nightly
+
+# Install neccessary tools for Rust.
+INSTALL_TOOLS:
+    FUNCTION
+    # Install cargo-binstall so we can speed up tool installation.
+    DO rust-tools+CARGO_BINSTALL_INSTALL
+
+    DO +COPY_TOOL --tool="cargo-nextest"
+    DO +COPY_TOOL --tool="cargo-machete"
+    DO +COPY_TOOL --tool="refinery"
+    DO +COPY_TOOL --tool="cargo-deny"
+    DO +COPY_TOOL --tool="cargo-modules"
+    DO +COPY_TOOL --tool="cargo-depgraph"
+    DO +COPY_TOOL --tool="cargo-llvm-cov"
+    DO +COPY_TOOL --tool="wasm-tools"
+    DO +COPY_TOOL --tool="cargo-expand"
+    DO +COPY_TOOL --tool="wit-bindgen"
+    DO +COPY_TOOL --tool="cargo-sweep"
+    DO +COPY_TOOL --tool="cargo-component"
+    DO +COPY_TOOL --tool="wasm-pack"
+    DO +COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
+    
