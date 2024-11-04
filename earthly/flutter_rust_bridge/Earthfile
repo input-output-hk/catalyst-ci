@@ -26,8 +26,9 @@ builder:
     RUN flutter_rust_bridge_codegen --version
 
 # Generated necessary files for running Flutter web.
-code-generator-web:
-    FROM +builder
+CODE_GENERATOR_WEB:
+    FUNCTION 
+
     RUN flutter_rust_bridge_codegen generate
     RUN flutter_rust_bridge_codegen build-web
 
