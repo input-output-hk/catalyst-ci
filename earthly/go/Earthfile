@@ -1,59 +1,55 @@
 VERSION 0.8
 
-DEPS:
-    FUNCTION
+ADD_GO_TOOLS:
+    FUNCTION 
 
-    # Establish a cache
-    RUN mkdir -p /go/cache && mkdir -p /go/modcache
-    ENV GOCACHE=/go/cache
-    ENV GOMODCACHE=/go/modcache
-    CACHE --sharing shared /go
+    ARG TARGETARCH
+    RUN apt-get update && \
+        apt-get install -y \
+        gcc \
+        musl-dev \
+        && rm -rf /var/lib/apt/lists/*
 
-    COPY go.mod go.sum ./
-    RUN go mod download
+    LET GO_VERSION = "1.23.2"
 
-    # Install ginkgo for testing - and test it works.
-    RUN go get github.com/onsi/ginkgo/v2/ginkgo && \
-        go install github.com/onsi/ginkgo/v2/ginkgo && \
-        ginkgo version
+    # Install go
+    IF [ "$TARGETARCH" = "amd64" ]
+        LET URL = "https://dl.google.com/go/go${GO_VERSION}.linux-amd64.tar.gz"
+    ELSE 
+        LET URL = "https://dl.google.com/go/go${GO_VERSION}.linux-arm64.tar.gz"
+    END
+    RUN curl -sSL $URL | tar -xz -C /usr/local
 
-    # Save artifacts that may have been modified
-    SAVE ARTIFACT go.mod AS LOCAL go.mod
-    SAVE ARTIFACT go.sum AS LOCAL go.sum
+    # Set go path
+    ENV GOROOT="/usr/local/go"
+    ENV GOPATH="/go"
+    ENV GOBIN="$GOPATH/bin"
+    ENV PATH="$PATH:$GOROOT/bin:$GOPATH/bin"
 
+    # Install golangci-lint
+    RUN curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
+        | sh -s -- -b $GOBIN v1.61.0 \
+        && golangci-lint --version
+    
+    # Install ginkgo
+    RUN go install github.com/onsi/ginkgo/ginkgo@v1.16.5 \
+        && ginkgo version
+    
 FMT:
     FUNCTION
 
-    # latest linux/amd64
-    FROM cytopia/gofmt@sha256:ae76abdbc96780819ce175f7ba4bf1fec98e9f708eb680d0b949d1737a959983
-    WORKDIR /work
+    ARG --required src
+    RUN gofmt -l .
+
+FIX_FMT:
+    FUNCTION
 
     ARG --required src
-
-    FOR f IN ${src}
-        COPY ${f} /work/${f}
-    END
-
-    RUN gofmt -l . | grep . && exit 1 || exit 0
+    RUN gofmt -w .
 
 LINT:
     FUNCTION
-
-    # v1.54-alpine
-    FROM golangci/golangci-lint@sha256:a8423cab177c2863b863ee6d9f00c58f101cadd6120e195b2bb59fdfa189c1ae
-    WORKDIR /work
-
     ARG --required src
-
-    FOR f IN ${src}
-        COPY ${f} /work/${f}
-    END
-
-    CACHE --sharing shared /cache
-    ENV GOLANGCI_LINT_CACHE=/cache/golangci-lint
-    ENV GOCACHE=/cache/go-build
-
-    RUN go get ./...
 
     RUN golangci-lint run \
         --timeout 5m \
@@ -65,3 +61,24 @@ LINT:
         -E nilnil \
         -E revive \
         -E testpackage
+
+# -------------delete this line if not needed----------------
+DEPS:
+    FUNCTION
+
+    # Establish a cache
+    RUN mkdir -p /go/cache && mkdir -p /go/modcache
+    ENV GOCACHE=/go/cache
+    ENV GOMODCACHE=/go/modcache
+    CACHE --sharing shared /go
+
+    RUN go mod download
+
+    # Install ginkgo for testing - and test it works.
+    RUN go get github.com/onsi/ginkgo/v2/ginkgo && \
+        go install github.com/onsi/ginkgo/v2/ginkgo && \
+        ginkgo version
+
+    # Save artifacts that may have been modified
+    SAVE ARTIFACT go.mod AS LOCAL go.mod
+    SAVE ARTIFACT go.sum AS LOCAL go.sum
