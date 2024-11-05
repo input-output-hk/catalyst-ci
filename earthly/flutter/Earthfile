@@ -75,34 +75,6 @@ BOOTSTRAP:
         RUN echo "No melos.yaml file found"
     END
 
-# Generates dart code from open api spec.
-OPENAPI_CODE_GEN:
-    FUNCTION
-
-    ARG SAVE_LOCALLY=false
-    ARG --required GEN_CODE_PATH
-    ARG --required LOCAL_GEN_CODE_PATH
-
-    RUN flutter pub get
-    RUN dart run build_runner build --delete-conflicting-outputs
-
-    IF [ $SAVE_LOCALLY = true ]
-        SAVE ARTIFACT "$GEN_CODE_PATH/*" AS LOCAL $LOCAL_GEN_CODE_PATH
-    ELSE
-        SAVE ARTIFACT $GEN_CODE_PATH
-    END
-
-# Validates open api generated specs.
-OPENAPI_VALIDATE:
-    FUNCTION
-
-    ARG --required WORKDIR
-
-    WORKDIR $WORKDIR
-    RUN dart run openapi_validate
-
-    SAVE ARTIFACT openapi_validate
-
 # Runs dart static analysis.
 ANALYZE:
     FUNCTION
