@@ -5,6 +5,7 @@ IMPORT ../rust AS rust-ci
 
 # This will be refactored in the future
 # TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
+# builder: Setup necessary tools for `flutter_rust_bridge`
 builder:
     FROM debian:stable-slim
 

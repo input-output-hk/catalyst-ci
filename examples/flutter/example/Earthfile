@@ -1,6 +1,7 @@
 VERSION 0.8
 
 IMPORT ../../../earthly/flutter AS flutter-ci
+IMPORT ../../../earthly/flutter_rust_bridge AS flutter_rust_bridge
 
 # To see more available functions, navigate to earthly/flutter/Earthfile.
 
@@ -39,3 +40,18 @@ build-web:
     ARG --required SENTRY_DSN
 
     DO flutter-ci+BUILD_WEB --WORKDIR=$WORKDIR --TARGET=$TARGET --SENTRY_DSN=$SENTRY_DSN
+
+# -----------------flutter_rust_bridge-----------------
+
+builder-frb:
+    FROM flutter_rust_bridge+builder
+    COPY . .
+
+# Generated necessary files for running Flutter web locally and save it locally.
+code-generator-web:
+    FROM +builder-frb
+    DO flutter_rust_bridge+CODE_GENERATOR_WEB
+
+    SAVE ARTIFACT ./web/pkg AS LOCAL ./example/web/pkg
+    SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
+    SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src

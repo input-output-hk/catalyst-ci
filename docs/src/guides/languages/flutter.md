@@ -157,6 +157,39 @@ please follow this [guide](./../../onboarding/index.md).
 It is pretty strait forward for this builder process,
 because as a part of `+build` target we already creating a docker image.
 
+## Enhancing Flutter
+
+### Integrating Flutter with Rust using `flutter_rust_bridge`
+
+The `flutter_rust_bridge` allows you to integrate Rust with Flutter app, while maintaining the rest of the app in
+Dart.
+This can be useful for situations where you need to run complex algorithms, handle data
+processing, or interact with low-level system APIs, but still want to leverage the Flutter ecosystem
+for UI and app management.
+
+Start by creating a new builder where all the necessary setup is done under the `flutter_rust_bridge+builder`,
+then copy the Flutter project that already have `flutter_rust_bridge` setup.
+Refer to <https://cjycode.com/flutter_rust_bridge/> for how to setup the project.
+
+```Earthfile
+builder-frb:
+    FROM flutter_rust_bridge+builder
+    COPY . .
+```
+
+Then generate a binding between Rust and Flutter
+
+```Earthfile
+# Generated necessary files for running Flutter web locally and save it locally.
+code-generator-web:
+    FROM +builder-frb
+    DO flutter_rust_bridge+CODE_GENERATOR_WEB
+
+    SAVE ARTIFACT ./web/pkg AS LOCAL ./example/web/pkg
+    SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
+    SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src
+```
+
 ## Conclusion
 
 You can see the final `Earthfile`
