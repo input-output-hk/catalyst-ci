@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+# Delete this line to use the file
+
+# !/usr/bin/env bash
 
 set -e
 

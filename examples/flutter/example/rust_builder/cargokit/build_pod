@@ -1,4 +1,6 @@
-#!/bin/sh
+# Delete this line to use the file
+
+!/bin/sh
 set -e
 
 BASEDIR=$(dirname "$0")
