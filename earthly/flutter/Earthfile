@@ -39,6 +39,8 @@ flutter-base:
 
     COPY +flutter-src/flutter /usr/local
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+    # Flutter prints warnings when used by root user but omits them if has CI env flag found.
+    # script: https://github.com/flutter/flutter/blob/master/bin/internal/shared.sh#L214
     ENV CI="true"
     RUN flutter config --no-analytics
     RUN flutter --version
