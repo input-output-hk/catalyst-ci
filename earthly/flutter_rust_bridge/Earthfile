@@ -33,4 +33,5 @@ CODE_GENERATOR_WEB:
     RUN flutter_rust_bridge_codegen generate --default-external-library-loader-web-prefix=/assets/packages/catalyst_key_derivation/assets/js/
     RUN flutter_rust_bridge_codegen build-web
 
-    RUN mkdir -p assets/js/ && mv web/pkg/ assets/js/
+    RUN mkdir -p assets/js && cp -rf ./web/pkg/ assets/js/
+
