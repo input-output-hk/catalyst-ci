@@ -24,6 +24,7 @@ INSTALL_FLUTTER:
     RUN git config --global --add safe.directory /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
 
+    ENV CI="true"
     RUN flutter config --no-analytics
     RUN flutter --version
     RUN flutter doctor -v
@@ -53,8 +54,6 @@ flutter-base:
     ARG edge_version = 125.0.2535.51
     ARG edge_package_release = 1
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
-
-
 
 # test-flutter-base-amd64 : installs required tools and packages for amd64.
 test-flutter-base-amd64:
