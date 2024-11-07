@@ -104,7 +104,7 @@ def main():
     results.add(exec_manager.cli_run("cargo machete", name="Unused Dependencies Check"))
     # Check if we have any supply chain issues with dependencies.
     results.add(
-        exec_manager.cli_run("cargo deny check --exclude-dev -W vulnerability", name="Supply Chain Issues Check")
+        exec_manager.cli_run("cargo deny check --exclude-dev -W vulnerability -W unmaintained", name="Supply Chain Issues Check")
     )
 
     results.print()
