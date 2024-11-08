@@ -185,7 +185,7 @@ code-generator-web:
     FROM +builder-frb
     DO flutter_rust_bridge+CODE_GENERATOR_WEB
 
-    SAVE ARTIFACT ./web/pkg AS LOCAL ./example/web/pkg
+    SAVE ARTIFACT ./assets/js AS LOCAL ./assets/js
     SAVE ARTIFACT ./rust/src/frb_generated.rs AS LOCAL ./rust/src/frb_generated.rs
     SAVE ARTIFACT ./lib/src AS LOCAL ./lib/src
 ```
