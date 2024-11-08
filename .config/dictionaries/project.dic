@@ -1,6 +1,7 @@
 aarch
 bindgen
 binstall
+bkioshn
 buildkit
 camelcase
 canvaskit
@@ -46,6 +47,7 @@ gopls
 gosec
 graphviz
 idents
+JDBC
 jorm
 jormungandr
 junitreport
@@ -89,6 +91,7 @@ PYTHONDONTWRITEBYTECODE
 rankdir
 rivo
 runewidth
+rustc
 rustdoc
 rustdocflags
 rustflags
@@ -122,4 +125,3 @@ xerrors
 xvfb
 zstd
 zstdcat
-JDBC

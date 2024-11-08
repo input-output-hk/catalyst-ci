@@ -1,0 +1,38 @@
+VERSION 0.8
+
+IMPORT ../flutter AS flutter-ci
+IMPORT ../rust AS rust-ci
+
+# This will be refactored in the future
+# TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
+# builder: Setup necessary tools for `flutter_rust_bridge`
+builder:
+    FROM debian:stable-slim
+
+    WORKDIR /work
+
+    RUN apt-get update \
+        && apt-get install -y \
+        apt-utils \
+        wget \
+        tar \
+        xz-utils \
+        git \
+        build-essential \
+        curl \
+        unzip 
+
+    DO flutter-ci+INSTALL_FLUTTER
+    DO rust-ci+INSTALL_RUST
+    DO rust-ci+INSTALL_TOOLS
+
+# Generated necessary files for running Flutter web.
+CODE_GENERATOR_WEB:
+    FUNCTION 
+
+    RUN flutter_rust_bridge_codegen generate --default-external-library-loader-web-prefix=/assets/packages/catalyst_key_derivation/assets/js/
+    RUN flutter_rust_bridge_codegen build-web
+
+    RUN mkdir -p assets/js && cp -rf ./web/pkg/* assets/js/
+     # Don't want this gitignore file.
+    RUN rm -rf ./assets/js/.gitignore
