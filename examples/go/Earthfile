@@ -52,28 +52,3 @@ test:
     FROM +build
 
     RUN go test ./...
-
-# This target is normally named `release` but is renamed here in order to avoid
-# the CI from picking it up and trying to release our example.
-release-example:
-    # This target is called by the CI when performing a release. It should use
-    # `SAVE ARTIFACT` to save the release artifact which is then picked up by
-    # the CI.
-    FROM +build
-
-    SAVE ARTIFACT bin/hello hello
-
-# This target is normally named `publish` but is renamed here in order to avoid
-# the CI from picking it up and trying to publish our example.
-publish-example:
-    # This target is called by CI when publishing images. It should use the
-    # `SAVE IMAGE` command to save the image which is then picked up by the CI.
-    # Note that we start from a "fresh" base image.
-    FROM alpine:3.20.3
-    WORKDIR /app
-    ARG tag=latest  # Prefer to use `latest` by default, the CI will override this.
-
-    COPY +build/hello .  # Use the cached artifact from the build target.
-
-    ENTRYPOINT ["/app/hello"]
-    SAVE IMAGE hello:${tag}

@@ -55,13 +55,9 @@ flutter-base:
     ARG edge_package_release = 1
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
 
-# test-flutter-base-amd64 : installs required tools and packages for amd64.
-test-flutter-base-amd64:
-    BUILD --platform=linux/amd64 +flutter-base
-
-# test-flutter-base-arm64 : installs required tools and packages for arm64.
-test-flutter-base-arm64:
-    BUILD --platform=linux/arm64 +flutter-base
+# test-flutter-base : installs required tools and packages for flutter development.
+test-flutter-base:
+    BUILD +flutter-base
 
 SETUP:
     FUNCTION
