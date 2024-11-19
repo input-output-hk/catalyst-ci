@@ -1,3 +1,0 @@
-refinery_schema_history
-address
-users
