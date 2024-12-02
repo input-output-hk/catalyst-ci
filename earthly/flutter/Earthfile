@@ -41,7 +41,7 @@ flutter-base:
 
     ENV DEBIAN_FRONTEND=noninteractive
 
-    # Runing update & install as same command so if either fails, the whole step fails and
+    # Runing update and install as same command so if either fails, the whole step fails and
     # is not cached.
     RUN apt-get update --fix-missing && \
             apt-get install -y \
