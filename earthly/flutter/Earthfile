@@ -41,8 +41,24 @@ flutter-base:
 
     ENV DEBIAN_FRONTEND=noninteractive
 
-    RUN apt-get update --fix-missing
-    RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov tar wget xz-utils
+    # Runing update & install as same command so if either fails, the whole step fails and
+    # is not cached.
+    RUN apt-get update --fix-missing && \
+            apt-get install -y \
+            apt-utils \
+            git \
+            curl \
+            gzip \
+            unzip \
+            bzip2 \
+            bash \
+            jq \
+            gpg \
+            lcov \
+            tar \
+            wget \
+            xz-utils \
+            && rm -rf /var/lib/apt/lists/*
 
     DO +INSTALL_FLUTTER
 
