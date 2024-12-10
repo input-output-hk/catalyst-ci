@@ -93,7 +93,9 @@ class ChangeEventHandler(FileSystemEventHandler):
                     self.file_index[file_path] = size
                     helper.add_or_init(self.layer_index, layer_name, size)
 
-                    logger.debug(f"initial file: {file_path} (size: {size:,} bytes)")
+                    logger.debug(
+                        f"initial file: {file_path} (size: {size:,} bytes)"
+                    )
                 except OSError as e:
                     if log_file_accessing_err:
                         logger.error(f"{e}: {file_path}")
@@ -225,11 +227,15 @@ class ChangeEventHandler(FileSystemEventHandler):
 
         if (
             not skip_sum_check
-            and sum(self.layer_growth_index.values()) >= max_time_window_growth_size
+            and sum(self.layer_growth_index.values())
+            >= max_time_window_growth_size
         ):
             self.trigger_interval_growth_exceeded()
 
-        if not skip_sum_check and sum(self.layer_index.values()) >= max_cache_size:
+        if (
+            not skip_sum_check
+            and sum(self.layer_index.values()) >= max_cache_size
+        ):
             self.trigger_max_cache_size()
 
     def trigger_layer_size_exceeded(self, layer_name: str):
@@ -323,7 +329,13 @@ class ChangeEventHandler(FileSystemEventHandler):
 
 
 def main():
-    global watch_dir, large_layer_size, max_cache_size, time_window, max_time_window_growth_size, log_file_accessing_err
+    global \
+        watch_dir, \
+        large_layer_size, \
+        max_cache_size, \
+        time_window, \
+        max_time_window_growth_size, \
+        log_file_accessing_err
 
     default_config_path = sys.argv[1] if len(sys.argv) > 1 else "default.conf"
 
@@ -336,7 +348,9 @@ def main():
     log_file_accessing_err = True
 
     if os.path.isfile(default_config_path):
-        logger.info(f"read config from {os.path.abspath(default_config_path)!r}")
+        logger.info(
+            f"read config from {os.path.abspath(default_config_path)!r}"
+        )
 
         cfg = dotenv_values(default_config_path)
 
@@ -362,7 +376,9 @@ def main():
         )
     )
     logger.info(
-        " ".join(["with `log_file_accessing_err` set to", log_file_accessing_err])
+        " ".join(
+            ["with `log_file_accessing_err` set to", log_file_accessing_err]
+        )
     )
 
     # init watcher
