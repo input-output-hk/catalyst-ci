@@ -1,0 +1,61 @@
+VERSION 0.8
+
+deps:
+    FROM python:3.12.3-slim-bookworm
+    WORKDIR /work
+
+    ARG version = 1.7.1
+
+    ENV POETRY_HOME=/opt/poetry
+    ENV POETRY_VERSION=$version
+    ENV POETRY_VIRTUALENVS_IN_PROJECT=true
+    ENV PATH=$POETRY_HOME/bin:$PATH
+
+    RUN apt-get update && \
+        apt-get install -y --no-install-recommends \
+        build-essential \
+        curl
+
+    RUN curl -sSL https://install.python-poetry.org | python3 -
+
+    COPY poetry.lock pyproject.toml README.md .
+
+    RUN poetry install --only main --no-root
+
+src:
+    FROM +deps
+
+    COPY --dir jorm_metrics_server .
+
+check:
+    FROM +src
+
+    RUN poetry install --only dev --no-root
+    RUN poetry run ruff check .
+    RUN poetry run ruff format --check .
+
+build:
+    FROM +src
+
+    COPY --dir jorm_metrics_server .
+    RUN poetry install --only main
+
+    SAVE ARTIFACT .venv venv
+    SAVE ARTIFACT . src
+
+docker:
+    FROM python:3.12.3-slim-bookworm
+
+    WORKDIR /app
+
+    ARG container="jorm-metrics-server"
+    ARG tag="latest"
+
+    ENV PATH=/app/.venv/bin:$PATH
+
+    COPY +build/venv .
+    COPY +build/src .
+
+    ENTRYPOINT ["python", "-m", "jorm_metrics_server.main"]
+
+    SAVE IMAGE ${container}:${tag}
