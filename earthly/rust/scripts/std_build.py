@@ -95,7 +95,7 @@ def cargo_bench(flags: str, verbose: bool = False) -> exec_manager.Result:
 
 def cargo_doc(verbose: bool = False) -> exec_manager.Result:
     return exec_manager.cli_run(
-        "cargo +nightly docs --enable-index-page -Z unstable-options", 
+        "cargo +nightly docs -Z unstable-options --enable-index-page", 
         name="Documentation build", 
         verbose=verbose
     )
