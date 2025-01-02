@@ -36,7 +36,7 @@ def cargo_lint(flags: str, verbose: bool = False) -> exec_manager.Result:
 
 def cargo_doctest(flags: str, verbose: bool = False) -> exec_manager.Result:
     return exec_manager.cli_run(
-        "cargo +nightly testdocs " + f"{flags} ",
+        "cargo testdocs " + f"{flags} ",
         name="Documentation tests all pass check",
         verbose=verbose,
     )
@@ -95,7 +95,9 @@ def cargo_bench(flags: str, verbose: bool = False) -> exec_manager.Result:
 
 def cargo_doc(verbose: bool = False) -> exec_manager.Result:
     return exec_manager.cli_run(
-        "cargo +nightly docs ", name="Documentation build", verbose=verbose
+        "cargo +nightly docs --enable-index-page -Z unstable-options", 
+        name="Documentation build", 
+        verbose=verbose
     )
 
 
