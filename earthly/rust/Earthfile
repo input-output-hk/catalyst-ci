@@ -407,7 +407,13 @@ INSTALL_RUST:
     RUN rustup component add llvm-tools-preview
 
     # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
+    RUN rustup toolchain install nightly \
+        --component miri \
+        --component rust-src \
+        --component rustfmt \
+        --component clippy \
+        --component cargo \
+        --component llvm-tools-preview
 
     # Ensure we have all the necessary targets
     RUN rustup target add wasm32-unknown-unknown
