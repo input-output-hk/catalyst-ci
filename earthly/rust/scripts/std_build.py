@@ -36,7 +36,7 @@ def cargo_lint(flags: str, verbose: bool = False) -> exec_manager.Result:
 
 def cargo_doctest(flags: str, verbose: bool = False) -> exec_manager.Result:
     return exec_manager.cli_run(
-        "cargo +nightly testdocs " + f"{flags} ",
+        "cargo testdocs " + f"{flags} ",
         name="Documentation tests all pass check",
         verbose=verbose,
     )
@@ -94,8 +94,13 @@ def cargo_bench(flags: str, verbose: bool = False) -> exec_manager.Result:
 
 
 def cargo_doc(verbose: bool = False) -> exec_manager.Result:
+    # Add RUSTDOCFLAGS to the inherited environment so we can build an index page with nightly.
+    env = os.environ
+    env["RUSTDOCFLAGS"] = "-Z unstable-options --enable-index-page"
     return exec_manager.cli_run(
-        "cargo +nightly docs ", name="Documentation build", verbose=verbose
+        "cargo +nightly docs", 
+        name="Documentation build", 
+        verbose=verbose
     )
 
 
@@ -328,9 +333,8 @@ def main():
         runner.run(cargo_lint, args.lint_flags, args.verbose)
 
         # Check if all Self contained tests pass (Test that need no external resources).
+        # But NOT doc tests, as these are not replacements for unit tests.
         if not args.disable_tests:
-            # Check if all documentation tests pass.
-            runner.run(cargo_doctest, args.doctest_flags, args.verbose)
             if args.cov_report == "":
                 # Without coverage report
                 runner.run(cargo_nextest, args.test_flags, args.verbose)
@@ -364,6 +368,15 @@ def main():
             cargo_modules_bin(runner, package, bin_name, not args.disable_docs, args.verbose)
 
         results = runner.get_results()
+
+    # Check if all Self contained doc tests pass (Test that need no external resources).
+    # Can not be run in parallel with the normal builds as it becomes flaky and randomly fails.
+    # NOTE: DocTests are ONLY run to prove they are valid, they are NOT unit tests, and never
+    # currently contribute to code coverage.
+    if not args.disable_tests:
+        # Check if all documentation tests pass.
+        results.add(cargo_doctest(args.doctest_flags, args.verbose))
+
 
     results.print()
     if not results.ok():
