@@ -4,29 +4,62 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
-# flutter-src save Flutter source code as artifact.
-flutter-src:
-    FROM busybox
+# TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
+# Install flutter.
+INSTALL_FLUTTER:
+    FUNCTION
     ARG version=3.24.1
     ARG TARGETARCH
 
-    RUN mkdir -p /flutter
+    # Install Flutter
     IF [ "$TARGETARCH" = "amd64" ]
         RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
-            | tar -xJ -C /flutter
+            | tar -xJ -C /usr/local
+    ELSE IF [ "$TARGETARCH" = "arm64" ]
+        GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local
     ELSE
-        GIT CLONE --branch $version https://github.com/flutter/flutter.git /flutter
+        RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
     END
-    SAVE ARTIFACT /flutter flutter
 
+    RUN git config --global --add safe.directory /usr/local/flutter
+    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
+
+    ENV CI="true"
+    RUN flutter config --no-analytics
+    RUN flutter --version
+    RUN flutter doctor -v
+    RUN flutter config --enable-web
+    RUN dart pub global activate melos
+    RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
+    RUN dart pub global activate combine_coverage
+    RUN dart pub global activate license_checker
+	
 # flutter-base installs required tools and packages.
 flutter-base:
     FROM debian:bookworm-20240513-slim
 
     ENV DEBIAN_FRONTEND=noninteractive
 
-    RUN apt-get update --fix-missing
-    RUN apt-get install -y apt-utils git curl gzip unzip bzip2 bash jq gpg lcov
+    # Update and install as same command so if either fails, the whole step fails and is not cached.
+    RUN apt-get update --fix-missing && \
+            apt-get install -y \
+            apt-utils \
+            git \
+            curl \
+            gzip \
+            unzip \
+            bzip2 \
+            bash \
+            jq \
+            gpg \
+            lcov \
+            tar \
+            wget \
+            xz-utils \
+            && rm -rf /var/lib/apt/lists/*
+
+    DO +INSTALL_FLUTTER
 
     WORKDIR frontend
 
@@ -37,25 +70,9 @@ flutter-base:
     ARG edge_package_release = 1
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
 
-    COPY +flutter-src/flutter /usr/local
-    ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
-    RUN flutter config --no-analytics
-    RUN flutter --version
-    RUN flutter doctor -v
-    RUN flutter config --enable-web
-    RUN dart pub global activate melos
-    RUN dart pub global activate junitreport
-    RUN dart pub global activate coverage
-    RUN dart pub global activate combine_coverage
-    RUN dart pub global activate license_checker
-
-# test-flutter-base-amd64 : installs required tools and packages for amd64.
-test-flutter-base-amd64:
-    BUILD --platform=linux/amd64 +flutter-base
-
-# test-flutter-base-arm64 : installs required tools and packages for arm64.
-test-flutter-base-arm64:
-    BUILD --platform=linux/arm64 +flutter-base
+# test-flutter-base : installs required tools and packages for flutter development.
+test-flutter-base:
+    BUILD +flutter-base
 
 SETUP:
     FUNCTION

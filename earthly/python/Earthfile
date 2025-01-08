@@ -8,7 +8,7 @@ IMPORT ../../utilities/scripts AS scripts
 python-base:
     FROM python:3.12-alpine3.20
 
-    # Install necessary packages 
+    # Install necessary packages
     RUN apk add --no-cache \
         bash \
         curl \
@@ -30,7 +30,7 @@ python-base:
     ENV PYTHONDONTWRITEBYTECODE=1
 
     # Install Poetry using the recommended installer.
-    RUN curl -sSL https://install.python-poetry.org | python3 -
+    RUN curl -sSL https://install.python-poetry.org | python3 - --version 2.0.0
 
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
@@ -54,7 +54,7 @@ BUILDER:
     COPY pyproject.toml poetry.lock Readme.md .
 
     # Install it all with poetry
-    RUN poetry install $opts    
+    RUN poetry install $opts
 
 CHECK:
     FUNCTION
@@ -77,6 +77,5 @@ LINT_PYTHON:
     RUN pip install ruff
 
     COPY $src .
-    
-    RUN ruff .
 
+    RUN ruff .

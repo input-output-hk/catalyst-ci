@@ -5,7 +5,7 @@ import sys
 import threading
 import time
 from collections.abc import Callable
-from typing import Set
+from typing import set
 
 from dotenv import dotenv_values
 from loguru import logger
@@ -64,8 +64,8 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.layer_growth_index: dict[str, int] = {}
         self.layer_index: dict[str, int] = {}
         self.file_index: dict[str, int] = {}
-        self.triggered_layers: Set[str] = set()
-        self.triggered_growth_layers: Set[str] = set()
+        self.triggered_layers: set[str] = set()
+        self.triggered_growth_layers: set[str] = set()
         self.interval = Interval(interval, self.handle_interval_change)
 
         self.list_initial_sizes()
