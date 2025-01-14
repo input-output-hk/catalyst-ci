@@ -910,25 +910,6 @@ files = [
 Markdown = ">=2.3.1"
 
 [[package]]
-name = "mkdocs-kroki-plugin"
-version = "0.6.1"
-description = "MkDocs plugin for Kroki-Diagrams"
-optional = false
-python-versions = ">=3.6"
-files = []
-develop = false
-
-[package.dependencies]
-mkdocs = ">=1.4.0"
-requests = ">=2.27.0"
-
-[package.source]
-type = "git"
-url = "https://github.com/oniboni/mkdocs-kroki-plugin"
-reference = "refactoring/image-handling"
-resolved_reference = "46f072be1a70c408d4dbd17f8edd3c6ececa8fb0"
-
-[[package]]
 name = "mkdocs-macros-plugin"
 version = "1.3.7"
 description = "Unleash the power of MkDocs with macros and variables"
@@ -1005,7 +986,7 @@ pydantic = "^2.1.1"
 type = "git"
 url = "https://github.com/stevenj/mkdocs-material-adr"
 reference = "new-id"
-resolved_reference = "219ff8831c8e07ca77e9a892e03efe563a1ef815"
+resolved_reference = "e083ac77bc424dd6659853e34317292317cc3690"
 
 [[package]]
 name = "mkdocs-material-extensions"
@@ -1987,4 +1968,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "50928281e6e6248073e2ac98252d3e74d2de39c62e36ebc2ba262603bf3588e6"
+content-hash = "24f397473a8ccf35e0f5c6e0f8d5ff8fd938820875506055e79d6f548c04fa30"
