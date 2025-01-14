@@ -1,0 +1,24 @@
+VERSION 0.8
+
+IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
+
+test:
+    FROM python-ci+python-base
+    COPY . .
+    DO python-ci+CHECK
+
+validate-project-fields:
+    FROM python-ci+python-base
+    COPY . .
+
+    RUN pip install requests
+
+    ARG PROJECT_NUMBER=102
+    ARG --required GITHUB_REPOSITORY
+    ARG --required GITHUB_EVENT_NUMBER
+
+    ENV PROJECT_NUMBER=${PROJECT_NUMBER}
+    ENV GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+    ENV GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
+
+    RUN --no-cache --secret GITHUB_TOKEN python3 main.py
