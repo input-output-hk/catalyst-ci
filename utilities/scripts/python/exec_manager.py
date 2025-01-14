@@ -150,6 +150,7 @@ def cli_run(
     log: bool = True,
     timeout=None,
     verbose=False,
+    env=None
 ) -> Result:
     def procedure() -> ProcedureResult:
         result = subprocess.run(
@@ -159,6 +160,7 @@ def cli_run(
             stderr=subprocess.STDOUT,
             text=True,
             timeout=timeout,
+            env=env
         )
         return ProcedureResult(result.returncode, command, result.stdout)
 
