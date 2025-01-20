@@ -56,8 +56,7 @@ flutter-base:
             lcov \
             tar \
             wget \
-            xz-utils \
-            libdatrie1
+            xz-utils
 
     DO +INSTALL_FLUTTER
 
