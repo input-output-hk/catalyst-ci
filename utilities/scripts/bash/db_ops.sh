@@ -121,8 +121,8 @@ function init_db() {
         return 1
     fi
 
-    echo "include_if_exists ${data_dir}/pg_hba.extra.conf" >> "${data_dir}/pg_hba.conf"
-    echo "include_if_exists /sql/pg_hba.extra.conf" >> "${data_dir}/pg_hba.conf"
+    echo "include_if_exists ${data_dir}/pg_hba.extra.conf" >>"${data_dir}/pg_hba.conf"
+    echo "include_if_exists /sql/pg_hba.extra.conf" >>"${data_dir}/pg_hba.conf"
 
     return 0
 }
@@ -170,7 +170,7 @@ function wait_ready_pgsql() {
     fi
 
     # Check if PostgreSQL is running using pg_isready
-    until pg_isready -d "${dbconn}" > /dev/null 2>&1; do
+    until pg_isready -d "${dbconn}" >/dev/null 2>&1; do
         sleep 1
         if [[ ${timeout} -gt 0 ]]; then
             timeout=$((timeout - 1))
@@ -196,7 +196,7 @@ function wait_pgsql_stopped() {
     echo "Waiting for PostgreSQL DB to stop..."
 
     # Check if PostgreSQL is running using pg_isready
-    until ! pg_isready -d "${dbconn}" > /dev/null 2>&1; do
+    until ! pg_isready -d "${dbconn}" >/dev/null 2>&1; do
         sleep 60
     done
 
@@ -228,6 +228,8 @@ function setup_db() {
     local dbuserpw=$(get_param dbuserpw env_vars defaults "$@")
     # shellcheck disable=SC2155 # Can not fail
     local dbconn=$(pgsql_superuser_connection "$@")
+    # shellcheck disable=SC2155 # Can not fail
+    local dbsuperuser=$(get_param dbsuperuser env_vars defaults "$@")
 
     psql -v ON_ERROR_STOP=on \
         -d "${dbconn}" \
@@ -235,7 +237,8 @@ function setup_db() {
         -v dbName="${dbname}" \
         -v dbDescription="${dbdesc}" \
         -v dbUser="${dbuser}" \
-        -v dbUserPw="${dbuserpw}"
+        -v dbUserPw="${dbuserpw}" \
+        -v dbSuperUser="${dbsuperuser}"
 
     return $?
 }

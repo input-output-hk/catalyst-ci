@@ -17,6 +17,7 @@
 \echo -> dbDescription .......... = :dbDescription
 \echo -> dbUser ................. = :dbUser
 \echo -> dbUserPw ............... = xxxx
+\echo -> dbSuperUser ............ = :dbSuperUser
 
 -- Cleanup if we already ran this before.
 --DROP OWNED BY IF EXISTS :"dbUser"; -- noqa: PRS
@@ -29,10 +30,13 @@ CREATE USER :"dbUser" WITH PASSWORD :'dbUserPw'; -- noqa: PRS
 -- Privileges for this user/role.
 ALTER DEFAULT PRIVILEGES GRANT EXECUTE ON FUNCTIONS TO public;
 
--- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS 
+-- ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT EXECUTE ON FUNCTIONS
 -- TO :"dbUser"; -- noqa: PRS
 
 -- Create the database.
 CREATE DATABASE :"dbName" WITH OWNER :"dbUser"; -- noqa: PRS
+
+-- This is necessary for RDS to work.
+GRANT :"dbUser" TO :"dbSuperUser";
 
 COMMENT ON DATABASE :"dbName" IS :'dbDescription'; -- noqa: PRS
