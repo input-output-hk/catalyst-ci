@@ -7,7 +7,7 @@ VERSION 0.8
 # Then replace that Release version number in the path below.
 # This ensures that the tools are properly cached, and will also be re-installed when the upstream artifact is updated.
 # If a branch is no longer used by CI, delete it.
-ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/R0002/web-browsers"
+ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/R0001/web-browsers"
 
 #TODO(minikin): https://github.com/input-output-hk/catalyst-storage/issues/1
 
