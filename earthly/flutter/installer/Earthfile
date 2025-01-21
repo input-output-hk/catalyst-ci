@@ -7,7 +7,7 @@ VERSION 0.8
 # Then replace that Release version number in the path below.
 # This ensures that the tools are properly cached, and will also be re-installed when the upstream artifact is updated.
 # If a branch is no longer used by CI, delete it.
-ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/R0001/web-browsers"
+ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/R0002/web-browsers"
 
 #TODO(minikin): https://github.com/input-output-hk/catalyst-storage/issues/1
 
@@ -26,7 +26,7 @@ INSTALL_CHROME_LINUX64:
     # You must provide it as ARG, e.g., `ARG TARGETARCH` in your function to use it.
     # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
     IF [ "$TARGETARCH" = "amd64" ]
-        RUN printf "${BLUE} Installing Google Chrome..." \
+        RUN --no-cache printf "${BLUE} Installing Google Chrome..." \
             && curl -sSL -o /opt/chrome.zip "${BASE_URL}/chrome/chrome_amd64.zip" \
             && unzip /opt/chrome.zip -d /opt/chrome \
             && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
