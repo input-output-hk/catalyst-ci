@@ -178,6 +178,7 @@ INTEGRATION_TEST_SETUP:
 BUILD:
     FUNCTION
     ARG --required image_name
+    ARG --required image_tag
 
     USER postgres:postgres
 
@@ -185,5 +186,7 @@ BUILD:
 
     ENTRYPOINT ["/scripts/entry.sh"]
 
+    # Push the container...
+    SAVE IMAGE ${image_name}:${image_tag}
 
 
