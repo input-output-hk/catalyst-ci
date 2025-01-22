@@ -63,11 +63,11 @@ flutter-base:
     WORKDIR frontend
 
     DO installer+INSTALL_CHROME_LINUX64
-#    DO installer+INSTALL_FIREFOX_LINUX64
+    DO installer+INSTALL_FIREFOX_LINUX64
 
     ARG edge_version = 125.0.2535.51
     ARG edge_package_release = 1
-#    DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
+    DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
 
 # test-flutter-base : installs required tools and packages for flutter development.
 test-flutter-base:
