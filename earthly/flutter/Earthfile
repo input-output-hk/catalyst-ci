@@ -58,7 +58,7 @@ flutter-base:
             wget \
             xz-utils
 
-#    DO +INSTALL_FLUTTER
+    DO +INSTALL_FLUTTER
 
     WORKDIR frontend
 
