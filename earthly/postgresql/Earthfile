@@ -178,7 +178,7 @@ INTEGRATION_TEST_SETUP:
 BUILD:
     FUNCTION
     ARG --required image_name
-    ARG --required image_tag
+    ARG image_tag=latest
 
     USER postgres:postgres
 
