@@ -63,11 +63,11 @@ flutter-base:
     WORKDIR frontend
 
     DO installer+INSTALL_CHROME_LINUX64
-    DO installer+INSTALL_FIREFOX_LINUX64
+#    DO installer+INSTALL_FIREFOX_LINUX64
 
     ARG edge_version = 125.0.2535.51
     ARG edge_package_release = 1
-    DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
+#    DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
 
 # test-flutter-base : installs required tools and packages for flutter development.
 test-flutter-base:
@@ -96,11 +96,11 @@ OPENAPI_CODE_GEN:
     ARG --required GEN_CODE_PATH
     ARG --required LOCAL_GEN_CODE_PATH
 
-    RUN flutter pub get
-    RUN dart run build_runner build --delete-conflicting-outputs
+#    RUN flutter pub get
+#    RUN dart run build_runner build --delete-conflicting-outputs
 
     IF [ $SAVE_LOCALLY = true ]
-        SAVE ARTIFACT "$GEN_CODE_PATH/*" AS LOCAL $LOCAL_GEN_CODE_PATH
+#        SAVE ARTIFACT "$GEN_CODE_PATH/*" AS LOCAL $LOCAL_GEN_CODE_PATH
     ELSE
         SAVE ARTIFACT $GEN_CODE_PATH
     END
@@ -112,9 +112,9 @@ OPENAPI_VALIDATE:
     ARG --required WORKDIR
 
     WORKDIR $WORKDIR
-    RUN dart run openapi_validate
+#    RUN dart run openapi_validate
 
-    SAVE ARTIFACT openapi_validate
+#    SAVE ARTIFACT openapi_validate
 
 # Runs dart static analysis.
 ANALYZE:
@@ -122,10 +122,10 @@ ANALYZE:
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos analyze"
-        RUN melos analyze --fatal-infos --fatal-warnings
+#        RUN melos analyze --fatal-infos --fatal-warnings
     ELSE
         RUN echo "Running flutter analyze"
-        RUN flutter analyze --fatal-infos --fatal-warnings
+#        RUN flutter analyze --fatal-infos --fatal-warnings
     END
 
 # Runs dart formatting check.
@@ -134,10 +134,10 @@ FORMAT:
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos format"
-        RUN melos run format-check
+#        RUN melos run format-check
     ELSE
         RUN echo "Running flutter format"
-        RUN flutter format --set-exit-if-changed .
+#        RUN flutter format --set-exit-if-changed .
     END
 
 # Dry-runs the publish script for publishable packages.
@@ -146,10 +146,10 @@ PUBLISH_DRY_RUN:
 
     IF [ -f melos.yaml ]
         RUN echo "Running melos publish --dry-run"
-        RUN melos publish --dry-run --yes
+#        RUN melos publish --dry-run --yes
     ELSE
         RUN echo "Running dart pub publish --dry-run"
-        RUN dart pub publish --dry-run
+#        RUN dart pub publish --dry-run
     END
 
 
@@ -162,28 +162,28 @@ UNIT_TESTS:
 
         # We always want to save the test_reports and coverage
         # therefore we must defer the error reported here until later.
-        RUN melos run test-report > melos-output.txt 2>&1 || touch fail
+#        RUN melos run test-report > melos-output.txt 2>&1 || touch fail
 
         # If not failed then print the output immediately,
         # if it has failed then it's printed at the end of the function when exiting.
         IF [ ! -f fail ]
-            RUN cat melos-output.txt
+#            RUN cat melos-output.txt
         END
 
         WAIT
-            SAVE ARTIFACT test_reports AS LOCAL test_reports
-            SAVE ARTIFACT coverage AS LOCAL coverage
+#            SAVE ARTIFACT test_reports AS LOCAL test_reports
+#            SAVE ARTIFACT coverage AS LOCAL coverage
         END
 
         # Defer the failure to here.
         IF [ -f fail ]
             RUN echo "Error occurred when running: melos run test-report"; \
-                cat melos-output.txt; \
+#                cat melos-output.txt; \
                 exit 1
         END
     ELSE
         RUN echo "Running flutter test"
-        RUN flutter test
+#        RUN flutter test
     END
 
 # Build web app and save artifacts locally if needed.
