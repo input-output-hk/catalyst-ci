@@ -15,7 +15,7 @@ postgres-base:
 
     WORKDIR /root
 
-    # Install necessary packages 
+    # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
     RUN apt-get update && apt-get install -y \
         bash \
@@ -80,7 +80,7 @@ BUILDER:
     ARG migrations=./migrations
     ARG seed=./seed
     ARG refinery_toml=./refinery.toml
-    
+
     FROM +postgres-base
 
     WORKDIR /build
@@ -91,7 +91,7 @@ BUILDER:
     COPY --dir $refinery_toml .
 
 # DOCS - FUNCTION to build the docs, needs to be run INSIDE the BUILDER like so:
-# 
+#
 # This function uses SchemaSpy to generate database documentation.
 # SchemaSpy creates detailed, Discoverable ER diagrams and schema documentation.
 #
@@ -117,7 +117,7 @@ DOCS:
     ARG refinery_toml=./refinery.toml
 
     FROM +postgres-base
-      
+
     USER postgres:postgres
     WORKDIR /docs
 
@@ -169,7 +169,7 @@ INTEGRATION_TEST_SETUP:
 
 
 # Build PostgreSQL image.
-# REQUIREMENTS: 
+# REQUIREMENTS:
 #  * prepare migrations files into the `./migrations` dir
 #  * prepare seed data files into the `./data` dir (optional)
 #  * prepare `refinery.toml` file
@@ -185,7 +185,5 @@ BUILD:
 
     ENTRYPOINT ["/scripts/entry.sh"]
 
-    # Push the container...
-    SAVE IMAGE ${image_name}:latest
 
 
