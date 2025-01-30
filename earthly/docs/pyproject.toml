@@ -7,44 +7,45 @@ readme = "Readme.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
-mkdocs-material = { version = "^9.5.3", extras = ["recommended","git","imaging"] }
+mkdocs-material = { version = "^9.5.49", extras = ["recommended","git","imaging"] }
 
 ### MkDocs Plugins we add.
 
 # https://github.com/byrnereese/mkdocs-minify-plugin
-mkdocs-minify-plugin = "^0.7.1"
+mkdocs-minify-plugin = "^0.8.0"
 
 # https://github.com/mkdocs/mkdocs-redirects
-mkdocs-redirects = "^v1.2.1"
+mkdocs-redirects = "^1.2.2"
 
 # https://github.com/Blueswen/mkdocs-glightbox
-mkdocs-glightbox = "^0.3.5"
+mkdocs-glightbox = "^0.4.0"
 
+# Kroki is disabled because it requires an external service
 # https://github.com/AVATEAM-IT-SYSTEMHAUS/mkdocs-kroki-plugin/tree/main
 # Using this fork: https://github.com/oniboni/mkdocs-kroki-plugin/tree/refactoring/image-handling
 # Because it properly handles the image files.
-#mkdocs-kroki-plugin = "^0.6.1"
-mkdocs-kroki-plugin = { git = "https://github.com/oniboni/mkdocs-kroki-plugin", branch="refactoring/image-handling" }
+# mkdocs-kroki-plugin = "^0.6.1"
+# mkdocs-kroki-plugin = { git = "https://github.com/oniboni/mkdocs-kroki-plugin", branch="refactoring/image-handling" }
 
 # https://github.com/jdoiro3/mkdocs-multirepo-plugin
-mkdocs-multirepo-plugin = "^v0.6.3"
+mkdocs-multirepo-plugin = "^0.8.3"
 
 # https://mkdocs-macros-plugin.readthedocs.io/en/latest/
-mkdocs-macros-plugin = "^v1.0.4"
+mkdocs-macros-plugin = "^1.3.7"
 
 # https://github.com/timmeinerzhagen/mkdocs-meta-manager
-mkdocs-meta-manager = "^0.2.1"
+mkdocs-meta-manager = "^1.0.0"
 
 # https://github.com/Kl0ven/mkdocs-material-adr
 # mkdocs-material-adr = "^1.1.0"
-mkdocs-material-adr = { git = "https://github.com/stevenj/mkdocs-material-adr" }
+mkdocs-material-adr = { git = "https://github.com/stevenj/mkdocs-material-adr", branch = "new-id" }
 
 # https://henrywhitaker3.github.io/mkdocs-material-dark-theme/plugins/awesome-pages/
 # https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
-mkdocs-awesome-pages-plugin = "^2.9.2"
+mkdocs-awesome-pages-plugin = "^2.10.1"
 
 # https://github.com/landmaj/mkdocs-d2-plugin
-mkdocs-d2-plugin = "^1.1.0"
+mkdocs-d2-plugin = "^1.6.0"
 
 # https://gitlab.com/rod2ik/mkdocs-graphviz
 mkdocs-graphviz = "^1.5.3"

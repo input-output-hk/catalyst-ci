@@ -228,6 +228,8 @@ function setup_db() {
     local dbuserpw=$(get_param dbuserpw env_vars defaults "$@")
     # shellcheck disable=SC2155 # Can not fail
     local dbconn=$(pgsql_superuser_connection "$@")
+    # shellcheck disable=SC2155 # Can not fail
+    local dbsuperuser=$(get_param dbsuperuser env_vars defaults "$@")
 
     psql -v ON_ERROR_STOP=on \
         -d "${dbconn}" \
@@ -235,7 +237,8 @@ function setup_db() {
         -v dbName="${dbname}" \
         -v dbDescription="${dbdesc}" \
         -v dbUser="${dbuser}" \
-        -v dbUserPw="${dbuserpw}"
+        -v dbUserPw="${dbuserpw}" \
+        -v dbSuperUser="${dbsuperuser}"
 
     return $?
 }

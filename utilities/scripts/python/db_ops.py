@@ -209,7 +209,8 @@ class DBOps:
             + f' -v dbName="{self.args.dbname}"'
             + f' -v dbDescription="{self.args.dbdescription}"'
             + f' -v dbUser="{self.args.dbuser}"'
-            + f' -v dbUserPw="{self.args.dbuserpw}"',
+            + f' -v dbUserPw="{self.args.dbuserpw}"'
+            + f' -v dbSuperUser="{self.args.dbsuperuser}"',
             name="Setup Database",
             verbose=True,
         )
