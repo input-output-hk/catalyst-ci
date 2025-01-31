@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
+import json as jsonlib
 import os
 import sys
-from dataclasses import dataclass
-from typing import Optional, List, Dict, Any, Set, NamedTuple, Iterable
-from enum import Enum
-import json as jsonlib
 import traceback
 import urllib.error
 import urllib.parse
 import urllib.request
+from dataclasses import dataclass
 from email.message import Message
-import traceback
+from enum import Enum
+from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Set
+
 
 class SafeOpener(urllib.request.OpenerDirector):
     """An opener with configurable set of handlers."""
@@ -45,8 +45,6 @@ class RequestException(Exception):
 
     def __init__(self, *args, **kwargs):
         """Initialize RequestException with `request` and `response` objects."""
-        print(f"Error ARGS={args} KWARGS={kwargs}")
-        traceback.print_stack()
         response = kwargs.pop("response", None)
         self.response = response
         self.request = kwargs.pop("request", None)
@@ -62,7 +60,7 @@ class Response(NamedTuple):
     headers: Message
     status: int
     url: str
-    request: "Request"
+    request: urllib.request.Request
 
     def json(self) -> Any:
         """
@@ -85,6 +83,7 @@ class Response(NamedTuple):
 
 # only used by `request`
 opener = SafeOpener()
+
 
 def request(
     method: str,
@@ -226,10 +225,14 @@ class ProjectFieldsValidator:
 
                 return data
             except jsonlib.JSONDecodeError as e:
-                raise GitHubAPIError(f"Failed to parse API response: {str(e)} METHOD={method} URL={url} JSON={kwargs.get("json")}")
+                raise GitHubAPIError(
+                    f"Failed to parse API response: {str(e)} METHOD={method} URL={url} JSON={kwargs.get("json")}"
+                )
 
         except RequestException as e:
-            raise GitHubAPIError(f"GitHub API request failed: {str(e)} METHOD={method} URL={url} ARGS={kwargs}")
+            raise GitHubAPIError(
+                f"GitHub API request failed: {str(e)} METHOD={method} URL={url} ARGS={kwargs}"
+            )
 
     def run_query(self, query: str, variables: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a GraphQL query against GitHub's API."""
