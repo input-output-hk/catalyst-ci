@@ -226,7 +226,7 @@ class ProjectFieldsValidator:
                 return data
             except jsonlib.JSONDecodeError as e:
                 raise GitHubAPIError(
-                    f"Failed to parse API response: {str(e)} METHOD={method} URL={url} JSON={kwargs.get("json")}"
+                    f"Failed to parse API response: {str(e)} METHOD={method} URL={url} JSON={kwargs.get('json')}"
                 )
 
         except RequestException as e:

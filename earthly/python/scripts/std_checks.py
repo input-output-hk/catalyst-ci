@@ -4,21 +4,37 @@ import os
 import subprocess
 import sys
 
-def check_pyproject_toml():
+def check_pyproject_toml(stand_alone):
     # Check if 'pyproject.toml' exists in the project root.
     if not os.path.isfile('pyproject.toml'):
+        if stand_alone:
+            print("pyproject.toml check passed.")
+            return True
+        
         print("Error: pyproject.toml not found.")
         return False
     else:
+        if stand_alone:
+            print("Error: pyproject.toml found in standalone python module.")
+            return False
+        
         print("pyproject.toml check passed.")
         return True
     
-def check_poetry_lock():
+def check_poetry_lock(stand_alone):
     # Check if 'poetry.lock' exists in the project root.
     if not os.path.isfile('poetry.lock'):
+        if stand_alone:
+            print("poetry.lock check passed.")
+            return True
+            
         print("Error: poetry.lock not found.")
         return False
     else:
+        if stand_alone:
+            print("Error: poetry.lock found in stand alone module.")
+            return False
+        
         print("poetry.lock check passed.")
         return True
 
@@ -67,14 +83,15 @@ def check_no_third_party_imports():
         return True
 
 
-def main(stand_alone : bool):
+def main(stand_alone):
+    if stand_alone:
+        print("Checking Standalone Python files (No third party imports or poetry project)")
     checks_passed = True
     # Perform checks
     
-    # These are done on python programs that require third party libraries
-    if not stand_alone:
-        checks_passed &= check_pyproject_toml()
-        checks_passed &= check_poetry_lock()
+    # These are true on python programs that require third party libraries, false otherwise
+    checks_passed &= check_pyproject_toml(stand_alone)
+    checks_passed &= check_poetry_lock(stand_alone)
         
     # Always done
     checks_passed &= check_lint_with_ruff()
@@ -88,4 +105,5 @@ def main(stand_alone : bool):
         sys.exit(1)
 
 if __name__ == "__main__":
+    print(f"Current Working Directory: {os.getcwd()}")    
     main("--stand-alone" in sys.argv[1:])

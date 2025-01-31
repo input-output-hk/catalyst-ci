@@ -1,9 +1,10 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
+IMPORT ../../earthly/python AS python-ci
 
 test:
     FROM python-ci+python-base
+    WORKDIR /stand-alone
     COPY . .
     # Stand alone python command doesn't use any third party libraries
     DO python-ci+CHECK --options="--stand-alone"
