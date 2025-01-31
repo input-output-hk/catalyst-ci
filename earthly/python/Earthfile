@@ -38,6 +38,7 @@ python-base:
     # Install ruff for linting.
     RUN pip3 install ruff
     RUN pip3 install rich
+    RUN pip3 install third-party-imports
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
@@ -58,9 +59,10 @@ BUILDER:
 
 CHECK:
     FUNCTION
+    ARG options=""
 
     # Execute the check script
-    RUN /scripts/std_checks.py
+    RUN /scripts/std_checks.py $options
 
 LINT_PYTHON:
     # Linting all Python code is done with ruff
