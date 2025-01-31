@@ -35,6 +35,10 @@ python-base:
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
 
+    # Extension we use needs rust.
+    RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+    RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+
     # Install ruff for linting.
     RUN pip3 install ruff
     RUN pip3 install rich
