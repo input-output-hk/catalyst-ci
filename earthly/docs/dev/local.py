@@ -2,13 +2,13 @@
 
 # cspell: words gmtime
 
+import argparse
 import subprocess
+import sys
 import time
+import urllib.request
 import webbrowser
 from dataclasses import dataclass, field
-import argparse
-import sys
-import urllib.request
 
 
 class ProcessRunError(Exception):
@@ -213,7 +213,7 @@ def main():
 
             # Open the webpage in a browser (once)
             if not browsed:
-                browsed=True
+                browsed = True
                 if not args.no_browser:
                     webbrowser.open(f"http://localhost:{docs_container.exposed_port}")
 

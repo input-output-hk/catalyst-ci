@@ -2,15 +2,16 @@
 
 # cspell: words dbmigrations dbhost dbuser dbuserpw Tsvg pgsql11
 
-from typing import Optional
-import python.exec_manager as exec_manager
-import python.db_ops as db_ops
 import argparse
-import rich
-from rich import print
 import os
 import re
 from textwrap import indent
+
+import python.db_ops as db_ops
+import python.exec_manager as exec_manager
+import rich
+from rich import print
+
 
 def process_sql_files(directory):
     file_pattern = r"V(\d+)__(\w+)\.sql"
@@ -32,10 +33,11 @@ def process_sql_files(directory):
             migrations[version] = {
                 "version": version,
                 "migration_name": migration_name,
-                "sql_data": sql_data
+                "sql_data": sql_data,
             }
 
     return migrations, largest_version
+
 
 class Migrations:
     def __init__(self, args: argparse.Namespace):
@@ -72,6 +74,7 @@ class Migrations:
                 )
 
         print("Markdown file created successfully at: {}".format(file_path))
+
 
 def main():
     # Force color output in CI
@@ -124,9 +127,7 @@ def main():
             f"-o docs/database_schema/ "
         )
         res = exec_manager.cli_run(
-            schemaspy_cmd,
-            name="Generate SchemaSpy Documentation",
-            verbose=True
+            schemaspy_cmd, name="Generate SchemaSpy Documentation", verbose=True
         )
         results.add(res)
 
@@ -135,7 +136,7 @@ def main():
             exec_manager.cli_run(
                 'echo "hide: true" > docs/database_schema/.pages',
                 name="Create .pages file",
-                verbose=True
+                verbose=True,
             )
 
         migrations.create_markdown_file("docs/migrations.md")
@@ -144,6 +145,7 @@ def main():
 
     if not results.ok():
         exit(1)
+
 
 if __name__ == "__main__":
     main()

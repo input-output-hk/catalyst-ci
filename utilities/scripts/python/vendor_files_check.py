@@ -25,11 +25,12 @@ def toml_diff_check(
         f"{'' if strict else 'Non '}Strict Checking"
         + f" if Provided File {provided_file_path} == Vendored File {vendor_file_path}"
     )
-    
+
     try:
-        with open(vendor_file_path, "rb") as vendor_file, open(
-            provided_file_path, "rb"
-        ) as provided_file:
+        with (
+            open(vendor_file_path, "rb") as vendor_file,
+            open(provided_file_path, "rb") as provided_file,
+        ):
 
             def procedure() -> exec_manager.ProcedureResult:
                 vendor_obj = tomllib.load(vendor_file)
@@ -52,8 +53,8 @@ def toml_diff_check(
         res = exec_manager.Result(
             1, command_name, f"Exception caught: {exc}", 0.0, command_name
         )
-        
+
         if log:
             res.print(verbose_errors=True, verbose=False)
 
-    return res        
+    return res
