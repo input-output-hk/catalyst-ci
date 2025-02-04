@@ -33,6 +33,8 @@ INSTALL_CHROME_LINUX64:
             && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
             && echo "Check and fix missing dependencies..." \
             && apt --fix-broken install -y \
+            && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
+            && apt --fix-broken install -y \
             && rm -rf /opt/chrome.zip /opt/chrome
         RUN google-chrome --version
 
