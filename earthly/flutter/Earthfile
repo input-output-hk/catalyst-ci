@@ -8,7 +8,7 @@ IMPORT ./installer AS installer
 # Install flutter.
 INSTALL_FLUTTER:
     FUNCTION
-    ARG version=3.24.1
+    ARG version=3.27.3
     ARG TARGETARCH
 
     # Install Flutter
@@ -37,7 +37,7 @@ INSTALL_FLUTTER:
 
 # flutter-base installs required tools and packages.
 flutter-base:
-    FROM debian:bookworm-20240513-slim
+    FROM debian:bookworm-20250203-slim
 
     ENV DEBIAN_FRONTEND=noninteractive
 
