@@ -10,6 +10,6 @@ SETUP:
     DO flutter-ci+INSTALL_CHROME_LINUX64_WITH_DEPS
 
     RUN apt-get update && apt-get install -y \
-        libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb python3.11 python3-pip && \
+        libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/*
