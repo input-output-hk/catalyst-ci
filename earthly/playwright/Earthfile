@@ -4,10 +4,11 @@ IMPORT ../flutter AS flutter-ci
 SETUP:
     FUNCTION
     ARG workdir
-    FROM mcr.microsoft.com/playwright:v1.48.0-jammy
+    FROM mcr.microsoft.com/playwright:v1.48.0-noble
     WORKDIR $workdir
 
     DO flutter-ci+INSTALL_CHROME_LINUX64_WITH_DEPS
+
     RUN apt-get update && apt-get install -y \
         libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb python3.11 python3-pip && \
         apt-get clean && \
