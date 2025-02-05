@@ -27,7 +27,8 @@ jobs:
       pull-requests: read      
       repository-projects: read
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
+      # Needs a PAT Classic with Project Permissions (what else?)
+      GITHUB_TOKEN: ${{ secrets.PAT_FOR_GITHUB }}          
       GITHUB_REPOSITORY: "${{ github.repository }}"
       GITHUB_EVENT_NUMBER: "${{ github.event.number || '0' }}"
       PROJECT_NUMBER: 102
