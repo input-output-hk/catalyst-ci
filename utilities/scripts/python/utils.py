@@ -32,7 +32,6 @@ def fix_quoted_earthly_args():
 
 
 class TestProcessListWithQuotes(unittest.TestCase):
-
     def test_process_list_with_quotes(self):
         sys.argv = [sys.argv[0]] + [
             "this",
@@ -42,7 +41,7 @@ class TestProcessListWithQuotes(unittest.TestCase):
             "this",
             "doesn't",
         ]
-        expected_result = ["this", 'has quoted strings in it', "this", "doesn't"]
+        expected_result = ["this", "has quoted strings in it", "this", "doesn't"]
         fix_quoted_earthly_args()
         self.assertEqual(sys.argv[1:], expected_result)
 

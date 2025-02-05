@@ -2,12 +2,13 @@
 
 # cspell: words stdcfgs
 
+import argparse
+import os
+
 import python.exec_manager as exec_manager
 import python.vendor_files_check as vendor_files_check
-import argparse
 import rich
 from rich import print
-import os
 
 # This script is run inside the `check` stage for rust projects to perform all
 # high level non-compilation checks.
@@ -22,12 +23,12 @@ import os
 
 
 def main():
-    rust_toolchain_enabled=False
-    
+    rust_toolchain_enabled = False
+
     # Force color output in CI
     rich.reconfigure(color_system="256")
 
-    parser = argparse.ArgumentParser(
+    argparse.ArgumentParser(
         description="Rust high level non-compilation checks processing."
     )
 
@@ -68,7 +69,7 @@ def main():
 
     results.add(
         vendor_files_check.toml_diff_check(
-            f"/stdcfgs/cargo_config.toml", ".cargo/config.toml"
+            "/stdcfgs/cargo_config.toml", ".cargo/config.toml"
         )
     )
     if rust_toolchain_enabled:
@@ -104,7 +105,10 @@ def main():
     results.add(exec_manager.cli_run("cargo machete", name="Unused Dependencies Check"))
     # Check if we have any supply chain issues with dependencies.
     results.add(
-        exec_manager.cli_run("cargo deny check --exclude-dev -W vulnerability -W unmaintained", name="Supply Chain Issues Check")
+        exec_manager.cli_run(
+            "cargo deny check --exclude-dev -W vulnerability -W unmaintained",
+            name="Supply Chain Issues Check",
+        )
     )
 
     results.print()

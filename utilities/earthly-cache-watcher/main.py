@@ -17,6 +17,7 @@ import helper
 logger.remove()  # Remove the default handler
 logger.add(sys.stdout, level="INFO", serialize=True, format="{message}")
 
+
 class Interval:
     """
     A class that repeatedly executes a function
@@ -170,11 +171,15 @@ class ChangeEventHandler(FileSystemEventHandler):
                 # checks
                 self.check_sizes(layer_name)
 
-                logger.debug(" ".join([
-                    f"file modified: {file_path}",
-                    f"(size changed from {prev_size:,} bytes",
-                    f"to {size:,} bytes)"
-                ]))
+                logger.debug(
+                    " ".join(
+                        [
+                            f"file modified: {file_path}",
+                            f"(size changed from {prev_size:,} bytes",
+                            f"to {size:,} bytes)",
+                        ]
+                    )
+                )
             else:
                 logger.debug(f"file modified: {file_path} (size unchanged)")
         except OSError as e:
@@ -216,8 +221,7 @@ class ChangeEventHandler(FileSystemEventHandler):
     def check_sizes(self, layer_name: str, skip_sum_check=False):
         if (
             layer_name in self.layer_index
-            and self.layer_index[layer_name]
-            >= large_layer_size
+            and self.layer_index[layer_name] >= large_layer_size
         ):
             self.trigger_layer_size_exceeded(layer_name)
 
@@ -241,17 +245,19 @@ class ChangeEventHandler(FileSystemEventHandler):
         self.triggered_layers.add(layer_name)
 
         logger.error(
-            " ".join([
-                f"layer '{layer_name}' exceeds large layer size criteria",
-                f"(size: {self.layer_index[layer_name]:,} bytes",
-                f"- limit: {large_layer_size:,} bytes)"
-            ]),
+            " ".join(
+                [
+                    f"layer '{layer_name}' exceeds large layer size criteria",
+                    f"(size: {self.layer_index[layer_name]:,} bytes",
+                    f"- limit: {large_layer_size:,} bytes)",
+                ]
+            ),
             extra={
                 "err_type": "layer_size_exceeded",
                 "layer": layer_name,
                 "size": self.layer_index[layer_name],
-                "limit": large_layer_size
-            }
+                "limit": large_layer_size,
+            },
         )
 
     def trigger_interval_growth_exceeded(self):
@@ -265,33 +271,37 @@ class ChangeEventHandler(FileSystemEventHandler):
                 self.triggered_growth_layers.add(layer_name)
 
                 logger.error(
-                    " ".join([
-                        f"layer '{layer_name}'",
-                        f"- {size:,} bytes within the interval"
-                    ]),
+                    " ".join(
+                        [
+                            f"layer '{layer_name}'",
+                            f"- {size:,} bytes within the interval",
+                        ]
+                    ),
                     extra={
                         "err_type": "layer_list_growth_exceeded",
                         "layer": layer_name,
-                        "size": size
-                    }
+                        "size": size,
+                    },
                 )
 
             if has_triggered_layer:
                 size = sum(self.layer_growth_index.values())
 
                 logger.error(
-                    " ".join([
-                        "the total amount of cache growth",
-                        f"within {time_window:,} secs exceeds the limit",
-                        f"(size: {size:,} bytes",
-                        f"- limit: {max_time_window_growth_size:,} bytes)"
-                    ]),
+                    " ".join(
+                        [
+                            "the total amount of cache growth",
+                            f"within {time_window:,} secs exceeds the limit",
+                            f"(size: {size:,} bytes",
+                            f"- limit: {max_time_window_growth_size:,} bytes)",
+                        ]
+                    ),
                     extra={
                         "err_type": "interval_growth_exceeded",
                         "size": size,
                         "limit": max_time_window_growth_size,
-                        "within": time_window
-                    }
+                        "within": time_window,
+                    },
                 )
         except RuntimeError as e:
             logger.error(f"an error occurred: {e}")
@@ -300,20 +310,23 @@ class ChangeEventHandler(FileSystemEventHandler):
         size = sum(self.layer_index.values())
 
         logger.error(
-            " ".join([
-                "the total amount of cache exceeds the limit",
-                f"(size: {size:,} bytes",
-                f"- limit: {max_cache_size:,} bytes)"
-            ]),
+            " ".join(
+                [
+                    "the total amount of cache exceeds the limit",
+                    f"(size: {size:,} bytes",
+                    f"- limit: {max_cache_size:,} bytes)",
+                ]
+            ),
             extra={
                 "err_type": "max_cache_size_exceeded",
                 "size": size,
-                "limit": max_cache_size
-            }
+                "limit": max_cache_size,
+            },
         )
 
     def drop(self):
         self.interval.drop()
+
 
 def main():
     global \
@@ -354,14 +367,19 @@ def main():
     logger.info(f"with `large_layer_size` set to {large_layer_size:,} bytes")
     logger.info(f"with `max_cache_size` set to {max_cache_size:,} bytes")
     logger.info(f"with `time_window` set to {time_window:,} secs")
-    logger.info(" ".join([
-        "with `max_time_window_growth_size` set to",
-        f"{max_time_window_growth_size:,} bytes"
-    ]))
-    logger.info(" ".join([
-        "with `log_file_accessing_err` set to",
-        log_file_accessing_err
-    ]))
+    logger.info(
+        " ".join(
+            [
+                "with `max_time_window_growth_size` set to",
+                f"{max_time_window_growth_size:,} bytes",
+            ]
+        )
+    )
+    logger.info(
+        " ".join(
+            ["with `log_file_accessing_err` set to", log_file_accessing_err]
+        )
+    )
 
     # init watcher
     handler = ChangeEventHandler(time_window)

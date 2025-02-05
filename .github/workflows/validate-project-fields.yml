@@ -19,33 +19,31 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
 
-env:
-  AWS_REGION: eu-central-1
-  AWS_ROLE_ARN: arn:aws:iam::332405224602:role/ci
-  EARTHLY_TARGET: docker
-  ECR_REGISTRY: 332405224602.dkr.ecr.eu-central-1.amazonaws.com
-
 jobs:
   validate-project-fields:
     runs-on: ubuntu-latest
+    env:
+      # Needs a PAT Classic with (read:project)
+      GITHUB_PROJECTS_PAT: ${{ secrets.PROJECTS_PAT }}
+      GITHUB_REPOSITORY: "${{ github.repository }}"
+      GITHUB_EVENT_NUMBER: "${{ github.event.number || '0' }}"
+      PROJECT_NUMBER: 102
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@master
+      - name: Fetch Validation Script
+        uses: actions/checkout@v4
         with:
-          aws_role_arn: ${{ env.AWS_ROLE_ARN }}
-          aws_region: ${{ env.AWS_REGION }}
-          earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
+          repository: input-output-hk/catalyst-ci
+          ref: feat/validate-project-fields-in-prs-and-issues-sj
+          sparse-checkout: |
+            utilities/project-fields-validator/main.py
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5 
+        with:
+          python-version: '3.13'
 
       - name: Run Project Fields Validation
-        uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: false
-        with:
-          earthfile: ./utilities/project-fields-validator
-          flags: --allow-privileged
-          targets: validate-project-fields
-          target_flags: --GITHUB_REPOSITORY="${{ github.repository }}" --GITHUB_EVENT_NUMBER="${{ github.event.number || '0' }}"
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: false
+        run: utilities/project-fields-validator/main.py

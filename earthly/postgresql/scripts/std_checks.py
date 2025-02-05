@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 
+import argparse
+
 import python.exec_manager as exec_manager
 import python.vendor_files_check as vendor_files_check
-import argparse
 import rich
-from rich import print
-import os
 
 # This script is run inside the `check` stage for postgres database setup
 # to perform all high level non-compilation checks.
@@ -32,7 +31,7 @@ def main():
     # Force color output in CI
     rich.reconfigure(color_system="256")
 
-    parser = argparse.ArgumentParser(description="Postgres checks processing.")
+    argparse.ArgumentParser(description="Postgres checks processing.")
 
     results = exec_manager.Results("Postgres checks")
 

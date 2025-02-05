@@ -1,17 +1,20 @@
 VERSION 0.8
 
-IMPORT github.com/input-output-hk/catalyst-ci/earthly/python:v3.1.7 AS python-ci
+IMPORT ../../earthly/python AS python-ci
 
 test:
     FROM python-ci+python-base
+    WORKDIR /stand-alone
     COPY . .
-    DO python-ci+CHECK
+    # Stand alone python command doesn't use any third party libraries
+    DO python-ci+CHECK --options="--stand-alone"
 
 validate-project-fields:
     FROM python-ci+python-base
-    COPY . .
 
-    RUN pip install requests
+    RUN --no-cache echo No Cache
+
+    COPY . .
 
     ARG PROJECT_NUMBER=102
     ARG --required GITHUB_REPOSITORY
@@ -21,4 +24,4 @@ validate-project-fields:
     ENV GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
     ENV GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
 
-    RUN --no-cache --secret GITHUB_TOKEN python3 main.py
+    RUN --no-cache --secret GITHUB_PROJECTS_PAT python3 main.py
