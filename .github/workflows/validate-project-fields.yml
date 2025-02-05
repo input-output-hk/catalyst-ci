@@ -49,6 +49,4 @@ jobs:
       - name: Run Project Fields Validation
         if: always()
         continue-on-error: false
-        run: |
-          env
-          ls -al utilities/project-fields-validator/main.py
+        run: utilities/project-fields-validator/main.py
