@@ -80,6 +80,9 @@ flutter-base:
     ARG edge_package_release = 1
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
 
+install-chrome:
+    DO +INSTALL_CHROME_LINUX64_WITH_DEPS
+
 # test-flutter-base : installs required tools and packages for flutter development.
 test-flutter-base:
     BUILD +flutter-base
