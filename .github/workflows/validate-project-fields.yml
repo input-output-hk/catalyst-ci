@@ -28,8 +28,19 @@ env:
 jobs:
   validate-project-fields:
     runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      pull-requests: read      
+      repository-projects: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Fetch Validation Script
+        uses: actions/checkout@v4
+        with:
+          repository: input-output-hk/catalyst-ci
+          ref: feat/validate-project-fields-in-prs-and-issues-sj
+          sparse-checkout: |
+            utilities/project-fields-validator/main.py
+          sparse-checkout-cone-mode: false
 
       - name: Setup CI
         uses: input-output-hk/catalyst-ci/actions/setup@master
@@ -38,14 +49,19 @@ jobs:
           aws_region: ${{ env.AWS_REGION }}
           earthly_runner_secret: ${{ secrets.EARTHLY_RUNNER_SECRET }}
 
+      - name: Set up Python
+        uses: actions/setup-python@v5 
+        with:
+          python-version: '3.13'
+
       - name: Run Project Fields Validation
-        uses: input-output-hk/catalyst-ci/actions/run@master
         if: always()
         continue-on-error: false
-        with:
-          earthfile: ./utilities/project-fields-validator
-          flags: --allow-privileged
-          targets: validate-project-fields
-          target_flags: --GITHUB_REPOSITORY="${{ github.repository }}" --GITHUB_EVENT_NUMBER="${{ github.event.number || '0' }}"
-          runner_address: ${{ secrets.EARTHLY_SATELLITE_ADDRESS }}
-          artifact: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}          
+          GITHUB_REPOSITORY: "${{ github.repository }}"
+          GITHUB_EVENT_NUMBER: "${{ github.event.number || '0' }}"
+          PROJECT_NUMBER: 102
+        run: |
+          env
+          ls -al utilities/project-fields-validator/main.py
