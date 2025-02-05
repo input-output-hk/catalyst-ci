@@ -38,7 +38,7 @@ INSTALL_FLUTTER:
 INSTALL_CHROME_LINUX64_WITH_DEPS:
     FUNCTION
 
-    RUN apt-get update --fix-missing && \
+    RUN --no-cache apt-get update --fix-missing && \
         apt-get install -y \
         apt-utils \
         curl \

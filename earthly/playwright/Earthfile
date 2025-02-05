@@ -4,6 +4,7 @@ IMPORT ../flutter AS flutter-ci
 SETUP:
     FUNCTION
     ARG workdir
+    ARG arg1
     FROM mcr.microsoft.com/playwright:v1.48.0-noble
     WORKDIR $workdir
 
