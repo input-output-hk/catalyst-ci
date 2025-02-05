@@ -24,7 +24,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       # Needs a PAT Classic with (read:project)
-      GITHUB_PROJECTS_PAT: ${{ secrets.GITHUB_PROJECTS_PAT }}
+      GITHUB_PROJECTS_PAT: ${{ secrets.PROJECTS_PAT }}
       GITHUB_REPOSITORY: "${{ github.repository }}"
       GITHUB_EVENT_NUMBER: "${{ github.event.number || '0' }}"
       PROJECT_NUMBER: 102
