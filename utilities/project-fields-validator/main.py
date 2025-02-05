@@ -236,8 +236,6 @@ class ProjectFieldsValidator:
 
     def run_query(self, query: str, variables: Dict[str, Any]) -> Dict[str, Any]:
         """Execute a GraphQL query against GitHub's API."""
-        print(query)
-        print(variables)
         return self._make_request(
             "POST", self.GRAPHQL_URL, json={"query": query, "variables": variables}
         )
