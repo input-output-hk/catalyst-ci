@@ -11,6 +11,9 @@ test:
 
 validate-project-fields:
     FROM python-ci+python-base
+
+    RUN --no-cache echo No Cache
+
     COPY . .
 
     ARG PROJECT_NUMBER=102
@@ -21,4 +24,4 @@ validate-project-fields:
     ENV GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
     ENV GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
 
-    RUN --no-cache --secret GITHUB_TOKEN python3 main.py
+    RUN --no-cache --secret GITHUB_PROJECTS_PAT python3 main.py

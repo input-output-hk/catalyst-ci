@@ -184,12 +184,12 @@ class ProjectFieldsValidator:
     BASE_URL = "https://api.github.com"
     GRAPHQL_URL = f"{BASE_URL}/graphql"
 
-    def __init__(self, github_token: str):
-        if not github_token:
+    def __init__(self, GITHUB_PROJECTS_PAT: str):
+        if not GITHUB_PROJECTS_PAT:
             raise ValueError("GitHub token is required but was empty")
 
         self.headers = {
-            "Authorization": f"Bearer {github_token}",
+            "Authorization": f"Bearer {GITHUB_PROJECTS_PAT}",
             "Accept": "application/vnd.github.v3+json",
         }
         self.required_fields = [
@@ -486,14 +486,14 @@ def clean_env_var(var: str) -> str:
 def main():
     try:
         env_vars = {
-            "GITHUB_TOKEN": clean_env_var(os.environ.get("GITHUB_TOKEN")),
+            "GITHUB_PROJECTS_PAT": clean_env_var(os.environ.get("GITHUB_PROJECTS_PAT")),
             "GITHUB_REPOSITORY": clean_env_var(os.environ.get("GITHUB_REPOSITORY")),
             "GITHUB_EVENT_NUMBER": clean_env_var(os.environ.get("GITHUB_EVENT_NUMBER")),
             "PROJECT_NUMBER": clean_env_var(os.environ.get("PROJECT_NUMBER")),
         }
 
         debug_vars = env_vars.copy()
-        debug_vars["GITHUB_TOKEN"] = "[REDACTED]" if env_vars["GITHUB_TOKEN"] else None
+        debug_vars["GITHUB_PROJECTS_PAT"] = "[REDACTED]" if env_vars["GITHUB_PROJECTS_PAT"] else None
         print("\nEnvironment variables:")
         for key, value in debug_vars.items():
             print(f"{key}: {value}")
@@ -526,7 +526,7 @@ def main():
         print(f"Project number: {project_number}")
         print("=" * 50)
 
-        validator = ProjectFieldsValidator(env_vars["GITHUB_TOKEN"])
+        validator = ProjectFieldsValidator(env_vars["GITHUB_PROJECTS_PAT"])
 
         try:
             pr_details = validator.get_pr_details(org_name, repo_name, pr_number)

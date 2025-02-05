@@ -22,14 +22,9 @@ concurrency:
 jobs:
   validate-project-fields:
     runs-on: ubuntu-latest
-    permissions:
-      issues: read
-      pull-requests: read      
-      repository-projects: read
     env:
-      # Needs a PAT Classic with:
-      #    read:project
-      GITHUB_TOKEN: ${{ secrets.PAT_FOR_GITHUB }}          
+      # Needs a PAT Classic with (read:project)
+      GITHUB_PROJECTS_PAT: ${{ secrets.GITHUB_PROJECTS_PAT }}
       GITHUB_REPOSITORY: "${{ github.repository }}"
       GITHUB_EVENT_NUMBER: "${{ github.event.number || '0' }}"
       PROJECT_NUMBER: 102
