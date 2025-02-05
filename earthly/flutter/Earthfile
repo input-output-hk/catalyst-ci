@@ -35,6 +35,17 @@ INSTALL_FLUTTER:
     RUN dart pub global activate combine_coverage
     RUN dart pub global activate license_checker
 
+INSTALL_CHROME_LINUX64_WITH_DEPS:
+    FUNCTION
+
+    RUN apt-get update --fix-missing && \
+        apt-get install -y \
+        apt-utils \
+        curl \
+        unzip
+
+    DO installer+INSTALL_CHROME_LINUX64
+
 # flutter-base installs required tools and packages.
 flutter-base:
     FROM debian:bookworm-20240513-slim
