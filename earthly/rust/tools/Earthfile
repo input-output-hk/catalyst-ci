@@ -85,3 +85,6 @@ tool-wasm-pack:
 
 tool-flutter-rust-bridge-codegen:
     DO +CARGO_BINSTALL --package=flutter_rust_bridge_codegen --version=2.5.1 --executable="flutter_rust_bridge_codegen"
+
+tool-hurl:
+    DO +CARGO_BINSTALL --package=hurl --version=6.0.0

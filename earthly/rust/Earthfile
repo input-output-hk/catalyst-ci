@@ -134,6 +134,7 @@ rust-base-plus-tools:
     DO +COPY_TOOL --tool="cargo-sweep"
     DO +COPY_TOOL --tool="cargo-component"
     DO +COPY_TOOL --tool="wasm-pack"
+    DO +COPY_TOOL --tool="hurl"
 
 # installer - fully setup our Rust caching.
 installer:
