@@ -1,15 +1,16 @@
 # cspell: words rtype
 
+import concurrent.futures
+import multiprocessing
 import subprocess
-from typing import Optional
-from rich import print
-from rich.text import Text
-from rich.table import Table
-from dataclasses import dataclass
 import textwrap
 import time
-import multiprocessing
-import concurrent.futures
+from dataclasses import dataclass
+from typing import Optional
+
+from rich import print
+from rich.table import Table
+from rich.text import Text
 
 
 def status_for_rc(rc: int) -> str:
@@ -150,7 +151,7 @@ def cli_run(
     log: bool = True,
     timeout=None,
     verbose=False,
-    env=None
+    env=None,
 ) -> Result:
     def procedure() -> ProcedureResult:
         result = subprocess.run(
@@ -160,7 +161,7 @@ def cli_run(
             stderr=subprocess.STDOUT,
             text=True,
             timeout=timeout,
-            env=env
+            env=env,
         )
         return ProcedureResult(result.returncode, command, result.stdout)
 

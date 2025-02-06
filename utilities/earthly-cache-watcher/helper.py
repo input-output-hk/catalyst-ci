@@ -27,18 +27,18 @@ def get_subdirectory_name(working_dir_path: str, path: str):
     working_dir_path = os.path.abspath(working_dir_path)
     path = os.path.abspath(path)
 
-    if (
-        os.path.commonpath([working_dir_path])
-        != os.path.commonpath([working_dir_path, path])
+    if os.path.commonpath([working_dir_path]) != os.path.commonpath(
+        [working_dir_path, path]
     ):
         return None
-    
+
     relative_path = os.path.relpath(path, working_dir_path)
     parts = relative_path.split(os.sep)
-    
+
     if parts:
         return parts[0]
     return None
+
 
 def add_or_init(obj: dict[str, int], key: str, value: int):
     obj.setdefault(key, 0)

@@ -1,6 +1,7 @@
 import os
-import textwrap
 import re
+import textwrap
+
 
 def inc_file(env, filename, start_line=0, end_line=None, indent=None):
     """
@@ -10,7 +11,7 @@ def inc_file(env, filename, start_line=0, end_line=None, indent=None):
     project.
     indent = number of spaces to indent every line but the first.
     """
-    
+
     try:
         full_filename = os.path.join(env.project_dir, filename)
 
@@ -24,8 +25,8 @@ def inc_file(env, filename, start_line=0, end_line=None, indent=None):
         else:
             indent = " " * indent
         text = textwrap.indent(text, indent)
-        text = text[len(indent):] # First line should not be indented at all.
-        text = re.sub(r'\n$', '', text, count=1)
+        text = text[len(indent) :]  # First line should not be indented at all.
+        text = re.sub(r"\n$", "", text, count=1)
         # print(text)
         return text
     except Exception as exc:

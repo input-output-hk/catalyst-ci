@@ -2,10 +2,11 @@
 
 # cspell: words lcov depgraph readelf sysroot bindgen autodrop mexec
 
-import python.exec_manager as exec_manager
 import argparse
-import rich
 import os
+
+import python.exec_manager as exec_manager
+import rich
 
 # This script is run inside the `build` stage.
 
@@ -15,12 +16,14 @@ BINDINGS_SRC = "bindings_src"
 def wit_bindgen_c(results: exec_manager.Results, wit_path: str):
     results.add(
         exec_manager.cli_run(
-            " ".join([
-                "wit-bindgen c",
-                "--autodrop-borrows yes",
-                f"--out-dir {BINDINGS_SRC}",
-                wit_path
-            ]),
+            " ".join(
+                [
+                    "wit-bindgen c",
+                    "--autodrop-borrows yes",
+                    f"--out-dir {BINDINGS_SRC}",
+                    wit_path,
+                ]
+            ),
             name="Generate bindings C code.",
             verbose=True,
         )
@@ -38,16 +41,18 @@ def clang_wasm_compile(results: exec_manager.Results, c_files: str):
     )
     results.add(
         exec_manager.cli_run(
-            " ".join([
-                "/opt/wasi-sdk/bin/clang",
-                "--sysroot=/opt/wasi-sdk/share/wasi-sysroot",
-                bindings_src,
-                c_files,
-                "-Oz",
-                "-o out.wasm",
-                "-mexec-model=reactor",
-                "--target=wasm32-wasi"
-            ]),
+            " ".join(
+                [
+                    "/opt/wasi-sdk/bin/clang",
+                    "--sysroot=/opt/wasi-sdk/share/wasi-sysroot",
+                    bindings_src,
+                    c_files,
+                    "-Oz",
+                    "-o out.wasm",
+                    "-mexec-model=reactor",
+                    "--target=wasm32-wasi",
+                ]
+            ),
             name="Compile C code to wasm module",
             verbose=True,
         )

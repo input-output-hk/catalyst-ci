@@ -2,14 +2,11 @@
 
 # cspell: words lcov depgraph readelf sysroot
 
-import concurrent.futures
-import time
+import argparse
 import os
 
-import argparse
-import rich
-
 import python.exec_manager as exec_manager
+import rich
 from python.utils import fix_quoted_earthly_args
 
 # This script is run inside the `build` stage.
@@ -98,14 +95,11 @@ def cargo_doc(verbose: bool = False) -> exec_manager.Result:
     env = os.environ
     env["RUSTDOCFLAGS"] = "-Z unstable-options --enable-index-page"
     return exec_manager.cli_run(
-        "cargo +nightly docs", 
-        name="Documentation build", 
-        verbose=verbose
+        "cargo +nightly docs", name="Documentation build", verbose=verbose
     )
 
 
 def cargo_depgraph(runner: exec_manager.ParallelRunner, verbose: bool = False) -> None:
-
     runner.run(
         exec_manager.cli_run,
         "cargo depgraph "
@@ -250,7 +244,6 @@ def strip(results: exec_manager.Results, bin: str):
         )
     )
 
-import sys
 
 def main():
     # Force color output in CI
@@ -322,8 +315,12 @@ def main():
     )
     args = parser.parse_args()
 
-    libs = filter(lambda lib:  lib.strip() and len(lib.strip()) > 0, args.libs.split(","))
-    bins = list(filter(lambda bin: bin.strip() and len(bin.strip()) > 0, args.bins.split(",")))
+    libs = filter(
+        lambda lib: lib.strip() and len(lib.strip()) > 0, args.libs.split(",")
+    )
+    bins = list(
+        filter(lambda bin: bin.strip() and len(bin.strip()) > 0, args.bins.split(","))
+    )
 
     with exec_manager.ParallelRunner("Rust build") as runner:
         # Build the code.
@@ -365,7 +362,9 @@ def main():
             cargo_modules_lib(runner, lib, not args.disable_docs, args.verbose)
         for bin in bins:
             package, bin_name = bin.split("/")
-            cargo_modules_bin(runner, package, bin_name, not args.disable_docs, args.verbose)
+            cargo_modules_bin(
+                runner, package, bin_name, not args.disable_docs, args.verbose
+            )
 
         results = runner.get_results()
 
@@ -376,7 +375,6 @@ def main():
     if not args.disable_tests:
         # Check if all documentation tests pass.
         results.add(cargo_doctest(args.doctest_flags, args.verbose))
-
 
     results.print()
     if not results.ok():

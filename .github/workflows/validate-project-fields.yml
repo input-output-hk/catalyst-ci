@@ -1,0 +1,49 @@
+name: Validate Project Fields
+
+on:
+  pull_request:
+    types:
+      - opened
+      - edited
+      - synchronize
+      - reopened
+      - unassigned
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+  repository-projects: write
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-project-fields:
+    runs-on: ubuntu-latest
+    env:
+      # Needs a PAT Classic with (read:project)
+      GITHUB_PROJECTS_PAT: ${{ secrets.PROJECTS_PAT }}
+      GITHUB_REPOSITORY: "${{ github.repository }}"
+      GITHUB_EVENT_NUMBER: "${{ github.event.number || '0' }}"
+      PROJECT_NUMBER: 102
+    steps:
+      - name: Fetch Validation Script
+        uses: actions/checkout@v4
+        with:
+          repository: input-output-hk/catalyst-ci
+          ref: master
+          sparse-checkout: |
+            utilities/project-fields-validator/main.py
+          sparse-checkout-cone-mode: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Run Project Fields Validation
+        if: always()
+        continue-on-error: false
+        run: utilities/project-fields-validator/main.py

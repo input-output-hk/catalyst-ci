@@ -1,0 +1,27 @@
+VERSION 0.8
+
+IMPORT ../../earthly/python AS python-ci
+
+test:
+    FROM python-ci+python-base
+    WORKDIR /stand-alone
+    COPY . .
+    # Stand alone python command doesn't use any third party libraries
+    DO python-ci+CHECK --options="--stand-alone"
+
+validate-project-fields:
+    FROM python-ci+python-base
+
+    RUN --no-cache echo No Cache
+
+    COPY . .
+
+    ARG PROJECT_NUMBER=102
+    ARG --required GITHUB_REPOSITORY
+    ARG --required GITHUB_EVENT_NUMBER
+
+    ENV PROJECT_NUMBER=${PROJECT_NUMBER}
+    ENV GITHUB_REPOSITORY=${GITHUB_REPOSITORY}
+    ENV GITHUB_EVENT_NUMBER=${GITHUB_EVENT_NUMBER}
+
+    RUN --no-cache --secret GITHUB_PROJECTS_PAT python3 main.py

@@ -7,11 +7,12 @@
 
 import argparse
 import os
-import time
-from typing import Optional
-import python.exec_manager as exec_manager
 import tempfile
 import threading
+import time
+from typing import Optional
+
+import python.exec_manager as exec_manager
 
 DB_ARGUMENTS = [
     ["dbhost", "DB_HOST", "localhost"],
@@ -109,7 +110,7 @@ class DBOps:
         if res.ok():
             with open(f"{self.args.dbpath}/pg_hba.conf", "a") as file:
                 file.write(f"include_if_exists {self.args.dbpath}/pg_hba.extra.conf\n")
-                file.write(f"include_if_exists /sql/pg_hba.extra.conf\n")
+                file.write("include_if_exists /sql/pg_hba.extra.conf\n")
 
         return res
 
@@ -203,7 +204,7 @@ class DBOps:
         # WARNING: Will destroy all data in the DB
 
         return exec_manager.cli_run(
-            f"psql -v ON_ERROR_STOP=on"
+            "psql -v ON_ERROR_STOP=on"
             + f" -d {self.superuser_connection()} "
             + f" -f {self.args.setupdbsql}"
             + f' -v dbName="{self.args.dbname}"'
@@ -224,7 +225,7 @@ class DBOps:
         # Run schema migrations
         return exec_manager.cli_run(
             f"DATABASE_URL={self.user_connection()}"
-            + f" refinery migrate -e DATABASE_URL"
+            + " refinery migrate -e DATABASE_URL"
             + f" -c {self.args.dbrefinerytoml} "
             + f" -p {self.args.dbmigrations}",
             name="Migrate Schema",
