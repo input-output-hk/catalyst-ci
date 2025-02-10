@@ -60,6 +60,7 @@ ldflags
 libasound
 libatk
 libatspi
+libsqlite
 libdrm
 libgbm
 libgcc
