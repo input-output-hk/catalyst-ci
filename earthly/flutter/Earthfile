@@ -42,6 +42,7 @@ flutter-base:
     ENV DEBIAN_FRONTEND=noninteractive
 
     # Update and install as same command so if either fails, the whole step fails and is not cached.
+    # sqlite3 and libsqlite3-dev are required for running db tests in CI
     RUN apt-get update --fix-missing && \
             apt-get install -y \
             apt-utils \
@@ -56,7 +57,9 @@ flutter-base:
             lcov \
             tar \
             wget \
-            xz-utils
+            xz-utils \
+            sqlite3 \
+            libsqlite3-dev
 
     DO +INSTALL_FLUTTER
 
