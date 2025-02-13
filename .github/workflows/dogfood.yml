@@ -5,6 +5,9 @@ on:
     branches: [master]
     tags: ['**']
   pull_request:
+    types:
+      - synchronize
+      - ready_for_review
 
 permissions:
   id-token: write
