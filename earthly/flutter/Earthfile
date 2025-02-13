@@ -16,7 +16,15 @@ INSTALL_FLUTTER:
         RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
             | tar -xJ -C /usr/local
     ELSE IF [ "$TARGETARCH" = "arm64" ]
-        GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local
+        # Restore below line when https://github.com/flutter/flutter/issues/162251 is solved.
+        # GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local/flutter
+
+        # And remove below lines to the end of this ELSE-IF block:
+        GIT CLONE https://github.com/flutter/flutter.git /usr/local/flutter
+        WORKDIR /usr/local/flutter
+        RUN git fetch --unshallow
+        RUN git checkout tags/$version
+        WORKDIR /
     ELSE
         RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
     END
