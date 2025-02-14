@@ -23,7 +23,8 @@ INSTALL_FLUTTER:
         GIT CLONE https://github.com/flutter/flutter.git /usr/local/flutter
         WORKDIR /usr/local/flutter
         # Explicitly fetch from the 'origin' remote (HTTPS). Otherwise may attempt SSH-a
-        RUN git fetch --unshallow origin
+        RUN git remote set-url origin https://github.com/flutter/flutter.git
+        RUN git fetch --unshallow
         RUN git checkout tags/$version
         WORKDIR /
     ELSE
