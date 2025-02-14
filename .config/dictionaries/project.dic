@@ -60,11 +60,11 @@ ldflags
 libasound
 libatk
 libatspi
-libsqlite
 libdrm
 libgbm
 libgcc
 libnss
+libsqlite
 libxkbcommon
 libxshmfence
 lintfix
@@ -119,6 +119,7 @@ transpiling
 UDCs
 unarchiving
 uniseg
+unshallow
 voteplan
 wasi
 wasmtime
