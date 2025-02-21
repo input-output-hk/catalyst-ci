@@ -1,5 +1,4 @@
 [workspace]
-resolver = "2"
 members = [
     "crates/foo",
     "crates/bar",
