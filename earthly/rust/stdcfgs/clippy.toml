@@ -2,4 +2,4 @@ allow-unwrap-in-tests = true
 allow-expect-in-tests = true
 allow-panic-in-tests = true
 allow-indexing-slicing-in-tests = true
-arithmetic-side-effects-allowed = ["num_bigint::BigInt", "cardano_blockchain_types::Slot"]
+arithmetic-side-effects-allowed = ["num_bigint::BigInt"]
