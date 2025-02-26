@@ -53,7 +53,7 @@ tool-refinery:
     DO +CARGO_BINSTALL --package=refinery_cli --version=0.8.14 --executable=refinery
 
 tool-cargo-deny:
-    DO +CARGO_BINSTALL --package=cargo-deny --version=0.16.1
+    DO +CARGO_BINSTALL --package=cargo-deny --version=0.18.0
 
 tool-cargo-modules:
     DO +CARGO_BINSTALL --package=cargo-modules --version=0.17.0 --test_param="--help"
