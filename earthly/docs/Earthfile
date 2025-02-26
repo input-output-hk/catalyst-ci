@@ -14,28 +14,20 @@ deps:
     # This is all the tooling needed to build the docs.
 
     # Install extra packages we will need to support plugins.
-    RUN apk add --no-cache \
-        bash \
+    RUN apt-get install -y \
         graphviz \
         fontconfig \
-        ttf-liberation \
-        curl \
-        zlib-dev \
-        jpeg-dev \
+        fonts-liberation \
         libxml2-dev \
-        libxslt-dev \
+        libxslt1-dev \
         libffi-dev \
-        gcc \
-        musl-dev \
-        libgcc \
-        openssl-dev \
-        freetype-dev \
-        lcms2-dev \
-        openjpeg-dev \
-        tiff-dev \
+        libssl-dev \
+        libfreetype6-dev \
+        liblcms2-dev \
+        libopenjp2-7-dev \
+        libtiff-dev \
         tk-dev \
         tcl-dev  \
-        git \
         make
 
     # Fix up font cache
