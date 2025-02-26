@@ -3,7 +3,7 @@ VERSION 0.8
 IMPORT ../python AS python-ci
 IMPORT ../../utilities/scripts AS scripts
 
-# cspell: words freetype lcms openjpeg etag
+# cspell: words libfreetype liblcms libopenjp etag
 
 deps:
     FROM python-ci+python-base
