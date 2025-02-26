@@ -15,9 +15,8 @@ python-base:
         libffi-dev \
         gcc \
         musl-dev \
-        libgcc \
-        zlib-dev \
-        jpeg-dev \
+        zlib1g-dev \
+        libjpeg-dev \
         git
 
     # Poetry Installation directory.
