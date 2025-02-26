@@ -111,7 +111,7 @@ PACKAGE:
     FUNCTION
 
     # Use the official Nginx base image
-    FROM nginx:alpine3.20-slim
+    FROM nginx:bookworm
 
     # Force this server to disable the browsers cache for these files.
     RUN echo " " > /etc/nginx/conf.d/disable-cache.conf; \
