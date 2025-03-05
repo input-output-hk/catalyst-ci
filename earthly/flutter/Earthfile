@@ -170,33 +170,77 @@ PUBLISH_DRY_RUN:
 UNIT_TESTS:
     FUNCTION
 
+    ARG PLATFORM=native
+    ARG REPORT=false
+
     IF [ -f melos.yaml ]
-        RUN echo "Running unit tests with melos."
+        IF [ $PLATFORM = native ]
+            RUN echo "Running native unit tests with melos."
 
-        # We always want to save the test_reports and coverage
-        # therefore we must defer the error reported here until later.
-        RUN melos run test-report > melos-output.txt 2>&1 || touch fail
+            IF [ $REPORT = true ]
+                # We always want to save the test_reports and coverage
+                # therefore we must defer the error reported here until later.
+                RUN melos run test-report-native > melos-output.txt 2>&1 || touch fail
 
-        # If not failed then print the output immediately,
-        # if it has failed then it's printed at the end of the function when exiting.
-        IF [ ! -f fail ]
-            RUN cat melos-output.txt
+                # If not failed then print the output immediately,
+                # if it has failed then it's printed at the end of the function when exiting.
+                IF [ ! -f fail ]
+                    RUN cat melos-output.txt
+                END
+
+                WAIT
+                    SAVE ARTIFACT test_reports AS LOCAL test_reports
+                    SAVE ARTIFACT coverage AS LOCAL coverage
+                END
+
+                # Defer the failure to here.
+                IF [ -f fail ]
+                    RUN echo "Error occurred when running: melos run test-report"; \
+                        cat melos-output.txt; \
+                        exit 1
+                END
+            ELSE
+                RUN melos run test-native
+            END
         END
+        IF [ $PLATFORM = web ]
+            RUN echo "Running web unit tests with melos."
 
-        WAIT
-            SAVE ARTIFACT test_reports AS LOCAL test_reports
-            SAVE ARTIFACT coverage AS LOCAL coverage
-        END
+            IF [ $REPORT = true ]
+                # We always want to save the test_reports and coverage
+                # therefore we must defer the error reported here until later.
+                RUN melos run test-report-web > melos-output.txt 2>&1 || touch fail
 
-        # Defer the failure to here.
-        IF [ -f fail ]
-            RUN echo "Error occurred when running: melos run test-report"; \
-                cat melos-output.txt; \
-                exit 1
+                # If not failed then print the output immediately,
+                # if it has failed then it's printed at the end of the function when exiting.
+                IF [ ! -f fail ]
+                    RUN cat melos-output.txt
+                END
+
+                WAIT
+                    SAVE ARTIFACT test_reports AS LOCAL test_reports
+                    SAVE ARTIFACT coverage AS LOCAL coverage
+                END
+
+                # Defer the failure to here.
+                IF [ -f fail ]
+                    RUN echo "Error occurred when running: melos run test-report"; \
+                        cat melos-output.txt; \
+                        exit 1
+                END
+            ELSE
+                RUN melos run test-web
+            END
         END
     ELSE
-        RUN echo "Running flutter test"
-        RUN flutter test
+        IF [ $PLATFORM = native ]
+            RUN echo "Running flutter native test"
+            RUN flutter test
+        END
+        IF [ $PLATFORM = web ]
+            RUN echo "Running flutter web test"
+            RUN flutter test --platform chrome
+        END
     END
 
 # Build web app and save artifacts locally if needed.
