@@ -43,6 +43,12 @@ INSTALL_CHROME_LINUX64:
             && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
         RUN chromedriver --version
 
+        # patch Google Chrome workaround for https://github.com/flutter/flutter/issues/154727
+        ENV CHROME_EXECUTABLE="/usr/local/bin/chrome-patch.sh"
+        RUN printf "${BLUE} Creating a Google Chrome patch at ${CHROME_EXECUTABLE}..." \
+            && echo '#!/bin/bash' > $CHROME_EXECUTABLE \
+            && echo '/usr/bin/google-chrome --no-sandbox --disable-gpu --disable-dev-shm-usage --headless --disable-extensions --disable-popup-blocking --incognito "$@"' >> $CHROME_EXECUTABLE \
+            && chmod +x $CHROME_EXECUTABLE
     ELSE
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium.zip"
         RUN chromium --version
