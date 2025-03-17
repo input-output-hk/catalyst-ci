@@ -147,5 +147,5 @@ PATCH_CHROME:
     ENV CHROME_EXECUTABLE="/usr/local/bin/chrome-patch.sh"
     RUN printf "${BLUE} Creating a ${BIN} patch at ${CHROME_EXECUTABLE}..." \
         && echo '#!/bin/bash' > $CHROME_EXECUTABLE \
-        && echo '/usr/bin/$BIN --no-sandbox --disable-gpu --disable-dev-shm-usage --headless --disable-extensions --disable-popup-blocking --incognito "$@"' >> $CHROME_EXECUTABLE \
+        && echo '/usr/bin/${BIN} --no-sandbox --disable-gpu --disable-dev-shm-usage --headless --disable-extensions --disable-popup-blocking --incognito "$@"' >> $CHROME_EXECUTABLE \
         && chmod +x $CHROME_EXECUTABLE
