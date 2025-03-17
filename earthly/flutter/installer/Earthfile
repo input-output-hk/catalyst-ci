@@ -35,7 +35,7 @@ INSTALL_CHROME_LINUX64:
             && apt-get install -f -y \
             && rm -rf /opt/chrome.zip /opt/chrome
         RUN google-chrome --version
-        DO +PATCH_CHROME --BIN="google-chrome"
+        DO +PATCH_CHROME --BIN_TO_PATCH="google-chrome"
 
         RUN printf "${BLUE} Installing Chromedriver..." \
             && mkdir -p /opt/chromedriver \
@@ -47,7 +47,7 @@ INSTALL_CHROME_LINUX64:
     ELSE
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium.zip"
         RUN chromium --version
-        DO +PATCH_CHROME --BIN="chromium"
+        DO +PATCH_CHROME --BIN_TO_PATCH="chromium"
 
         DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium-driver.zip"
         RUN chromedriver --version
@@ -142,10 +142,10 @@ INSTALL_CHROMIUM:
 
 PATCH_CHROME:
     FUNCTION
-    ARG --required BIN
+    ARG --required BIN_TO_PATCH
     # patch Chrome - workaround for https://github.com/flutter/flutter/issues/154727
     ENV CHROME_EXECUTABLE="/usr/local/bin/chrome-patch.sh"
-    RUN printf "${BLUE} Creating a ${BIN} patch at ${CHROME_EXECUTABLE}..." \
+    RUN printf "${BLUE} Creating a ${BIN_TO_PATCH} patch at ${CHROME_EXECUTABLE}..." \
         && echo '#!/bin/bash' > $CHROME_EXECUTABLE \
-        && echo '/usr/bin/${BIN} --no-sandbox --disable-gpu --disable-dev-shm-usage --headless --disable-extensions --disable-popup-blocking --incognito "$@"' >> $CHROME_EXECUTABLE \
+        && echo '/usr/bin/'$BIN_TO_PATCH' --no-sandbox --disable-gpu --disable-dev-shm-usage --headless --disable-extensions --disable-popup-blocking --incognito "$@"' >> $CHROME_EXECUTABLE \
         && chmod +x $CHROME_EXECUTABLE
