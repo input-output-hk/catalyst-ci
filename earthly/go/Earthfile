@@ -13,7 +13,7 @@ DEPS:
     RUN go mod download
 
     # Install ginkgo for testing - and test it works.
-    RUN go get github.com/onsi/ginkgo/v2/ginkgo && \
+    RUN go get github.com/onsi/ginkgo/v2@v2.22.2 && \
         go install github.com/onsi/ginkgo/v2/ginkgo && \
         ginkgo version
 
