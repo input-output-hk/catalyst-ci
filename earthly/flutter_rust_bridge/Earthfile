@@ -1,3 +1,5 @@
+# cspell: words Zwasm
+
 VERSION 0.8
 
 IMPORT ../flutter AS flutter-ci
