@@ -1,3 +1,5 @@
+# cspell: words Zwasm
+
 VERSION 0.8
 
 IMPORT ../flutter AS flutter-ci
@@ -31,7 +33,8 @@ CODE_GENERATOR_WEB:
     FUNCTION 
 
     RUN flutter_rust_bridge_codegen generate --default-external-library-loader-web-prefix=/assets/packages/catalyst_key_derivation/assets/js/
-    RUN flutter_rust_bridge_codegen build-web
+    # resolving a WASM compilation issue https://github.com/rust-lang/rust/issues/138762
+    RUN flutter_rust_bridge_codegen build-web --wasm-pack-rustflags="-Zwasm-c-abi=legacy"
 
     RUN mkdir -p assets/js && cp -rf ./web/pkg/* assets/js/
      # Don't want this gitignore file.
