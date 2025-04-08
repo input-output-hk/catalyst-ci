@@ -31,7 +31,7 @@ CODE_GENERATOR_WEB:
     FUNCTION 
 
     RUN flutter_rust_bridge_codegen generate --default-external-library-loader-web-prefix=/assets/packages/catalyst_key_derivation/assets/js/
-    RUN flutter_rust_bridge_codegen build-web
+    RUN flutter_rust_bridge_codegen build-web --args="wasmPackRustflags=-Zwasm-c-abi=legacy"
 
     RUN mkdir -p assets/js && cp -rf ./web/pkg/* assets/js/
      # Don't want this gitignore file.
