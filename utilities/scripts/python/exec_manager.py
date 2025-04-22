@@ -149,7 +149,7 @@ def cli_run(  # noqa: PLR0913
     log: bool = True,
     timeout: float | None = None,
     verbose: bool = False,
-    env: subprocess._ENV | None = None,
+    env: Any = None,  # noqa: ANN401
 ) -> Result:
     """CLI Run."""
 
