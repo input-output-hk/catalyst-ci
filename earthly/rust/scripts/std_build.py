@@ -188,16 +188,16 @@ def cargo_modules_bin(
         runner.run(
             exec_manager.cli_run,
             COMMON_CARGO_MODULES_STRUCTURE
-            + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.tree' ",
-            name=f"Generate Module Trees for {package}/{bin}",
+            + f"--package '{package}' --bin '{bin_file}' > 'target/doc/{package}.{bin_file}.bin.modules.tree' ",
+            name=f"Generate Module Trees for {package}/{bin_file}",
             verbose=verbose,
         )
         # Generate graph
         runner.run(
             exec_manager.cli_run,
             COMMON_CARGO_MODULES_DEPENDENCIES
-            + f"--package '{package}' --bin '{bin}' > 'target/doc/{package}.{bin}.bin.modules.dot' ",
-            name=f"Generate Module Graphs for {package}/{bin}",
+            + f"--package '{package}' --bin '{bin_file}' > 'target/doc/{package}.{bin_file}.bin.modules.dot' ",
+            name=f"Generate Module Graphs for {package}/{bin_file}",
             verbose=verbose,
         )
 
