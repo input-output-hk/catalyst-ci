@@ -112,5 +112,5 @@ def main(*, stand_alone: bool) -> None:
 
 
 if __name__ == "__main__":
-    print(f"Current Working Directory: {Path.cwd()}")
-    main("--stand-alone" in sys.argv[1:])
+    print(f"Current Working Directory: {Path.cwd()}")  # noqa: T201
+    main(stand_alone="--stand-alone" in sys.argv[1:])
