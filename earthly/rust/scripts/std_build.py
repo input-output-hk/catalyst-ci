@@ -313,24 +313,24 @@ def main() -> None:  # noqa: C901, PLR0915
 
     with exec_manager.ParallelRunner("Rust build") as runner:
         # Build the code.
-        runner.run(cargo_build, args.build_flags, args.verbose)
+        runner.run(cargo_build, args.build_flags, verbose=args.verbose)
 
         # Check the code passes all clippy lint checks.
-        runner.run(cargo_lint, args.lint_flags, args.verbose)
+        runner.run(cargo_lint, args.lint_flags, verbose=args.verbose)
 
         # Check if all Self contained tests pass (Test that need no external resources).
         # But NOT doc tests, as these are not replacements for unit tests.
         if not args.disable_tests:
             if args.cov_report == "":
                 # Without coverage report
-                runner.run(cargo_nextest, args.test_flags, args.verbose)
+                runner.run(cargo_nextest, args.test_flags, verbose=args.verbose)
             else:
                 # With coverage report
-                runner.run(cargo_llvm_cov, args.test_flags, args.cov_report, args.verbose)
+                runner.run(cargo_llvm_cov, args.test_flags, args.cov_report, verbose=args.verbose)
                 # pass
 
         if not args.disable_benches:
-            runner.run(cargo_bench, args.bench_flags, args.verbose)
+            runner.run(cargo_bench, args.bench_flags, verbose=args.verbose)
 
         # Generate all the documentation. Ensure the path docs make in exists first.
         # We need this even if we aren't making docs.
@@ -338,17 +338,17 @@ def main() -> None:  # noqa: C901, PLR0915
             # Make sure docs path exists before making any docs.
             Path("target/doc").mkdir(parents=True)
             # Generate rust docs.
-            runner.run(cargo_doc, args.verbose)
+            runner.run(cargo_doc, verbose=args.verbose)
             # Generate dependency graphs
-            cargo_depgraph(runner, args.verbose)
+            cargo_depgraph(runner, verbose=args.verbose)
 
         # These do generate documentation artifacts, but are NOT blocked by docs generation because they
         # ALSO check for orphaned dependencies.  Which is required for all targets.
         for lib in libs:
-            cargo_modules_lib(runner, lib, not args.disable_docs, args.verbose)
+            cargo_modules_lib(runner, lib, docs=not args.disable_docs, verbose=args.verbose)
         for bin_file in bins:
             package, bin_name = bin_file.split("/")
-            cargo_modules_bin(runner, package, bin_name, not args.disable_docs, args.verbose)
+            cargo_modules_bin(runner, package, bin_name, docs=not args.disable_docs, verbose=args.verbose)
 
         results = runner.get_results()
 
@@ -358,7 +358,7 @@ def main() -> None:  # noqa: C901, PLR0915
     # currently contribute to code coverage.
     if not args.disable_tests:
         # Check if all documentation tests pass.
-        results.add(cargo_doctest(args.doctest_flags, args.verbose))
+        results.add(cargo_doctest(args.doctest_flags, verbose=args.verbose))
 
     results.print()
     if not results.ok():
@@ -369,7 +369,7 @@ def main() -> None:  # noqa: C901, PLR0915
 
     for bin_file in bins:
         _, bin_name = bin_file.split("/")
-        help_check(results, bin_name, args.verbose)
+        help_check(results, bin_name, verbose=args.verbose)
         ldd(results, bin_name)
         readelf(results, bin_name)
         strip(results, bin_name)

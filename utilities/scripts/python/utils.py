@@ -38,7 +38,7 @@ class TestProcessListWithQuotes(unittest.TestCase):
         sys.argv = [sys.argv[0], "this", 'has "quoted', "strings", 'in it"', "this", "doesn't"]
         expected_result = ["this", "has quoted strings in it", "this", "doesn't"]
         fix_quoted_earthly_args()
-        self.assertEqual(sys.argv[1:], expected_result)  # noqa: PT009
+        self.assertEqual(sys.argv[1:], expected_result)
 
 
 if __name__ == "__main__":
