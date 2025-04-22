@@ -336,7 +336,7 @@ def main() -> None:  # noqa: C901, PLR0915
         # We need this even if we aren't making docs.
         if not args.disable_docs:
             # Make sure docs path exists before making any docs.
-            Path("target/doc").mkdir(parents=True)
+            Path("target/doc").mkdir(parents=True, exist_ok=True)
             # Generate rust docs.
             runner.run(cargo_doc, verbose=args.verbose)
             # Generate dependency graphs
