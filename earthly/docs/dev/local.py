@@ -49,7 +49,7 @@ def run_command(command: str) -> None:
     )
 
     for line in iter(process.stdout.readline, ""):
-        print(line, end="")
+        print(line, end="")  # noqa: T201
 
     process.stdout.close()
 
@@ -169,14 +169,14 @@ class DocsContainer:
                     break
                 time.sleep(1)
         except subprocess.CalledProcessError as e:
-            print(f"Error stopping or removing Docker container: {e}")
+            print(f"Error stopping or removing Docker container: {e}")  # noqa: T201
 
     def print_logs(self) -> None:
         """Print Logs."""
         cmd = f"docker logs --since {self.last_log_time} {self.container_id}"
         output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # noqa: S602
         for line in output.stdout:
-            print(line.decode().strip())
+            print(line.decode().strip())  # noqa: T201
         self.last_log_time = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 
@@ -231,12 +231,12 @@ def main() -> None:  # noqa: C901
                         docs_container = new_docs
                         docs_container.run_container()
                         break
-                    print("Docs did not change. Waiting...")
+                    print("Docs did not change. Waiting...")  # noqa: T201
                 except Exception as exc:  # noqa: BLE001
-                    print(f"Error rebuilding docs: {exc}")
+                    print(f"Error rebuilding docs: {exc}")  # noqa: T201
 
         except KeyboardInterrupt:
-            print("\nExiting...")
+            print("\nExiting...")  # noqa: T201
             docs_container.stop_container()
             sys.exit(0)
 

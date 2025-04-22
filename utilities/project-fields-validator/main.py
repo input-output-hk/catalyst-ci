@@ -220,7 +220,7 @@ class ProjectFieldsValidator:
             response = request(method, url, headers=self.headers, **kwargs)
             response.raise_for_status()
 
-            print(f"\nAPI Response Status: {response.status}")
+            print(f"\nAPI Response Status: {response.status}")  # noqa: T201
 
             try:
                 data = response.json()
@@ -270,7 +270,7 @@ class ProjectFieldsValidator:
         }
         """
 
-        print(f"\nFetching PR details for {org_name}/{repo_name}#{pr_number}")
+        print(f"\nFetching PR details for {org_name}/{repo_name}#{pr_number}")  # noqa: T201
 
         result = self.run_query(query, {"org": org_name, "repo": repo_name, "number": pr_number})
 
@@ -291,9 +291,9 @@ class ProjectFieldsValidator:
         url = f"{self.BASE_URL}/repos/{org_name}/{repo_name}/issues/{pr_number}/assignees"
         try:
             self._make_request("POST", url, json={"assignees": [assignee]})
-            print(f"✅ PR assigned to @{assignee}")
+            print(f"✅ PR assigned to @{assignee}")  # noqa: T201
         except GitHubAPIError as e:
-            print(f"❌ Failed to assign PR to @{assignee}: {e!s}")
+            print(f"❌ Failed to assign PR to @{assignee}: {e!s}")  # noqa: T201
 
     def get_project_items(self, org_name: str, project_number: int) -> list[dict[str, Any]]:
         """Fetch all items from the project with pagination."""
@@ -411,24 +411,24 @@ class ProjectFieldsValidator:
                 cursor = project_data["pageInfo"]["endCursor"]
 
             except GitHubAPIError as e:
-                print(f"\nError fetching project items: {e!s}")
+                print(f"\nError fetching project items: {e!s}")  # noqa: T201
                 if e.response_data:
-                    print("\nAPI Response data:")
-                    print(jsonlib.dumps(e.response_data, indent=2))
+                    print("\nAPI Response data:")  # noqa: T201
+                    print(jsonlib.dumps(e.response_data, indent=2))  # noqa: T201
                 raise
 
-        print("\n")
+        print("\n")  # noqa: T201
         return all_items
 
     def validate_item(self, item: dict[str, Any]) -> set[str]:
         """Validate required fields for an item."""
         field_values = self._extract_field_values(item)
 
-        print("\nCurrent field values:")
-        print("=" * 50)
+        print("\nCurrent field values:")  # noqa: T201
+        print("=" * 50)  # noqa: T201
         for field in self.required_fields:
             value = field_values.get(field.name, "❌ empty")
-            print(f"  • {field.name}: {value}")
+            print(f"  • {field.name}: {value}")  # noqa: T201
 
         return {field.name for field in self.required_fields if field.name not in field_values}
 
@@ -457,19 +457,19 @@ class ProjectFieldsValidator:
     @staticmethod
     def print_validation_results(empty_fields: set[str]) -> None:
         """Print validation results in a formatted way."""
-        print("\n" + "=" * 50)
-        print("Validation Results:")
-        print("=" * 50)
+        print("\n" + "=" * 50)  # noqa: T201
+        print("Validation Results:")  # noqa: T201
+        print("=" * 50)  # noqa: T201
 
         if not empty_fields:
-            print("✅ All required fields are filled. Validation passed!")
+            print("✅ All required fields are filled. Validation passed!")  # noqa: T201
         else:
-            print("❌ Validation failed. The following fields need to be filled:")
+            print("❌ Validation failed. The following fields need to be filled:")  # noqa: T201
             for field in sorted(empty_fields):
-                print(f"  • {field}")
-            print("\nPlease fill in these fields in the project board.")
+                print(f"  • {field}")  # noqa: T201
+            print("\nPlease fill in these fields in the project board.")  # noqa: T201
 
-        print("=" * 50)
+        print("=" * 50)  # noqa: T201
 
 
 def clean_env_var(var: str) -> str:
@@ -491,9 +491,9 @@ def main() -> None:  # noqa: C901, PLR0915
 
         debug_vars = env_vars.copy()
         debug_vars["GITHUB_PROJECTS_PAT"] = "[REDACTED]" if env_vars["GITHUB_PROJECTS_PAT"] else None
-        print("\nEnvironment variables:")
+        print("\nEnvironment variables:")  # noqa: T201
         for key, value in debug_vars.items():
-            print(f"{key}: {value}")
+            print(f"{key}: {value}")  # noqa: T201
 
         missing_vars = [k for k, v in env_vars.items() if not v]
         if missing_vars:
@@ -514,9 +514,9 @@ def main() -> None:  # noqa: C901, PLR0915
             msg = f"Invalid repository format: {github_repository}. Expected format: owner/repo"
             raise ValueError(msg) from err
 
-        print(f"\nValidating PR #{pr_number} in {github_repository}")
-        print(f"Project number: {project_number}")
-        print("=" * 50)
+        print(f"\nValidating PR #{pr_number} in {github_repository}")  # noqa: T201
+        print(f"Project number: {project_number}")  # noqa: T201
+        print("=" * 50)  # noqa: T201
 
         validator = ProjectFieldsValidator(env_vars["GITHUB_PROJECTS_PAT"])
 
@@ -526,7 +526,7 @@ def main() -> None:  # noqa: C901, PLR0915
             assignees = [node["login"] for node in pr_details["assignees"]["nodes"]]
 
             if not assignees:
-                print(f"\nAssigning PR to author @{author}")
+                print(f"\nAssigning PR to author @{author}")  # noqa: T201
                 validator.assign_pr(org_name, repo_name, pr_number, author)
 
             project_items = validator.get_project_items(org_name, project_number)
@@ -540,12 +540,12 @@ def main() -> None:  # noqa: C901, PLR0915
             ]
 
             if not pr_items:
-                print(f"\nWarning: PR #{pr_number} is not linked to project #{project_number}")
-                print("Please add it to the project using the following steps:")
-                print("1. Go to the project board")
-                print("2. Click '+ Add items'")
-                print("3. Search for this PR")
-                print("4. Click 'Add selected items'")
+                print(f"\nWarning: PR #{pr_number} is not linked to project #{project_number}")  # noqa: T201
+                print("Please add it to the project using the following steps:")  # noqa: T201
+                print("1. Go to the project board")  # noqa: T201
+                print("2. Click '+ Add items'")  # noqa: T201
+                print("3. Search for this PR")  # noqa: T201
+                print("4. Click 'Add selected items'")  # noqa: T201
                 sys.exit(0)
 
             validation_errors = set()
@@ -559,17 +559,17 @@ def main() -> None:  # noqa: C901, PLR0915
                 sys.exit(1)
 
         except GitHubAPIError as e:
-            print(f"\nError accessing GitHub API: {e!s}")
+            print(f"\nError accessing GitHub API: {e!s}")  # noqa: T201
             if e.response_data:
-                print("\nAPI Response data:")
-                print(jsonlib.dumps(e.response_data, indent=2))
+                print("\nAPI Response data:")  # noqa: T201
+                print(jsonlib.dumps(e.response_data, indent=2))  # noqa: T201
             sys.exit(1)
 
     except ValueError as e:
-        print(f"Configuration error: {e!s}")
+        print(f"Configuration error: {e!s}")  # noqa: T201
         sys.exit(1)
     except Exception as e:  # noqa: BLE001
-        print(f"Error: {e!s}")
+        print(f"Error: {e!s}")  # noqa: T201
         traceback.print_exc()
         sys.exit(1)
 
