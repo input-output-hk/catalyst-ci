@@ -166,7 +166,7 @@ def cli_run(  # noqa: PLR0913
         )
         return ProcedureResult(result.returncode, command, result.stdout)
 
-    return procedure_run(procedure, name, log, verbose)
+    return procedure_run(procedure, name, log=log, verbose=verbose)
 
 
 def procedure_run(
