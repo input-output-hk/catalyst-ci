@@ -20,7 +20,9 @@ def process_sql_files(directory: str) -> tuple[dict, int]:
     largest_version = 0
 
     for filename in Path(directory).iterdir():
-        match = re.match(file_pattern, filename)
+        print(filename)
+        print(filename.name)
+        match = re.match(file_pattern, filename.name)
         if match:
             version = int(match.group(1))
             migration_name = match.group(2)
