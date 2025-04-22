@@ -15,12 +15,12 @@ check-spelling:
     earthly +check-spelling
 
 
-# Fix and Check Markdown files
+# Fix and Check Code Format for Python files
 format-python-code:
     ruff check --select I --fix .
     ruff format .
 
-# Fix and Check Markdown files
+# Fix and Check Lint for Python files
 lint-python: format-python-code
     ruff check --fix .
     ruff check .
