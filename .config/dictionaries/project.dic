@@ -16,6 +16,8 @@ devenv
 dind
 direnv
 dockerhub
+docstrings
+doctests
 doseq
 doublecircle
 Earthfile
