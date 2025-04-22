@@ -14,6 +14,7 @@ cytopia
 depgraph
 devenv
 dind
+direnv
 dockerhub
 doseq
 doublecircle
@@ -48,6 +49,7 @@ gopls
 gosec
 graphviz
 idents
+ipynb
 JDBC
 jorm
 jormungandr
@@ -90,7 +92,9 @@ projectcatalyst
 pubout
 pubspec
 pymdownx
+pypackages
 PYTHONDONTWRITEBYTECODE
+pytype
 rankdir
 rivo
 runewidth

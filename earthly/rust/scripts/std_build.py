@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
+"""Rust Standard Build."""
 
 # cspell: words lcov depgraph readelf sysroot
 
 import argparse
 import os
+import sys
+from pathlib import Path
 
-import python.exec_manager as exec_manager
 import rich
+from python import exec_manager
 from python.utils import fix_quoted_earthly_args
 
 # This script is run inside the `build` stage.
@@ -15,7 +18,8 @@ from python.utils import fix_quoted_earthly_args
 # to pass without needing to iterate excessively.
 
 
-def cargo_build(flags: str, verbose: bool = False) -> exec_manager.Result:
+def cargo_build(flags: str, *, verbose: bool = False) -> exec_manager.Result:
+    """Cargo Build."""
     return exec_manager.cli_run(
         "cargo build " + "--release " + f"{flags} ",
         name="Build all code in the workspace",
@@ -23,7 +27,8 @@ def cargo_build(flags: str, verbose: bool = False) -> exec_manager.Result:
     )
 
 
-def cargo_lint(flags: str, verbose: bool = False) -> exec_manager.Result:
+def cargo_lint(flags: str, *, verbose: bool = False) -> exec_manager.Result:
+    """Cargo Lint."""
     return exec_manager.cli_run(
         "cargo lint --release " + f"{flags}",
         name="Clippy Lints in the workspace check",
@@ -31,7 +36,8 @@ def cargo_lint(flags: str, verbose: bool = False) -> exec_manager.Result:
     )
 
 
-def cargo_doctest(flags: str, verbose: bool = False) -> exec_manager.Result:
+def cargo_doctest(flags: str, *, verbose: bool = False) -> exec_manager.Result:
+    """Cargo Doctest."""
     return exec_manager.cli_run(
         "cargo testdocs " + f"{flags} ",
         name="Documentation tests all pass check",
@@ -39,7 +45,8 @@ def cargo_doctest(flags: str, verbose: bool = False) -> exec_manager.Result:
     )
 
 
-def cargo_nextest(flags: str, verbose: bool = False) -> exec_manager.Result:
+def cargo_nextest(flags: str, *, verbose: bool = False) -> exec_manager.Result:
+    """Cargo Nextest."""
     return exec_manager.cli_run(
         "cargo testunit " + f"{flags} ",
         name="Self contained Unit tests all pass check",
@@ -47,9 +54,8 @@ def cargo_nextest(flags: str, verbose: bool = False) -> exec_manager.Result:
     )
 
 
-def cargo_llvm_cov(
-    flags: str, cov_report: str, verbose: bool = False
-) -> list[exec_manager.Result]:
+def cargo_llvm_cov(flags: str, cov_report: str, *, verbose: bool = False) -> list[exec_manager.Result]:
+    """Cargo LLVM Cov."""
     # These can not be run in parallel as they depend on each other
     results = []
     # Remove artifacts that may affect the coverage results
@@ -70,10 +76,7 @@ def cargo_llvm_cov(
     # Save coverage report to file if it is provided
     if res.ok():
         res = exec_manager.cli_run(
-            "cargo llvm-cov report --lcov "
-            + f"{flags} "
-            + "--release "
-            + f"--output-path {cov_report} ",
+            "cargo llvm-cov report --lcov " + f"{flags} " + "--release " + f"--output-path {cov_report} ",
             name=f"Generate lcov report to {cov_report}",
             verbose=verbose,
         )
@@ -82,7 +85,8 @@ def cargo_llvm_cov(
     return results
 
 
-def cargo_bench(flags: str, verbose: bool = False) -> exec_manager.Result:
+def cargo_bench(flags: str, *, verbose: bool = False) -> exec_manager.Result:
+    """Cargo Bench."""
     return exec_manager.cli_run(
         "cargo bench --all-targets --no-fail-fast" + f"{flags} ",
         name="Benchmarks all run to completion check",
@@ -90,22 +94,19 @@ def cargo_bench(flags: str, verbose: bool = False) -> exec_manager.Result:
     )
 
 
-def cargo_doc(verbose: bool = False) -> exec_manager.Result:
+def cargo_doc(*, verbose: bool = False) -> exec_manager.Result:
+    """Cargo Doc."""
     # Add RUSTDOCFLAGS to the inherited environment so we can build an index page with nightly.
     env = os.environ
     env["RUSTDOCFLAGS"] = "-Z unstable-options --enable-index-page"
-    return exec_manager.cli_run(
-        "cargo +nightly docs", name="Documentation build", verbose=verbose
-    )
+    return exec_manager.cli_run("cargo +nightly docs", name="Documentation build", verbose=verbose)
 
 
-def cargo_depgraph(runner: exec_manager.ParallelRunner, verbose: bool = False) -> None:
+def cargo_depgraph(runner: exec_manager.ParallelRunner, *, verbose: bool = False) -> None:
+    """Cargo Depgraph."""
     runner.run(
         exec_manager.cli_run,
-        "cargo depgraph "
-        + "--workspace-only "
-        + "--dedup-transitive-deps "
-        + "> target/doc/workspace.dot ",
+        "cargo depgraph " + "--workspace-only " + "--dedup-transitive-deps " + "> target/doc/workspace.dot ",
         name="Workspace dependency graphs generation",
         verbose=verbose,
     )
@@ -119,35 +120,29 @@ def cargo_depgraph(runner: exec_manager.ParallelRunner, verbose: bool = False) -
 
     runner.run(
         exec_manager.cli_run,
-        "cargo depgraph "
-        + "--all-deps "
-        + "--dedup-transitive-deps "
-        + "> target/doc/all.dot ",
+        "cargo depgraph " + "--all-deps " + "--dedup-transitive-deps " + "> target/doc/all.dot ",
         name="All dependency graphs generation",
         verbose=verbose,
     )
 
 
-COMMON_CARGO_MODULES_ORPHANS = (
-    "NO_COLOR=1 " + "cargo modules orphans --all-features " + "--deny --cfg-test "
-)
-COMMON_CARGO_MODULES_STRUCTURE = (
-    "NO_COLOR=1 " + "cargo modules structure --no-fns --all-features "
-)
+COMMON_CARGO_MODULES_ORPHANS = "NO_COLOR=1 " + "cargo modules orphans --all-features " + "--deny --cfg-test "
+COMMON_CARGO_MODULES_STRUCTURE = "NO_COLOR=1 " + "cargo modules structure --no-fns --all-features "
 COMMON_CARGO_MODULES_DEPENDENCIES = (
     "NO_COLOR=1 "
-    + "cargo modules dependencies --all-features "
-    + "--no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses "
+    "cargo modules dependencies --all-features "
+    "--no-externs --no-fns --no-sysroot --no-traits --no-types --no-uses "
 )
 
 
 def cargo_modules_lib(
     runner: exec_manager.ParallelRunner,
     lib: str,
+    *,
     docs: bool = True,
     verbose: bool = False,
 ) -> None:
-    # Check if we have any Orphans.
+    """Check if we have any Orphans."""
     runner.run(
         exec_manager.cli_run,
         COMMON_CARGO_MODULES_ORPHANS + f"--package '{lib}' --lib",
@@ -159,16 +154,14 @@ def cargo_modules_lib(
         # Generate tree
         runner.run(
             exec_manager.cli_run,
-            COMMON_CARGO_MODULES_STRUCTURE
-            + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.tree' ",
+            COMMON_CARGO_MODULES_STRUCTURE + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.tree' ",
             name=f"Generate Module Trees for {lib}",
             verbose=verbose,
         )
         # Generate graph
         runner.run(
             exec_manager.cli_run,
-            COMMON_CARGO_MODULES_DEPENDENCIES
-            + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.dot' ",
+            COMMON_CARGO_MODULES_DEPENDENCIES + f"--package '{lib}' --lib > 'target/doc/{lib}.lib.modules.dot' ",
             name=f"Generate Module Graphs for {lib}",
             verbose=verbose,
         )
@@ -177,15 +170,16 @@ def cargo_modules_lib(
 def cargo_modules_bin(
     runner: exec_manager.ParallelRunner,
     package: str,
-    bin: str,
+    bin_file: str,
+    *,
     docs: bool = True,
     verbose: bool = False,
 ) -> None:
-    # Check if we have any Orphans.
+    """Check if we have any Orphans."""
     runner.run(
         exec_manager.cli_run,
-        COMMON_CARGO_MODULES_ORPHANS + f"--package '{package}' --bin '{bin}'",
-        name=f"Checking Orphans for {package}/{bin}",
+        COMMON_CARGO_MODULES_ORPHANS + f"--package '{package}' --bin '{bin_file}'",
+        name=f"Checking Orphans for {package}/{bin_file}",
         verbose=verbose,
     )
 
@@ -209,43 +203,42 @@ def cargo_modules_bin(
 
 
 # ALL executables MUST have `--help` as an option.
-def help_check(results: exec_manager.Results, bin: str, verbose: bool = False):
+def help_check(results: exec_manager.Results, bin_file: str, *, verbose: bool = False) -> None:
+    """Help Check."""
     results.add(
         exec_manager.cli_run(
-            f"target/release/{bin} --help",
-            name=f"Executable '{bin}' MUST have `--help` as an option.",
+            f"target/release/{bin_file} --help",
+            name=f"Executable '{bin_file}' MUST have `--help` as an option.",
             verbose=verbose,
-        )
+        ),
     )
 
 
-def ldd(results: exec_manager.Results, bin: str):
-    results.add(
-        exec_manager.cli_run(
-            f"ldd target/release/{bin}", name=f"ldd for '{bin}'", verbose=True
-        )
-    )
+def ldd(results: exec_manager.Results, bin_file: str) -> None:
+    """Ldd."""
+    results.add(exec_manager.cli_run(f"ldd target/release/{bin_file}", name=f"ldd for '{bin_file}'", verbose=True))
 
 
-def readelf(results: exec_manager.Results, bin: str):
+def readelf(results: exec_manager.Results, bin_file: str) -> None:
+    """Readelf."""
     results.add(
         exec_manager.cli_run(
-            f"readelf -p .comment target/release/{bin}",
-            name=f"readelf for '{bin}'",
+            f"readelf -p .comment target/release/{bin_file}",
+            name=f"readelf for '{bin_file}'",
             verbose=True,
-        )
+        ),
     )
 
 
-def strip(results: exec_manager.Results, bin: str):
+def strip(results: exec_manager.Results, bin_file: str) -> None:
+    """Strip."""
     results.add(
-        exec_manager.cli_run(
-            f"strip -v target/release/{bin}", name=f"strip for '{bin}'", verbose=True
-        )
+        exec_manager.cli_run(f"strip -v target/release/{bin_file}", name=f"strip for '{bin_file}'", verbose=True),
     )
 
 
-def main():
+def main() -> None:  # noqa: C901, PLR0915
+    """Rust Standard Build."""
     # Force color output in CI
     rich.reconfigure(color_system="256")
 
@@ -315,12 +308,8 @@ def main():
     )
     args = parser.parse_args()
 
-    libs = filter(
-        lambda lib: lib.strip() and len(lib.strip()) > 0, args.libs.split(",")
-    )
-    bins = list(
-        filter(lambda bin: bin.strip() and len(bin.strip()) > 0, args.bins.split(","))
-    )
+    libs = filter(lambda lib: lib.strip() and len(lib.strip()) > 0, args.libs.split(","))
+    bins = list(filter(lambda bin_file: bin_file.strip() and len(bin_file.strip()) > 0, args.bins.split(",")))
 
     with exec_manager.ParallelRunner("Rust build") as runner:
         # Build the code.
@@ -337,9 +326,7 @@ def main():
                 runner.run(cargo_nextest, args.test_flags, args.verbose)
             else:
                 # With coverage report
-                runner.run(
-                    cargo_llvm_cov, args.test_flags, args.cov_report, args.verbose
-                )
+                runner.run(cargo_llvm_cov, args.test_flags, args.cov_report, args.verbose)
                 # pass
 
         if not args.disable_benches:
@@ -349,8 +336,7 @@ def main():
         # We need this even if we aren't making docs.
         if not args.disable_docs:
             # Make sure docs path exists before making any docs.
-            if not os.path.exists("target/doc"):
-                os.makedirs("target/doc")
+            Path("target/doc").mkdir(parents=True)
             # Generate rust docs.
             runner.run(cargo_doc, args.verbose)
             # Generate dependency graphs
@@ -360,11 +346,9 @@ def main():
         # ALSO check for orphaned dependencies.  Which is required for all targets.
         for lib in libs:
             cargo_modules_lib(runner, lib, not args.disable_docs, args.verbose)
-        for bin in bins:
-            package, bin_name = bin.split("/")
-            cargo_modules_bin(
-                runner, package, bin_name, not args.disable_docs, args.verbose
-            )
+        for bin_file in bins:
+            package, bin_name = bin_file.split("/")
+            cargo_modules_bin(runner, package, bin_name, not args.disable_docs, args.verbose)
 
         results = runner.get_results()
 
@@ -378,13 +362,13 @@ def main():
 
     results.print()
     if not results.ok():
-        exit(1)
+        sys.exit(1)
 
     # Check if the build executable, isn't a busted mess.
     results = exec_manager.Results("Smoke test")
 
-    for bin in bins:
-        _, bin_name = bin.split("/")
+    for bin_file in bins:
+        _, bin_name = bin_file.split("/")
         help_check(results, bin_name, args.verbose)
         ldd(results, bin_name)
         readelf(results, bin_name)
@@ -392,7 +376,7 @@ def main():
 
     results.print()
     if not results.ok():
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

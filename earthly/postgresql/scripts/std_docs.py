@@ -1,33 +1,33 @@
 #!/usr/bin/env python3
-
+"""Postgresql Standard Docs."""
 # cspell: words dbmigrations dbhost dbuser dbuserpw Tsvg pgsql11
 
 import argparse
-import os
 import re
+import sys
+from pathlib import Path
 from textwrap import indent
 
-import python.db_ops as db_ops
-import python.exec_manager as exec_manager
 import rich
-from rich import print
+from python import db_ops, exec_manager
+from rich import print  # noqa: A004
 
 
-def process_sql_files(directory):
+def process_sql_files(directory: str) -> tuple[dict, int]:
+    """Process SQL Files."""
     file_pattern = r"V(\d+)__(\w+)\.sql"
     migrations = {}
     largest_version = 0
 
-    for filename in os.listdir(directory):
+    for filename in Path(directory).iterdir():
         match = re.match(file_pattern, filename)
         if match:
             version = int(match.group(1))
             migration_name = match.group(2)
 
-            if version > largest_version:
-                largest_version = version
+            largest_version = max(largest_version, version)
 
-            with open(os.path.join(directory, filename), "r") as file:
+            with filename.open() as file:
                 sql_data = file.read()
 
             migrations[version] = {
@@ -40,25 +40,26 @@ def process_sql_files(directory):
 
 
 class Migrations:
-    def __init__(self, args: argparse.Namespace):
-        """
-        Initialize the class with the given arguments.
+    """Migrations."""
+
+    def __init__(self, args: argparse.Namespace) -> None:
+        """Initialize the class with the given arguments.
 
         Args:
             args (argparse.Namespace): The command line arguments.
 
         Returns:
             None
+
         """
         self.args = args
         self.migrations, self.migration_version = process_sql_files(args.dbmigrations)
 
-    def create_markdown_file(self, file_path):
-        with open(file_path, "w") as markdown_file:
+    def create_markdown_file(self, file_path: str) -> None:
+        """Create Markdown File."""
+        with Path(file_path).open("w") as markdown_file:
             # Write the title with the maximum migration version
-            markdown_file.write(
-                "# Migrations (Version {}) \n\n".format(self.migration_version)
-            )
+            markdown_file.write(f"# Migrations (Version {self.migration_version}) \n\n")
 
             # Write the contents of each file in order
             for version in sorted(self.migrations.keys()):
@@ -69,20 +70,17 @@ class Migrations:
                 markdown_file.write(f"## {migration['migration_name']}\n\n")
 
                 markdown_file.write('??? abstract "Schema Definition"\n\n')
-                markdown_file.write(
-                    indent(f"```postgres\n{sql_data}\n```", "    ") + "\n\n"
-                )
+                markdown_file.write(indent(f"```postgres\n{sql_data}\n```", "    ") + "\n\n")
 
-        print("Markdown file created successfully at: {}".format(file_path))
+        print(f"Markdown file created successfully at: {file_path}")
 
 
-def main():
+def main() -> None:
+    """Postgresql Standard Docs Processing."""
     # Force color output in CI
     rich.reconfigure(color_system="256")
 
-    parser = argparse.ArgumentParser(
-        description="Standard Postgresql Documentation Processing."
-    )
+    parser = argparse.ArgumentParser(description="Standard Postgresql Documentation Processing.")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
     db_ops.add_args(parser)
 
@@ -126,9 +124,7 @@ def main():
             f"-p {args.dbuserpw} "
             f"-o docs/database_schema/ "
         )
-        res = exec_manager.cli_run(
-            schemaspy_cmd, name="Generate SchemaSpy Documentation", verbose=True
-        )
+        res = exec_manager.cli_run(schemaspy_cmd, name="Generate SchemaSpy Documentation", verbose=True)
         results.add(res)
 
         # If SchemaSpy command completes without error, create .pages file to hide the schema folder
@@ -144,7 +140,7 @@ def main():
     results.print()
 
     if not results.ok():
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":
