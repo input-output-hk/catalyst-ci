@@ -7,9 +7,10 @@ from pathlib import Path
 def inc_file(
     env: any,
     filename: str,
+    *,
     start_line: int = 0,
     end_line: int | None = None,
-    indent: int | None = None,
+    indent: int = 0,
 ) -> str:
     """Include a file, optionally indicating start_line and end_line (start counting from 0).
 
