@@ -8,7 +8,7 @@ IMPORT ./installer AS installer
 # Install flutter.
 INSTALL_FLUTTER:
     FUNCTION
-    ARG version=3.29.0
+    ARG version=3.29.3
     ARG TARGETARCH
 
     # Install Flutter
@@ -16,17 +16,7 @@ INSTALL_FLUTTER:
         RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
             | tar -xJ -C /usr/local
     ELSE IF [ "$TARGETARCH" = "arm64" ]
-        # Restore below line when https://github.com/flutter/flutter/issues/162251 is solved.
-        # GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local/flutter
-
-        # And remove below lines to the end of this ELSE-IF block:
-        GIT CLONE https://github.com/flutter/flutter.git /usr/local/flutter
-        WORKDIR /usr/local/flutter
-        # Explicitly fetch from the 'origin' remote (HTTPS). Otherwise may attempt SSH-a
-        RUN git remote set-url origin https://github.com/flutter/flutter.git
-        RUN git fetch --unshallow
-        RUN git checkout tags/$version
-        WORKDIR /
+        GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local/flutter
     ELSE
         RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
     END
