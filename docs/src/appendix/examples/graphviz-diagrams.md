@@ -7,9 +7,9 @@ icon: material/draw
 ## Graphviz SVG's
 
 === "Trees"
-<!-- markdownlint-disable no-inline-html -->
+    <!-- markdownlint-disable no-inline-html -->
     <center>
-<!-- markdownlint-enable no-inline-html -->
+    <!-- markdownlint-enable no-inline-html -->
 
     ```dot
     graph G {

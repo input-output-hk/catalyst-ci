@@ -25,10 +25,12 @@ def inc_file(
     """
     try:
         if filename.startswith("."):
-            this_file = Path(env.page.file.src_dir) / env.page.file.src_dir
+            this_file = Path(env.page.file.src_dir) / env.page.file.src_uri
             this_dir = this_file.parent
             relative_filename = this_dir / filename
         else:
+            this_file = "Absolute"
+            this_dir = "Not Calculated"
             project_dir = Path(env.project_dir)
             relative_filename = project_dir / filename
 
@@ -39,6 +41,13 @@ def inc_file(
         lines = full_filename.read_text().splitlines()
         line_range = lines[start_line:end_line]
         text = f"\n{' ' * indent}".join(line_range).rstrip()
-        return re.sub(r"\n$", "", text, count=1)
     except Exception as exc:  # noqa: BLE001
-        return f"{filename} error: {exc}"
+        text = f"{filename} error: {exc}"
+
+    # Debug Values
+    # text += f"\n{' ' * indent}filename = {filename}"  # noqa: ERA001
+    # text += f"\n{' ' * indent}this_file = {this_file}"  # noqa: ERA001
+    # text += f"\n{' ' * indent}this_dir = {this_dir}"  # noqa: ERA001
+    # text += f"\n{' ' * indent}relative_file = {relative_filename}"  # noqa: ERA001
+    # text += f"\n{' ' * indent}full_filename = {full_filename}"  # noqa: ERA001
+    return re.sub(r"\n$", "", text, count=1)

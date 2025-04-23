@@ -25,10 +25,9 @@ lint-python: format-python-code
     ruff check --fix .
     ruff check .
 
-# generates specifications data
-gen_specs:
-    just specs/pre-push
-
 # Pre Push Checks - intended to be run by a git pre-push hook.
-pre-push: gen_specs check-markdown check-spelling format-python-code lint-python
-    just rust/pre-push
+pre-push: check-markdown check-spelling format-python-code lint-python
+
+# Preview docs locally
+preview-docs:
+    earthly/docs/dev/local.py cat-ci-docs:latest

@@ -42,13 +42,11 @@ theme:
     - search.suggest
     - search.highlight
     - content.code.copy
+    - content.tooltips
 
 plugins:
-  - mkdocs-material-adr/adr:
-      graph_file: architecture/09_architecture_decisions/index.md
   - awesome-pages
-  - material/tags:
-      tags_file: appendix/tags.md
+  - material/tags
   - search
   - meta-manager
   - macros:
@@ -60,6 +58,8 @@ plugins:
   #    HttpMethod: POST
   - d2
   - glightbox
+  - mkdocs-material-adr/adr:
+      graph_file: architecture/09_architecture_decisions/index.md
 
 markdown_extensions:
   # Python Markdown

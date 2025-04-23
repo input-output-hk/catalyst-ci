@@ -4,4 +4,4 @@ icon: fontawesome/solid/tags
 
 # Tag Index
 
-[TAGS]
+<!-- material/tags -->
