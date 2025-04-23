@@ -150,13 +150,13 @@ icon: material/draw
 ???- note "graphviz in UnExpanded Block"
 
     ```dot
-    {{ include_file('src/appendix/examples/diagrams/invasion_plan.dot', indent=4) }}
+    {{ include_file('./diagrams/invasion_plan.dot', indent=4) }}
     ```
 
 ???+ note "graphviz in Expanded Block"
 
     ```dot
-    {{ include_file('src/appendix/examples/diagrams/invasion_plan.dot', indent=4) }}
+    {{ include_file('./diagrams/invasion_plan.dot', indent=4) }}
     ```
 
 ## Graphviz PNG's (lower quality than SVGs)
@@ -164,7 +164,7 @@ icon: material/draw
 === "Graphviz Render"
 
     ```graphviz dot attack_plan.png
-    {{ include_file('src/appendix/examples/diagrams/invasion_plan.dot', indent=4) }}
+    {{ include_file('./diagrams/invasion_plan.dot', indent=4) }}
     ```
 
 === "Example of Code Syntax"
@@ -173,6 +173,6 @@ icon: material/draw
 
     ~~~
     ``` graphviz dot attack_plan.png
-    {{ include_file('src/appendix/examples/diagrams/invasion_plan.dot', indent=4) }}
+    {{ include_file('./diagrams/invasion_plan.dot', indent=4) }}
     ```
     ~~~
