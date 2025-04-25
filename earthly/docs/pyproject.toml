@@ -6,7 +6,7 @@ authors = ["Joshua Gilman", "Steven Johnson"]
 readme = "Readme.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = "^3.13"
 mkdocs-material = { version = "^9.6.12", extras = ["recommended","git","imaging"] }
 
 ### MkDocs Plugins we add.

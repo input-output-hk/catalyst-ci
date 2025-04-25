@@ -5,9 +5,9 @@ description = "Python example project"
 authors = []
 
 [tool.poetry.dependencies]
-python = "^3.11"
-pytest = "^7.4.0"
-pillow = "10.2.0"
+python = "^3.13"
+pytest = "^8.3.5"
+pillow = "11.2.1"
 
 [build-system]
 requires = ["poetry-core"]
