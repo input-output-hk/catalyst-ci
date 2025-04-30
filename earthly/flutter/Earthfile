@@ -247,7 +247,7 @@ BUILD_WEB:
 
     RUN flutter clean
     RUN flutter pub get
-    RUN flutter build web $BUILD_MODE --target $TARGET --dart-define SENTRY_DSN=$SENTRY_DSN --build-number=$(date +%s)
+    RUN flutter build web $BUILD_MODE --pwa-strategy=none --target $TARGET --dart-define SENTRY_DSN=$SENTRY_DSN --build-number=$(date +%s)
 
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
