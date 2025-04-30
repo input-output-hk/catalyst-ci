@@ -244,6 +244,7 @@ BUILD_WEB:
     ARG WORKDIR
 
     WORKDIR $WORKDIR
+    DO +SET_BUILDER_NUMBER
     RUN flutter clean
     RUN flutter pub get
     RUN flutter build web $BUILD_MODE --target $TARGET --dart-define SENTRY_DSN=$SENTRY_DSN
@@ -254,3 +255,14 @@ BUILD_WEB:
     ELSE
         SAVE ARTIFACT web /web
     END
+
+
+SET_BUILDER_NUMBER:
+    FUNCTION
+
+    ARG BUILD_NUMBER=""
+   
+    RUN BUILD_NUMBER=${BUILD_NUMBER:-$(date +%s)} && \
+        VERSION_NAME=$(grep "^version:" pubspec.yaml | cut -d':' -f2 | cut -d'+' -f1 | xargs) && \
+        sed -i.bak "s/^version: .*/version: ${VERSION_NAME}+${BUILD_NUMBER}/" pubspec.yaml && \
+        echo "📦 Updated pubspec.yaml to version: ${VERSION_NAME}+${BUILD_NUMBER}"
