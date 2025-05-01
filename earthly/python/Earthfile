@@ -35,6 +35,9 @@ python-base:
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
 
+    # Install UV through the recommended installer.
+    RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+
     # Extension we use needs rust.
     RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
     RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
