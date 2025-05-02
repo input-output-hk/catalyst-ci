@@ -13,8 +13,3 @@ check:
     FROM +builder
 
     DO python-ci+CHECK
-
-python-linter:
-    FROM +builder
-    
-    DO python-ci+LINT_PYTHON

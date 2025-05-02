@@ -1,15 +1,18 @@
+"""Diff Operations."""
+
 from dataclasses import dataclass
 
 
 @dataclass
 class DiffEntry:
-    """
-    A data class representing an entry in a difference collection.
+    """A data class representing an entry in a difference collection.
+
     Attributes:
     val: any
         The value of the entry.
     add_or_remove_flag: bool
         A flag indicating whether the entry should be removed (False) or added (True).
+
     """
 
     val: any
@@ -18,26 +21,25 @@ class DiffEntry:
 
 @dataclass
 class DiffResult:
-    """
-    Represents the difference between two dictionaries.
-    """
+    """Represents the difference between two dictionaries."""
 
     diff: dict
 
     def has_diff(self) -> bool:
+        """Has Diff."""
         return bool(self.diff)
 
-    def to_ascii_colored_string(
+    def to_ascii_colored_string(  # noqa: C901
         self,
         obj_name_to_add: str,
         obj_name_to_remove: str,
     ) -> str:
-        """
-        Generates an ascii colored string representation of the diff.
+        """Generate an ascii colored string representation of the diff.
 
         Args:
             obj_name_to_add (str): The name of the object to add.
             obj_name_to_remove (str): The name of the object to remove.
+
         """
 
         def impl(
@@ -60,9 +62,7 @@ class DiffResult:
             if isinstance(diff, DiffEntry):
                 color = "green" if diff.add_or_remove_flag else "red"
                 minus_or_plus = "+" if diff.add_or_remove_flag else "-"
-                obj_name = (
-                    obj_name_to_add if diff.add_or_remove_flag else obj_name_to_remove
-                )
+                obj_name = obj_name_to_add if diff.add_or_remove_flag else obj_name_to_remove
 
                 result += "\n------\n"
                 result += add_color(obj_name, "yellow")
@@ -70,9 +70,9 @@ class DiffResult:
                 result += add_color(f"{minus_or_plus}{ident} {diff.val}", color)
 
             if isinstance(diff, dict):
-                for key in diff:
+                for key, value in diff.items():
                     result += impl(
-                        diff[key],
+                        value,
                         obj_name_to_add,
                         obj_name_to_remove,
                         ident + " ",
@@ -81,9 +81,7 @@ class DiffResult:
 
             if isinstance(diff, tuple):
                 for val in diff:
-                    result += impl(
-                        val, obj_name_to_add, obj_name_to_remove, ident, path
-                    )
+                    result += impl(val, obj_name_to_add, obj_name_to_remove, ident, path)
 
             return result
 
@@ -92,40 +90,40 @@ class DiffResult:
 
 @dataclass
 class Diff:
-    """
-    Calculates the difference between two dictionaries.
-    """
+    """Calculates the difference between two dictionaries."""
 
     a: dict
     b: dict
     strict: bool
 
     def get_diff(self) -> DiffResult:
+        """Get Diff."""
         if self.strict:
             return self._strict_diff_()
-        else:
-            return self._inclusion_diff_()
+        return self._inclusion_diff_()
 
-    def _inclusion_diff_(self, reverse: bool = False) -> DiffResult:
-        """
-        Calculates an inclusion diff between the 'a' and 'b' dicts in a recursive manner.
+    def _inclusion_diff_(self, *, reverse: bool = False) -> DiffResult:
+        """Calculate an inclusion diff between the 'a' and 'b' dicts in a recursive manner.
+
         Checks that 'a' has an inclusion of 'b'.
+
         Args:
             reverse (bool): An inclusion diff calculation flag.
                 If 'True' evaluates that 'a' as an inclusion of 'b'.
                 If 'False' evaluates that 'b' as an inclusion of 'a'.
+
         """
 
         def impl(expected: dict, provided: dict) -> dict:
             diff = {}
-            for key in expected:
+            for key, expect in expected.items():
                 if key not in provided:
-                    diff[key] = DiffEntry(expected[key], True)
+                    diff[key] = DiffEntry(expect, add_or_remove_flag=True)
                 elif not isinstance(expected[key], dict):
                     if expected[key] != provided[key]:
                         diff[key] = (
-                            DiffEntry(expected[key], True),
-                            DiffEntry(provided[key], False),
+                            DiffEntry(expect, add_or_remove_flag=True),
+                            DiffEntry(provided[key], add_or_remove_flag=False),
                         )
                 else:
                     res = impl(expected[key], provided[key])
@@ -137,11 +135,9 @@ class Diff:
         return DiffResult(diff)
 
     def _strict_diff_(self) -> DiffResult:
-        """
-        Calculate the strict diff between  the expected and provided inputs.
-        """
+        """Calculate the strict diff between  the expected and provided inputs."""
 
-        def change_flags(diff):
+        def change_flags(diff: DiffResult) -> None:
             if isinstance(diff, DiffEntry):
                 diff.add_or_remove_flag = not diff.add_or_remove_flag
             if isinstance(diff, tuple):
@@ -155,7 +151,7 @@ class Diff:
         # Also it is important to update a result from the second inclusion diff result
         # Because it's result has a "reverse" add_or_remove_flag meaning
         incl_diff_1 = self._inclusion_diff_()
-        incl_diff_2 = self._inclusion_diff_(True)
+        incl_diff_2 = self._inclusion_diff_(reverse=True)
         change_flags(incl_diff_2.diff)
         incl_diff_1.diff.update(incl_diff_2.diff)
 

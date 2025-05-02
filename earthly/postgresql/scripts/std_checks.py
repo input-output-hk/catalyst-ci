@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
+"""Postgresql Standard Checks."""
 
 import argparse
+import sys
 
-import python.exec_manager as exec_manager
-import python.vendor_files_check as vendor_files_check
 import rich
+from python import exec_manager, vendor_files_check
 
 # This script is run inside the `check` stage for postgres database setup
 # to perform all high level non-compilation checks.
@@ -18,16 +19,18 @@ import rich
 # to pass without needing to iterate excessively.
 
 
-def sqlfluff(results: exec_manager.Results, path: str):
+def sqlfluff(results: exec_manager.Results, path: str) -> None:
+    """Run SQL Fluff."""
     results.add(
         exec_manager.cli_run(
-            " ".join(["sqlfluff lint", "-vv", path]),
+            f"sqlfluff lint -vv {path}",
             name=f"Checking SQLFluff linter against files from: {path}",
-        )
+        ),
     )
 
 
-def main():
+def main() -> None:
+    """Postgresql Standard Checks."""
     # Force color output in CI
     rich.reconfigure(color_system="256")
 
@@ -39,7 +42,7 @@ def main():
         vendor_files_check.colordiff_check(
             "/sql/.sqlfluff",
             ".sqlfluff",
-        )
+        ),
     )
 
     sqlfluff(results, "/sql")
@@ -47,7 +50,7 @@ def main():
 
     results.print()
     if not results.ok():
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

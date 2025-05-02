@@ -4,9 +4,7 @@ icon: material/draw
 
 # Mermaid Diagrams
 
-There is overlap between Kroki and Mermaid
-
-Mermaid can not zoom, but it can embed links.
+Mermaid diagrams can be embedded inline.
 
 ``` mermaid
 graph LR
