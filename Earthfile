@@ -4,6 +4,7 @@ IMPORT ./earthly/mdlint AS mdlint-ci
 IMPORT ./earthly/cspell AS cspell-ci
 IMPORT ./earthly/bash AS bash-ci
 IMPORT ./earthly/spectral AS spectral-ci
+IMPORT ./earthly/python AS python-ci
 
 # cspell: words livedocs sitedocs
 
@@ -49,6 +50,7 @@ repo-config:
 
     WORKDIR /repo
     COPY --dir .sqlfluff .
+    COPY --dir ruff.toml .
 
     SAVE ARTIFACT /repo repo
 
@@ -57,4 +59,9 @@ edit-docs:
     LOCALLY
 
     RUN ./earthly/docs/dev/local.py cat-ci-docs:latest
-    
+
+# We lint python globally in repos, so that all scripts and programs
+# are linted equally.
+# Its also fast.
+check-python:
+    DO python-ci+LINT_PYTHON    

@@ -6,8 +6,8 @@ authors = ["Joshua Gilman", "Steven Johnson"]
 readme = "Readme.md"
 
 [tool.poetry.dependencies]
-python = "^3.12"
-mkdocs-material = { version = "^9.5.49", extras = ["recommended","git","imaging"] }
+python = "^3.13"
+mkdocs-material = { version = "^9.6.12", extras = ["recommended","git","imaging"] }
 
 ### MkDocs Plugins we add.
 
@@ -34,7 +34,7 @@ mkdocs-multirepo-plugin = "^0.8.3"
 mkdocs-macros-plugin = "^1.3.7"
 
 # https://github.com/timmeinerzhagen/mkdocs-meta-manager
-mkdocs-meta-manager = "^1.0.0"
+mkdocs-meta-manager = "^1.1.0"
 
 # https://github.com/Kl0ven/mkdocs-material-adr
 # mkdocs-material-adr = "^1.1.0"

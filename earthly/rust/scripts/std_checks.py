@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
-
+"""Rust Standard Checks."""
 # cspell: words stdcfgs
 
 import argparse
 import os
+import sys
 
-import python.exec_manager as exec_manager
-import python.vendor_files_check as vendor_files_check
 import rich
-from rich import print
+from python import exec_manager, vendor_files_check
+from rich import print  # noqa: A004
 
 # This script is run inside the `check` stage for rust projects to perform all
 # high level non-compilation checks.
@@ -22,15 +22,14 @@ from rich import print
 # to pass without needing to iterate excessively.
 
 
-def main():
+def main() -> None:
+    """Rust Standard Checks."""
     rust_toolchain_enabled = False
 
     # Force color output in CI
     rich.reconfigure(color_system="256")
 
-    argparse.ArgumentParser(
-        description="Rust high level non-compilation checks processing."
-    )
+    argparse.ArgumentParser(description="Rust high level non-compilation checks processing.")
 
     results = exec_manager.Results("Rust checks")
 
@@ -67,30 +66,18 @@ def main():
                     results.add(res2)
                     results.add(res3)
 
-    results.add(
-        vendor_files_check.toml_diff_check(
-            "/stdcfgs/cargo_config.toml", ".cargo/config.toml"
-        )
-    )
+    results.add(vendor_files_check.toml_diff_check("/stdcfgs/cargo_config.toml", ".cargo/config.toml"))
     if rust_toolchain_enabled:
         results.add(
             vendor_files_check.toml_diff_check(
                 "/stdcfgs/rust-toolchain.toml",
                 "rust-toolchain.toml",
                 strict=False,
-            )
+            ),
         )
-    results.add(
-        vendor_files_check.toml_diff_check("/stdcfgs/rustfmt.toml", "rustfmt.toml")
-    )
-    results.add(
-        vendor_files_check.toml_diff_check(
-            "/stdcfgs/nextest.toml", ".config/nextest.toml"
-        )
-    )
-    results.add(
-        vendor_files_check.toml_diff_check("/stdcfgs/clippy.toml", "clippy.toml")
-    )
+    results.add(vendor_files_check.toml_diff_check("/stdcfgs/rustfmt.toml", "rustfmt.toml"))
+    results.add(vendor_files_check.toml_diff_check("/stdcfgs/nextest.toml", ".config/nextest.toml"))
+    results.add(vendor_files_check.toml_diff_check("/stdcfgs/clippy.toml", "clippy.toml"))
     results.add(vendor_files_check.toml_diff_check("/stdcfgs/deny.toml", "deny.toml"))
 
     # Check if the rust src is properly formatted.
@@ -98,7 +85,8 @@ def main():
     results.add(res)
     if not res.ok():
         print(
-            "[yellow]You can locally fix format errors by running: [/yellow] \n [red bold]cargo +nightly fmtfix [/red bold]"
+            "[yellow]You can locally fix format errors by running:"
+            " [/yellow] \n [red bold]cargo +nightly fmtfix [/red bold]",
         )
 
     # Check if we have unused dependencies declared in our Cargo.toml files.
@@ -108,12 +96,12 @@ def main():
         exec_manager.cli_run(
             "cargo deny check --exclude-dev -W vulnerability -W unmaintained",
             name="Supply Chain Issues Check",
-        )
+        ),
     )
 
     results.print()
     if not results.ok():
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == "__main__":

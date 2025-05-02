@@ -29,11 +29,11 @@ example:
 This is the sample valid CQL schema code:
 
 ```cql
-{{ include_file('src/appendix/examples/diagrams/sample_d2.cql') }}
+{{ include_file('./diagrams/sample_d2.cql') }}
 ```
 
 Resulted in D2:
 
 ```d2
-{{ include_file('src/appendix/examples/diagrams/sample_d2.d2') }}
+{{ include_file('./diagrams/sample_d2.d2') }}
 ```
