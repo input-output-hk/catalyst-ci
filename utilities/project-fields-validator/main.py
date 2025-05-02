@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
+"""Project Fields Validator."""
+
 import json as jsonlib
+import logging
 import os
 import sys
 import traceback
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Iterable
 from dataclasses import dataclass
 from email.message import Message
 from enum import Enum
-from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Set
+from typing import Any, NamedTuple
+
+logger = logging.getLogger(__name__)
 
 
 class SafeOpener(urllib.request.OpenerDirector):
@@ -17,12 +23,12 @@ class SafeOpener(urllib.request.OpenerDirector):
 
     opener = None
 
-    def __init__(self, handlers: Iterable = None):
-        """
-        Instantiate an OpenDirector with selected handlers.
+    def __init__(self, handlers: Iterable | None = None) -> None:
+        """Instantiate an OpenDirector with selected handlers.
 
         Args:
             handlers: an Iterable of handler classes
+
         """
         super().__init__()
         handlers = handlers or (
@@ -38,12 +44,10 @@ class SafeOpener(urllib.request.OpenerDirector):
             self.add_handler(handler)
 
 
-class RequestException(Exception):
-    """There was an ambiguous exception that occurred while handling your
-    request.
-    """
+class RequestException(Exception):  # noqa: N818
+    """There was an ambiguous exception that occurred while handling your request."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:  # noqa: ANN002, ANN003
         """Initialize RequestException with `request` and `response` objects."""
         response = kwargs.pop("response", None)
         self.response = response
@@ -62,22 +66,22 @@ class Response(NamedTuple):
     url: str
     request: urllib.request.Request
 
-    def json(self) -> Any:
-        """
-        Decode body's JSON.
+    def json(self) -> Any:  # noqa: ANN401
+        """Decode body's JSON.
 
         Returns:
             Pythonic representation of the JSON object
+
         """
         try:
             output = jsonlib.loads(self.body)
         except jsonlib.JSONDecodeError as e:
-            raise RequestException(e, response=self)
+            raise RequestException(e, response=self) from e
         return output
 
-    def raise_for_status(self):
+    def raise_for_status(self) -> None:
         """Raise an exception if the response is not successful."""
-        if self.status >= 400:
+        if self.status >= 400:  # noqa: PLR2004
             raise RequestException(Exception("Status Error"), response=self)
 
 
@@ -85,16 +89,16 @@ class Response(NamedTuple):
 opener = SafeOpener()
 
 
-def request(
+def request(  # noqa: PLR0913
     method: str,
     url: str,
-    json: dict = None,
-    params: dict = None,
-    headers: dict = None,
+    json: dict | None = None,
+    params: dict | None = None,
+    headers: dict | None = None,
+    *,
     data_as_json: bool = True,
 ) -> Response:
-    """
-    Perform HTTP request.
+    """Perform HTTP request.
 
     Args:
         url: url to fetch
@@ -107,6 +111,7 @@ def request(
     Returns:
         A dict with headers, body, status code, and, if applicable, object
         rendered from JSON
+
     """
     try:
         method = method.upper()
@@ -132,7 +137,7 @@ def request(
             else:
                 request_data = urllib.parse.urlencode(json).encode()
 
-        httprequest = urllib.request.Request(
+        httprequest = urllib.request.Request(  # noqa: S310
             url,
             data=request_data,
             headers=headers,
@@ -143,21 +148,21 @@ def request(
             httprequest,
         ) as httpresponse:
             response = Response(
-                body=httpresponse.read().decode(
-                    httpresponse.headers.get_content_charset("utf-8")
-                ),
+                body=httpresponse.read().decode(httpresponse.headers.get_content_charset("utf-8")),
                 headers=httpresponse.headers,
                 status=httpresponse.status,
                 url=httpresponse.url,
                 request=httprequest,
             )
     except Exception as e:
-        raise RequestException(e, request=httprequest, response=response)
+        raise RequestException(e, request=httprequest, response=response) from e
 
     return response
 
 
 class FieldType(Enum):
+    """Field Type."""
+
     TEXT = "text"
     DATE = "date"
     SELECT = "name"
@@ -167,26 +172,33 @@ class FieldType(Enum):
 
 @dataclass
 class ProjectField:
+    """Project Field."""
+
     name: str
-    value: Optional[str] = None
-    field_type: Optional[FieldType] = None
+    value: str | None = None
+    field_type: FieldType | None = None
 
 
 class GitHubAPIError(Exception):
-    """Exception for GitHub API errors"""
+    """Exception for GitHub API errors."""
 
-    def __init__(self, message: str, response_data: Optional[Dict] = None):
+    def __init__(self, message: str, response_data: dict | None = None) -> None:
+        """Init."""
         super().__init__(message)
         self.response_data = response_data
 
 
 class ProjectFieldsValidator:
+    """Project Fields Validator."""
+
     BASE_URL = "https://api.github.com"
     GRAPHQL_URL = f"{BASE_URL}/graphql"
 
-    def __init__(self, GITHUB_PROJECTS_PAT: str):
+    def __init__(self, GITHUB_PROJECTS_PAT: str) -> None:  # noqa: N803
+        """Init."""
         if not GITHUB_PROJECTS_PAT:
-            raise ValueError("GitHub token is required but was empty")
+            msg = "GitHub token is required but was empty"
+            raise ValueError(msg)
 
         self.headers = {
             "Authorization": f"Bearer {GITHUB_PROJECTS_PAT}",
@@ -202,8 +214,8 @@ class ProjectFieldsValidator:
             ProjectField("End"),
         ]
 
-    def _make_request(self, method: str, url: str, **kwargs) -> Dict[str, Any]:
-        """Generic method to make HTTP requests with error handling"""
+    def _make_request(self, method: str, url: str, **kwargs: dict[str, Any]) -> dict[str, Any]:
+        """Make HTTP requests with error handling."""
         try:
             response = request(method, url, headers=self.headers, **kwargs)
             response.raise_for_status()
@@ -214,35 +226,31 @@ class ProjectFieldsValidator:
                 data = response.json()
 
                 if "errors" in data:
-                    error_messages = "; ".join(
-                        error.get("message", "Unknown error")
-                        for error in data["errors"]
-                    )
-                    raise GitHubAPIError(f"GraphQL API errors: {error_messages}", data)
+                    error_messages = "; ".join(error.get("message", "Unknown error") for error in data["errors"])
+                    msg = f"GraphQL API errors: {error_messages}"
+                    raise GitHubAPIError(msg, data)
 
                 if "data" in data and data["data"] is None:
-                    raise GitHubAPIError("API returned null data", data)
+                    msg = "API returned null data"
+                    raise GitHubAPIError(msg, data)
 
-                return data
             except jsonlib.JSONDecodeError as e:
+                msg = f"Failed to parse API response: {e!s} METHOD={method} URL={url} JSON={kwargs.get('json')}"
                 raise GitHubAPIError(
-                    f"Failed to parse API response: {str(e)} METHOD={method} URL={url} JSON={kwargs.get('json')}"
-                )
+                    msg,
+                ) from e
+            else:
+                return data
 
         except RequestException as e:
-            raise GitHubAPIError(
-                f"GitHub API request failed: {str(e)} METHOD={method} URL={url} ARGS={kwargs}"
-            )
+            msg = f"GitHub API request failed: {e!s} METHOD={method} URL={url} ARGS={kwargs}"
+            raise GitHubAPIError(msg) from e
 
-    def run_query(self, query: str, variables: Dict[str, Any]) -> Dict[str, Any]:
+    def run_query(self, query: str, variables: dict[str, Any]) -> dict[str, Any]:
         """Execute a GraphQL query against GitHub's API."""
-        return self._make_request(
-            "POST", self.GRAPHQL_URL, json={"query": query, "variables": variables}
-        )
+        return self._make_request("POST", self.GRAPHQL_URL, json={"query": query, "variables": variables})
 
-    def get_pr_details(
-        self, org_name: str, repo_name: str, pr_number: int
-    ) -> Dict[str, Any]:
+    def get_pr_details(self, org_name: str, repo_name: str, pr_number: int) -> dict[str, Any]:
         """Get PR details including assignees."""
         query = """
         query($org: String!, $repo: String!, $number: Int!) {
@@ -264,35 +272,30 @@ class ProjectFieldsValidator:
 
         print(f"\nFetching PR details for {org_name}/{repo_name}#{pr_number}")
 
-        result = self.run_query(
-            query, {"org": org_name, "repo": repo_name, "number": pr_number}
-        )
+        result = self.run_query(query, {"org": org_name, "repo": repo_name, "number": pr_number})
 
         if not result.get("data"):
-            raise GitHubAPIError("No data returned from API", result)
+            msg = "No data returned from API"
+            raise GitHubAPIError(msg, result)
         if not result["data"].get("repository"):
-            raise GitHubAPIError("Repository not found", result)
+            msg = "Repository not found"
+            raise GitHubAPIError(msg, result)
         if not result["data"]["repository"].get("pullRequest"):
-            raise GitHubAPIError(f"PR #{pr_number} not found", result)
+            msg = f"PR #{pr_number} not found"
+            raise GitHubAPIError(msg, result)
 
         return result["data"]["repository"]["pullRequest"]
 
-    def assign_pr(
-        self, org_name: str, repo_name: str, pr_number: int, assignee: str
-    ) -> None:
+    def assign_pr(self, org_name: str, repo_name: str, pr_number: int, assignee: str) -> None:
         """Assign PR to a user using REST API."""
-        url = (
-            f"{self.BASE_URL}/repos/{org_name}/{repo_name}/issues/{pr_number}/assignees"
-        )
+        url = f"{self.BASE_URL}/repos/{org_name}/{repo_name}/issues/{pr_number}/assignees"
         try:
             self._make_request("POST", url, json={"assignees": [assignee]})
             print(f"✅ PR assigned to @{assignee}")
         except GitHubAPIError as e:
-            print(f"❌ Failed to assign PR to @{assignee}: {str(e)}")
+            print(f"❌ Failed to assign PR to @{assignee}: {e!s}")
 
-    def get_project_items(
-        self, org_name: str, project_number: int
-    ) -> List[Dict[str, Any]]:
+    def get_project_items(self, org_name: str, project_number: int) -> list[dict[str, Any]]:
         """Fetch all items from the project with pagination."""
         query = """
         query($org: String!, $projectNumber: Int!, $cursor: String) {
@@ -372,9 +375,7 @@ class ProjectFieldsValidator:
         """
         return self._paginate_items(query, org_name, project_number)
 
-    def _paginate_items(
-        self, query: str, org_name: str, project_number: int
-    ) -> List[Dict[str, Any]]:
+    def _paginate_items(self, query: str, org_name: str, project_number: int) -> list[dict[str, Any]]:
         """Handle pagination for project items."""
         all_items = []
         cursor = None
@@ -390,13 +391,12 @@ class ProjectFieldsValidator:
             try:
                 result = self.run_query(query, variables)
                 if not result.get("data", {}).get("organization", {}).get("projectV2"):
-                    raise GitHubAPIError("Could not access project data", result)
+                    msg = "Could not access project data"
+                    raise GitHubAPIError(msg, result)  # noqa: TRY301
 
                 project_data = result["data"]["organization"]["projectV2"]["items"]
                 valid_items = [
-                    item
-                    for item in project_data["nodes"]
-                    if item.get("content") and isinstance(item["content"], dict)
+                    item for item in project_data["nodes"] if item.get("content") and isinstance(item["content"], dict)
                 ]
 
                 all_items.extend(valid_items)
@@ -411,7 +411,7 @@ class ProjectFieldsValidator:
                 cursor = project_data["pageInfo"]["endCursor"]
 
             except GitHubAPIError as e:
-                print(f"\nError fetching project items: {str(e)}")
+                print(f"\nError fetching project items: {e!s}")
                 if e.response_data:
                     print("\nAPI Response data:")
                     print(jsonlib.dumps(e.response_data, indent=2))
@@ -420,7 +420,7 @@ class ProjectFieldsValidator:
         print("\n")
         return all_items
 
-    def validate_item(self, item: Dict[str, Any]) -> Set[str]:
+    def validate_item(self, item: dict[str, Any]) -> set[str]:
         """Validate required fields for an item."""
         field_values = self._extract_field_values(item)
 
@@ -430,13 +430,9 @@ class ProjectFieldsValidator:
             value = field_values.get(field.name, "❌ empty")
             print(f"  • {field.name}: {value}")
 
-        return {
-            field.name
-            for field in self.required_fields
-            if field.name not in field_values
-        }
+        return {field.name for field in self.required_fields if field.name not in field_values}
 
-    def _extract_field_values(self, item: Dict[str, Any]) -> Dict[str, str]:
+    def _extract_field_values(self, item: dict[str, Any]) -> dict[str, str]:
         """Extract field values from item data."""
         field_values = {}
 
@@ -459,7 +455,7 @@ class ProjectFieldsValidator:
         return field_values
 
     @staticmethod
-    def print_validation_results(empty_fields: Set[str]) -> None:
+    def print_validation_results(empty_fields: set[str]) -> None:
         """Print validation results in a formatted way."""
         print("\n" + "=" * 50)
         print("Validation Results:")
@@ -477,13 +473,14 @@ class ProjectFieldsValidator:
 
 
 def clean_env_var(var: str) -> str:
-    """Clean environment variable by removing quotes and extra whitespace"""
+    """Clean environment variable by removing quotes and extra whitespace."""
     if var is None:
         return None
     return var.strip().strip("\"'")
 
 
-def main():
+def main() -> None:  # noqa: C901, PLR0915
+    """Project Field Validator."""
     try:
         env_vars = {
             "GITHUB_PROJECTS_PAT": clean_env_var(os.environ.get("GITHUB_PROJECTS_PAT")),
@@ -500,27 +497,22 @@ def main():
 
         missing_vars = [k for k, v in env_vars.items() if not v]
         if missing_vars:
-            raise ValueError(
-                f"Missing required environment variables: {', '.join(missing_vars)}"
-            )
+            msg = f"Missing required environment variables: {', '.join(missing_vars)}"
+            raise ValueError(msg)  # noqa: TRY301
 
         try:
             pr_number = int(env_vars["GITHUB_EVENT_NUMBER"])
-            project_number = int(
-                env_vars.get("PROJECT_NUMBER", "102")
-            )  # Default to 102 if not set
+            project_number = int(env_vars.get("PROJECT_NUMBER", "102"))  # Default to 102 if not set
         except ValueError as e:
-            raise ValueError(
-                f"Invalid numeric value in environment variables: {str(e)}"
-            )
+            msg = f"Invalid numeric value in environment variables: {e!s}"
+            raise ValueError(msg) from e
 
         github_repository = env_vars["GITHUB_REPOSITORY"]
         try:
             org_name, repo_name = github_repository.split("/")
-        except ValueError:
-            raise ValueError(
-                f"Invalid repository format: {github_repository}. Expected format: owner/repo"
-            )
+        except ValueError as err:
+            msg = f"Invalid repository format: {github_repository}. Expected format: owner/repo"
+            raise ValueError(msg) from err
 
         print(f"\nValidating PR #{pr_number} in {github_repository}")
         print(f"Project number: {project_number}")
@@ -548,9 +540,7 @@ def main():
             ]
 
             if not pr_items:
-                print(
-                    f"\nWarning: PR #{pr_number} is not linked to project #{project_number}"
-                )
+                print(f"\nWarning: PR #{pr_number} is not linked to project #{project_number}")
                 print("Please add it to the project using the following steps:")
                 print("1. Go to the project board")
                 print("2. Click '+ Add items'")
@@ -569,17 +559,17 @@ def main():
                 sys.exit(1)
 
         except GitHubAPIError as e:
-            print(f"\nError accessing GitHub API: {str(e)}")
+            print(f"\nError accessing GitHub API: {e!s}")
             if e.response_data:
                 print("\nAPI Response data:")
                 print(jsonlib.dumps(e.response_data, indent=2))
             sys.exit(1)
 
     except ValueError as e:
-        print(f"Configuration error: {str(e)}")
+        print(f"Configuration error: {e!s}")
         sys.exit(1)
-    except Exception as e:
-        print(f"Error: {str(e)}")
+    except Exception as e:  # noqa: BLE001
+        print(f"Error: {e!s}")
         traceback.print_exc()
         sys.exit(1)
 

@@ -1,14 +1,17 @@
-# Checks if two files that should exist DO, and are equal.
-# used to enforce consistency between local config files and the expected config locked in CI.
+"""Checks if two files that should exist DO, and are equal.
 
-import python.exec_manager as exec_manager
+used to enforce consistency between local config files and the expected config locked in CI.
+"""
+
 import tomllib
+from pathlib import Path
+
+from python import exec_manager
 from python.diff import Diff
 
 
-def colordiff_check(
-    vendor_file_path: str, provided_file_path: str
-) -> exec_manager.Result:
+def colordiff_check(vendor_file_path: str, provided_file_path: str) -> exec_manager.Result:
+    """Use colordiff to check files are the same."""
     return exec_manager.cli_run(
         f"colordiff -Nau {provided_file_path} {vendor_file_path}",
         name=f"Checking if Provided File {provided_file_path} == Vendored File {vendor_file_path}",
@@ -18,18 +21,20 @@ def colordiff_check(
 def toml_diff_check(
     vendor_file_path: str,
     provided_file_path: str,
+    *,
     strict: bool = True,
     log: bool = True,
 ) -> exec_manager.Result:
+    """Check if toml files are the same."""
     command_name = (
         f"{'' if strict else 'Non '}Strict Checking"
-        + f" if Provided File {provided_file_path} == Vendored File {vendor_file_path}"
+        f" if Provided File {provided_file_path} == Vendored File {vendor_file_path}"
     )
 
     try:
         with (
-            open(vendor_file_path, "rb") as vendor_file,
-            open(provided_file_path, "rb") as provided_file,
+            Path(vendor_file_path).open("rb") as vendor_file,
+            Path(provided_file_path).open("rb") as provided_file,
         ):
 
             def procedure() -> exec_manager.ProcedureResult:
@@ -49,10 +54,8 @@ def toml_diff_check(
                 command_name,
                 log=log,
             )
-    except Exception as exc:
-        res = exec_manager.Result(
-            1, command_name, f"Exception caught: {exc}", 0.0, command_name
-        )
+    except Exception as exc:  # noqa: BLE001
+        res = exec_manager.Result(1, command_name, f"Exception caught: {exc}", 0.0, command_name)
 
         if log:
             res.print(verbose_errors=True, verbose=False)

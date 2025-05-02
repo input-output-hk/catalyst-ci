@@ -1,3 +1,4 @@
+"""Exec Manager."""
 # cspell: words rtype
 
 import concurrent.futures
@@ -5,30 +6,30 @@ import multiprocessing
 import subprocess
 import textwrap
 import time
+import types
 from dataclasses import dataclass
-from typing import Optional
+from typing import Any
 
-from rich import print
+from rich import print  # noqa: A004
 from rich.table import Table
 from rich.text import Text
 
 
 def status_for_rc(rc: int) -> str:
-    """
-    Returns a status emoji based on the given RC (return code) value.
+    """Return a status emoji based on the given RC (return code) value.
 
-    Parameters:
-        rc (int): The return code to evaluate.
+    Args:
+        rc: The return code to evaluate.
 
     Returns:
         str: The corresponding status emoji (":white_check_mark:" for rc == 0, ":x:" otherwise).
+
     """
     return ":white_check_mark:" if rc == 0 else ":x:"
 
 
-def format_execution_time(execution_time: float):
-    """
-    Formats the given execution time into a human-readable string representation.
+def format_execution_time(execution_time: float) -> str:
+    """Format the given execution time into a human-readable string representation.
 
     Args:
         execution_time (float): The execution time to format.
@@ -37,7 +38,7 @@ def format_execution_time(execution_time: float):
         str: The formatted execution time string.
 
     """
-    if execution_time < 1e-3:
+    if execution_time < 1e-3:  # noqa: PLR2004
         execution_time *= 1e6
         unit = "us"
     elif execution_time < 1:
@@ -50,8 +51,7 @@ def format_execution_time(execution_time: float):
 
 
 def indent(text: str, first: str, rest: str) -> str:
-    """
-    Indent the given text using the specified indentation strings.
+    """Indent the given text using the specified indentation strings.
 
     Args:
         text (str): The text to be indented.
@@ -60,12 +60,15 @@ def indent(text: str, first: str, rest: str) -> str:
 
     Returns:
         str: The indented text.
+
     """
     return first + textwrap.indent(text, rest)[len(first) :]
 
 
 @dataclass
 class ProcedureResult:
+    """Procedure Result."""
+
     rc: int
     cmd: str
     out: str
@@ -73,31 +76,32 @@ class ProcedureResult:
 
 @dataclass
 class Result:
+    """Result."""
+
     rc: int
     cmd: str
     out: str
     runtime: float
-    name: Optional[str] = None
+    name: str | None = None
 
     def get_command(self) -> str:
-        """
-        Returns the command of the object.
+        """Return the command of the object.
+
         :return: A string representing the command of the object.
         :rtype: str
         """
         return self.cmd
 
     def get_name(self) -> str:
-        """
-        Returns the name of the object.
+        """Return the name of the object.
+
         :return: A string representing the name of the object.
         :rtype: str
         """
         return self.name or self.get_command()
 
     def ok(self) -> bool:
-        """
-        Check if the value of `rc` is equal to 0.
+        """Check if the value of `rc` is equal to 0.
 
         :param self: The current instance of the class.
         :return: True if `rc` is equal to 0, False otherwise.
@@ -106,26 +110,22 @@ class Result:
         return self.rc == 0
 
     def status(self) -> str:
-        """
-        Returns the status of the object.
+        """Return the status of the object.
+
         :return: A string representing the status.
         """
         return status_for_rc(self.rc)
 
     def duration(self) -> str:
-        """
-        Calculates the duration of the function execution.
+        """Calculate the duration of the function execution.
 
         :return: A string representing the formatted execution time.
         :rtype: str
         """
         return format_execution_time(self.runtime)
 
-    def print(
-        self, verbose: bool = False, verbose_errors: bool = False, name_width: int = 0
-    ) -> None:
-        """
-        Print the information about the task, including its name, duration, and status.
+    def print(self, *, verbose: bool = False, verbose_errors: bool = False, name_width: int = 0) -> None:
+        """Print the information about the task, including its name, duration, and status.
 
         Args:
             verbose (bool, optional): Whether to print additional information. Defaults to False.
@@ -134,27 +134,27 @@ class Result:
 
         Returns:
             None
+
         """
-        print(
-            f"[bold cyan]{self.get_name():<{name_width}}[/bold cyan] : {self.duration()} : {self.status()}"
-        )
+        print(f"[bold cyan]{self.get_name():<{name_width}}[/bold cyan] : {self.duration()} : {self.status()}")
         if verbose or (self.rc != 0 and verbose_errors):
-            print(
-                f"[italic bright_red]{indent(self.get_command(), '  $ ', '  . ')}[/italic bright_red]"
-            )
+            print(f"[italic bright_red]{indent(self.get_command(), '  $ ', '  . ')}[/italic bright_red]")
             print(Text(indent(self.out, "  > ", "  . ")))
 
 
-def cli_run(
+def cli_run(  # noqa: PLR0913
     command: str,
-    name: Optional[str] = None,
+    name: str | None = None,
+    *,
     log: bool = True,
-    timeout=None,
-    verbose=False,
-    env=None,
+    timeout: float | None = None,
+    verbose: bool = False,
+    env: Any = None,  # noqa: ANN401
 ) -> Result:
+    """CLI Run."""
+
     def procedure() -> ProcedureResult:
-        result = subprocess.run(
+        result = subprocess.run(  # noqa: S602
             command,
             shell=True,
             stdout=subprocess.PIPE,
@@ -162,23 +162,24 @@ def cli_run(
             text=True,
             timeout=timeout,
             env=env,
+            check=False,
         )
         return ProcedureResult(result.returncode, command, result.stdout)
 
-    return procedure_run(procedure, name, log, verbose)
+    return procedure_run(procedure, name, log=log, verbose=verbose)
 
 
 def procedure_run(
-    procedure,
-    name: Optional[str] = None,
+    procedure: callable,
+    name: str | None = None,
+    *,
     log: bool = True,
-    verbose=False,
+    verbose: bool = False,
 ) -> Result:
-    """
-    Execute a command and return the result.
+    """Execute a command and return the result.
 
     Args:
-        command (str): The command to be executed.
+        procedure (callable): The procedure to be executed.
         name (Optional[str], optional): The name of the command. Defaults to None.
         log (bool, optional): Whether to log the result. Defaults to True.
         input (Optional[str], optional): The input to be passed to the command. Defaults to None.
@@ -195,7 +196,8 @@ def procedure_run(
         - If `log` is True, the result is logged using `Result.print()`.
 
     Example:
-        >>> result = run('ls -l', name='List Files', log=True, verbose=True)
+        >>> result = run("ls -l", name="List Files", log=True, verbose=True)
+
     """
     start_time = time.perf_counter()
 
@@ -212,43 +214,47 @@ def procedure_run(
 
 
 class Results:
+    """Results."""
+
     def __init__(self, title: str) -> None:
-        """
-        Initializes a new instance of the class.
+        """Initialize a new instance of the class.
 
         Args:
             title (str): The title of the instance.
 
         Returns:
             None
+
         """
         self.title = title
         self.results = []
 
     def add(self, result: Result | list[Result]) -> None:
-        """
-        Add a result to the list of results.
+        """Add a result to the list of results.
 
         Args:
             result (Result): The result object (or list of result objects) to be added.
 
         Returns:
             None
+
         """
         if isinstance(result, list):
             self.results.extend(result)
         else:
             self.results.append(result)
 
-    def print(self):
-        """
-        Prints the results of a test run in a formatted table.
+    def print(self) -> None:
+        """Print the results of a test run in a formatted table.
 
-        Parameters:
+        Parameters
+        ----------
             None
 
-        Returns:
+        Returns
+        -------
             None
+
         """
         table = Table(title=self.title)
         table.add_column("Step", style="cyan")
@@ -263,50 +269,52 @@ class Results:
             total_runtime += result.runtime
 
         table.add_section()
-        table.add_row(
-            "Summary", format_execution_time(total_runtime), status_for_rc(total_rc)
-        )
+        table.add_row("Summary", format_execution_time(total_runtime), status_for_rc(total_rc))
 
         print(table)
 
     def ok(self) -> bool:
-        """
-        Check if all results in the list are ok.
+        """Check if all results in the list are ok.
 
         :param self: The current object.
         :return: True if all results are ok, False otherwise.
         :rtype: bool
         """
-        for result in self.results:
-            if not result.ok():
-                return False
-        return True
+        return all(result.ok() for result in self.results)
 
 
 class ParallelRunner:
-    def __init__(self, name: str, max_workers: int = None) -> None:
+    """Parallel Runner."""
+
+    def __init__(self, name: str, max_workers: int | None = None) -> None:
+        """Init."""
         self.max_workers = max_workers if max_workers else multiprocessing.cpu_count()
         self.results = Results(name)
-        self.executor = concurrent.futures.ProcessPoolExecutor(
-            max_workers=self.max_workers
-        )
+        self.executor = concurrent.futures.ProcessPoolExecutor(max_workers=self.max_workers)
         self.processes = []
         self.start_time = time.perf_counter()
 
-    def __enter__(self):
+    def __enter__(self) -> "ParallelRunner":
+        """Enter."""
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: types.TracebackType | None,
+    ) -> None:
+        """Exit."""
         # Stop the multiprocessing pool when done.
         self.executor.shutdown()
 
-    def run(self, func, *args, **kwargs) -> None:
+    def run(self, func: callable, *args: tuple, **kwargs: dict[str, Any]) -> None:
+        """Run tasks in parallel."""
         self.processes.append(self.executor.submit(func, *args, **kwargs))
 
     def get_results(self) -> Results:
-        """
-        A method that calculates the execution time of each process in self.processes
-        and adds the results to the Results object.
+        """Calculate the execution time of each process in self.processes and add the results to the Results object.
+
         As execution time overlaps, the recalculated execution time is based on
         when tasks complete vs how long they ran internally.
 

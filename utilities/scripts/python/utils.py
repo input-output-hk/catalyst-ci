@@ -5,14 +5,13 @@ import sys
 import unittest
 
 
-def fix_quoted_earthly_args():
+def fix_quoted_earthly_args() -> None:
     """Arguments that are quoted in Earthly need to be corrected to be parsed.
 
     This function does that by modifying sys.argv in-place.
 
     It should still work with normal argument strings from a command line.
     """
-
     # Fix arguments because of munging that can happen because of the
     # rust builder +EXECUTE function and the necessity to quote the arguments.
     processed_args = []
@@ -28,19 +27,15 @@ def fix_quoted_earthly_args():
             processed_args.append(arg)
 
     # Replace sys.argv with the processed arguments
-    sys.argv = [sys.argv[0]] + processed_args
+    sys.argv = [sys.argv[0], *processed_args]
 
 
 class TestProcessListWithQuotes(unittest.TestCase):
-    def test_process_list_with_quotes(self):
-        sys.argv = [sys.argv[0]] + [
-            "this",
-            'has "quoted',
-            "strings",
-            'in it"',
-            "this",
-            "doesn't",
-        ]
+    """Test Process List With Quotes."""
+
+    def test_process_list_with_quotes(self) -> None:
+        """Test Process List with Quotes."""
+        sys.argv = [sys.argv[0], "this", 'has "quoted', "strings", 'in it"', "this", "doesn't"]
         expected_result = ["this", "has quoted strings in it", "this", "doesn't"]
         fix_quoted_earthly_args()
         self.assertEqual(sys.argv[1:], expected_result)
