@@ -106,7 +106,7 @@ license-files = [{ path = "LICENSE", hash = 0xbd0eed23 }]
 [[licenses.clarify]]
 crate = "hdf5-metno-src"
 expression = "MIT"
-license-files = [{ path = "ext/hdf5/COPYING", hash = 0xbd0eed23 }]
+license-files = [{ path = "../LICENSE-MIT", hash = 0xf13e3591 }]
 
 # SPDX considers OpenSSL to encompass both the OpenSSL and SSLeay licenses
 # https://spdx.org/licenses/OpenSSL.html
