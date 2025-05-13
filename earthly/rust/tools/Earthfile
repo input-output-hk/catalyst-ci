@@ -71,7 +71,7 @@ tool-cargo-expand:
     DO +CARGO_BINSTALL --package=cargo-expand --version=1.0.90
 
 tool-wit-bindgen:
-    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.32.0 --executable="wit-bindgen" --test_param="-V"
+    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.19.2 --executable="wit-bindgen" --test_param="-V"
 
 # We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
 tool-cargo-sweep:
