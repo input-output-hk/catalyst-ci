@@ -1,0 +1,22 @@
+on:
+  schedule:
+    # Runs every Wednesday at 2:00 AM UTC
+    # https://crontab.guru/#0_2_*_*_3
+    - cron: "0 2 * * 3"
+
+jobs:
+  move-to-next-iteration:
+    name: Transfer tasks from the previous iteration to the current iteration.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Move issues to next iteration
+        uses: blombard/move-to-next-iteration@master
+        with:
+          owner: input-output-hk
+          number: 102
+          token: ${{ secrets.CATALYST_PROJECT_PAT }}
+          iteration-field: Iteration
+          iteration: last
+          new-iteration: current
+          statuses: "🔖 Ready,🏗 In progress,👀 In review,🔬 Ready For QA,🛑 Blocked"
