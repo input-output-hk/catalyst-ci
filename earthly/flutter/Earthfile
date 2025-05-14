@@ -240,13 +240,13 @@ BUILD_WEB:
     ARG --required TARGET
     ARG BUILD_MODE='--release'
     ARG SAVE_LOCALLY=false
-    ARG SENTRY_DSN
     ARG WORKDIR
 
     WORKDIR $WORKDIR
+
     RUN flutter clean
     RUN flutter pub get
-    RUN flutter build web $BUILD_MODE --target $TARGET --dart-define SENTRY_DSN=$SENTRY_DSN
+    RUN flutter build web $BUILD_MODE --pwa-strategy=none --target $TARGET --build-number=$(date +%s)
 
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
