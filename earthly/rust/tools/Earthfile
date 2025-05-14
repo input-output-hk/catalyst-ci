@@ -72,7 +72,6 @@ tool-cargo-expand:
 
 # Should align with our wit-bindgen library, but doesn't currently or it fails to build.
 # DO NOT change the version without testing that hermes targets all build correctly with the updated tool.
-# 0.28.0
 tool-wit-bindgen:
     DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.29.0 --executable="wit-bindgen" --test_param="-V"
 
