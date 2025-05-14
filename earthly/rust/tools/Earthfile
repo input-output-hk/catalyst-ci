@@ -72,7 +72,7 @@ tool-cargo-expand:
 
 # Should align with our wit-bindgen library, but doesn't currently or it fails to build.
 tool-wit-bindgen:
-    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.32.0 --executable="wit-bindgen" --test_param="-V"
+    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.24.0 --executable="wit-bindgen" --test_param="-V"
 
 # We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
 tool-cargo-sweep:
