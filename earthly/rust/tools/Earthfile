@@ -71,8 +71,9 @@ tool-cargo-expand:
     DO +CARGO_BINSTALL --package=cargo-expand --version=1.0.90
 
 # Should align with our wit-bindgen library, but doesn't currently or it fails to build.
+# DO NOT change the version without testing that hermes targets all build correctly with the updated tool.
 tool-wit-bindgen:
-    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.24.0 --executable="wit-bindgen" --test_param="-V"
+    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.25.0 --executable="wit-bindgen" --test_param="-V"
 
 # We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
 tool-cargo-sweep:
