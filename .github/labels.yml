@@ -35,7 +35,7 @@
   description: Good for newcomers
 
 - name: help wanted
-  color: 008672
+  color: "008672"
   description: Extra attention is needed
 
 - name: in triage
@@ -131,7 +131,7 @@
   description: Issue or feature relates specifically to Windows platform
 
 - name: "platform: mac"
-  color: 000000
+  color: "000000"
   description: Issue or feature relates specifically to macOS platform
 
 - name: "platform: server"
