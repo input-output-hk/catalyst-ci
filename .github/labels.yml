@@ -196,19 +196,19 @@
 
 - name: "rr: face"
   color: "033A80"
-  description: Required review - Frontend Catalyst Experience Team must approve before merge
+  description: Required review by face team
 
 - name: "rr: gatekeepers"
   color: "A569BD"
-  description: Required review - Catalyst App Backend, System Development & Integration Team must approve before merge
+  description: Required review by gatekeepers team
 
 - name: "rr: cot"
   color: "6C3483"
-  description: Required review - Catalyst Ops & Tools Team must approve before merge
+  description: Required review by cot team
 
 - name: "rr: hermes"
   color: "85C1E9"
-  description: Required review - Hermes Backend, System Development & Integration Team must approve before merge
+  description: Required review by hermes team
 
 - name: refactor
   color: "17A2B8"
@@ -216,4 +216,4 @@
 
 - name: research
   color: "6F42C1"
-  description: Information gathering task such as benchmarks, load tests, operational analysis, or proof of concepts
+  description: Benchmarks, load tests, operational analysis, or proof of concepts
