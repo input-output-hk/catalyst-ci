@@ -15,9 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          sparse-checkout: .github/labels.yml
       - uses: EndBug/label-sync@v2
         with:
-          config-file: .github/labels.yml
+          config-file: https://raw.githubusercontent.com/input-output-hk/catalyst-ci/refs/heads/feature/add-labels/.github/labels.yml
           delete-other-labels: ${{ inputs.delete }}
+          dry-run: true
