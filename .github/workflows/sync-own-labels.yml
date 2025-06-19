@@ -2,7 +2,7 @@ name: Sync labels here and notify others
 
 on:
   push:
-    paths: [".github/labels.yml"] # fire only when the canonical list changes
+    paths: [".github/labels.yml"]
   workflow_dispatch:
 
 permissions:
@@ -13,8 +13,7 @@ jobs:
   sync-self:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout canonical labels from catalyst-ci
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: input-output-hk/catalyst-ci
           ref: feature/add-labels
@@ -23,11 +22,11 @@ jobs:
         with:
           config-file: .github/labels.yml
           delete-other-labels: false
-          dry-run: true
+          dry-run: false
 
   notify-others:
     needs: sync-self
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/feature/add-labels'
     runs-on: ubuntu-latest
     strategy:
       matrix:
