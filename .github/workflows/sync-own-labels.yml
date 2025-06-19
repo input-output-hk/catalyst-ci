@@ -22,7 +22,6 @@ jobs:
         with:
           config-file: .github/labels.yml
           delete-other-labels: false
-          dry-run: false
 
   notify-others:
     needs: sync-self
@@ -46,4 +45,4 @@ jobs:
         with:
           token: ${{ secrets.CATALYST_PROJECT_PAT }}
           repository: ${{ matrix.repo }}
-          event-type: labels-updated
+          event-type: catalyst-labels-updated
