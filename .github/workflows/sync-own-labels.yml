@@ -13,8 +13,11 @@ jobs:
   sync-self:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout canonical labels from catalyst-ci
+        uses: actions/checkout@v4
         with:
+          repository: input-output-hk/catalyst-ci
+          ref: feature/add-labels
           sparse-checkout: .github/labels.yml
       - uses: EndBug/label-sync@v2
         with:
