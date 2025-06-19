@@ -1,0 +1,47 @@
+name: Sync labels here and notify others
+
+on:
+  push:
+    paths: [".github/labels.yml"] # fire only when the canonical list changes
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  contents: read
+
+jobs:
+  sync-self:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/labels.yml
+      - uses: EndBug/label-sync@v2
+        with:
+          config-file: .github/labels.yml
+          delete-other-labels: false
+          dry-run: true
+
+  notify-others:
+    needs: sync-self
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        repo:
+          #   - input-output-hk/catalyst-voices
+          #   - input-output-hk/hermes
+          #   - input-output-hk/catalyst-libs
+          #   - input-output-hk/catalyst-reviews
+          #   - input-output-hk/catalyst-som
+          #   - input-output-hk/catalyst-execution
+          #   - input-output-hk/norns
+          #   - input-output-hk/catalyst-forge
+          - minikin/alula
+    steps:
+      - name: Dispatch “labels-updated” to ${{ matrix.repo }}
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.CATALYST_PROJECT_PAT }}
+          repository: ${{ matrix.repo }}
+          event-type: labels-updated
