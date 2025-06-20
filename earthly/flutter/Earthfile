@@ -241,12 +241,17 @@ BUILD_WEB:
     ARG BUILD_MODE='--release'
     ARG SAVE_LOCALLY=false
     ARG WORKDIR
+    ARG SENTRY_UPLOAD_DEBUG_SYMBOLS=false
 
     WORKDIR $WORKDIR
 
     RUN flutter clean
     RUN flutter pub get
     RUN flutter build web $BUILD_MODE --pwa-strategy=none --target $TARGET --build-number=$(date +%s)
+
+    IF [ $SENTRY_UPLOAD_DEBUG_SYMBOLS = true ]
+        RUN flutter pub run sentry_dart_plugin
+    END
 
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
