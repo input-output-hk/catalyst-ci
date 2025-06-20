@@ -100,3 +100,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# intellij
+.idea/
