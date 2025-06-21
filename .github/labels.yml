@@ -217,7 +217,3 @@
 - name: research
   color: "6F42C1"
   description: Benchmarks, load tests, operational analysis, or proof of concepts
-
-- name: NEW TESTING LABEL
-  color: "6F42C1"
-  description: This is a test!
