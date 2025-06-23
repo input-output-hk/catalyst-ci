@@ -241,12 +241,24 @@ BUILD_WEB:
     ARG BUILD_MODE='--release'
     ARG SAVE_LOCALLY=false
     ARG WORKDIR
+    ARG SENTRY_UPLOAD_DEBUG_SYMBOLS=false
+    ARG BUILD_ARGS=''
 
     WORKDIR $WORKDIR
 
+    IF [ $SENTRY_UPLOAD_DEBUG_SYMBOLS = true ]
+        IF [ ! echo "$BUILD_ARGS" | grep -q -- '--source-maps' ]
+            ARG BUILD_ARGS='$BUILD_ARGS --source-maps'
+        END
+    END
+
     RUN flutter clean
     RUN flutter pub get
-    RUN flutter build web $BUILD_MODE --pwa-strategy=none --target $TARGET --build-number=$(date +%s)
+    RUN flutter build web $BUILD_MODE --pwa-strategy=none --target $TARGET --build-number=$(date +%s) $BUILD_ARGS
+
+    IF [ $SENTRY_UPLOAD_DEBUG_SYMBOLS = true ]
+        RUN flutter pub run sentry_dart_plugin
+    END
 
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
