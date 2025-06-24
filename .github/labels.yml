@@ -66,23 +66,23 @@
   color: "944e7e"
   description: Catalyst Ops & Tools Team
 
-- name: "squad: hermes"
+- name: "squad: hermetics"
   color: "bfd4f2"
   description: Hermes Backend, System Development & Integration Team
 
-- name: Critical
+- name: "p: critical"
   color: "B60205"
   description: The issue or pull request is critical and needs immediate attention
 
-- name: High
+- name: "p: high"
   color: "D93F0B"
   description: The issue or pull request is high priority and needs to be addressed soon
 
-- name: Normal
+- name: "p: normal"
   color: "0E8A16"
   description: The issue or pull request is of normal priority and can be addressed in due course
 
-- name: Low
+- name: "p: low"
   color: "5319E7"
   description: The issue or pull request is of low priority and can be addressed later
 
@@ -97,14 +97,6 @@
 - name: "browser: firefox"
   color: "FF7139"
   description: Issue or feature relates specifically to Firefox browser
-
-- name: "browser: brave"
-  color: "FB542B"
-  description: Issue or feature relates specifically to Brave browser
-
-- name: "browser: edge"
-  color: "0078D4"
-  description: Issue or feature relates specifically to Edge browser
 
 - name: "browser: any"
   color: "6F42C1"
@@ -206,7 +198,7 @@
   color: "6C3483"
   description: Required review by cot team
 
-- name: "rr: hermes"
+- name: "rr: hermetics"
   color: "85C1E9"
   description: Required review by hermes team
 
