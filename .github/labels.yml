@@ -1,0 +1,211 @@
+- name: comment me
+  color: "8F1B19"
+  description: Request for comments
+
+- name: dependencies
+  color: "0366d6"
+  description: Pull requests that update a dependencies
+
+- name: do not merge yet
+  color: "1EB2F5"
+  description: PR is not ready to be merged yet
+
+- name: do not review yet
+  color: "D44389"
+  description: Do not review yet
+
+- name: documentation
+  color: "0366d6"
+  description: Pull requests that update a documentation
+
+- name: draft
+  color: "E29E35"
+  description: Draft
+
+- name: duplicate
+  color: "cfd3d7"
+  description: This issue or pull request already exists
+
+- name: enhancement
+  color: "a2eeef"
+  description: New feature or request
+
+- name: good first issue
+  color: "7057ff"
+  description: Good for newcomers
+
+- name: help wanted
+  color: "008672"
+  description: Extra attention is needed
+
+- name: in triage
+  color: "CDED24"
+  description: Presently being triaged by the triage team
+
+- name: invalid
+  color: "e4e669"
+  description: This doesn't seem right
+
+- name: question
+  color: "d876e3"
+  description: Further information is requested
+
+- name: review me
+  color: "65FA5D"
+  description: PR is ready for review
+
+- name: "squad: face"
+  color: "0553B1"
+  description: Frontend Catalyst Experience Team
+
+- name: "squad: gatekeepers"
+  color: "D590CC"
+  description: Catalyst App Backend, System Development & Integration Team
+
+- name: "squad: cot"
+  color: "944e7e"
+  description: Catalyst Ops & Tools Team
+
+- name: "squad: hermetics"
+  color: "bfd4f2"
+  description: Hermes Backend, System Development & Integration Team
+
+- name: "p: critical"
+  color: "B60205"
+  description: The issue or pull request is critical and needs immediate attention
+
+- name: "p: high"
+  color: "D93F0B"
+  description: The issue or pull request is high priority and needs to be addressed soon
+
+- name: "p: normal"
+  color: "0E8A16"
+  description: The issue or pull request is of normal priority and can be addressed in due course
+
+- name: "p: low"
+  color: "5319E7"
+  description: The issue or pull request is of low priority and can be addressed later
+
+- name: "browser: chrome"
+  color: "4285F4"
+  description: Issue or feature relates specifically to Chrome browser
+
+- name: "browser: safari"
+  color: "006CFF"
+  description: Issue or feature relates specifically to Safari browser
+
+- name: "browser: firefox"
+  color: "FF7139"
+  description: Issue or feature relates specifically to Firefox browser
+
+- name: "browser: any"
+  color: "6F42C1"
+  description: Issue or feature relates to any browser
+
+- name: "platform: android"
+  color: "3DDC84"
+  description: Issue or feature relates specifically to Android platform
+
+- name: "platform: iOS"
+  color: "007AFF"
+  description: Issue or feature relates specifically to iOS platform
+
+- name: "platform: web"
+  color: "E34F26"
+  description: Issue or feature relates specifically to web platform
+
+- name: "platform: linux"
+  color: "FCC624"
+  description: Issue or feature relates specifically to Linux platform
+
+- name: "platform: windows"
+  color: "0078D4"
+  description: Issue or feature relates specifically to Windows platform
+
+- name: "platform: mac"
+  color: "000000"
+  description: Issue or feature relates specifically to macOS platform
+
+- name: "platform: server"
+  color: "8B5CF6"
+  description: Issue or feature relates specifically to server platform
+
+- name: "fyi: qa"
+  color: "F39C12"
+  description: For information - Quality Assurance team
+
+- name: "fyi: architecture"
+  color: "E74C3C"
+  description: For information - Architecture team
+
+- name: "fyi: design"
+  color: "9B59B6"
+  description: For information - Design team
+
+- name: "fyi: product"
+  color: "27AE60"
+  description: For information - Product team
+
+- name: "fyi: engineering"
+  color: "3498DB"
+  description: For information - Engineering team
+
+- name: "fyi: face"
+  color: "0553B1"
+  description: For information - Frontend Catalyst Experience Team
+
+- name: "fyi: gatekeepers"
+  color: "D590CC"
+  description: For information - Catalyst App Backend, System Development & Integration Team
+
+- name: "fyi: cot"
+  color: "944e7e"
+  description: For information - Catalyst Ops & Tools Team
+
+- name: "fyi: hermetics"
+  color: "bfd4f2"
+  description: For information - Hermes Backend, System Development & Integration Team
+
+- name: "rr: qa"
+  color: "D68910"
+  description: Required review - Quality Assurance team must approve before merge
+
+- name: "rr: architecture"
+  color: "C0392B"
+  description: Required review - Architecture team must approve before merge
+
+- name: "rr: design"
+  color: "7D3C98"
+  description: Required review - Design team must approve before merge
+
+- name: "rr: product"
+  color: "1E8449"
+  description: Required review - Product team must approve before merge
+
+- name: "rr: engineering"
+  color: "2E86C1"
+  description: Required review - Engineering team must approve before merge
+
+- name: "rr: face"
+  color: "033A80"
+  description: Required review by face team
+
+- name: "rr: gatekeepers"
+  color: "A569BD"
+  description: Required review by gatekeepers team
+
+- name: "rr: cot"
+  color: "6C3483"
+  description: Required review by cot team
+
+- name: "rr: hermetics"
+  color: "85C1E9"
+  description: Required review by hermes team
+
+- name: refactor
+  color: "17A2B8"
+  description: Code refactoring task
+
+- name: research
+  color: "6F42C1"
+  description: Benchmarks, load tests, operational analysis, or proof of concepts

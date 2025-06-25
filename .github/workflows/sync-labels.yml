@@ -1,0 +1,21 @@
+name: Sync labels from catalyst-ci
+on:
+  workflow_call:
+    inputs:
+      delete-other-labels:
+        description: "Prune labels not in the spec?"
+        type: boolean
+        default: false
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: EndBug/label-sync@v2
+        with:
+          config-file: https://raw.githubusercontent.com/input-output-hk/catalyst-ci/main/.github/labels.yml
+          delete-other-labels: ${{ inputs.delete-other-labels }}
