@@ -17,5 +17,5 @@ jobs:
       - uses: actions/checkout@v4
       - uses: EndBug/label-sync@v2
         with:
-          config-file: https://raw.githubusercontent.com/input-output-hk/catalyst-ci/main/.github/labels.yml
+          config-file: https://raw.githubusercontent.com/input-output-hk/catalyst-ci/master/.github/labels.yml
           delete-other-labels: ${{ inputs.delete-other-labels }}
