@@ -119,14 +119,14 @@ class Diff:
             for key, expect in expected.items():
                 if key not in provided:
                     diff[key] = DiffEntry(expect, add_or_remove_flag=True)
-                elif not isinstance(expected[key], dict):
-                    if expected[key] != provided[key]:
+                elif not isinstance(expect, dict):
+                    if expect != provided[key]:
                         diff[key] = (
                             DiffEntry(expect, add_or_remove_flag=True),
                             DiffEntry(provided[key], add_or_remove_flag=False),
                         )
                 else:
-                    res = impl(expected[key], provided[key])
+                    res = impl(expect, provided[key])
                     if res != {}:
                         diff[key] = res
             return diff

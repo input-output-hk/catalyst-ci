@@ -44,7 +44,7 @@ def check_poetry_lock(*, stand_alone: bool) -> bool:
 def check_lint_with_ruff() -> bool:
     """Check Lint with Ruff."""
     # Check Python code linting issues using 'ruff'.
-    result = subprocess.run(["ruff", "check", "."], capture_output=True, check=False)  # noqa: S603, S607
+    result = subprocess.run(["ruff", "check", "."], capture_output=True, check=False)  # noqa: S607
     if result.returncode != 0:
         print("Code linting issues found.")
         print(result.stdout.decode())
@@ -56,7 +56,7 @@ def check_lint_with_ruff() -> bool:
 def check_code_format_with_ruff() -> bool:
     """Check Code Format with Ruff."""
     # Check Python code formatting and linting issues using 'ruff'.
-    result = subprocess.run(["ruff", "format", "--check", "."], capture_output=True, check=False)  # noqa: S603, S607
+    result = subprocess.run(["ruff", "format", "--check", "."], capture_output=True, check=False)  # noqa: S607
     if result.returncode != 0:
         print("Code formatting issues found.")
         print(result.stdout.decode())
@@ -77,7 +77,7 @@ def zero_third_party_packages_found(output: str) -> bool:
 def check_no_third_party_imports() -> bool:
     """Check No Third Party Imports."""
     # Check No third party imports have been used
-    result = subprocess.run(["third-party-imports", "."], capture_output=True, check=False)  # noqa: S603, S607
+    result = subprocess.run(["third-party-imports", "."], capture_output=True, check=False)  # noqa: S607
     output = result.stdout.decode()
 
     if result.returncode != 0 or not zero_third_party_packages_found(output):

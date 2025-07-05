@@ -2,7 +2,10 @@
 
 /// Adds two numbers
 #[must_use]
-pub fn add(left: usize, right: usize) -> usize {
+pub fn add(
+    left: usize,
+    right: usize,
+) -> usize {
     left.saturating_add(right)
 }
 
