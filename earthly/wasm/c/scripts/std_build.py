@@ -56,13 +56,6 @@ def wasm_tools_gen_component(results: exec_manager.Results, out: str) -> None:
             verbose=True,
         ),
     )
-    results.add(
-        exec_manager.cli_run(
-            "wasm-tools component new out.wasm -o " + f"{out}",
-            name="Generate WASM component",
-            verbose=True,
-        ),
-    )
 
 
 def main() -> None:
