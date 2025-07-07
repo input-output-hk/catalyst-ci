@@ -47,11 +47,11 @@ def clang_wasm_compile(results: exec_manager.Results, c_files: str, out: str) ->
     )
 
 
-def wasm_tools_gen_component(results: exec_manager.Results) -> None:
+def wasm_tools_gen_component(results: exec_manager.Results, out: str) -> None:
     """Wasm Tools Gen Component."""
     results.add(
         exec_manager.cli_run(
-            "wasm-tools validate out.wasm",
+            f"wasm-tools validate {out}",
             name="Validate wasm module",
             verbose=True,
         ),
@@ -83,7 +83,7 @@ def main() -> None:
 
     wit_bindgen_c(results, args.wit_path)
     clang_wasm_compile(results, args.c_files, args.out)
-    wasm_tools_gen_component(results)
+    wasm_tools_gen_component(results, args.out)
 
     results.print()
     if not results.ok():
