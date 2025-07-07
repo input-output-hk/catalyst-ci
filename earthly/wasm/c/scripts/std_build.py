@@ -40,7 +40,7 @@ def clang_wasm_compile(results: exec_manager.Results, c_files: str) -> None:
             "/opt/wasi-sdk/bin/clang"
             " --sysroot=/opt/wasi-sdk/share/wasi-sysroot"
             f" {bindings_src} {c_files}"
-            " -Oz -o out.wasm -mexec-model=reactor --target=wasm32-wasi",
+            " -Oz -o out.wasm -mexec-model=reactor --target=wasm32-wasip2",
             name="Compile C code to wasm module",
             verbose=True,
         ),

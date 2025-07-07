@@ -31,7 +31,7 @@ rust-base:
     # This is our base Host toolset, and rustup.
     # Never use `rust-toolchain.toml` in CI as it breaks builds.
     # The only toolchain supported is the one installed here.
-    FROM rust:1.88.0-slim-bookworm
+    FROM rust:1.85.0-slim-bookworm
 
     WORKDIR /root
 
@@ -365,7 +365,7 @@ REMOVE_SOURCE_FINGERPRINTS:
     
 # TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
 # Installing Rust
-# Code reference from [rust1.88.0-slim-bookworm](https://github.com/rust-lang/docker-rust/blob/63f877a36f8ba9d9b4b35cd49df3327264510886/stable/bookworm/slim/Dockerfile)
+# Code reference from [rust1.85.0-slim-bookworm](https://github.com/rust-lang/docker-rust/blob/63f877a36f8ba9d9b4b35cd49df3327264510886/stable/bookworm/slim/Dockerfile)
 INSTALL_RUST:
     FUNCTION
 
@@ -374,7 +374,7 @@ INSTALL_RUST:
     ENV RUSTUP_HOME=/usr/local/rustup 
     ENV CARGO_HOME=/usr/local/cargo 
     ENV PATH=/usr/local/cargo/bin:$PATH 
-    ENV RUST_VERSION=1.88.0
+    ENV RUST_VERSION=1.85.0
 
     IF [ "$TARGETARCH" = "amd64" ]
         LET PLATFORM = "x86_64-unknown-linux-gnu"
