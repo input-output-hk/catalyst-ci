@@ -32,7 +32,7 @@ def wit_bindgen_c(results: exec_manager.Results, wit_path: str) -> None:
     )
 
 
-def clang_wasm_compile(results: exec_manager.Results, c_files: str) -> None:
+def clang_wasm_compile(results: exec_manager.Results, c_files: str, out: str) -> None:
     """Get file names from the BINDINGS_SRC except *.h files."""
     bindings_src = " ".join([BINDINGS_SRC + "/" + f for f in os.listdir(BINDINGS_SRC) if not f.endswith(".h")])  # noqa: PTH208
     results.add(
@@ -40,14 +40,14 @@ def clang_wasm_compile(results: exec_manager.Results, c_files: str) -> None:
             "/opt/wasi-sdk/bin/clang"
             " --sysroot=/opt/wasi-sdk/share/wasi-sysroot"
             f" {bindings_src} {c_files}"
-            " -Oz -o out.wasm -mexec-model=reactor --target=wasm32-wasip2",
+            f" -Oz -o {out} -mexec-model=reactor --target=wasm32-wasip2",
             name="Compile C code to wasm module",
             verbose=True,
         ),
     )
 
 
-def wasm_tools_gen_component(results: exec_manager.Results, out: str) -> None:
+def wasm_tools_gen_component(results: exec_manager.Results) -> None:
     """Wasm Tools Gen Component."""
     results.add(
         exec_manager.cli_run(
@@ -82,8 +82,8 @@ def main() -> None:
     results = exec_manager.Results("WASM C build")
 
     wit_bindgen_c(results, args.wit_path)
-    clang_wasm_compile(results, args.c_files)
-    wasm_tools_gen_component(results, args.out)
+    clang_wasm_compile(results, args.c_files, args.out)
+    wasm_tools_gen_component(results)
 
     results.print()
     if not results.ok():
