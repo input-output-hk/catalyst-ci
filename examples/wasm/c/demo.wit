@@ -1,5 +1,5 @@
 package demo:demo;
 
 world demo {
-    export foo: func();
+    foo: func();
 }
