@@ -1,4 +1,4 @@
 #include "bindings_src/demo.h"
 
-void demo_foo(void) {   
+void exports_demo_foo(void) {   
 }
