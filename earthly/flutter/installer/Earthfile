@@ -109,7 +109,7 @@ INSTALL_EDGE_LINUX64:
         # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
         RUN printf "${BLUE} Installing Edgedriver..."
         RUN mkdir -p /opt/edgedriver
-        RUN curl -L https://msedgedriver.azureedge.net/{$edge_version}/edgedriver_linux64.zip \
+        RUN curl -L https://msedgedriver.microsoft.com/{$edge_version}/edgedriver_linux64.zip \
             -o /opt/edgedriver/edgedriver.zip
         RUN unzip /opt/edgedriver/edgedriver.zip -d /usr/local/bin/
         RUN msedgedriver --version
