@@ -88,10 +88,14 @@ go-wasm-builder:
     FROM golang:1.24.5-bookworm
 
     DO rust-ci+INSTALL_RUST
-    # wasm-tools and wkg are needed
+    # wasm-tools is needed
     DO rust-ci+INSTALL_TOOLS
     DO +GO_WASM_TOOL
-
+    
+    # This installation should be a part of INSTALL_TOOLS, but
+    # receiving `wkg: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.39' not found (required by wkg)`
+    # so this is a get around
+    RUN cargo install wkg --version 0.11.0
     RUN go version
     RUN wkg --version
     RUN tinygo version
