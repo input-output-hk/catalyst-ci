@@ -69,7 +69,6 @@ LINT:
         -E revive \
         -E testpackage
 
-# Install go tools needed for go WASM binding
 GO_WASM_TOOL: 
     FUNCTION
 
@@ -84,10 +83,12 @@ GO_WASM_TOOL:
     RUN wget $path
     RUN dpkg -i tinygo_${tinygo_version}_${TARGETARCH}.deb
 
+# Install go tools needed for go WASM binding
 go-wasm-builder:
     FROM golang:1.24.5-bookworm
 
     DO rust-ci+INSTALL_RUST
+    # wasm-tools and wkg are needed
     DO rust-ci+INSTALL_TOOLS
     DO +GO_WASM_TOOL
 
