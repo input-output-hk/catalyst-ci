@@ -454,4 +454,5 @@ INSTALL_TOOLS:
     DO +COPY_TOOL --tool="cargo-component"
     DO +COPY_TOOL --tool="wasm-pack"
     DO +COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
+    DO +COPY_TOOL --tool="wkg"
     
