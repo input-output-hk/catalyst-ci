@@ -96,6 +96,7 @@ go-wasm-builder:
     # receiving `wkg: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.39' not found (required by wkg)`
     # so this is a get around
     RUN cargo install wkg --version 0.11.0
+
     RUN go version
     RUN wkg --version
     RUN tinygo version
