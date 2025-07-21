@@ -1,5 +1,10 @@
 VERSION 0.8
 
+# cspell: words libc tinygo bytecodealliance
+
+IMPORT ../rust AS rust-ci
+
+
 DEPS:
     FUNCTION
 
@@ -65,3 +70,36 @@ LINT:
         -E nilnil \
         -E revive \
         -E testpackage
+
+GO_WASM_TOOL: 
+    FUNCTION
+
+    ARG TARGETARCH
+    ARG tinygo_version = 0.38.0
+    ARG wit_bindgen_go_version = 0.7.0
+
+    RUN go install go.bytecodealliance.org/cmd/wit-bindgen-go@v${wit_bindgen_go_version}
+
+    # Install tinygo
+    LET path = "https://github.com/tinygo-org/tinygo/releases/download/v${tinygo_version}/tinygo_${tinygo_version}_${TARGETARCH}.deb"
+    RUN wget $path
+    RUN dpkg -i tinygo_${tinygo_version}_${TARGETARCH}.deb
+
+# Install go tools needed for go WASM binding
+go-wasm-builder:
+    FROM golang:1.24.5-bookworm
+
+    DO rust-ci+INSTALL_RUST
+    # wasm-tools is needed
+    DO rust-ci+INSTALL_TOOLS
+    DO +GO_WASM_TOOL
+    
+    # This installation should be a part of INSTALL_TOOLS, but
+    # receiving `wkg: /lib/x86_64-linux-gnu/libc.so.6: version `GLIBC_2.39' not found (required by wkg)`
+    # so this is a get around
+    RUN cargo install wkg --version 0.11.0
+
+    RUN go version
+    RUN wkg --version
+    RUN tinygo version
+    RUN wit-bindgen-go --version
