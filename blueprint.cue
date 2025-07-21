@@ -28,11 +28,6 @@ global: {
 			}
 
 			earthly: {
-				credentials: {
-					provider: "aws"
-					path:     "global/ci/earthly"
-				}
-				org:       "Catalyst"
 				satellite: "ci"
 				version:   "0.8.15"
 			}
