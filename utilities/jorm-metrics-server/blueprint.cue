@@ -1,4 +1,3 @@
-version: "1.0"
 project: {
 	name: "jorm-metrics-server"
 	release: {

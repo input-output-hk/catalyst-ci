@@ -1,4 +1,3 @@
-version: "1.0"
 project: {
 	name: "ci-flutter"
 	ci: targets: {

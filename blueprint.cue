@@ -1,4 +1,3 @@
-version: "1.0"
 global: {
 	ci: {
 		local: [
@@ -28,11 +27,23 @@ global: {
 			}
 
 			earthly: {
-				satellite: "ci"
-				version:   "0.8.15"
+				satellite: credentials: {
+					provider: "aws"
+					path:     "global/ci/ci-tls"
+				}
+				version: "0.8.15"
 			}
 
 			github: registry: "ghcr.io"
+
+			tailscale: {
+				credentials: {
+					provider: "aws"
+					path:     "global/ci/tailscale"
+				}
+				tags:    "tag:cat-github"
+				version: "latest"
+			}
 		}
 		secrets: [
 			{
@@ -44,7 +55,10 @@ global: {
 		]
 	}
 	deployment: {
-		registry: ci.providers.aws.ecr.registry
+		registries: {
+			containers: "ghcr.io/input-output-hk/catalyst-forge"
+			modules:    ci.providers.aws.ecr.registry + "/catalyst-deployments"
+		}
 		repo: {
 			url: "https://github.com/input-output-hk/catalyst-world"
 			ref: "master"

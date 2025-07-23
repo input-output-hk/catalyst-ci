@@ -114,6 +114,7 @@ stdcfgs
 subproject
 subprojects
 superfences
+tailscale
 TARGETARCH
 templating
 testcov
