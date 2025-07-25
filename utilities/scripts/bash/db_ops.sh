@@ -262,7 +262,7 @@ function apply_seed_data() {
     # shellcheck disable=SC2155 # Can not fail
     local dbconn=$(pgsql_user_connection "$@")
 
-    echo "Applying seed data from directory: ${seed_data}"
+    echo "Applying aaaaaaaa seed data from directory: ${seed_data}"
     rc=0
 
     for file in "${seed_data}"/*.sql; do
