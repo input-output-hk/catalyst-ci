@@ -296,6 +296,7 @@ seed_database() {
             apply_seed_data "${seed_data_dir}"
             rc=$?
         else
+            ls
             echo "ERROR: Seed Data Directory not found: ${seed_data_dir}"
             rc=1
         fi
