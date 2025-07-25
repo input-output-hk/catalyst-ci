@@ -265,7 +265,7 @@ function apply_seed_data() {
     echo "Applying aaaaaaaa seed data from directory: ${seed_data}"
     rc=0
 
-    for file in "${seed_data}"/*.sql; do
+    for file in ${seed_data}/*.sql; do
         echo "    ++++ : ${file}"
         psql -v ON_ERROR_STOP=on -1 -d "${dbconn}" -f "${file}"
         psql_rc=$?
