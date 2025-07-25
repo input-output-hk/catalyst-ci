@@ -262,9 +262,10 @@ function apply_seed_data() {
     # shellcheck disable=SC2155 # Can not fail
     local dbconn=$(pgsql_user_connection "$@")
 
-    echo "Applying aaaaaaaa seed data from directory: ${seed_data}"
+    echo "Applying seed data from directory: ${seed_data}"
     rc=0
 
+    shopt -s nullglob  # Prevent literal '*.sql' when no matches found
     for file in ${seed_data}/*.sql; do
         echo "    ++++ : ${file}"
         psql -v ON_ERROR_STOP=on -1 -d "${dbconn}" -f "${file}"
@@ -274,6 +275,7 @@ function apply_seed_data() {
             rc=1
         fi
     done
+    shopt -u nullglob  # Optionally turn it off after use
 
     return "${rc}"
 }
