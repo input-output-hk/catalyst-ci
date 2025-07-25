@@ -265,6 +265,7 @@ function apply_seed_data() {
     echo "Applying seed data from directory: ${seed_data}"
     rc=0
 
+    ls ${seed_data}
     shopt -s nullglob  # Prevent literal '*.sql' when no matches found
     for file in ${seed_data}/*.sql; do
         echo "    ++++ : ${file}"
