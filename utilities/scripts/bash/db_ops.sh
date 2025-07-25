@@ -262,7 +262,7 @@ function apply_seed_data() {
     # shellcheck disable=SC2155 # Can not fail
     local dbconn=$(pgsql_user_connection "$@")
 
-    echo "Applying seed data from directory: $1"
+    echo "Applying seed data from directory: ${seed_data}"
     rc=0
 
     while IFS= read -r -d '' file; do
@@ -291,13 +291,12 @@ seed_database() {
     rc=0
 
     if [[ -n "${seed_data}" ]]; then
-        local full_path="${seed_data_dir}/${seed_data}"
 
         if [[ -d "${full_path}" ]]; then
-            apply_seed_data "${full_path}"
+            apply_seed_data "${seed_data_dir}"
             rc=$?
         else
-            echo "ERROR: Seed Data Directory not found: ${full_path}"
+            echo "ERROR: Seed Data Directory not found: ${seed_data_dir}"
             rc=1
         fi
     fi
