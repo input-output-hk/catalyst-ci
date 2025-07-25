@@ -292,11 +292,10 @@ seed_database() {
 
     if [[ -n "${seed_data}" ]]; then
 
-        if [[ -d "${full_path}" ]]; then
+        if [[ -d "${seed_data_dir}" ]]; then
             apply_seed_data "${seed_data_dir}"
             rc=$?
         else
-            ls
             echo "ERROR: Seed Data Directory not found: ${seed_data_dir}"
             rc=1
         fi
