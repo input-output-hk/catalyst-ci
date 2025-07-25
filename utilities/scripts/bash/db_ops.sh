@@ -266,14 +266,12 @@ function apply_seed_data() {
     rc=0
 
     for file in "${seed_data}"/*.sql; do
-        if [[ -f "$file" ]]; then
-            echo "    ++++ : ${file}"
-            psql -v ON_ERROR_STOP=on -1 -d "${dbconn}" -f "${file}"
-            psql_rc=$?
-            if [[ ${psql_rc} -ne 0 ]]; then
-                echo "Failed to apply seed data from ${file} with exit code ${psql_rc}"
-                rc=1
-            fi
+        echo "    ++++ : ${file}"
+        psql -v ON_ERROR_STOP=on -1 -d "${dbconn}" -f "${file}"
+        psql_rc=$?
+        if [[ ${psql_rc} -ne 0 ]]; then
+            echo "Failed to apply seed data from ${file} with exit code ${psql_rc}"
+            rc=1
         fi
     done
 
