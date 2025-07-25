@@ -264,8 +264,8 @@ function apply_seed_data() {
 
     echo "Applying seed data from directory: ${seed_data}"
     rc=0
-
-    for file in "${seed_data[@]}"; do
+    find "${seed_data}" -maxdepth 1 -name '*.sql' -print0
+    while IFS= read -r -d '' file; do
         echo "    ++++ : ${file}"
         psql -v ON_ERROR_STOP=on -1 -d "${dbconn}" -f "${file}"
         psql_rc=$?
@@ -273,7 +273,7 @@ function apply_seed_data() {
             echo "Failed to apply seed data from ${file} with exit code ${psql_rc}"
             rc=1
         fi
-    done
+    done < <(find "${seed_data}" -maxdepth 1 -name '*.sql' -print0 | sort -z) || true
 
     return "${rc}"
 }
