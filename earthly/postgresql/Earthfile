@@ -15,7 +15,6 @@ postgres-base:
     # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
     RUN apt-get update && apt-get install -y \
-        bash \
         python3-rich \
         && rm -rf /var/lib/apt/lists/*
 
