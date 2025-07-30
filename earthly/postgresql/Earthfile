@@ -10,45 +10,19 @@ IMPORT ../java AS java
 postgres-base:
     FROM postgres:16.4-bookworm
 
-    ARG SCHEMASPY_VERSION=6.2.4
-    ARG POSTGRESQL_JDBC_VERSION=42.7.4
-
     WORKDIR /root
 
     # Install necessary packages
     # Expand this list as needed, rather than adding more tools in later containers.
     RUN apt-get update && apt-get install -y \
         bash \
-        build-essential \
-        clang \
-        cmake \
-        colordiff \
-        findutils \
-        fontconfig \
-        fonts-liberation2 \
-        graphviz \
-        libssl-dev \
-        mold \
-        openssl \
-        pkgconf \
-        python3-pip \
         python3-rich \
-        python3-psycopg \
-        ripgrep \
-        wget \
         pipx \
         && rm -rf /var/lib/apt/lists/*
-
-    # Use the cached java installation from the java Earthfile
-    DO java+COPY_DEPS
 
     # Install SQLFluff - Check
     ENV PATH="/root/.local/bin:${PATH}"
     RUN pipx install sqlfluff==3.1.1 && sqlfluff version
-
-    # Install SchemaSpy and required Postgresql JDBC driver
-    RUN wget -O /bin/postgresql.jar https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
-    RUN wget -O /bin/schemaspy.jar https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar
 
     # Get refinery
     COPY rust-tools+tool-refinery/refinery /bin
@@ -115,8 +89,21 @@ DOCS:
 
     ARG migrations=./migrations
     ARG refinery_toml=./refinery.toml
+    ARG SCHEMASPY_VERSION=6.2.4
+    ARG POSTGRESQL_JDBC_VERSION=42.7.4
 
     FROM +postgres-base
+
+    RUN apt-get update && apt-get install -y \
+        graphviz \
+        wget
+
+    # Use the cached java installation from the java Earthfile
+    DO java+COPY_DEPS
+
+    # Install SchemaSpy and required Postgresql JDBC driver
+    RUN wget -O /bin/postgresql.jar https://jdbc.postgresql.org/download/postgresql-${POSTGRESQL_JDBC_VERSION}.jar
+    RUN wget -O /bin/schemaspy.jar https://github.com/schemaspy/schemaspy/releases/download/v${SCHEMASPY_VERSION}/schemaspy-${SCHEMASPY_VERSION}.jar
 
     USER postgres:postgres
     WORKDIR /docs
