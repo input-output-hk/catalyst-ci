@@ -17,7 +17,6 @@ postgres-base:
     RUN apt-get update && apt-get install -y \
         bash \
         python3-rich \
-        pipx \
         && rm -rf /var/lib/apt/lists/*
 
     # Get refinery
