@@ -11,14 +11,14 @@ IMPORT ../../ AS cat-ci
 builder:
     DO postgresql-ci+BUILDER
 
-    # MUST Manually copy the .sqlfluff config used in the repo because the FUNCTION
-    # above can not be passed a reference to a local target as an argument.
-    COPY cat-ci+repo-config/repo/.sqlfluff .
-
 # check if the sql files are properly formatted and pass lint quality checks.
 #   CI target : true
 check:
-    FROM +builder
+    FROM postgresql-ci+sqlfluff-base
+
+    # MUST Manually copy the .sqlfluff config used in the repo because the FUNCTION
+    # above can not be passed a reference to a local target as an argument.
+    COPY cat-ci+repo-config/repo/.sqlfluff .
 
     # Now you can run the script without the file not found error
     DO postgresql-ci+CHECK

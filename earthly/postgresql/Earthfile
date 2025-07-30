@@ -20,10 +20,6 @@ postgres-base:
         pipx \
         && rm -rf /var/lib/apt/lists/*
 
-    # Install SQLFluff - Check
-    ENV PATH="/root/.local/bin:${PATH}"
-    RUN pipx install sqlfluff==3.1.1 && sqlfluff version
-
     # Get refinery
     COPY rust-tools+tool-refinery/refinery /bin
 
@@ -41,6 +37,16 @@ postgres-base:
 
     SAVE ARTIFACT /scripts /scripts
     SAVE ARTIFACT /templates /templates
+
+sqlfluff-base:
+    FROM +postgres-base
+    
+    RUN apt-get update && apt-get install -y \
+        pipx
+
+    # Install SQLFluff - Check
+    ENV PATH="/root/.local/bin:${PATH}"
+    RUN pipx install sqlfluff==3.1.1 && sqlfluff version
 
 # Common build setup steps.
 # Arguments:
@@ -120,7 +126,7 @@ DOCS:
 # Linter checks for sql files
 CHECK:
     FUNCTION
-
+    
     RUN /scripts/std_checks.py
 
 # Format sql files
