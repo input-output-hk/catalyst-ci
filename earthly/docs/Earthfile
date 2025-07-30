@@ -56,7 +56,7 @@ deps:
 common:
     FROM scratch
 
-    COPY --dir common/includes common/macros common/overrides common/std-theme.yml /std
+    COPY --dir common/includes common/javascript common/macros common/overrides common/std-theme.yml /std
 
     SAVE ARTIFACT /std
 

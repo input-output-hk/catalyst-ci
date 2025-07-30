@@ -7,6 +7,7 @@ camelcase
 canvaskit
 cardano
 Chromedriver
+chtml
 codegen
 colordiff
 cowsay
@@ -130,6 +131,7 @@ uniseg
 unshallow
 voteplan
 wasi
+wasip
 wasmtime
 webkitallowfullscreen
 WORKDIR
@@ -137,4 +139,3 @@ xerrors
 xvfb
 zstd
 zstdcat
-wasip

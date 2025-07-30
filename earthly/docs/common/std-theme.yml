@@ -119,5 +119,5 @@ extra:
 extra_javascript:
   - javascript/massillia-graphviz.js
   - javascript/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  - javascript/tex-mml-chtml.js
     
