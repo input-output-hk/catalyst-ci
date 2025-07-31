@@ -951,19 +951,23 @@ files = [
 ]
 
 [[package]]
-name = "mkdocs-graphviz"
+name = "mkdocs_graphviz"
 version = "1.5.3"
 description = "Render Graphviz graphs in Mkdocs, as inline SVGs and PNGs, natively & dynamically compatible with Mkdocs Light & Dark Themes, directly from your Markdown"
 optional = false
 python-versions = "*"
 groups = ["main"]
-files = [
-    {file = "mkdocs_graphviz-1.5.3-py3-none-any.whl", hash = "sha256:fb2159cf49c02604104a4077f4b92ddc543cd054102dc78cb1c347dd1a847ddc"},
-    {file = "mkdocs_graphviz-1.5.3.tar.gz", hash = "sha256:913fbd77a0b4f2683b6d4f244f1f7d4e421866f9a7b70057900700909052709c"},
-]
+files = []
+develop = false
 
 [package.dependencies]
 Markdown = ">=2.3.1"
+
+[package.source]
+type = "git"
+url = "https://github.com/EastSunrise/mkdocs-graphviz"
+reference = "162c7989db7f266c66d33ec0237a333aad463038"
+resolved_reference = "162c7989db7f266c66d33ec0237a333aad463038"
 
 [[package]]
 name = "mkdocs-macros-plugin"
@@ -993,14 +997,14 @@ test = ["mkdocs-d2-plugin", "mkdocs-include-markdown-plugin", "mkdocs-macros-tes
 
 [[package]]
 name = "mkdocs-material"
-version = "9.6.12"
+version = "9.6.16"
 description = "Documentation that simply works"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "mkdocs_material-9.6.12-py3-none-any.whl", hash = "sha256:92b4fbdc329e4febc267ca6e2c51e8501fa97b2225c5f4deb4d4e43550f8e61e"},
-    {file = "mkdocs_material-9.6.12.tar.gz", hash = "sha256:add6a6337b29f9ea7912cb1efc661de2c369060b040eb5119855d794ea85b473"},
+    {file = "mkdocs_material-9.6.16-py3-none-any.whl", hash = "sha256:8d1a1282b892fe1fdf77bfeb08c485ba3909dd743c9ba69a19a40f637c6ec18c"},
+    {file = "mkdocs_material-9.6.16.tar.gz", hash = "sha256:d07011df4a5c02ee0877496d9f1bfc986cfb93d964799b032dd99fe34c0e9d19"},
 ]
 
 [package.dependencies]
@@ -1964,4 +1968,4 @@ files = [
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.13"
-content-hash = "144906c8368a4679fa8dfb40698a23f0902595bcb61fa315579f9d1c73ba9d1a"
+content-hash = "b0d65d5202d0cb77176c199626b81804b6c252eb97b35a59d60cb946d537b069"
