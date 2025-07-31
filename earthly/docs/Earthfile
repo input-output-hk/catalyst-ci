@@ -98,6 +98,8 @@ BUILD:
 
     RUN /scripts/build.sh
 
+    RUN mv /docs/javascript/* /site/assets/javascripts
+
     SAVE ARTIFACT /site/*
 
 
