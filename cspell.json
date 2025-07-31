@@ -55,7 +55,7 @@
         "**/**/go.sum",
         "**/**/pyproject.toml",
         "examples/flutter/example/**",
-        "/docs/common/javascript/*"
+        "earthly/docs/common/javascript/**"
     ],
     "flagWords": [
         "don;t: don't"
