@@ -1,7 +1,7 @@
 # cspell: words Diagramsnet, pymdownx, linenums, inlinehilite, superfences,
 # cspell: words tasklist, betterem, materialx, twemoji, smartsymbols,
 # cspell: words kroki, excalidraw, glightbox, cips, pygments, arithmatex, fontawesome
-# cspell: words massillia, mathjax
+# cspell: words massilia, mathjax
 
 site_author: The Project Catalyst Team
 copyright: (c) 2023 Input Output Global Ltd.
@@ -94,7 +94,7 @@ markdown_extensions:
   - pymdownx.smartsymbols
   - pymdownx.snippets:
       auto_append:
-        - /docs/includes/abbreviations.md
+        - includes/abbreviations.md
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
@@ -120,4 +120,3 @@ extra_javascript:
   - assets/javascripts/massilia-graphviz.js
   - assets/javascripts/mathjax.js
   - assets/javascripts/tex-mml-chtml.js
-    
