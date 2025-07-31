@@ -117,7 +117,7 @@ extra:
       make our documentation better.
 
 extra_javascript:
-  - assets/javascripts/massillia-graphviz.js
+  - assets/javascripts/massilia-graphviz.js
   - assets/javascripts/mathjax.js
   - assets/javascripts/tex-mml-chtml.js
     
