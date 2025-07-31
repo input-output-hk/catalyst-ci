@@ -1,7 +1,7 @@
 # cspell: words Diagramsnet, pymdownx, linenums, inlinehilite, superfences,
 # cspell: words tasklist, betterem, materialx, twemoji, smartsymbols,
 # cspell: words kroki, excalidraw, glightbox, cips, pygments, arithmatex, fontawesome
-# cspell: words massillia, mathjax
+# cspell: words massilia, mathjax
 
 site_author: The Project Catalyst Team
 copyright: (c) 2023 Input Output Global Ltd.
@@ -117,7 +117,6 @@ extra:
       make our documentation better.
 
 extra_javascript:
-  - javascript/massillia-graphviz.js
-  - javascript/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
-    
+  - assets/javascripts/massilia-graphviz.js
+  - assets/javascripts/mathjax.js
+  - assets/javascripts/tex-mml-chtml.js

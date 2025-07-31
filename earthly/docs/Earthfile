@@ -56,7 +56,7 @@ deps:
 common:
     FROM scratch
 
-    COPY --dir common/includes common/macros common/overrides common/std-theme.yml /std
+    COPY --dir common/includes common/javascript common/macros common/overrides common/std-theme.yml /std
 
     SAVE ARTIFACT /std
 
@@ -97,6 +97,8 @@ BUILD:
     FUNCTION
 
     RUN /scripts/build.sh
+
+    RUN mv /docs/javascript/* /site/assets/javascripts
 
     SAVE ARTIFACT /site/*
 
