@@ -48,9 +48,7 @@ mkdocs-awesome-pages-plugin = "^2.10.1"
 mkdocs-d2-plugin = "^1.6.0"
 
 # https://gitlab.com/rod2ik/mkdocs-graphviz
-#mkdocs-graphviz = "^1.5.3"
-# This is a bugfixed version of mkdocs-graphviz whic was rendering strangely when image gets big.
-mkdocs-graphviz = { git = "https://github.com/EastSunrise/mkdocs-graphviz", rev = "162c7989db7f266c66d33ec0237a333aad463038" }
+mkdocs-graphviz = "^1.5.3"
 
 ### DO NOT ENABLE THESE BAD PLUGINS.
 ### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
