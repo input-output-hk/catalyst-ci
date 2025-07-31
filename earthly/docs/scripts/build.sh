@@ -8,6 +8,11 @@ rc=0
 
 ## Build the code
 status "${rc}" "Changing to Poetry Environment Workspace" \
+    uv --help
+rc=$?
+
+## Build the code
+status "${rc}" "Changing to Poetry Environment Workspace" \
     cd /poetry
 rc=$?
 
