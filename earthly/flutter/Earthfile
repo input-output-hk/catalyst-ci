@@ -73,8 +73,7 @@ flutter-base:
     DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
 
 # test-flutter-base : installs required tools and packages for flutter development.
-# TODO: Enable when our earthly self-satellites will be back
-disable-test-flutter-base:
+test-flutter-base:
     BUILD +flutter-base
 
 SETUP:
