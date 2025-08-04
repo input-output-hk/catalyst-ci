@@ -32,7 +32,8 @@ INSTALL_CHROME_LINUX64:
             && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
             && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
             && echo "Check and fix missing dependencies..." \
-            && apt-get install -f -y \
+            && apt-get update --fix-missing \
+	    && apt-get install -f -y \
             && rm -rf /opt/chrome.zip /opt/chrome
         RUN google-chrome --version
         DO +PATCH_CHROME --BIN_TO_PATCH="google-chrome"
@@ -74,7 +75,7 @@ INSTALL_FIREFOX_LINUX64:
     END
 
     RUN curl -L ${FIREFOX_URL} -o /tmp/firefox.deb \
-        && apt-get update \
+        && apt-get update --fix-missing \
         && apt-get --fix-broken install -y /tmp/firefox.deb \
         && rm /tmp/firefox.deb
 
@@ -103,7 +104,8 @@ INSTALL_EDGE_LINUX64:
 
         RUN printf "${BLUE} Installing Edge..."
         RUN curl -LO https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
-        RUN apt-get update && apt-get install -y ./microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
+        RUN apt-get update --fix-missing \
+	    && apt-get --fix-broken install -y ./microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
         RUN microsoft-edge-stable --version
 
         # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
