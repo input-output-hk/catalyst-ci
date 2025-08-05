@@ -9,14 +9,11 @@ on:
       - reopened
 
 permissions:
-  contents: write
-  pull-requests: write
-  id-token: write
-  repository-projects: write
+  contents: read
+  pull-requests: read
+  repository-projects: read
 
 jobs:
   validate-own-fields:
     uses: ./.github/workflows/validate-project-fields.yml
-    with:
-      project_number: "102"
     secrets: inherit
