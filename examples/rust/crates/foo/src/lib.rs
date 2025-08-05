@@ -2,7 +2,10 @@
 
 /// Format our hello message nicely.
 #[must_use]
-pub fn fmt_hello(name: &str, count: u8) -> String {
+pub fn fmt_hello(
+    name: &str,
+    count: u8,
+) -> String {
     format!("Hello #{count:>3} {name}!")
 }
 
