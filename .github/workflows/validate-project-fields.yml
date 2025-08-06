@@ -1,6 +1,13 @@
 name: Validate Project Fields
 
 on:
+  workflow_call:
+    inputs:
+      project_number:
+        description: "Project number to validate"
+        required: false
+        type: string
+        default: "102"
   pull_request:
     types:
       - opened
@@ -27,7 +34,7 @@ jobs:
       GITHUB_PROJECTS_PAT: ${{ secrets.PROJECTS_PAT }}
       GITHUB_REPOSITORY: "${{ github.repository }}"
       GITHUB_EVENT_NUMBER: "${{ github.event.number || '0' }}"
-      PROJECT_NUMBER: 102
+      PROJECT_NUMBER: ${{ inputs.project_number || '102' }}
     steps:
       - name: Fetch Validation Script
         uses: actions/checkout@v4
