@@ -540,7 +540,9 @@ def main() -> None:  # noqa: C901, PLR0915
             ]
 
             if not pr_items:
-                print("❌ Pull request is not assigned to any GitHub Project. Please select a project before continuing.")
+                print(
+                    "❌ Pull request is not assigned to any GitHub Project. Please select a project before continuing."
+                )
                 sys.exit(1)
 
             validation_errors = set()
