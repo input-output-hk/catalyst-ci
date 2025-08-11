@@ -62,6 +62,7 @@ rust-base:
         python3-psycopg \
         ripgrep \
         wget \
+        gcc-multilib \
         && rm -rf /var/lib/apt/lists/*
 
     # Fix up font cache.
