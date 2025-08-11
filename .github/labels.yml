@@ -209,3 +209,7 @@
 - name: research
   color: "6F42C1"
   description: Benchmarks, load tests, operational analysis, or proof of concepts
+
+- name: no-track
+  color: "000000"
+  description: Used to skip tracking in Swarmia analytics, etc.
