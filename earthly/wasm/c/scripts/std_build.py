@@ -22,6 +22,7 @@ def wit_bindgen_c(results: exec_manager.Results, wit_path: str) -> None:
                 [
                     "wit-bindgen c",
                     "--autodrop-borrows yes",
+                    "--world hermes",
                     f"--out-dir {BINDINGS_SRC}",
                     wit_path,
                 ],
