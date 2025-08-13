@@ -1,11 +1,11 @@
 """Doc Macros Init."""
 
-from typing import Any
+from mkdocs_macros import MacrosPlugin
 
 from .include import inc_file
 
 
-def define_env(env: Any) -> None:  # noqa: ANN401
+def define_env(env: MacrosPlugin) -> None:
     """Hooks for defining variables, macros and filters."""
 
     @env.macro

@@ -6,8 +6,8 @@ import argparse
 import subprocess
 import sys
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 import webbrowser
 from dataclasses import dataclass, field
 

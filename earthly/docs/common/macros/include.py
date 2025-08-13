@@ -2,11 +2,12 @@
 
 import re
 from pathlib import Path
-from typing import Any
+
+from mkdocs_macros import MacrosPlugin
 
 
 def inc_file(
-    env: Any,
+    env: MacrosPlugin,
     filename: str,
     *,
     start_line: int = 0,
