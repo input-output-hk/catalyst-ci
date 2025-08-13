@@ -8,8 +8,7 @@ builder:
     COPY demo.wit ./wit/
     COPY component.c .
 
-# TODO: Enable when our earthly self-satellites will be back
-disable-build: 
+build: 
     FROM +builder
 
     RUN /scripts/std_build.py --c_files="component.c" --out="component.wasm"

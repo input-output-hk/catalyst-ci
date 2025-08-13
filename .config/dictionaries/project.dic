@@ -85,6 +85,7 @@ mkdocs
 modcache
 mozallowfullscreen
 msedgedriver
+multilib
 multirepo
 nextest
 nilnil
