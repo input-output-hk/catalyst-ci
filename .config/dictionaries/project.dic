@@ -102,6 +102,7 @@ pubout
 pubspec
 pymdownx
 pypackages
+pyrightconfig
 PYTHONDONTWRITEBYTECODE
 pytype
 rankdir

@@ -26,6 +26,7 @@ Cargo.lock
 
 # Python junk
 **/*.pyc
+**/typings
 
 
 ### Linux ###
