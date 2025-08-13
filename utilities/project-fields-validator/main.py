@@ -211,7 +211,6 @@ class ProjectFieldsValidator:
             ProjectField("Estimate"),
             ProjectField("Iteration"),
             ProjectField("Start"),
-            ProjectField("End"),
         ]
 
     def _make_request(self, method: str, url: str, **kwargs: dict[str, Any]) -> dict[str, Any]:
