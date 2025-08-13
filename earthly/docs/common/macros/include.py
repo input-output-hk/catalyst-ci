@@ -3,7 +3,7 @@
 import re
 from pathlib import Path
 
-from mkdocs_macros import MacrosPlugin
+from mkdocs_macros.plugin import MacrosPlugin
 
 
 def inc_file(
@@ -26,7 +26,7 @@ def inc_file(
     indent = number of spaces to indent every line but the first.
     """
     try:
-        if filename.startswith("."):
+        if filename.startswith(".") and env.page.file.src_dir is not None:
             this_file = Path(env.page.file.src_dir) / env.page.file.src_uri
             this_dir = this_file.parent
             relative_filename = this_dir / filename
