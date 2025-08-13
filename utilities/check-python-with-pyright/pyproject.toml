@@ -1,0 +1,10 @@
+[project]
+name = "check-python-with-pyright"
+version = "0.1.0"
+description = "Checks a REPO that its python code is properly annotated."
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "rich>=14.1.0",
+    "sh>=2.2.2",
+]

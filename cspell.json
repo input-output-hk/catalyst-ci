@@ -40,7 +40,7 @@
     "ignorePaths": [
         ".config/dictionaries",
         ".github",
-        "earthly/docs/poetry.lock",
+        "earthly/docs/uv.lock",
         "actions/*/dist",
         "cli/go.sum",
         "cli/go.mod",

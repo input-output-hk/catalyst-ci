@@ -55,14 +55,14 @@ builder:
 ```
 
 The first target `builder` is responsible to prepare an already configured Python environment,
-instal all needed tools and dependencies.
-Every Python project must be a [poetry](https://python-poetry.org) based project,
-so it is mandatory to have `pyproject.toml` and `poetry.lock` files in the root dir of the project.
+install all needed tools and dependencies.
+Every Python project must be a [uv](https://docs.astral.sh/uv/) based project,
+so it is mandatory to have `pyproject.toml` and `uv.lock` files in the root dir of the project.
 
-The fist step of the `builder` target is prepare a Python environment
-with poetry via `+python-base` target.
+The first step of the `builder` target is to prepare a Python environment
+with `uv` via `+python-base` target.
 Next step is to copy source code of the project and finally finalize the build
-with some poetry project setup which is done with `+BUILDER` Function.
+with some `uv` project setup which is done with `+BUILDER` Function.
 
 ### Running checks
 
@@ -74,12 +74,12 @@ with some poetry project setup which is done with `+BUILDER` Function.
 test:
     FROM +builder
 
-    RUN poetry run pytest
+    RUN uv run pytest
 ```
 
 As the final step, after proper setup of the Python project we can run tests,
 to do so
-inherit from the already discussed `+builder` target and just run `poetry run pytest`
+inherit from the already discussed `+builder` target and just run `uv run pytest`
 or with any other way which are suitable for your project setup.
 And that's it!
 

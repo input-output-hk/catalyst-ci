@@ -1,0 +1,18 @@
+{
+    // Start scanning from repo root
+    "include": [
+        "**/*.py"
+    ],
+    // Don't stop if there are multiple Python projects — just treat all files
+    "exclude": [
+        "**/node_modules",
+        "**/__pycache__",
+        "**/.venv"
+    ],
+    // Strictest possible settings
+    "typeCheckingMode": "strict",
+    // Optional: make sure it treats every .py as a module, even without __init__.py
+    "pythonVersion": "3.13", // or your version
+    "reportMissingImports": true,
+    "reportMissingTypeStubs": true
+}

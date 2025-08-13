@@ -36,8 +36,8 @@ deps:
     # Install D2
     RUN curl -fsSL https://d2lang.com/install.sh | sh -s --
 
-    # Install poetry and our python dependencies.
-    DO python-ci+BUILDER --opts=--no-root
+    # Install uv and our python dependencies.
+    DO python-ci+BUILDER 
 
     # Copy our run scripts
     COPY --dir scripts/* /scripts/

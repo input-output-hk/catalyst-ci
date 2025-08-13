@@ -16,7 +16,7 @@ In an `Earthfile` in your source repository add:
 
 ```Earthfile
 example_python_target:
-    FROM python:3.13-bullseye
+    FROM python:3.13.5-slim-bookworm
     DO github.com/input-output-hk/catalyst-ci:v1.2.0/earthly/python+POETRY_SETUP
 ```
 

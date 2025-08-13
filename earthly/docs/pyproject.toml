@@ -1,64 +1,28 @@
-[tool.poetry]
-name = "Documentation Tooling"
+[project]
+name = "Documentation-Tooling"
 version = "0.1.0"
 description = "Common Project Catalyst Documentation Tooling."
-authors = ["Joshua Gilman", "Steven Johnson"]
+authors = [
+    { name = "Joshua Gilman" },
+    { name = "Steven Johnson" },
+]
+requires-python = "~=3.13.5"
 readme = "Readme.md"
+dependencies = [
+    "mkdocs-material[recommended, git, imaging]==9.6.16",
+    "mkdocs-minify-plugin>=0.8.0,<0.9",
+    "mkdocs-redirects>=1.2.2,<2",
+    "mkdocs-glightbox>=0.4.0,<0.5",
+    "mkdocs-multirepo-plugin>=0.8.3,<0.9",
+    "mkdocs-macros-plugin>=1.3.9,<2",
+    "mkdocs-meta-manager>=1.1.0,<2",
+    "mkdocs-material-adr",
+    "mkdocs-awesome-pages-plugin>=2.10.1,<3",
+    "mkdocs-d2-plugin>=1.6.0,<2",
+    "mkdocs-graphviz>=1.5.3,<2",
+]
 
-[tool.poetry.dependencies]
-python = "^3.13"
-mkdocs-material = { version = "9.6.16", extras = ["recommended","git","imaging"] }
+[tool.uv]
 
-### MkDocs Plugins we add.
-
-# https://github.com/byrnereese/mkdocs-minify-plugin
-mkdocs-minify-plugin = "^0.8.0"
-
-# https://github.com/mkdocs/mkdocs-redirects
-mkdocs-redirects = "^1.2.2"
-
-# https://github.com/Blueswen/mkdocs-glightbox
-mkdocs-glightbox = "^0.4.0"
-
-# Kroki is disabled because it requires an external service
-# https://github.com/AVATEAM-IT-SYSTEMHAUS/mkdocs-kroki-plugin/tree/main
-# Using this fork: https://github.com/oniboni/mkdocs-kroki-plugin/tree/refactoring/image-handling
-# Because it properly handles the image files.
-# mkdocs-kroki-plugin = "^0.6.1"
-# mkdocs-kroki-plugin = { git = "https://github.com/oniboni/mkdocs-kroki-plugin", branch="refactoring/image-handling" }
-
-# https://github.com/jdoiro3/mkdocs-multirepo-plugin
-mkdocs-multirepo-plugin = "^0.8.3"
-
-# https://mkdocs-macros-plugin.readthedocs.io/en/latest/
-mkdocs-macros-plugin = "^1.3.7"
-
-# https://github.com/timmeinerzhagen/mkdocs-meta-manager
-mkdocs-meta-manager = "^1.1.0"
-
-# https://github.com/Kl0ven/mkdocs-material-adr
-# mkdocs-material-adr = "^1.1.0"
+[tool.uv.sources]
 mkdocs-material-adr = { git = "https://github.com/stevenj/mkdocs-material-adr", branch = "new-id" }
-
-# https://henrywhitaker3.github.io/mkdocs-material-dark-theme/plugins/awesome-pages/
-# https://github.com/lukasgeiter/mkdocs-awesome-pages-plugin
-mkdocs-awesome-pages-plugin = "^2.10.1"
-
-# https://github.com/landmaj/mkdocs-d2-plugin
-mkdocs-d2-plugin = "^1.6.0"
-
-# https://gitlab.com/rod2ik/mkdocs-graphviz
-mkdocs-graphviz = "^1.5.3"
-
-### DO NOT ENABLE THESE BAD PLUGINS.
-### DOCUMENTED HERE FOR INFORMATIONAL PURPOSES.
-# https://github.com/zoni/mkdocs-diagrams
-#mkdocs-diagrams # Doesn't work properly look for replacement.
-
-# https://github.com/pawamoy/mkdocs-spellcheck
-#mkdocs-spellcheck[all] == 1.0.2 # We use cspell, don't use this.
-
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"

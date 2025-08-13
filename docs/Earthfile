@@ -21,7 +21,7 @@ src:
     COPY --dir postgresql-ci+build/docs src/appendix/examples/built_docs/postgresql
 
 # Build the docs here.
-docs:
+build-docs:
     FROM +src
 
     DO docs-ci+BUILD

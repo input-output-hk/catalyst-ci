@@ -12,7 +12,7 @@ scylladb-base:
     RUN apt-get update && apt-get install -y python3 pipx
 
     RUN pipx ensurepath
-    RUN pipx install poetry
+    #RUN pipx install poetry
 
 # cql-to-d2 - converts cql files into d2 diagram entity files
 cql-to-d2:
