@@ -1,7 +1,7 @@
 VERSION 0.8
 
 deps:
-    FROM python:3.13-slim-bookworm
+    FROM python:3.13.5-slim-bookworm
     WORKDIR /work
 
     ARG version = 1.7.1
@@ -44,7 +44,7 @@ build:
     SAVE ARTIFACT . src
 
 docker:
-    FROM python:3.13-slim-bookworm
+    FROM python:3.13.5-slim-bookworm
 
     WORKDIR /app
 
