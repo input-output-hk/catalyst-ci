@@ -4,6 +4,7 @@ from mkdocs_macros.plugin import MacrosPlugin
 
 from .include import inc_file
 
+
 def define_env(env: MacrosPlugin) -> None:
     """Hooks for defining variables, macros and filters."""
 
