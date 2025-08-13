@@ -52,6 +52,7 @@ def check_lint_with_ruff() -> bool:
     print("Code linting check passed.")
     return True
 
+
 def check_lint_with_pyright() -> bool:
     """Check Lint with Pyright."""
     # Check Python code linting issues using 'pyright'.
@@ -83,6 +84,7 @@ def zero_third_party_packages_found(output: str) -> bool:
     if len(lines) < 2:  # noqa: PLR2004
         return False  # The second line doesn't exist
     return lines[1].startswith("Found '0' third-party package imports")
+
 
 def main(*, stand_alone: bool) -> None:
     """Python Standard Checks."""
