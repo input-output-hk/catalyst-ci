@@ -6,8 +6,8 @@ authors = []
 
 [tool.poetry.dependencies]
 python = "^3.13"
-pytest = "^8.3.5"
-pillow = "11.2.1"
+pytest = "^8.4.1"
+pillow = "11.3.0"
 
 [build-system]
 requires = ["poetry-core"]

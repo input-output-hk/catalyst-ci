@@ -7,6 +7,7 @@ import subprocess
 import sys
 import time
 import urllib.request
+import urllib.error
 import webbrowser
 from dataclasses import dataclass, field
 
@@ -27,7 +28,7 @@ class ImageNotFound(Exception):  # noqa: N818
     """Image Not Found."""
 
 
-def run_command(command: str) -> None:
+def run_command(command: str | list[str]) -> None:
     """Run a command and print its output.
 
     Args:
@@ -48,10 +49,13 @@ def run_command(command: str) -> None:
         universal_newlines=True,
     )
 
-    for line in iter(process.stdout.readline, ""):
-        print(line, end="")
+    if process.stdout is not None:
+        for line in iter(process.stdout.readline, ""):
+            print(line, end="")
 
-    process.stdout.close()
+        process.stdout.close()
+    else:
+        print("stdout can not be read?")
 
     rc = process.wait()
 
@@ -175,8 +179,11 @@ class DocsContainer:
         """Print Logs."""
         cmd = f"docker logs --since {self.last_log_time} {self.container_id}"
         output = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)  # noqa: S602
-        for line in output.stdout:
-            print(line.decode().strip())
+        if output.stdout is not None:
+            for line in output.stdout:
+                print(line.decode().strip())
+        else:
+            print("stdout can not be read?")
         self.last_log_time = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
 
 

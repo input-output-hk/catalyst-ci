@@ -2,10 +2,11 @@
 
 import re
 from pathlib import Path
+from typing import Any
 
 
 def inc_file(
-    env: any,
+    env: Any,
     filename: str,
     *,
     start_line: int = 0,

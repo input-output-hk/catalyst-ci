@@ -8,17 +8,17 @@ readme = "README.md"
 
 
 [tool.poetry.dependencies]
-python = "^3.13"
-pydantic = "^2.11.3"
-aiohttp = "^3.11.18"
-prometheus-client = "^0.21.1"
+python = "^3.13.5"
+pydantic = "^2.11.7"
+aiohttp = "^3.12.15"
+prometheus-client = "^0.22.1"
 prometheus-async = { extras = ["aiohttp"], version = "25.1.0" }
 asyncclick = "^8.1.8"
 loguru = "^0.7.3"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.11.7"
-ipython = "^9.1.0"
+ruff = "^0.12.8"
+ipython = "^9.4.0"
 
 [tool.ruff]
 line-length = 79

@@ -9,5 +9,5 @@ def define_env(env: Any) -> None:  # noqa: ANN401
     """Hooks for defining variables, macros and filters."""
 
     @env.macro
-    def include_file(filename: str, *, start_line: int = 0, end_line: int | None = None, indent: int = 0) -> str:
+    def include_file(filename: str, *, start_line: int = 0, end_line: int | None = None, indent: int = 0) -> str: # pyright: ignore[reportUnusedFunction]
         return inc_file(env, filename, start_line=start_line, end_line=end_line, indent=indent)

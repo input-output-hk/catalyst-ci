@@ -21,8 +21,7 @@ src:
     COPY --dir postgresql-ci+build/docs src/appendix/examples/built_docs/postgresql
 
 # Build the docs here.
-# TODO: Enable when our earthly self-satellites will be back
-disable-docs:
+build-docs:
     FROM +src
 
     DO docs-ci+BUILD

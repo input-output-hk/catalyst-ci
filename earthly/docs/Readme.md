@@ -15,7 +15,7 @@ earthly -P +check
 If a new dependency is added to `pyproject.toml` ensure to run:
 
 ```sh
-poetry lock
+uv lock
 ```
 
 in the `earthly/docs` directory to update the locked dependencies.

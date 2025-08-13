@@ -1,0 +1,1 @@
+# Don't check this directory in CI with Pyright Linter.
