@@ -11,6 +11,7 @@ chtml
 codegen
 colordiff
 cowsay
+cuelang
 cytopia
 depgraph
 devenv
@@ -89,6 +90,7 @@ nextest
 nilnil
 nixos
 nixpkgs
+noninteractive
 onsi
 penwidth
 pkeyopt
@@ -127,6 +129,7 @@ testunit
 Timoni
 toolsets
 transpiling
+trixie
 UDCs
 unarchiving
 uniseg
