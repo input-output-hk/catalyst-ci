@@ -1,4 +1,5 @@
 aarch
+autogen
 bindgen
 binstall
 bkioshn
@@ -25,6 +26,7 @@ doublecircle
 Earthfile
 Earthfiles
 Edgedriver
+EPREFIX
 errchkjson
 extldflags
 findutils
@@ -68,9 +70,13 @@ libasound
 libatk
 libatspi
 libdrm
+libexpat
+libfreetype
 libgbm
 libgcc
+liblasi
 libnss
+librsvg
 libsqlite
 libxkbcommon
 libxshmfence

@@ -5,6 +5,7 @@ IMPORT ../../utilities/scripts AS scripts
 IMPORT ../../ AS cat-ci
 IMPORT ../debian AS debian
 IMPORT ../cue AS cue
+IMPORT ../graphviz AS graphviz
 
 
 # Define a constant name for the container and its version.
@@ -30,6 +31,9 @@ python-base:
 
     # Install CUE
     DO cue+INSTALL
+
+    # Install Graphviz
+    DO graphviz+INSTALL
 
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.
