@@ -11,8 +11,8 @@ INSTALL:
 
     # Install the packages and leave no garbage behind
     # Also don't install anything not explicitly asked for.
+    ENV DEBIAN_FRONTEND=noninteractive
     RUN set -eux; \
-        DEBIAN_FRONTEND=noninteractive \
         apt-get update --fix-missing \
         && apt-get install -y --no-install-recommends $packages \
         && apt-get dist-clean \
