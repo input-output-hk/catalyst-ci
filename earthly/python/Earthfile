@@ -3,14 +3,21 @@ VERSION 0.8
 
 IMPORT ../../utilities/scripts AS scripts
 IMPORT ../../ AS cat-ci
+IMPORT ../debian AS debian
+IMPORT ../cue AS cue
+IMPORT ../graphviz AS graphviz
+
+
+# Define a constant name for the container and its version.
+ARG --global PYTHON_IMAGE="python:3.13-slim-trixie"
 
 # cspell: words libjpeg ruff
 
 python-base:
-    FROM python:3.13-slim-bookworm
+    FROM $PYTHON_IMAGE
 
     # Install necessary packages
-    RUN apt-get update && apt-get install -y \
+    LET PACKAGES= \
         bash \
         curl \
         libffi-dev \
@@ -18,7 +25,15 @@ python-base:
         musl-dev \
         zlib1g-dev \
         libjpeg-dev \
-        git
+        git \
+        jq
+    DO debian+INSTALL --packages=$PACKAGES
+
+    # Install CUE
+    DO cue+INSTALL
+
+    # Install Graphviz
+    DO graphviz+INSTALL
 
     # Poetry Installation directory.
     # Gives poetry and our poetry project a reliable location.

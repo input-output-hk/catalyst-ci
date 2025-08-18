@@ -1,4 +1,5 @@
 aarch
+autogen
 bindgen
 binstall
 bkioshn
@@ -11,6 +12,7 @@ chtml
 codegen
 colordiff
 cowsay
+cuelang
 cytopia
 depgraph
 devenv
@@ -24,6 +26,7 @@ doublecircle
 Earthfile
 Earthfiles
 Edgedriver
+EPREFIX
 errchkjson
 extldflags
 findutils
@@ -67,9 +70,13 @@ libasound
 libatk
 libatspi
 libdrm
+libexpat
+libfreetype
 libgbm
 libgcc
+liblasi
 libnss
+librsvg
 libsqlite
 libxkbcommon
 libxshmfence
@@ -89,6 +96,8 @@ nextest
 nilnil
 nixos
 nixpkgs
+noninteractive
+nproc
 onsi
 penwidth
 pkeyopt
@@ -127,6 +136,7 @@ testunit
 Timoni
 toolsets
 transpiling
+trixie
 UDCs
 unarchiving
 uniseg
