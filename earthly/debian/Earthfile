@@ -50,7 +50,7 @@ common:
 
 # Checks our debian container is basically usable, and nothing more.
 check-debian:
-    FROM +debian
+    FROM +common
 
     RUN cat /etc/os-release
 
