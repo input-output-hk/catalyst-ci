@@ -1,6 +1,7 @@
 VERSION 0.8
 
 IMPORT ../python AS python-ci
+IMPORT ../debian AS debian
 IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words libfreetype liblcms libopenjp etag
@@ -14,21 +15,21 @@ deps:
     # This is all the tooling needed to build the docs.
 
     # Install extra packages we will need to support plugins.
-    RUN apt-get install -y \
-        graphviz \
+    LET PACKAGES= \
         fontconfig \
-        fonts-liberation \
         libxml2-dev \
-        libxslt1-dev \
         libffi-dev \
-        libssl-dev \
         libfreetype6-dev \
+        libtiff-dev \
+        libssl-dev \
+        fonts-liberation \
+        libxslt1-dev \
         liblcms2-dev \
         libopenjp2-7-dev \
-        libtiff-dev \
         tk-dev \
         tcl-dev  \
         make
+    DO debian+INSTALL --packages=$PACKAGES
 
     # Fix up font cache
     RUN fc-cache -f
