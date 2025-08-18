@@ -23,7 +23,6 @@ INSTALL:
 debian-clean:
     FROM $DEBIAN_IMAGE
 
-    RUN echo $DEBIAN_IMAGE
 
 # The current version of our base Debian Container.
 # Normally you want this because it has all the common tools
