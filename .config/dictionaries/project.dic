@@ -97,6 +97,7 @@ nilnil
 nixos
 nixpkgs
 noninteractive
+nproc
 onsi
 penwidth
 pkeyopt
