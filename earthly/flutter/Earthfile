@@ -257,10 +257,11 @@ BUILD_WEB:
     RUN flutter build web $BUILD_MODE --pwa-strategy=none --target $TARGET --build-number=$(date +%s) $BUILD_ARGS
 
     IF [ $SENTRY_UPLOAD_DEBUG_SYMBOLS = true ]
-        RUN --secret \
-            SENTRY_AUTH_TOKEN \
-            SENTRY_ORG \
-            SENTRY_PROJECT \
+        RUN --secret SENTRY_ORG=SENTRY_ORG echo "SENTRY_ORG -> is $SENTRY_ORG"
+        RUN --secret SENTRY_PROJECT=SENTRY_PROJECT echo "SENTRY_PROJECT -> is SENTRY_PROJECT"
+        RUN --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN \
+            --secret SENTRY_ORG=SENTRY_ORG \
+            --secret SENTRY_PROJECT=SENTRY_PROJECT \
             flutter pub run sentry_dart_plugin
     END
 
