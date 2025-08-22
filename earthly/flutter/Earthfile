@@ -258,9 +258,9 @@ BUILD_WEB:
 
     IF [ $SENTRY_UPLOAD_DEBUG_SYMBOLS = true ]
         RUN --secret \
-            SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN \
-            SENTRY_ORG=SENTRY_ORG \
-            SENTRY_PROJECT=SENTRY_PROJECT \
+            SENTRY_AUTH_TOKEN \
+            SENTRY_ORG \
+            SENTRY_PROJECT \
             flutter pub run sentry_dart_plugin
     END
 
