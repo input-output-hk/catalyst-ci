@@ -234,33 +234,54 @@ UNIT_TESTS:
     END
 
 # Build web app and save artifacts locally if needed.
+# TODO(damian-molinski): This targer should become BUILD_APP with platforms ARG.
+# platforms='web,android,ios'
+# Because `sentry_dart_plugin` requires access to .dart_tool as well as flutter itself
+# and using `sentry-cli` instead seems to not be worth effort.
 BUILD_WEB:
     FUNCTION
 
     ARG --required TARGET
     ARG BUILD_MODE='--release'
+    ARG --required BUILD_NAME
+    ARG --required BUILD_NUMBER
     ARG SAVE_LOCALLY=false
     ARG WORKDIR
-    ARG SENTRY_UPLOAD_DEBUG_SYMBOLS=false
-    ARG BUILD_ARGS=''
+    ARG UPLOAD_DEBUG_SYMBOLS=false
 
     WORKDIR $WORKDIR
 
-    IF [ $SENTRY_UPLOAD_DEBUG_SYMBOLS = true ]
-        IF [ ! echo "$BUILD_ARGS" | grep -q -- '--source-maps' ]
-            ARG BUILD_ARGS='$BUILD_ARGS --source-maps'
+    LET ADDITIONAL_BUILD_ARGS = ""
+    LET SENTRY_RELASE = "$SENTRY_PROJECT@$BUILD_NAME+$BUILD_NUMBER"
+    LET SENTRY_DIST = "$BUILD_NUMBER"
+
+    IF [ $UPLOAD_DEBUG_SYMBOLS = true ]
+        SET ADDITIONAL_BUILD_ARGS = "--dart-define=SENTRY_RELASE=$SENTRY_RELASE $ADDITIONAL_BUILD_ARGS"
+        SET ADDITIONAL_BUILD_ARGS = "--dart-define=SENTRY_DIST=$SENTRY_DIST $ADDITIONAL_BUILD_ARGS"
+
+        IF [ ! echo "$ADDITIONAL_BUILD_ARGS" | grep -q -- '--source-maps' ]
+            SET ADDITIONAL_BUILD_ARGS = "$ADDITIONAL_BUILD_ARGS --source-maps"
         END
     END
 
+    RUN echo "ADDITIONAL_BUILD_ARGS -> $ADDITIONAL_BUILD_ARGS"
+    RUN echo "SENTRY_RELASE -> $SENTRY_RELASE"
+    RUN echo "SENTRY_DIST -> $SENTRY_DIST"
+
     RUN flutter clean
     RUN flutter pub get
-    RUN flutter build web $BUILD_MODE --pwa-strategy=none --target $TARGET --build-number=$(date +%s) $BUILD_ARGS
+    RUN flutter build web $BUILD_MODE \
+        --pwa-strategy=none \
+        --target $TARGET \
+        --build-name=$BUILD_NAME \
+        --build-number=$BUILD_NUMBER \
+        $ADDITIONAL_BUILD_ARGS
 
-    IF [ $SENTRY_UPLOAD_DEBUG_SYMBOLS = true ]
-        RUN --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN \
-            --secret SENTRY_ORG=SENTRY_ORG \
-            --secret SENTRY_PROJECT=SENTRY_PROJECT \
-            flutter pub run sentry_dart_plugin
+    IF [ $UPLOAD_DEBUG_SYMBOLS = true ]
+#        RUN --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN \
+#            --secret SENTRY_ORG=SENTRY_ORG \
+#            --secret SENTRY_PROJECT=SENTRY_PROJECT \
+#            flutter pub run sentry_dart_plugin --sentry-define=release=$SENTRY_RELASE --sentry-define=dist=$SENTRY_DIST
     END
 
     WORKDIR "$WORKDIR/build"
