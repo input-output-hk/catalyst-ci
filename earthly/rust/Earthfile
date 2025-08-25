@@ -61,9 +61,14 @@ rust-base:
         python3-rich \
         python3-psycopg \
         ripgrep \
-        wget \
-        gcc-multilib \
-        && rm -rf /var/lib/apt/lists/*
+        wget
+
+    # gcc-multilib only exist for x86_64 architecture
+    IF [ "$TARGETARCH" = "amd64" ]
+        RUN apt-get update && apt-get install -y gcc-multilib
+    END
+    # Clean up
+    RUN rm -rf /var/lib/apt/lists/*
 
     # Fix up font cache.
     RUN fc-cache -f
