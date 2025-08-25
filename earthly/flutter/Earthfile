@@ -248,8 +248,8 @@ BUILD_WEB:
     ARG SAVE_LOCALLY=false
     ARG WORKDIR
     ARG UPLOAD_DEBUG_SYMBOLS=false
-    ARG SENTRY_ORG='iohk-j4'
-    ARG SENTRY_PROJECT='catalyst-voices'
+    ARG SENTRY_ORG
+    ARG SENTRY_PROJECT
 
     WORKDIR $WORKDIR
 
@@ -263,10 +263,6 @@ BUILD_WEB:
         SET ADDITIONAL_BUILD_ARGS = "$ADDITIONAL_BUILD_ARGS --source-maps"
     END
 
-    RUN echo "ADDITIONAL_BUILD_ARGS -> $ADDITIONAL_BUILD_ARGS"
-    RUN echo "SENTRY_RELASE -> $SENTRY_RELASE"
-    RUN echo "SENTRY_DIST -> $SENTRY_DIST"
-
     RUN flutter clean
     RUN flutter pub get
     RUN flutter build web $BUILD_MODE \
@@ -277,12 +273,12 @@ BUILD_WEB:
         $ADDITIONAL_BUILD_ARGS
 
     IF [ $UPLOAD_DEBUG_SYMBOLS = true ]
-#        RUN --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN \
-#            flutter pub run sentry_dart_plugin \
-#            --sentry-define=org=$SENTRY_ORG \
-#            --sentry-define=project=$SENTRY_PROJECT \
-#            --sentry-define=release=$SENTRY_RELASE \
-#            --sentry-define=dist=$SENTRY_DIST
+        RUN --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN \
+            flutter pub run sentry_dart_plugin \
+            --sentry-define=org=$SENTRY_ORG \
+            --sentry-define=project=$SENTRY_PROJECT \
+            --sentry-define=release=$SENTRY_RELASE \
+            --sentry-define=dist=$SENTRY_DIST
     END
 
     WORKDIR "$WORKDIR/build"
