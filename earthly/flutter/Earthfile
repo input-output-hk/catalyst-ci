@@ -254,11 +254,11 @@ BUILD_WEB:
     WORKDIR $WORKDIR
 
     LET ADDITIONAL_BUILD_ARGS = ""
-    LET SENTRY_RELASE = "$SENTRY_PROJECT@$BUILD_NAME+$BUILD_NUMBER"
+    LET SENTRY_RELEASE = "$SENTRY_PROJECT@$BUILD_NAME+$BUILD_NUMBER"
     LET SENTRY_DIST = "$BUILD_NUMBER"
 
     IF [ $UPLOAD_DEBUG_SYMBOLS = true ]
-        SET ADDITIONAL_BUILD_ARGS = "--dart-define=SENTRY_RELASE=$SENTRY_RELASE $ADDITIONAL_BUILD_ARGS"
+        SET ADDITIONAL_BUILD_ARGS = "--dart-define=SENTRY_RELEASE=$SENTRY_RELEASE $ADDITIONAL_BUILD_ARGS"
         SET ADDITIONAL_BUILD_ARGS = "--dart-define=SENTRY_DIST=$SENTRY_DIST $ADDITIONAL_BUILD_ARGS"
         SET ADDITIONAL_BUILD_ARGS = "$ADDITIONAL_BUILD_ARGS --source-maps"
     END
@@ -277,7 +277,7 @@ BUILD_WEB:
             flutter pub run sentry_dart_plugin \
             --sentry-define=org=$SENTRY_ORG \
             --sentry-define=project=$SENTRY_PROJECT \
-            --sentry-define=release=$SENTRY_RELASE \
+            --sentry-define=release=$SENTRY_RELEASE \
             --sentry-define=dist=$SENTRY_DIST
     END
 
