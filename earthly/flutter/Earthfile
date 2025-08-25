@@ -234,7 +234,7 @@ UNIT_TESTS:
     END
 
 # Build web app and save artifacts locally if needed.
-# TODO(damian-molinski): This targer should become BUILD_APP with platforms ARG.
+# TODO(damian-molinski): This target should become BUILD_APP with platforms ARG.
 # platforms='web,android,ios'
 # Because `sentry_dart_plugin` requires access to .dart_tool as well as flutter itself
 # and using `sentry-cli` instead seems to not be worth effort.
