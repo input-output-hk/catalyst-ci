@@ -8,7 +8,7 @@ IMPORT ./installer AS installer
 # Install flutter.
 INSTALL_FLUTTER:
     FUNCTION
-    ARG version=3.32.8
+    ARG version=3.35.1
     ARG TARGETARCH
 
     # Install Flutter
