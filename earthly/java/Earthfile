@@ -2,7 +2,7 @@ VERSION 0.8
 
 # Base image for Java used in other targets to avoid improve caching
 java-base:
-    FROM openjdk:21-jdk-slim
+    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/openjdk:21-jdk-slim
 
     SAVE ARTIFACT /usr/local/openjdk-21 /java
 

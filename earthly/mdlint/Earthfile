@@ -60,8 +60,9 @@ CHECK:
 
     # Unlikely this ever needs to be changed.
     ARG cfg_file=.markdownlint-cli2.jsonc
+    ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/"
 
-    FROM davidanson/markdownlint-cli2-rules:v0.14.0 
+    FROM ${REGISTRY}/davidanson/markdownlint-cli2-rules:v0.14.0 
 
     # Status line for what we are about to do.
     RUN echo Linting Markdown Recursively from: $src

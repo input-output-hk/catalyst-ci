@@ -31,7 +31,7 @@ rust-base:
     # This is our base Host toolset, and rustup.
     # Never use `rust-toolchain.toml` in CI as it breaks builds.
     # The only toolchain supported is the one installed here.
-    FROM rust:1.88.0-slim-bookworm
+    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/rust:1.88.0-slim-bookworm
 
     WORKDIR /root
 
