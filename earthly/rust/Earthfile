@@ -7,14 +7,16 @@ VERSION 0.8
 # FUNCTIONs or targets in that Earthfile MUST be shimmed here.
 # No other earthfile should reference the rust library in the earthly/lib repo.
 IMPORT github.com/earthly/lib/rust:3.0.3 AS rust
-
 # Local Earthfile reference imports
 IMPORT ./tools AS rust-tools
 IMPORT ../../utilities/scripts AS scripts
+IMPORT ../debian AS debian
 
 # cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset pkgconfig wasip
+
+ARG --global RUST_IMAGE="rust:1.89.0-slim-trixie"
 
 # rust-base : Base Rustup build container.
 #   Not called directly, used by other targets.
@@ -31,7 +33,7 @@ rust-base:
     # This is our base Host toolset, and rustup.
     # Never use `rust-toolchain.toml` in CI as it breaks builds.
     # The only toolchain supported is the one installed here.
-    FROM rust:1.88.0-slim-bookworm
+    FROM $RUST_IMAGE
 
     WORKDIR /root
 
@@ -43,7 +45,7 @@ rust-base:
     #
     # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
     #       if that crate is removed, these dependencies can also be removed.
-    RUN apt-get update && apt-get install -y \
+    LET PACKAGES= \
         bash \
         build-essential \
         clang \
@@ -51,7 +53,7 @@ rust-base:
         colordiff \
         findutils \
         fontconfig \
-        fonts-liberation2        \
+        fonts-liberation2 \
         graphviz \
         libssl-dev \
         mold \
@@ -61,9 +63,17 @@ rust-base:
         python3-rich \
         python3-psycopg \
         ripgrep \
-        wget \
-        gcc-multilib \
-        && rm -rf /var/lib/apt/lists/*
+        wget
+
+    # Installing packages specifically to an architecture.
+    IF [ "$TARGETARCH" = "amd64" ]
+        # gcc-multilib only exist for x86_64 architecture
+        SET PACKAGES= $PACKAGES \ 
+            gcc-multilib
+    END
+    
+    DO debian+INSTALL --packages=$PACKAGES
+
 
     # Fix up font cache.
     RUN fc-cache -f
@@ -366,7 +376,7 @@ REMOVE_SOURCE_FINGERPRINTS:
     
 # TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
 # Installing Rust
-# Code reference from [rust1.88.0-slim-bookworm](https://github.com/rust-lang/docker-rust/blob/63f877a36f8ba9d9b4b35cd49df3327264510886/stable/bookworm/slim/Dockerfile)
+# Code reference from [rust1.88.0-slim-trixie](https://hub.docker.com/layers/library/rust/1.88-slim-trixie/images/sha256-8db8b00515a87166ed92befb71c87f5dcffbdc98e8a9e90b452a302495330cdd)
 INSTALL_RUST:
     FUNCTION
 
@@ -375,19 +385,19 @@ INSTALL_RUST:
     ENV RUSTUP_HOME=/usr/local/rustup 
     ENV CARGO_HOME=/usr/local/cargo 
     ENV PATH=/usr/local/cargo/bin:$PATH 
-    ENV RUST_VERSION=1.88.0
+    ENV RUST_VERSION=1.89.0
 
     IF [ "$TARGETARCH" = "amd64" ]
         LET PLATFORM = "x86_64-unknown-linux-gnu"
-        LET RUSTUP_SHA = "6aeece6993e902708983b209d04c0d1dbb14ebb405ddb87def578d41f920f56d"
+        LET RUSTUP_SHA = "20a06e644b0d9bd2fbdbfd52d42540bdde820ea7df86e92e533c073da0cdd43c"
     ELSE IF [ "$TARGETARCH" = "arm64" ]
         LET PLATFORM = "aarch64-unknown-linux-gnu"
-        LET RUSTUP_SHA = "1cffbf51e63e634c746f741de50649bbbcbd9dbe1de363c9ecef64e278dba2b2"
+        LET RUSTUP_SHA = "e3853c5a252fca15252d07cb23a1bdd9377a8c6f3efa01531109281ae47f841c"
     ELSE
         RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
     END
 
-    LET URL = "https://static.rust-lang.org/rustup/archive/1.27.1/${PLATFORM}/rustup-init"
+    LET URL = "https://static.rust-lang.org/rustup/archive/1.28.2/${PLATFORM}/rustup-init"
     RUN wget $URL && echo "${RUSTUP_SHA} *rustup-init" | sha256sum -c - \
         && chmod +x rustup-init \
         && ./rustup-init -y --no-modify-path --profile minimal --default-toolchain $RUST_VERSION --default-host $PLATFORM \
