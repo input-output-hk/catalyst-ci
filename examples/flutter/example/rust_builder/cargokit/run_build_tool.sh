@@ -1,6 +1,4 @@
-# Delete this line to use the file
-
-# !/usr/bin/env bash
+#!/usr/bin/env bash
 
 set -e
 
@@ -17,9 +15,9 @@ cd "$CARGOKIT_TOOL_TEMP_DIR"
 BUILD_TOOL_PKG_DIR="$BASEDIR/build_tool"
 
 if [[ -z $FLUTTER_ROOT ]]; then # not defined
-  DART=dart
+    DART=dart
 else
-  DART="$FLUTTER_ROOT/bin/cache/dart-sdk/bin/dart"
+    DART="$FLUTTER_ROOT/bin/cache/dart-sdk/bin/dart"
 fi
 
 cat << EOF > "pubspec.yaml"
@@ -46,8 +44,8 @@ EOF
 
 # Create alias for `shasum` if it does not exist and `sha1sum` exists
 if ! [ -x "$(command -v shasum)" ] && [ -x "$(command -v sha1sum)" ]; then
-  shopt -s expand_aliases
-  alias shasum="sha1sum"
+    shopt -s expand_aliases
+    alias shasum="sha1sum"
 fi
 
 # Dart run will not cache any package that has a path dependency, which
@@ -58,9 +56,9 @@ fi
 # itself is not meant to have any path dependencies.
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-  PACKAGE_HASH=$(ls -lTR "$BUILD_TOOL_PKG_DIR" | shasum)
+    PACKAGE_HASH=$(ls -lTR "$BUILD_TOOL_PKG_DIR" | shasum)
 else
-  PACKAGE_HASH=$(ls -lR --full-time "$BUILD_TOOL_PKG_DIR" | shasum)
+    PACKAGE_HASH=$(ls -lR --full-time "$BUILD_TOOL_PKG_DIR" | shasum)
 fi
 
 PACKAGE_HASH_FILE=".package_hash"
@@ -79,6 +77,11 @@ if [ ! -f "$PACKAGE_HASH_FILE" ]; then
     echo "$PACKAGE_HASH" > "$PACKAGE_HASH_FILE"
 fi
 
+# Rebuild the tool if it was deleted by Android Studio
+if [ ! -f "bin/build_tool_runner.dill" ]; then
+    "$DART" compile kernel bin/build_tool_runner.dart
+fi
+
 set +e
 
 "$DART" bin/build_tool_runner.dill "$@"
@@ -87,10 +90,10 @@ exit_code=$?
 
 # 253 means invalid snapshot version.
 if [ $exit_code == 253 ]; then
-  "$DART" pub get --no-precompile
-  "$DART" compile kernel bin/build_tool_runner.dart
-  "$DART" bin/build_tool_runner.dill "$@"
-  exit_code=$?
+    "$DART" pub get --no-precompile
+    "$DART" compile kernel bin/build_tool_runner.dart
+    "$DART" bin/build_tool_runner.dill "$@"
+    exit_code=$?
 fi
 
 exit $exit_code

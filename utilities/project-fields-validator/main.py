@@ -211,7 +211,6 @@ class ProjectFieldsValidator:
             ProjectField("Estimate"),
             ProjectField("Iteration"),
             ProjectField("Start"),
-            ProjectField("End"),
         ]
 
     def _make_request(self, method: str, url: str, **kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -540,13 +539,10 @@ def main() -> None:  # noqa: C901, PLR0915
             ]
 
             if not pr_items:
-                print(f"\nWarning: PR #{pr_number} is not linked to project #{project_number}")
-                print("Please add it to the project using the following steps:")
-                print("1. Go to the project board")
-                print("2. Click '+ Add items'")
-                print("3. Search for this PR")
-                print("4. Click 'Add selected items'")
-                sys.exit(0)
+                print(
+                    "❌ Pull request is not assigned to any GitHub Project. Please select a project before continuing."
+                )
+                sys.exit(1)
 
             validation_errors = set()
             for item in pr_items:
