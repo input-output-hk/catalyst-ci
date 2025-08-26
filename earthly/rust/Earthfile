@@ -16,7 +16,7 @@ IMPORT ../debian AS debian
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset pkgconfig wasip
 
-ARG --global RUST_IMAGE="rust:1.88.0-slim-trixie"
+ARG --global RUST_IMAGE="rust:1.89.0-slim-trixie"
 
 # rust-base : Base Rustup build container.
 #   Not called directly, used by other targets.
@@ -64,14 +64,16 @@ rust-base:
         python3-psycopg \
         ripgrep \
         wget
-    DO debian+INSTALL --packages=$PACKAGES
 
     # Installing packages specifically to an architecture.
     IF [ "$TARGETARCH" = "amd64" ]
         # gcc-multilib only exist for x86_64 architecture
-        SET PACKAGES = gcc-multilib
-        DO debian+INSTALL --packages=$PACKAGES
+        SET PACKAGES= $PACKAGES \ 
+            gcc-multilib
     END
+    
+    DO debian+INSTALL --packages=$PACKAGES
+
 
     # Fix up font cache.
     RUN fc-cache -f
@@ -383,7 +385,7 @@ INSTALL_RUST:
     ENV RUSTUP_HOME=/usr/local/rustup 
     ENV CARGO_HOME=/usr/local/cargo 
     ENV PATH=/usr/local/cargo/bin:$PATH 
-    ENV RUST_VERSION=1.88.0
+    ENV RUST_VERSION=1.89.0
 
     IF [ "$TARGETARCH" = "amd64" ]
         LET PLATFORM = "x86_64-unknown-linux-gnu"
