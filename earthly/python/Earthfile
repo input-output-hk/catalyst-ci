@@ -55,20 +55,21 @@ python-base:
     ENV PATH=$HOME/.local/bin:$PATH
 
     # Extension we use needs rust.
-    RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-    RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
-    ENV PATH="/root/.cargo/bin:${PATH}"
+#    RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
+#    RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
+#    ENV PATH="/root/.cargo/bin:${PATH}"
 
-    # Install ruff for linting.
-    RUN pip3 install ruff
-    RUN pip3 install rich
-    RUN pip3 install third-party-imports
-
+#    # Install ruff for linting.
+#    RUN pip3 install ruff
+#    RUN pip3 install rich
+#    RUN pip3 install third-party-imports
+#
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
+    SAVE IMAGE python-tmp
 
 BUILDER:
     FUNCTION
