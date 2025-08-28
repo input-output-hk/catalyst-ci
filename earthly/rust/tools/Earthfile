@@ -33,7 +33,7 @@ CARGO_BINSTALL:
     FROM rust-ci+rust-base
     IF [ "$test_param" = "NONE" ]
         RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-            cargo binstall "$package" --version="$version" --locked --no-confirm \
+            cargo binstall "$package" --version="$version" --locked --no-confirm
     ELSE
         RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
             cargo binstall "$package" --version="$version" --locked --no-confirm \
