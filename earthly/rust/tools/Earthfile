@@ -37,8 +37,9 @@ CARGO_BINSTALL:
             if [ "$target" != "NONE" ]; then echo "--target $target"; fi )
     ELSE
         RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-            cargo binstall "$package" --version="$version" --locked --no-confirm \
-            "$executable" "$test_param" $(if [ "$target" != "NONE" ]; then echo "--target $target"; fi )
+            cargo binstall "$package" --version="$version" --locked --no-confirm $( \
+            if [ "$target" != "NONE" ]; then echo "--target $target"; fi ); \
+            "$executable" "$test_param" 
     END
     SAVE ARTIFACT $CARGO_HOME/bin/"$executable"
 
