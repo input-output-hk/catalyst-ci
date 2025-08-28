@@ -4,7 +4,7 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
-ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
 
 # TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
 # Install flutter.
