@@ -10,7 +10,7 @@ ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 # cspell: words psycopg
 
 postgres-base:
-    FROM ${REGISTRY}/library/postgres:16.4-bookworm
+    FROM ${REGISTRY}/library/postgres:16.10-trixie
 
     WORKDIR /root
 
