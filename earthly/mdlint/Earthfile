@@ -60,7 +60,7 @@ CHECK:
 
     # Unlikely this ever needs to be changed.
     ARG cfg_file=.markdownlint-cli2.jsonc
-    ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/"
+    ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
     FROM ${REGISTRY}/davidanson/markdownlint-cli2-rules:v0.14.0 
 

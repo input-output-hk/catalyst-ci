@@ -4,7 +4,7 @@ VERSION 0.8
 
 IMPORT ../rust AS rust-ci
 
-ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
 DEPS:
     FUNCTION
@@ -88,7 +88,7 @@ GO_WASM_TOOL:
 
 # Install go tools needed for go WASM binding
 go-wasm-builder:
-    FROM ${REGISTRY}/golang:1.24.5-bookworm
+    FROM ${REGISTRY}/library/golang:1.24.5-bookworm
 
     DO rust-ci+INSTALL_RUST
     # wasm-tools is needed
