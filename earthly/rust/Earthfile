@@ -16,8 +16,6 @@ IMPORT ../debian AS debian
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset pkgconfig wasip
 
-ARG --global RUST_IMAGE="rust:1.89.0-slim-trixie"
-
 # rust-base : Base Rustup build container.
 #   Not called directly, used by other targets.
 rust-base:
