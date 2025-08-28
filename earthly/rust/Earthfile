@@ -98,6 +98,7 @@ rust-base:
     RUN rustup target add x86_64-pc-windows-gnu
     RUN rustup target add aarch64-unknown-linux-gnu
     RUN rustup target add aarch64-apple-darwin
+    RUN rustup target add x86_64-unknown-linux-musl
 
     RUN rustup target add wasm32-unknown-unknown --toolchain nightly
     RUN rustup target add wasm32-wasip1 --toolchain nightly 
@@ -107,6 +108,7 @@ rust-base:
     RUN rustup target add x86_64-pc-windows-gnu --toolchain nightly
     RUN rustup target add aarch64-unknown-linux-gnu --toolchain nightly
     RUN rustup target add aarch64-apple-darwin --toolchain nightly
+    RUN rustup target add x86_64-unknown-linux-musl --toolchain nightly
 
     RUN echo $PATH
     RUN echo $CARGO_HOME

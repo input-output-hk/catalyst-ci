@@ -28,15 +28,21 @@ CARGO_BINSTALL:
     ARG version
     ARG executable="$package"
     ARG test_param="--version"
+    ARG target
 
     FROM rust-ci+rust-base
     IF [ "$test_param" = "NONE" ]
         RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
             cargo binstall "$package" --version="$version" --locked --no-confirm
     ELSE
-        RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-            cargo binstall "$package" --version="$version" --locked --no-confirm; \
-            "$executable" "$test_param"
+        IF [ "target" = "NONE" ]
+            RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
+                cargo binstall "$package" --version="$version" --locked --no-confirm; \
+                "$executable" "$test_param"
+        ELSE
+            RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
+                cargo binstall "$package" --version="$version" --locked --no-confirm; \
+                "$executable" "$test_param" --target "$target"
     END
     SAVE ARTIFACT $CARGO_HOME/bin/"$executable"
 
@@ -72,7 +78,7 @@ tool-cargo-expand:
 
 # Should align with our wit-bindgen library.
 tool-wit-bindgen:
-    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.45.0 --executable="wit-bindgen" --test_param="-V"
+    DO +CARGO_BINSTALL --package=wit-bindgen-cli --version=0.43.0 --executable="wit-bindgen" --test_param="-V" --target="x86_64-unknown-linux-musl"
 
 # We build cargo-sweep tooling for the rust library so that its not rebuilt for every target.
 tool-cargo-sweep:
