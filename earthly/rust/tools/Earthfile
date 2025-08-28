@@ -28,20 +28,17 @@ CARGO_BINSTALL:
     ARG version
     ARG executable="$package"
     ARG test_param="--version"
-    ARG target
+    ARG target="NONE"
 
     FROM rust-ci+rust-base
     IF [ "$test_param" = "NONE" ]
         RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-            cargo binstall "$package" --version="$version" --locked --no-confirm
-    ELSE IF [ "$target" = "NONE" ]
-        RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-            cargo binstall "$package" --version="$version" --locked --no-confirm; \
-            "$executable" "$test_param"
+            cargo binstall "$package" --version="$version" --locked --no-confirm $( \
+            if [ "$target" != "NONE" ]; then echo "--target $target"; fi )
     ELSE
         RUN --secret GITHUB_TOKEN=GITHUB_TOKEN \
-            cargo binstall "$package" --version="$version" --locked --no-confirm; \
-            "$executable" "$test_param" --target "$target"
+            cargo binstall "$package" --version="$version" --locked --no-confirm \
+            "$executable" "$test_param" $(if [ "$target" != "NONE" ]; then echo "--target $target"; fi )
     END
     SAVE ARTIFACT $CARGO_HOME/bin/"$executable"
 
