@@ -15,7 +15,7 @@ INSTALL:
     RUN set -eux; \
         apt-get update --fix-missing \
         && apt-get install -y --no-install-recommends $packages \
-        && apt-get clean \
+        && apt-get dist-clean \
         && rm -rf /var/lib/apt/lists/*
 
 # The current version of our base Debian Container.
