@@ -32,7 +32,7 @@ rust-base:
     # Never use `rust-toolchain.toml` in CI as it breaks builds.
     # The only toolchain supported is the one installed here.
 
-    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/rust:1.88.0-slim-bookworm
+    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/rust:1.89.0-slim-trixie
 
     WORKDIR /root
 
