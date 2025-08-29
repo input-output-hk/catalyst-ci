@@ -1,5 +1,7 @@
 VERSION 0.8
-FROM golang:1.22.4-alpine3.20
+
+ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+FROM ${REGISTRY}/golang:1.22.4-alpine3.20
 
 IMPORT ../../earthly/go AS go-ci
 

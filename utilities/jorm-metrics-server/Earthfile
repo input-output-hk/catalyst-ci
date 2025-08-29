@@ -1,7 +1,9 @@
 VERSION 0.8
 
+ARG --global IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/python:3.13-slim-bookworm"
+
 deps:
-    FROM python:3.13-slim-bookworm
+    FROM $IMAGE
     WORKDIR /work
 
     ARG version = 1.7.1
@@ -44,7 +46,7 @@ build:
     SAVE ARTIFACT . src
 
 docker:
-    FROM python:3.13-slim-bookworm
+    FROM $IMAGE
 
     WORKDIR /app
 

@@ -4,6 +4,7 @@ VERSION 0.8
 
 IMPORT ../rust AS rust-ci
 
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
 DEPS:
     FUNCTION
@@ -30,7 +31,7 @@ FMT:
     FUNCTION
 
     # latest linux/amd64
-    FROM cytopia/gofmt@sha256:ae76abdbc96780819ce175f7ba4bf1fec98e9f708eb680d0b949d1737a959983
+    FROM ${REGISTRY}/cytopia/gofmt@sha256:ae76abdbc96780819ce175f7ba4bf1fec98e9f708eb680d0b949d1737a959983
     WORKDIR /work
 
     ARG --required src
@@ -45,7 +46,7 @@ LINT:
     FUNCTION
 
     # v1.54-alpine
-    FROM golangci/golangci-lint@sha256:a8423cab177c2863b863ee6d9f00c58f101cadd6120e195b2bb59fdfa189c1ae
+    FROM ${REGISTRY}/golangci/golangci-lint@sha256:a8423cab177c2863b863ee6d9f00c58f101cadd6120e195b2bb59fdfa189c1ae
     WORKDIR /work
 
     ARG --required src
@@ -87,7 +88,7 @@ GO_WASM_TOOL:
 
 # Install go tools needed for go WASM binding
 go-wasm-builder:
-    FROM golang:1.24.5-bookworm
+    FROM ${REGISTRY}/library/golang:1.24.5-bookworm
 
     DO rust-ci+INSTALL_RUST
     # wasm-tools is needed

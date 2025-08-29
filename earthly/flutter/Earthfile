@@ -4,6 +4,8 @@ VERSION 0.8
 
 IMPORT ./installer AS installer
 
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+
 # TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
 # Install flutter.
 INSTALL_FLUTTER:
@@ -37,7 +39,7 @@ INSTALL_FLUTTER:
 
 # flutter-base installs required tools and packages.
 flutter-base:
-    FROM debian:bookworm-20250203-slim
+    FROM ${REGISTRY}/debian:bookworm-20250203-slim
 
     ENV DEBIAN_FRONTEND=noninteractive
 
