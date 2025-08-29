@@ -1,0 +1,62 @@
+VERSION 0.8
+
+# Define a constant name for the container and its version.
+ARG --global DEBIAN_IMAGE="debian:13.0-slim"
+
+# Optimally install packages for debian
+INSTALL:
+    FUNCTION
+
+    ARG packages
+
+    # Install the packages and leave no garbage behind
+    # Also don't install anything not explicitly asked for.
+    ENV DEBIAN_FRONTEND=noninteractive
+    RUN set -eux; \
+        apt-get update --fix-missing \
+        && apt-get install -y --no-install-recommends $packages \
+        && apt-get dist-clean \
+        && rm -rf /var/lib/apt/lists/*
+
+# The current version of our base Debian Container.
+# Clean with nothing added.
+debian-clean:
+    FROM $DEBIAN_IMAGE
+
+
+# The current version of our base Debian Container.
+# Normally you want this because it has all the common tools
+# one would expect inside CI.
+common:
+    FROM +debian-clean
+
+    LET PACKAGES= \
+        ca-certificates \
+        apt-utils \
+        git \
+        curl \
+        gzip \
+        unzip \
+        bzip2 \
+        bash \
+        jq \
+        gpg \
+        lcov \
+        tar \
+        wget \
+        xz-utils
+    DO +INSTALL --packages=$PACKAGES
+
+# Checks our debian container is basically usable, and nothing more.
+check-debian:
+    FROM +common
+
+    RUN cat /etc/os-release
+
+version-check-debian:
+    FROM +debian
+
+    # The idea here is the version check will check if the image its using is the latest image in docker hub.
+    # This would need to be run without cache, and should be a special target.
+    # We need a general solution to help us track our containers and make sure we are aware when they are out of date.
+    RUN exit 1

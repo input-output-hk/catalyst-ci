@@ -4,8 +4,8 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.7.0 <4.0.0'
-  flutter: ">=3.29.3"
+  sdk: '>=3.9.0 <4.0.0'
+  flutter: ">=3.35.1"
 
 dependencies:
   flutter:
@@ -14,7 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   rust_lib_example:
     path: rust_builder
-  flutter_rust_bridge: 2.5.1
+  flutter_rust_bridge: 2.11.1
 
 dev_dependencies:
   flutter_test:

@@ -1,0 +1,38 @@
+VERSION 0.8
+
+IMPORT ../debian AS debian
+
+# Define a constant name for the container and its version.
+ARG --global VERSION=13.1.0
+ARG --global SHA256=13339b83ee5467001a035cfacd175702ac4b14f5d390f0d34e89437b29881278
+ARG --global URL=https://gitlab.com/api/v4/projects/4207231/packages/generic/graphviz-releases/${VERSION}/graphviz-${VERSION}.tar.xz
+
+# Sadly this is the only way to reliably pin a version of graphviz in debian.
+INSTALL:
+    FUNCTION
+
+    LET PACKAGES= \
+        build-essential \
+        pkg-config \
+        libexpat1-dev \
+        zlib1g-dev \
+        libpng-dev \
+        libfreetype-dev \
+        librsvg2-dev \
+        liblasi-dev \
+        wget
+    DO debian+INSTALL --packages=$PACKAGES
+
+    RUN mkdir build; \
+        cd build; \
+        wget -nv -O graphviz-${VERSION}.tar.xz "$URL" \
+        && echo "${SHA256}  graphviz-${VERSION}.tar.xz" | sha256sum -c - \
+        && tar -xf graphviz-${VERSION}.tar.xz \
+        && cd graphviz-${VERSION} \
+        && echo "Building Graphviz ${VERSION}" \
+        && ./configure > /dev/null 2>&1 \
+        && make -j"$(nproc)" > /dev/null 2>&1 \
+        && make install > /dev/null 2>&1 \
+        && cd ../.. \
+        && rm -rf build \
+        && echo "Graphviz built and installed OK"

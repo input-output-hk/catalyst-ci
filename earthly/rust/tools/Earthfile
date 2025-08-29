@@ -50,7 +50,7 @@ tool-cargo-machete:
     DO +CARGO_BINSTALL --package=cargo-machete --version=0.6.2
 
 tool-refinery:
-    DO +CARGO_BINSTALL --package=refinery_cli --version=0.8.14 --executable=refinery
+    DO +CARGO_BINSTALL --package=refinery_cli --version=0.8.16 --executable=refinery
 
 tool-cargo-deny:
     DO +CARGO_BINSTALL --package=cargo-deny --version=0.18.0
@@ -85,4 +85,4 @@ tool-wasm-pack:
     DO +CARGO_BINSTALL --package=wasm-pack --version=0.13.0
 
 tool-flutter-rust-bridge-codegen:
-    DO +CARGO_BINSTALL --package=flutter_rust_bridge_codegen --version=2.5.1 --executable="flutter_rust_bridge_codegen"
+    DO +CARGO_BINSTALL --package=flutter_rust_bridge_codegen --version=2.11.1 --executable="flutter_rust_bridge_codegen"
