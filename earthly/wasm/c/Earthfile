@@ -9,19 +9,17 @@ wasm-c-base:
     # This image comes from: 
     # https://github.com/WebAssembly/wasi-sdk/pkgs/container/wasi-sdk
     ARG REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
-    FROM ${REGISTRY}/webassembly/wasi-sdk:sha-754aec3
+    FROM ${REGISTRY}/webassembly/wasi-sdk:sha-400dd95
     WORKDIR /root
 
     RUN apt-get update && apt-get install -y \
         bash \
         build-essential \
-        python3-pip \
+        python3-rich \
         && rm -rf /var/lib/apt/lists/*
 
     COPY rust-tools+tool-wasm-tools/wasm-tools /bin
     COPY rust-tools+tool-wit-bindgen/wit-bindgen /bin
-
-    RUN pip install rich==13.8.0
 
     # Universal build scripts.
     COPY --dir scripts /scripts
