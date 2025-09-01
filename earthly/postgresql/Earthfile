@@ -8,7 +8,7 @@ IMPORT ../java AS java
 # cspell: words psycopg
 
 postgres-base:
-    FROM debian:trixie
+    FROM postgres:17.6-trixie
 
     WORKDIR /root
 
