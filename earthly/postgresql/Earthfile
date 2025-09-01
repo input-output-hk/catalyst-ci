@@ -8,7 +8,7 @@ IMPORT ../java AS java
 # cspell: words psycopg
 
 postgres-base:
-    FROM postgres:16.4-bookworm
+    FROM debian:trixie
 
     WORKDIR /root
 
@@ -38,7 +38,7 @@ postgres-base:
 
 sqlfluff-base:
     FROM +postgres-base
-    
+
     RUN apt-get update && apt-get install -y \
         colordiff \
         pipx
@@ -125,7 +125,7 @@ DOCS:
 # Linter checks for sql files
 CHECK:
     FUNCTION
-    
+
     RUN /scripts/std_checks.py
 
 # Format sql files
