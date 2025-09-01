@@ -6,6 +6,8 @@ IMPORT ./earthly/bash AS bash-ci
 IMPORT ./earthly/spectral AS spectral-ci
 IMPORT ./earthly/python AS python-ci
 
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+
 # cspell: words livedocs sitedocs
 
 
@@ -21,7 +23,7 @@ markdown-check-fix:
 
 # Make sure the project dictionary is properly sorted.
 clean-spelling-list:
-    FROM debian:stable-slim
+    FROM ${REGISTRY}/debian:stable-slim
     DO cspell-ci+CLEAN
 
 # check-spelling Check spelling in this repo inside a container.
@@ -30,7 +32,7 @@ check-spelling:
 
 # check-bash - test all bash files lint properly according to shellcheck.
 check-bash:
-    FROM alpine:3.20.3
+    FROM ${REGISTRY}/alpine:3.20.3
 
     DO bash-ci+SHELLCHECK --src=.
 
