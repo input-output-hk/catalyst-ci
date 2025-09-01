@@ -50,7 +50,7 @@ tool-cargo-machete:
     DO +CARGO_BINSTALL --package=cargo-machete --version=0.6.2
 
 tool-refinery:
-    DO +CARGO_BINSTALL --package=refinery_cli --version=0.11.1 --executable=refinery
+    DO +CARGO_BINSTALL --package=refinery_cli --version=0.11.0 --executable=refinery
 
 tool-cargo-deny:
     DO +CARGO_BINSTALL --package=cargo-deny --version=0.18.0
