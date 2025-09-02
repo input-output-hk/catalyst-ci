@@ -114,7 +114,7 @@ PACKAGE:
     FUNCTION
 
     # Use the official Nginx base image
-    FROM nginx:bookworm
+    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/nginx:bookworm
 
     # Force this server to disable the browsers cache for these files.
     RUN echo " " > /etc/nginx/conf.d/disable-cache.conf; \

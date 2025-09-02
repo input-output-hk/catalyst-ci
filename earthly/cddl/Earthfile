@@ -3,6 +3,7 @@ VERSION 0.8
 # cspell: words cddlc
 
 cddl-base:
-    FROM ruby:3.3.0-alpine
+    ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+    FROM ${REGISTRY}/ruby:3.3.0-alpine
 
     RUN gem install cddlc

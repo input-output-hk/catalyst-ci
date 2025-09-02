@@ -5,10 +5,12 @@ IMPORT ../rust/tools AS rust-tools
 IMPORT ../../utilities/scripts AS scripts
 IMPORT ../java AS java
 
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
+
 # cspell: words psycopg
 
 postgres-base:
-    FROM postgres:17.6-trixie
+    FROM ${REGISTRY}/library/postgres:16.10-trixie
 
     WORKDIR /root
 
@@ -38,7 +40,7 @@ postgres-base:
 
 sqlfluff-base:
     FROM +postgres-base
-
+    
     RUN apt-get update && apt-get install -y \
         colordiff \
         pipx
@@ -125,7 +127,7 @@ DOCS:
 # Linter checks for sql files
 CHECK:
     FUNCTION
-
+    
     RUN /scripts/std_checks.py
 
 # Format sql files
@@ -143,7 +145,7 @@ FORMAT:
 
 # Internal: Integration Test container image
 integration-test:
-    FROM earthly/dind:alpine-3.20-docker-26.1.5-r0
+    FROM ${REGISTRY}/earthly/dind:alpine-3.20-docker-26.1.5-r0
 
     RUN apk add --no-cache \
             bash \

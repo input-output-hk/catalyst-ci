@@ -9,12 +9,12 @@ IMPORT ../graphviz AS graphviz
 
 
 # Define a constant name for the container and its version.
-ARG --global PYTHON_IMAGE="python:3.13-slim-trixie"
+ARG --global PYTHON_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/python"
 
 # cspell: words libjpeg ruff
 
 python-base:
-    FROM $PYTHON_IMAGE
+    FROM ${PYTHON_IMAGE}:3.13-slim-trixie
 
     # Install necessary packages
     LET PACKAGES= \
@@ -97,7 +97,7 @@ LINT_PYTHON:
     # Where we want to run the `lint` from. Use `.` to check the whole repo.
     ARG src=.
 
-    FROM python:3.13
+    FROM ${PYTHON_IMAGE}:3.13
     WORKDIR /work
 
     # Install ruff
