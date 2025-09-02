@@ -31,8 +31,9 @@ builder:
 # Generated necessary files for running Flutter web.
 CODE_GENERATOR_WEB:
     FUNCTION
+    ARG --required WEB_PREFIX
 
-    RUN flutter_rust_bridge_codegen generate --default-external-library-loader-web-prefix=/assets/packages/catalyst_key_derivation/assets/js/
+    RUN flutter_rust_bridge_codegen generate --default-external-library-loader-web-prefix=$WEB_PREFIX
     # https://blog.rust-lang.org/2025/04/04/c-abi-changes-for-wasm32-unknown-unknown/
     RUN flutter_rust_bridge_codegen build-web
 
