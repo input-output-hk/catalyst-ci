@@ -16,8 +16,6 @@ IMPORT ../debian AS debian
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
 # cspell: words findutils fileset pkgconfig wasip
 
-ARG --global RUST_IMAGE="rust:1.89.0-slim-trixie"
-
 # rust-base : Base Rustup build container.
 #   Not called directly, used by other targets.
 rust-base:
@@ -33,7 +31,8 @@ rust-base:
     # This is our base Host toolset, and rustup.
     # Never use `rust-toolchain.toml` in CI as it breaks builds.
     # The only toolchain supported is the one installed here.
-    FROM $RUST_IMAGE
+
+    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/rust:1.89.0-slim-trixie
 
     WORKDIR /root
 
