@@ -22,7 +22,8 @@ builder:
         git \
         build-essential \
         curl \
-        unzip
+        unzip \
+        clang
 
     DO flutter-ci+INSTALL_FLUTTER
     DO rust-ci+INSTALL_RUST
