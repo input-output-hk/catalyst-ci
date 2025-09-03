@@ -3,7 +3,7 @@ VERSION 0.8
 # cspell: words ruleset
 
 spectral-base:
-    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/stoplight/spectral:6.13.1
+    FROM harbor.shared-services.projectcatalyst.io/dockerhub/stoplight/spectral:6.13.1
     WORKDIR /work
 
 LINT:
