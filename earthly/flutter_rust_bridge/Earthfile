@@ -22,7 +22,8 @@ builder:
         git \
         build-essential \
         curl \
-        unzip
+        unzip \
+        clang
 
     DO flutter-ci+INSTALL_FLUTTER
     DO rust-ci+INSTALL_RUST
@@ -31,10 +32,11 @@ builder:
 # Generated necessary files for running Flutter web.
 CODE_GENERATOR_WEB:
     FUNCTION
+    ARG --required WASM_MODULE_NAME
 
-    RUN flutter_rust_bridge_codegen generate --default-external-library-loader-web-prefix=/assets/packages/catalyst_key_derivation/assets/js/
+    RUN flutter_rust_bridge_codegen generate
     # https://blog.rust-lang.org/2025/04/04/c-abi-changes-for-wasm32-unknown-unknown/
-    RUN flutter_rust_bridge_codegen build-web
+    RUN flutter_rust_bridge_codegen build-web --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME"
 
     RUN mkdir -p assets/js && cp -rf ./web/pkg/* assets/js/
      # Don't want this gitignore file.
