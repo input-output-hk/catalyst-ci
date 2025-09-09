@@ -34,9 +34,14 @@ CODE_GENERATOR_WEB:
     FUNCTION
     ARG --required WASM_MODULE_NAME
 
-    RUN flutter_rust_bridge_codegen generate
-    # https://blog.rust-lang.org/2025/04/04/c-abi-changes-for-wasm32-unknown-unknown/
-    RUN flutter_rust_bridge_codegen build-web --release --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME"
+    # TODO(dt-iohk): revert to official version when changes are merged
+    GIT CLONE https://github.com/dt-iohk/flutter_rust_bridge.git /usr/local/flutter_rust_bridge
+    cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- generate
+    cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- build-web --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME"
+
+    # RUN flutter_rust_bridge_codegen generate
+    # TODO(damian-molinski) add --release flag to the command below to optimize for performance
+    # RUN flutter_rust_bridge_codegen build-web --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME"
 
     RUN mkdir -p assets/js && cp -rf ./web/pkg/* assets/js/
      # Don't want this gitignore file.
