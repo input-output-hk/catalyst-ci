@@ -35,7 +35,7 @@ CODE_GENERATOR_WEB:
     ARG --required WASM_MODULE_NAME
 
     # TODO(dt-iohk): revert to official version when changes are merged
-    GIT CLONE https://github.com/dt-iohk/flutter_rust_bridge.git /usr/local/flutter_rust_bridge
+    GIT CLONE --branch feat/wasm_bindgen_configurable https://github.com/dt-iohk/flutter_rust_bridge.git /usr/local/flutter_rust_bridge
     RUN cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- generate
     RUN cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- build-web --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME"
 
