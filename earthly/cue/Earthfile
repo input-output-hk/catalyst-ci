@@ -1,6 +1,7 @@
 VERSION 0.8
 
-IMPORT ../debian AS debian
+# IMPORT ../debian AS debian
+IMPORT ../chainguard AS chainguard
 
 # Define a constant name for the container and its version.
 ARG --global CUE_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/cuelang/cue:0.14.1"
@@ -19,7 +20,8 @@ cue-bin:
 
 # Just check that Cue can be properly installed, and runs.
 check-cue:
-    FROM debian+common
+    # FROM debian+common
+    FROM chainguard+common
     
     DO +INSTALL
 

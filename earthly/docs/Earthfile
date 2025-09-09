@@ -1,7 +1,8 @@
 VERSION 0.8
 
 IMPORT ../python AS python-ci
-IMPORT ../debian AS debian
+# IMPORT ../debian AS debian
+IMPORT ../chainguard AS chainguard
 IMPORT ../../utilities/scripts AS scripts
 
 # cspell: words libfreetype liblcms libopenjp etag
@@ -15,21 +16,37 @@ deps:
     # This is all the tooling needed to build the docs.
 
     # Install extra packages we will need to support plugins.
+    # LET PACKAGES= \
+    #     fontconfig \
+    #     libxml2-dev \
+    #     libffi-dev \
+    #     libfreetype6-dev \
+    #     libtiff-dev \
+    #     libssl-dev \
+    #     fonts-liberation \
+    #     libxslt1-dev \
+    #     liblcms2-dev \
+    #     libopenjp2-7-dev \
+    #     tk-dev \
+    #     tcl-dev  \
+    #     make
+    # DO debian+INSTALL --packages=$PACKAGES
+
     LET PACKAGES= \
         fontconfig \
         libxml2-dev \
         libffi-dev \
-        libfreetype6-dev \
-        libtiff-dev \
-        libssl-dev \
-        fonts-liberation \
-        libxslt1-dev \
-        liblcms2-dev \
-        libopenjp2-7-dev \
+        freetype-dev \
+        tiff-dev \
+        openssl-dev \
+        font-liberation \
+        libxslt-dev \
+        lcms2-dev \
+        openjpeg-dev \
         tk-dev \
         tcl-dev  \
         make
-    DO debian+INSTALL --packages=$PACKAGES
+    DO chainguard+INSTALL --packages=$PACKAGES
 
     # Fix up font cache
     RUN fc-cache -f

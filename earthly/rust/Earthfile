@@ -10,7 +10,8 @@ IMPORT github.com/earthly/lib/rust:3.0.3 AS rust
 # Local Earthfile reference imports
 IMPORT ./tools AS rust-tools
 IMPORT ../../utilities/scripts AS scripts
-IMPORT ../debian AS debian
+# IMPORT ../debian AS debian
+IMPORT ../chainguard AS chainguard
 
 # cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
@@ -32,8 +33,10 @@ rust-base:
     # Never use `rust-toolchain.toml` in CI as it breaks builds.
     # The only toolchain supported is the one installed here.
 
-    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/rust:1.89.0-slim-trixie
+    # FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/rust:1.89.0-slim-trixie
+    FROM cgr.dev/chainguard/rust:latest-dev
 
+    USER root
     WORKDIR /root
 
     # Enables rust backtrace when something panics
@@ -44,38 +47,60 @@ rust-base:
     #
     # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
     #       if that crate is removed, these dependencies can also be removed.
+    # LET PACKAGES= \
+    #     bash \
+    #     build-essential \
+    #     clang \
+    #     cmake \
+    #     colordiff \
+    #     findutils \
+    #     fontconfig \
+    #     fonts-liberation2 \
+    #     graphviz \
+    #     libssl-dev \
+    #     mold \
+    #     openssl \
+    #     pkgconf \
+    #     python3-pip \
+    #     python3-rich \
+    #     python3-psycopg \
+    #     ripgrep \
+    #     wget
+
     LET PACKAGES= \
         bash \
-        build-essential \
+        build-base \
         clang \
         cmake \
-        colordiff \
         findutils \
         fontconfig \
-        fonts-liberation2 \
+        font-liberation \
         graphviz \
-        libssl-dev \
+        openssl-dev \
         mold \
         openssl \
         pkgconf \
-        python3-pip \
-        python3-rich \
-        python3-psycopg \
+        py3-pip \
+        py3-rich \
+        py3-psycopg \
         ripgrep \
         wget
 
     # Installing packages specifically to an architecture.
-    IF [ "$TARGETARCH" = "amd64" ]
-        # gcc-multilib only exist for x86_64 architecture
-        SET PACKAGES= $PACKAGES \ 
-            gcc-multilib
-    END
+    # IF [ "$TARGETARCH" = "amd64" ]
+    #     # gcc-multilib only exist for x86_64 architecture
+    #     SET PACKAGES= $PACKAGES \ 
+    #         gcc-multilib
+    # END
     
-    DO debian+INSTALL --packages=$PACKAGES
+    # DO debian+INSTALL --packages=$PACKAGES
+    DO chainguard+INSTALL --packages=$PACKAGES
 
 
     # Fix up font cache.
-    RUN fc-cache -f
+    # RUN fc-cache -f
+
+    RUN rustup default stable
 
     # Make sure we have cargo.
     RUN rustup component add cargo

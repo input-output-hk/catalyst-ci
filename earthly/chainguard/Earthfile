@@ -1,0 +1,54 @@
+VERSION 0.8
+
+# Define a constant name for the container and its version.
+# Temporary I'm not using Harbor as pull-though cache.
+ARG --global CG_IMAGE="cgr.dev/chainguard/wolfi-base"
+
+# Optimally install packages for chainguard
+INSTALL:
+    FUNCTION
+
+    ARG packages
+
+    RUN set -eux; \
+        apk update \
+        && apk add --no-interactive --no-cache $packages \
+        && rm -rf /var/cache/apk/*
+
+# The lates version of Chainguard base Container.
+# Clean with nothing added.
+chainguard-clean:
+    FROM $CG_IMAGE
+
+# The lates version of Chainguard base Container.
+# Normally you want this because it has all the common tools
+# one would expect inside CI.
+common:
+    FROM +chainguard-clean
+
+    # bash is dependence of lcov, use gnutar instead of tar, use xz instead of xz-utils
+    LET PACKAGES= \
+        git \
+        curl \
+        bash \
+        jq \
+        gpg \
+        lcov \
+        gnutar \
+        wget \
+        xz
+    DO +INSTALL --packages=$PACKAGES
+
+# Checks our Chainguard container is basically usable, and nothing more.
+check-chainguard:
+    FROM +common
+
+    RUN cat /etc/os-release
+
+version-check-Chainguard:
+    FROM +chainguard
+
+    # The idea here is the version check will check if the image its using is the latest image in docker hub.
+    # This would need to be run without cache, and should be a special target.
+    # We need a general solution to help us track our containers and make sure we are aware when they are out of date.
+    RUN exit 1
