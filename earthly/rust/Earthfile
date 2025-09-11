@@ -82,6 +82,7 @@ rust-base:
         mold \
         openssl \
         pkgconf \
+        python3 \
         py3-pip \
         py3-rich \
         py3-psycopg \
@@ -345,7 +346,7 @@ SETUP:
     ARG EARTHLY_TARGET_PROJECT_NO_TAG #https://docs.earthly.dev/docs/earthfile/builtin-args
     ARG TARGETARCH
     ARG TARGETOS
-	  ARG TARGETVARIANT    
+	ARG TARGETVARIANT    
     ARG CACHE_VERSION="00001" # Bumping this causes the old cache to be dropped.
     ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#${TARGETOS}#${TARGETARCH}${TARGETVARIANT}#earthly-cargo-cache#${CACHE_VERSION}"
 
