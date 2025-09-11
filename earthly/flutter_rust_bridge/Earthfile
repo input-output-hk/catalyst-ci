@@ -46,3 +46,6 @@ CODE_GENERATOR_WEB:
     RUN mkdir -p assets/js && cp -rf ./web/pkg/* assets/js/
      # Don't want this gitignore file.
     RUN rm -rf ./assets/js/.gitignore
+
+    # Reformat code once it's generated under lib directory.
+    RUN dart format lib
