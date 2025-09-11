@@ -124,6 +124,6 @@ LINT_PYTHON:
 
     RUN diff -Nau ruff.toml ruff.toml.std
 
-    RUN ruff format --check && \
-        ruff check --output-format=github .
+    RUN python3 -m ruff format --check && \
+        python3 -m ruff check --output-format=github .
 
