@@ -26,7 +26,7 @@ chainguard-clean:
 common:
     FROM +chainguard-clean
 
-    # bash is dependence of lcov, use gnutar instead of tar, use xz instead of xz-utils
+    # bash is dependence of lcov, use xz instead of xz-utils
     LET PACKAGES= \
         git \
         curl \
@@ -34,9 +34,9 @@ common:
         jq \
         gpg \
         lcov \
-        gnutar \
         wget \
-        xz
+        xz \
+        libmagic
     DO +INSTALL --packages=$PACKAGES
 
 # Checks our Chainguard container is basically usable, and nothing more.

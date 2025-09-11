@@ -39,6 +39,8 @@ rust-base:
     USER root
     WORKDIR /root
 
+    ENV CARGO_HOME=/usr/local
+
     # Enables rust backtrace when something panics
     ENV RUST_BACKTRACE=full
 
@@ -84,7 +86,8 @@ rust-base:
         py3-rich \
         py3-psycopg \
         ripgrep \
-        wget
+        wget \
+        libmagic
 
     # Installing packages specifically to an architecture.
     # IF [ "$TARGETARCH" = "amd64" ]
