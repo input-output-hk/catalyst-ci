@@ -40,6 +40,7 @@ rust-base:
     WORKDIR /root
 
     ENV CARGO_HOME=/usr/local
+    ENV RUSTUP_HOME=/usr/local/rustup
 
     # Enables rust backtrace when something panics
     ENV RUST_BACKTRACE=full
@@ -99,7 +100,6 @@ rust-base:
     
     # DO debian+INSTALL --packages=$PACKAGES
     DO chainguard+INSTALL --packages=$PACKAGES
-
 
     # Fix up font cache.
     # RUN fc-cache -f
