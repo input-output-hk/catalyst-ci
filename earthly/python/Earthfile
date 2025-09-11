@@ -112,7 +112,8 @@ LINT_PYTHON:
     # Where we want to run the `lint` from. Use `.` to check the whole repo.
     ARG src=.
 
-    FROM ${PYTHON_IMAGE}:3.13
+    # FROM ${PYTHON_IMAGE}:3.13
+    FROM $PYTHON_IMAGE
     WORKDIR /work
 
     # Install ruff

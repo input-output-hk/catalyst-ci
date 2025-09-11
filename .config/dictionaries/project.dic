@@ -156,3 +156,7 @@ xerrors
 xvfb
 zstd
 zstdcat
+libmagic
+lcms
+openjpeg
+libmagic
