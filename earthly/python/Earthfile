@@ -59,11 +59,11 @@ python-base:
 #    RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
 #    ENV PATH="/root/.cargo/bin:${PATH}"
 
-#    # Install ruff for linting.
-#    RUN pip3 install ruff
-#    RUN pip3 install rich
-#    RUN pip3 install third-party-imports
-#
+    # Install ruff for linting.
+    RUN pip3 install ruff
+    RUN pip3 install rich
+    RUN pip3 install third-party-imports
+
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
     # Copy our common scripts so we can use them inside the container.
