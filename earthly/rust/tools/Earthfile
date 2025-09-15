@@ -62,7 +62,7 @@ tool-cargo-depgraph:
     DO +CARGO_BINSTALL --package=cargo-depgraph --version=1.6.0
 
 tool-cargo-llvm-cov:
-    DO +CARGO_BINSTALL --package=cargo-llvm-cov --version=0.6.18 --test_param="NONE"
+    DO +CARGO_BINSTALL --package=cargo-llvm-cov --version=0.6.13 --test_param="NONE"
 
 tool-wasm-tools:
     DO +CARGO_BINSTALL --package=wasm-tools --version=1.235.0
