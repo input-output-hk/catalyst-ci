@@ -235,44 +235,113 @@ UNIT_TESTS:
         END
     END
 
-# Build web app and save artifacts locally if needed.
-# TODO(damian-molinski): This target should become BUILD_APP with platforms ARG.
-# platforms='web,android,ios'
-# Because `sentry_dart_plugin` requires access to .dart_tool as well as flutter itself
-# and using `sentry-cli` instead seems to not be worth effort.
-BUILD_WEB:
+# Build app and save artifacts locally if needed.
+#
+# Params:
+# platforms = 'web,android,ios'
+# ENVIRONMENT = 'dev|preprod|prod|relative'
+#
+# Notes:
+# Uploading debug symbols is here because `sentry_dart_plugin` requires access to .dart_tool as
+# well as flutter itself and using `sentry-cli` instead seems to not be worth effort.
+BUILD_APP:
     FUNCTION
 
+    ARG --required PLATFORMS
     ARG --required TARGET
-    ARG BUILD_MODE='--release'
+    ARG --required ENVIRONMENT
+    ARG WEB_ENVIRONMENT
+    ARG BUILD_MODE = '--release'
     ARG --required BUILD_NAME
     ARG --required BUILD_NUMBER
-    ARG SAVE_LOCALLY=false
+    ARG SAVE_LOCALLY = false
     ARG WORKDIR
-    ARG UPLOAD_DEBUG_SYMBOLS=false
+    ARG UPLOAD_DEBUG_SYMBOLS = false
     ARG SENTRY_ORG
     ARG SENTRY_PROJECT
 
     WORKDIR $WORKDIR
 
+    IF [ -z "$WEB_ENVIRONMENT" ]
+        SET WEB_ENVIRONMENT = $ENVIRONMENT
+    END
+
+    LET IS_WEB = false
+    LET IS_ANDROID = false
+    LET IS_IOS = false
+
+    IF echo "$PLATFORMS" | grep -q "web"
+        SET IS_WEB = true
+    END
+    IF echo "$PLATFORMS" | grep -q "android"
+        SET IS_ANDROID = true
+    END
+    IF echo "$PLATFORMS" | grep -q "ios"
+        SET IS_IOS = true
+    END
+
     LET ADDITIONAL_BUILD_ARGS = ""
+    LET WEB_ADDITIONAL_BUILD_ARGS = ""
+    LET ANDROID_ADDITIONAL_BUILD_ARGS = ""
+    LET IOS_ADDITIONAL_BUILD_ARGS = ""
+
     LET SENTRY_RELEASE = "$SENTRY_PROJECT@$BUILD_NAME+$BUILD_NUMBER"
     LET SENTRY_DIST = "$BUILD_NUMBER"
+
+    IF [ $IS_WEB = true]
+        SET WEB_ADDITIONAL_BUILD_ARGS = "--dart-define=ENV_NAME=$WEB_ENVIRONMENT $WEB_ADDITIONAL_BUILD_ARGS"
+    END
 
     IF [ $UPLOAD_DEBUG_SYMBOLS = true ]
         SET ADDITIONAL_BUILD_ARGS = "--dart-define=SENTRY_RELEASE=$SENTRY_RELEASE $ADDITIONAL_BUILD_ARGS"
         SET ADDITIONAL_BUILD_ARGS = "--dart-define=SENTRY_DIST=$SENTRY_DIST $ADDITIONAL_BUILD_ARGS"
-        SET ADDITIONAL_BUILD_ARGS = "$ADDITIONAL_BUILD_ARGS --source-maps"
+
+        IF [ $IS_WEB = true]
+            SET WEB_ADDITIONAL_BUILD_ARGS = "$WEB_ADDITIONAL_BUILD_ARGS --source-maps"
+        END
+
+        IF [ $IS_ANDROID = true]
+            SET ANDROID_ADDITIONAL_BUILD_ARGS = "$ANDROID_ADDITIONAL_BUILD_ARGS --obfuscate --split-debug-info=./debug-symbols"
+        END
+
+        IF [ $IS_IOS = true]
+            SET IOS_ADDITIONAL_BUILD_ARGS = "$IOS_ADDITIONAL_BUILD_ARGS --obfuscate --split-debug-info=./debug-symbols"
+        END
     END
 
     RUN flutter clean
     RUN flutter pub get
-    RUN flutter build web $BUILD_MODE \
-        --pwa-strategy=none \
-        --target $TARGET \
-        --build-name=$BUILD_NAME \
-        --build-number=$BUILD_NUMBER \
-        $ADDITIONAL_BUILD_ARGS
+
+    IF [ $IS_WEB = true ]
+        RUN flutter build web $BUILD_MODE \
+            --pwa-strategy=none \
+            --target $TARGET \
+            --build-name=$BUILD_NAME \
+            --build-number=$BUILD_NUMBER \
+            $ADDITIONAL_BUILD_ARGS \
+            $WEB_ADDITIONAL_BUILD_ARGS
+    END
+
+    IF [ $IS_ANDROID = true ]
+        RUN flutter build appbundle $BUILD_MODE \
+            --target $TARGET \
+            --flavor=$ENVIRONMENT \
+            --build-name=$BUILD_NAME \
+            --build-number=$BUILD_NUMBER \
+            $ADDITIONAL_BUILD_ARGS \
+            $ANDROID_ADDITIONAL_BUILD_ARGS
+    END
+
+    IF [ $IS_IOS = true ]
+        # Note: iOS builds require a macOS host. This will only work if Earthly is running on a Mac.
+        RUN flutter build ipa $BUILD_MODE \
+            --target $TARGET \
+            --flavor=$ENVIRONMENT \
+            --build-name=$BUILD_NAME \
+            --build-number=$BUILD_NUMBER \
+            $ADDITIONAL_BUILD_ARGS \
+            $IOS_ADDITIONAL_BUILD_ARGS
+    END
 
     IF [ $UPLOAD_DEBUG_SYMBOLS = true ]
         RUN --secret SENTRY_AUTH_TOKEN=SENTRY_AUTH_TOKEN \
@@ -280,12 +349,29 @@ BUILD_WEB:
             --sentry-define=org=$SENTRY_ORG \
             --sentry-define=project=$SENTRY_PROJECT \
             --sentry-define=release=$SENTRY_RELEASE \
-            --sentry-define=dist=$SENTRY_DIST
+            --sentry-define=dist=$SENTRY_DIST \
+            --sentry-define=symbols_path=./debug-symbols
     END
 
     WORKDIR "$WORKDIR/build"
     IF [ $SAVE_LOCALLY = true ]
-        SAVE ARTIFACT web /web AS LOCAL web
+        IF [ $IS_WEB = true ]
+            SAVE ARTIFACT web /web AS LOCAL web
+        END
+        IF [ $IS_ANDROID = true ]
+            SAVE ARTIFACT app/outputs/bundle /android AS LOCAL android
+        END
+        IF [ $IS_IOS = true ]
+            SAVE ARTIFACT ios/ipa /ios AS LOCAL ios
+        END
     ELSE
-        SAVE ARTIFACT web /web
+        IF [ $IS_WEB = true ]
+            SAVE ARTIFACT web /web
+        END
+        IF [ $IS_ANDROID = true ]
+            SAVE ARTIFACT app/outputs/bundle /android
+        END
+        IF [ $IS_IOS = true ]
+            SAVE ARTIFACT ios/ipa /ios
+        END
     END
