@@ -54,11 +54,6 @@ python-base:
     RUN curl -LsSf https://astral.sh/uv/install.sh | sh
     ENV PATH=$HOME/.local/bin:$PATH
 
-    # Extension we use needs rust.
-    RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
-    RUN echo 'source $HOME/.cargo/env' >> $HOME/.bashrc
-    ENV PATH="/root/.cargo/bin:${PATH}"
-
     # Install ruff for linting.
     RUN pip3 install ruff
     RUN pip3 install rich
