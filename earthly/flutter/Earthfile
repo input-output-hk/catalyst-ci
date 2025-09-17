@@ -32,6 +32,10 @@ INSTALL_FLUTTER:
     RUN flutter doctor -v
     RUN flutter config --enable-web
     RUN dart pub global activate melos
+    RUN dart pub global activate junitreport
+    RUN dart pub global activate coverage
+    RUN dart pub global activate combine_coverage
+    RUN dart pub global activate license_checker
 
 # flutter-base installs required tools and packages.
 flutter-base:
