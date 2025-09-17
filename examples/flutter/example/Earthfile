@@ -11,13 +11,13 @@ builder:
 
     COPY --dir . .
 
-# Run Flutter analyze over melos analyze.
+# Run flutter analyze over melos analyze.
 analyze:
     FROM +builder
 
     DO flutter-ci+ANALYZE
 
-# Run Flutter format over melos format.
+# Run dart format over melos format.
 format:
     FROM +builder
 
