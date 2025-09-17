@@ -36,6 +36,7 @@ INSTALL_FLUTTER:
     RUN dart pub global activate coverage
     RUN dart pub global activate combine_coverage
     RUN dart pub global activate license_checker
+    RUN dart pub global activate dartdoc
 
 # flutter-base installs required tools and packages.
 flutter-base:
