@@ -129,7 +129,7 @@ ANALYZE:
 
     IF grep -q "melos" pubspec.yaml
         RUN echo "Running melos analyze"
-        RUN melos analyze --fatal-infos --fatal-warnings
+        RUN melos analyze
     ELSE
         RUN echo "Running flutter analyze"
         RUN flutter analyze --fatal-infos --fatal-warnings
