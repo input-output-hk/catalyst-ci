@@ -94,7 +94,7 @@ def main() -> None:
     # Check if we have any supply chain issues with dependencies.
     results.add(
         exec_manager.cli_run(
-            "cargo deny check --exclude-dev -W vulnerability -W unmaintained -W unsound",
+            "cargo deny check --exclude-dev -W vulnerability -W unmaintained",
             name="Supply Chain Issues Check",
         ),
     )
