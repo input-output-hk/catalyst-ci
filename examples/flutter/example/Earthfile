@@ -27,7 +27,7 @@ format:
 unit-tests:
     FROM +builder
 
-    DO flutter-ci+UNIT_TEST
+    DO flutter-ci+UNIT_TESTS
 
 # Build the Flutter app for the web.
 # Assuming that we have a main.dart file in lib folder and we run `build-web` in folder

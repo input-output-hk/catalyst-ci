@@ -18,15 +18,12 @@ python-base:
 
     # Install necessary packages
     LET PACKAGES= \
-        bash \
         curl \
         libffi-dev \
-        gcc \
         musl-dev \
         zlib1g-dev \
         libjpeg-dev \
-        git \
-        jq
+        git
     DO debian+INSTALL --packages=$PACKAGES
 
     # Install CUE
@@ -71,7 +68,7 @@ BUILDER:
     ARG opts
 
     # Copy our dependencies.
-    COPY pyproject.toml poetry.lock Readme.md .
+    COPY --if-exists pyproject.toml poetry.lock Readme.md README.md . 
 
     # Install it all with poetry
     RUN poetry install $opts
@@ -91,11 +88,13 @@ LINT_PYTHON:
     # Where we want to run the `lint` from. Use `.` to check the whole repo.
     ARG src=.
 
-    FROM ${PYTHON_IMAGE}:3.13
+    # FROM ${PYTHON_IMAGE}:3.13
+    FROM ${PYTHON_IMAGE}:3.13-slim-trixie
     WORKDIR /work
 
     # Install ruff
-    RUN pip install ruff
+    # RUN pip install ruff
+    RUN pip3 install ruff
 
     COPY $src .
     COPY cat-ci+repo-config/repo/ruff.toml ruff.toml.std

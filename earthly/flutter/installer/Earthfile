@@ -68,16 +68,18 @@ INSTALL_FIREFOX_LINUX64:
 
     IF [ "$TARGETARCH" = "amd64" ]
         SET PLATFORM = "linux64"
-        LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_amd64.deb"
+        # LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_amd64.deb"
     ELSE
         SET PLATFORM = "linux-aarch64"
-        LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_arm64.deb"
+        # LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_arm64.deb"
     END
 
-    RUN curl -L ${FIREFOX_URL} -o /tmp/firefox.deb \
-        && apt-get update --fix-missing \
-        && apt-get --fix-broken install -y /tmp/firefox.deb \
-        && rm /tmp/firefox.deb
+    # RUN curl -L ${FIREFOX_URL} -o /tmp/firefox.deb \
+    #     && apt-get update --fix-missing \
+    #     && apt-get --fix-broken install -y /tmp/firefox.deb \
+    #     && rm /tmp/firefox.deb
+    RUN apt-get update --fix-missing \
+        && apt-get --fix-broken install -y firefox-esr
 
     RUN firefox --version
 

@@ -9,7 +9,7 @@ ARG --global CUE_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/cuel
 INSTALL:
     FUNCTION
 
-     COPY +cue-bin/cue /usr/bin/cue
+    COPY +cue-bin/cue /usr/bin/cue
 
 
 # Get cue binary

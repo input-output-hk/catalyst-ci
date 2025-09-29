@@ -1,7 +1,7 @@
 VERSION 0.8
 
 # Define a constant name for the container and its version.
-ARG --global DEBIAN_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/debian:13.0-slim"
+ARG --global DEBIAN_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/debian:stable-slim"
 
 # Optimally install packages for debian
 INSTALL:
@@ -44,6 +44,7 @@ common:
         lcov \
         tar \
         wget \
+        build-essential \
         xz-utils
     DO +INSTALL --packages=$PACKAGES
 
