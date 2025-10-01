@@ -45,6 +45,7 @@ common:
         tar \
         wget \
         build-essential \
+        gcc \
         xz-utils
     DO +INSTALL --packages=$PACKAGES
 
