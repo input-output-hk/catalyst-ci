@@ -463,5 +463,6 @@ INSTALL_TOOLS:
     DO +COPY_TOOL --tool="cargo-sweep"
     DO +COPY_TOOL --tool="cargo-component"
     DO +COPY_TOOL --tool="wasm-pack"
-    DO +COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
+    # TODO(dt-iohk): reenable when we're no longer using forked flutter_rust_bridge
+    # DO +COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
     
