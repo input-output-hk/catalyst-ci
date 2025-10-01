@@ -6,6 +6,7 @@ IMPORT ../../ AS cat-ci
 IMPORT ../debian AS debian
 IMPORT ../cue AS cue
 IMPORT ../graphviz AS graphviz
+IMPORT ../uv AS uv
 
 
 # Define a constant name for the container and its version.
@@ -48,13 +49,20 @@ python-base:
     RUN poetry config installer.max-workers 10
 
     # Install UV through the recommended installer.
-    RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+    # RUN curl -LsSf https://astral.sh/uv/install.sh | sh
     ENV PATH=$HOME/.local/bin:$PATH
 
+    DO uv+INSTALL
+
     # Install ruff for linting.
-    RUN pip3 install ruff
-    RUN pip3 install rich
-    RUN pip3 install third-party-imports
+    # RUN pip3 install ruff
+    # RUN pip3 install rich
+    # RUN pip3 install third-party-imports
+
+    # RUN uv pip install ruff --system
+    RUN uv tool install ruff
+    RUN uv pip install rich --system
+    RUN uv pip install third-party-imports --system
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
@@ -89,12 +97,13 @@ LINT_PYTHON:
     ARG src=.
 
     # FROM ${PYTHON_IMAGE}:3.13
-    FROM ${PYTHON_IMAGE}:3.13-slim-trixie
+    # FROM ${PYTHON_IMAGE}:3.13-slim-trixie
+
+    FROM +python-base
     WORKDIR /work
 
     # Install ruff
     # RUN pip install ruff
-    RUN pip3 install ruff
 
     COPY $src .
     COPY cat-ci+repo-config/repo/ruff.toml ruff.toml.std
