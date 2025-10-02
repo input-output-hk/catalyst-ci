@@ -4,6 +4,7 @@ VERSION 0.8
 IMPORT ../rust/tools AS rust-tools
 IMPORT ../../utilities/scripts AS scripts
 IMPORT ../java AS java
+IMPORT ../graphviz AS graphviz
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
@@ -101,9 +102,11 @@ DOCS:
 
     FROM +postgres-base
 
-    RUN apt-get update && apt-get install -y \
-        graphviz \
-        wget
+    # RUN apt-get update && apt-get install -y \
+    #     graphviz \
+    #     wget
+
+    DO graphviz+INSTALL
 
     # Use the cached java installation from the java Earthfile
     DO java+COPY_DEPS
