@@ -26,31 +26,51 @@ INSTALL_CHROME_LINUX64:
     # You must provide it as ARG, e.g., `ARG TARGETARCH` in your function to use it.
     # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
     IF [ "$TARGETARCH" = "amd64" ]
+        # RUN printf "${BLUE} Installing Google Chrome..." \
+        #     && curl -sSL -o /opt/chrome.zip "${BASE_URL}/chrome/chrome_amd64.zip" \
+        #     && unzip /opt/chrome.zip -d /opt/chrome \
+        #     && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
+        #     && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
+        #     && echo "Check and fix missing dependencies..." \
+        #     && apt-get update --fix-missing \
+	    # && apt-get install -f -y \
+        #     && rm -rf /opt/chrome.zip /opt/chrome
+        # RUN google-chrome --version
+        # DO +PATCH_CHROME --BIN_TO_PATCH="google-chrome"
+
+        # RUN printf "${BLUE} Installing Chromedriver..." \
+        #     && mkdir -p /opt/chromedriver \
+        #     && curl -L "${BASE_URL}/chrome/chromedriver-linux64.zip" \
+        #     -o /opt/chromedriver/chromedriver.zip \
+        #     && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
+        # RUN chromedriver --version
+
         RUN printf "${BLUE} Installing Google Chrome..." \
-            && curl -sSL -o /opt/chrome.zip "${BASE_URL}/chrome/chrome_amd64.zip" \
-            && unzip /opt/chrome.zip -d /opt/chrome \
-            && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
-            && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
+            && curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
+            && dpkg -i /opt/chrome.deb || true \
             && echo "Check and fix missing dependencies..." \
             && apt-get update --fix-missing \
-	    && apt-get install -f -y \
-            && rm -rf /opt/chrome.zip /opt/chrome
+	        && apt-get install -f -y \
+            && rm -rf /opt/chrome.deb
         RUN google-chrome --version
         DO +PATCH_CHROME --BIN_TO_PATCH="google-chrome"
 
         RUN printf "${BLUE} Installing Chromedriver..." \
             && mkdir -p /opt/chromedriver \
-            && curl -L "${BASE_URL}/chrome/chromedriver-linux64.zip" \
+            && CHROME_VERSION=$(google-chrome --version | cut -d' ' -f3) \
+            && curl -L "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip" \
             -o /opt/chromedriver/chromedriver.zip \
             && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
         RUN chromedriver --version
 
     ELSE
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium.zip"
+        # DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium.zip"
+        RUN apt-get update --fix-missing \
+	        && apt-get install -y chromium chromium-driver
         RUN chromium --version
         DO +PATCH_CHROME --BIN_TO_PATCH="chromium"
 
-        DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium-driver.zip"
+        # DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium-driver.zip"
         RUN chromedriver --version
     END
 
@@ -120,29 +140,29 @@ INSTALL_EDGE_LINUX64:
     END
 
 # Installs the Chromium or Chromium driver.
-INSTALL_CHROMIUM:
-    FUNCTION
+# INSTALL_CHROMIUM:
+#     FUNCTION
 
-    ARG --required PACKAGE_TYPE
-    ARG --required DOWNLOAD_URL
-    LET BLUE='\033[0;34m'
+#     ARG --required PACKAGE_TYPE
+#     ARG --required DOWNLOAD_URL
+#     LET BLUE='\033[0;34m'
 
-    RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
-        && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
-        && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
-        && echo "Downloaded file information:" \
-        && ls -lh /opt/${PACKAGE_TYPE}.zip \
-        && echo "Unzipping ${PACKAGE_TYPE} packages..." \
-        && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
-        && echo "Contents of /opt/${PACKAGE_TYPE} after unzipping:" \
-        && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
-        && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
-        && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
-        && echo "Checking for missing dependencies..." \
-        && echo "Cleaning up..." \
-        && rm /opt/${PACKAGE_TYPE}.zip \
-        && rm -r /opt/${PACKAGE_TYPE} \
-        && echo "${PACKAGE_TYPE} installation completed."
+#     RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
+#         && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
+#         && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
+#         && echo "Downloaded file information:" \
+#         && ls -lh /opt/${PACKAGE_TYPE}.zip \
+#         && echo "Unzipping ${PACKAGE_TYPE} packages..." \
+#         && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
+#         && echo "Contents of /opt/${PACKAGE_TYPE} after unzipping:" \
+#         && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
+#         && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
+#         && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
+#         && echo "Checking for missing dependencies..." \
+#         && echo "Cleaning up..." \
+#         && rm /opt/${PACKAGE_TYPE}.zip \
+#         && rm -r /opt/${PACKAGE_TYPE} \
+#         && echo "${PACKAGE_TYPE} installation completed."
 
 PATCH_CHROME:
     FUNCTION

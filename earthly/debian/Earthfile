@@ -35,17 +35,13 @@ common:
         apt-utils \
         git \
         curl \
-        gzip \
         unzip \
         bzip2 \
-        bash \
         jq \
         gpg \
         lcov \
-        tar \
         wget \
         build-essential \
-        gcc \
         xz-utils
     DO +INSTALL --packages=$PACKAGES
 
