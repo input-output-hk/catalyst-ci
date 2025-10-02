@@ -30,6 +30,8 @@ debian-clean:
 common:
     FROM +debian-clean
 
+    RUN sed -i 's|deb.debian.org|ftp.de.debian.org|g' /etc/apt/sources.list.d/debian.sources
+
     LET PACKAGES= \
         ca-certificates \
         apt-utils \
