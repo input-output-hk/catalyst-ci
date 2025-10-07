@@ -104,7 +104,7 @@ In case you have unit tests in your project, you can run them with `unit-tests` 
 unit-tests:
     FROM +builder
 
-    DO flutter-ci+UNIT_TEST
+    DO flutter-ci+UNIT_TESTS
 ```
 
 ### Build Flutter app for Web

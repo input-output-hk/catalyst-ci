@@ -11,6 +11,7 @@ IMPORT github.com/earthly/lib/rust:3.0.3 AS rust
 IMPORT ./tools AS rust-tools
 IMPORT ../../utilities/scripts AS scripts
 IMPORT ../debian AS debian
+IMPORT ../graphviz AS graphviz
 
 # cspell: words miri ripgrep toolset lcov psycopg
 # cspell: words TARGETPLATFORM TARGETOS TARGETARCH TARGETVARIANT USERPLATFORM USEROS USERARCH USERVARIANT
@@ -45,7 +46,6 @@ rust-base:
     # Note: openssl-dev and openssl-libs-static are added to support the cargo-component crate.
     #       if that crate is removed, these dependencies can also be removed.
     LET PACKAGES= \
-        bash \
         build-essential \
         clang \
         cmake \
@@ -53,7 +53,6 @@ rust-base:
         findutils \
         fontconfig \
         fonts-liberation2 \
-        graphviz \
         libssl-dev \
         mold \
         openssl \
@@ -72,7 +71,7 @@ rust-base:
     END
     
     DO debian+INSTALL --packages=$PACKAGES
-
+    DO graphviz+INSTALL
 
     # Fix up font cache.
     RUN fc-cache -f

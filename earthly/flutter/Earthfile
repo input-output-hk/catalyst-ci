@@ -3,6 +3,7 @@ VERSION 0.8
 # cspell: words noninteractive
 
 IMPORT ./installer AS installer
+IMPORT ../debian AS debian
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
 
@@ -39,27 +40,30 @@ INSTALL_FLUTTER:
 
 # flutter-base installs required tools and packages.
 flutter-base:
-    FROM ${REGISTRY}/debian:bookworm-20250203-slim
+    # FROM ${REGISTRY}/debian:bookworm-20250203-slim
+    FROM debian+common
 
     ENV DEBIAN_FRONTEND=noninteractive
 
     # Update and install as same command so if either fails, the whole step fails and is not cached.
     # sqlite3 and libsqlite3-dev are required for running db tests in CI
+    # RUN apt-get update --fix-missing && \
+    #         apt-get install -y \
+    #         apt-utils \
+    #         git \
+    #         curl \
+    #         gzip \
+    #         unzip \
+    #         bzip2 \
+    #         jq \
+    #         gpg \
+    #         lcov \
+    #         wget \
+    #         xz-utils \
+    #         sqlite3 \
+    #         libsqlite3-dev
     RUN apt-get update --fix-missing && \
             apt-get install -y \
-            apt-utils \
-            git \
-            curl \
-            gzip \
-            unzip \
-            bzip2 \
-            bash \
-            jq \
-            gpg \
-            lcov \
-            tar \
-            wget \
-            xz-utils \
             sqlite3 \
             libsqlite3-dev
 
@@ -142,7 +146,8 @@ FORMAT:
         RUN melos run format-check
     ELSE
         RUN echo "Running flutter format"
-        RUN flutter format --set-exit-if-changed .
+        # RUN flutter format --set-exit-if-changed .
+        RUN dart format --output=none --set-exit-if-changed .
     END
 
 # Dry-runs the publish script for publishable packages.
