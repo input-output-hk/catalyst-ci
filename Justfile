@@ -14,7 +14,6 @@ check-spelling:
     earthly +clean-spelling-list
     earthly +check-spelling
 
-
 # Fix and Check Code Format for Python files
 format-python-code:
     ruff check --select I --fix .
