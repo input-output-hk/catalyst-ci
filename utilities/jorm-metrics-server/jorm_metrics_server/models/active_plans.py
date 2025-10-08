@@ -1,9 +1,6 @@
 """This module provides a model for the /api/v0/vote/active/plans endpoint."""
 
 # cspell: words pydantic
-# ruff: noqa
-
-from typing import Optional
 
 from pydantic import BaseModel, Field
 
@@ -61,7 +58,7 @@ class VotePlanProposalTallyPrivateStateEncrypted(BaseModel):
     """
 
     encrypted_tally: str
-    total_stake: Optional[int] = Field(default=None)
+    total_stake: int | None = Field(default=None)
 
 
 class VotePlanProposalTallyPrivateState(BaseModel):
@@ -74,10 +71,10 @@ class VotePlanProposalTallyPrivateState(BaseModel):
             Decrypted tally state.
     """
 
-    encrypted: Optional[VotePlanProposalTallyPrivateStateEncrypted] = Field(
+    encrypted: VotePlanProposalTallyPrivateStateEncrypted | None = Field(
         default=None, alias="Encrypted"
     )
-    decrypted: Optional[VotePlanProposalTallyPrivateStateDecrypted] = Field(
+    decrypted: VotePlanProposalTallyPrivateStateDecrypted | None = Field(
         default=None, alias="Decrypted"
     )
 
@@ -110,10 +107,10 @@ class VotePlanProposalTally(BaseModel):
         private (VotePlanProposalTallyPrivate): Private tally result.
     """
 
-    public: Optional[VotePlanProposalTallyPublic] = Field(
+    public: VotePlanProposalTallyPublic | None = Field(
         default=None, alias="Public"
     )
-    private: Optional[VotePlanProposalTallyPrivate] = Field(
+    private: VotePlanProposalTallyPrivate | None = Field(
         default=None, alias="Private"
     )
 
