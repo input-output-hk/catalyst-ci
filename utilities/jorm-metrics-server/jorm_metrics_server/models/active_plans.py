@@ -1,6 +1,7 @@
 """This module provides a model for the /api/v0/vote/active/plans endpoint."""
 
 # cspell: words pydantic
+# ruff: noqa
 
 from typing import Optional
 
