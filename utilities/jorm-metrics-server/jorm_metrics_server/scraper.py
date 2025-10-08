@@ -2,6 +2,8 @@
 This module provides a scraper for scraping metrics from the Jormungandr API.
 """
 
+# ruff: noqa
+
 from typing import Callable
 
 from .client import ApiClient
