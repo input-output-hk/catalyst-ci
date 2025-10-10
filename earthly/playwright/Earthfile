@@ -4,7 +4,7 @@ IMPORT ../flutter/installer AS flutter-installer
 SETUP:
     FUNCTION
     ARG workdir
-    FROM mcr.microsoft.com/playwright:v1.48.0-noble
+    FROM mcr.microsoft.com/playwright:v1.55.0-noble
     WORKDIR $workdir
 
     RUN apt-get update --fix-missing && apt-get install -y apt-utils curl unzip
@@ -15,3 +15,11 @@ SETUP:
         libnss3 libatk-bridge2.0-0 libdrm-dev libxkbcommon-dev libgbm-dev libasound-dev libatspi2.0-0 libxshmfence-dev postgresql-client xvfb && \
         apt-get clean && \
         rm -rf /var/lib/apt/lists/*
+
+# SETUP_WITH_CHROME_V140 - Setup with Chrome for Testing v140
+SETUP_WITH_CHROME_V140:
+    FUNCTION
+    ARG workdir
+    DO +SETUP --workdir=$workdir
+    # Install Chrome v140 from flutter-installer
+    DO flutter-installer+INSTALL_CHROME_LINUX64_V140
