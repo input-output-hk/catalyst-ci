@@ -137,11 +137,11 @@ COMMON_CARGO_MODULES_DEPENDENCIES = (
 
 
 def cargo_modules_lib(
-        runner: exec_manager.ParallelRunner,
-        lib: str,
-        *,
-        docs: bool = True,
-        verbose: bool = False,
+    runner: exec_manager.ParallelRunner,
+    lib: str,
+    *,
+    docs: bool = True,
+    verbose: bool = False,
 ) -> None:
     """Check if we have any Orphans."""
     runner.run(
