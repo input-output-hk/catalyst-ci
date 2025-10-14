@@ -7,6 +7,7 @@ buildkit
 camelcase
 canvaskit
 cardano
+chainguard
 Chromedriver
 chtml
 codegen
@@ -38,12 +39,14 @@ fontawesome
 fontconfig
 fontname
 forcelabels
+freetype
 Geckodriver
 genpkey
 giga
 ginkgolinter
 gitops
 glightbox
+gnutar
 GOCACHE
 gofmt
 goimports
@@ -149,8 +152,14 @@ wasi
 wasip
 wasmtime
 webkitallowfullscreen
+wolfi
 WORKDIR
 xerrors
 xvfb
 zstd
 zstdcat
+libmagic
+lcms
+openjpeg
+libmagic
+iohk

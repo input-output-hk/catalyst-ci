@@ -3,31 +3,47 @@ VERSION 0.8
 
 IMPORT ../../utilities/scripts AS scripts
 IMPORT ../../ AS cat-ci
-IMPORT ../debian AS debian
+# IMPORT ../debian AS debian
+IMPORT ../chainguard AS chainguard
 IMPORT ../cue AS cue
 IMPORT ../graphviz AS graphviz
 
 
 # Define a constant name for the container and its version.
-ARG --global PYTHON_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/python"
+# ARG --global PYTHON_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/python"
+ARG --global PYTHON_IMAGE="cgr.dev/chainguard/python:latest-dev" 
 
 # cspell: words libjpeg ruff
 
 python-base:
-    FROM ${PYTHON_IMAGE}:3.13-slim-trixie
+    # FROM ${PYTHON_IMAGE}:3.13-slim-trixie
+    FROM $PYTHON_IMAGE
+    
+    # https://edu.chainguard.dev/chainguard/migration/migration-guides/migrating-python/#differences-from-the-docker-official-image
+    USER root
 
     # Install necessary packages
+    # LET PACKAGES= \
+    #     bash \
+    #     curl \
+    #     libffi-dev \
+    #     gcc \
+    #     musl-dev \
+    #     zlib1g-dev \
+    #     libjpeg-dev \
+    #     git \
+    #     jq
+    # DO debian+INSTALL --packages=$PACKAGES
     LET PACKAGES= \
         bash \
         curl \
         libffi-dev \
         gcc \
-        musl-dev \
-        zlib1g-dev \
+        zlib-dev \
         libjpeg-dev \
         git \
         jq
-    DO debian+INSTALL --packages=$PACKAGES
+    DO chainguard+INSTALL --packages=$PACKAGES
 
     # Install CUE
     DO cue+INSTALL
@@ -91,7 +107,8 @@ LINT_PYTHON:
     # Where we want to run the `lint` from. Use `.` to check the whole repo.
     ARG src=.
 
-    FROM ${PYTHON_IMAGE}:3.13
+    # FROM ${PYTHON_IMAGE}:3.13
+    FROM $PYTHON_IMAGE
     WORKDIR /work
 
     # Install ruff
@@ -102,6 +119,6 @@ LINT_PYTHON:
 
     RUN diff -Nau ruff.toml ruff.toml.std
 
-    RUN ruff format --check && \
-        ruff check --output-format=github .
+    RUN python3 -m ruff format --check && \
+        python3 -m ruff check --output-format=github .
 

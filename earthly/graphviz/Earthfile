@@ -1,6 +1,7 @@
 VERSION 0.8
 
-IMPORT ../debian AS debian
+# IMPORT ../debian AS debian
+IMPORT ../chainguard AS chainguard
 
 # Define a constant name for the container and its version.
 ARG --global VERSION=13.1.0
@@ -11,17 +12,28 @@ ARG --global URL=https://gitlab.com/api/v4/projects/4207231/packages/generic/gra
 INSTALL:
     FUNCTION
 
+    # LET PACKAGES= \
+    #     build-essential \
+    #     pkg-config \
+    #     libexpat1-dev \
+    #     zlib1g-dev \
+    #     libpng-dev \
+    #     libfreetype-dev \
+    #     librsvg2-dev \
+    #     liblasi-dev \
+    #     wget
+    # DO debian+INSTALL --packages=$PACKAGES
+
     LET PACKAGES= \
-        build-essential \
-        pkg-config \
-        libexpat1-dev \
-        zlib1g-dev \
+        build-base \
+        pkgconf \
+        expat-dev \
+        zlib-dev \
         libpng-dev \
-        libfreetype-dev \
-        librsvg2-dev \
-        liblasi-dev \
+        freetype-dev \
+        librsvg-dev \
         wget
-    DO debian+INSTALL --packages=$PACKAGES
+    DO chainguard+INSTALL --packages=$PACKAGES
 
     RUN mkdir build; \
         cd build; \
