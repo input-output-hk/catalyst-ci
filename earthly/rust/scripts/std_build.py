@@ -12,7 +12,6 @@ import rich
 from python import exec_manager
 from python.utils import fix_quoted_earthly_args
 
-
 # This script is run inside the `build` stage.
 # This is set up so that ALL build steps are run and it will fail if any fail.
 # This improves visibility into all issues that need to be corrected for `build`
