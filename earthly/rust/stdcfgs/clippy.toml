@@ -2,3 +2,6 @@ allow-unwrap-in-tests = true
 allow-expect-in-tests = true
 allow-panic-in-tests = true
 arithmetic-side-effects-allowed = ["num_bigint::BigInt"]
+disallowed-macros = [
+    { path = "std::fmt::Debug", reason = "Debug Formatting not permitted in production release code.\nUse `#[cfg_attr(debug_assertions, derive(Debug))]` instead." },
+]
