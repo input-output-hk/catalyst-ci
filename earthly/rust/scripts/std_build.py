@@ -169,12 +169,12 @@ def cargo_modules_lib(
 
 
 def cargo_modules_bin(
-        runner: exec_manager.ParallelRunner,
-        package: str,
-        bin_file: str,
-        *,
-        docs: bool = True,
-        verbose: bool = False,
+    runner: exec_manager.ParallelRunner,
+    package: str,
+    bin_file: str,
+    *,
+    docs: bool = True,
+    verbose: bool = False,
 ) -> None:
     """Check if we have any Orphans."""
     runner.run(
