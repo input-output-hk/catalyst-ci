@@ -78,7 +78,7 @@ jobs:
           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
           echo "DEST_DIR=$DEST_DIR" >> $GITHUB_ENV
       - name: Setup CI
-        uses: input-output-hk/catalyst-ci/actions/setup@v3.2.25
+        uses: input-output-hk/catalyst-ci/actions/setup@v3.2.25-lucio-do-not-delete
         with:
           aws_role_arn: ${{ inputs.aws_role_arn }}
           aws_region: ${{ inputs.aws_region }}
@@ -86,7 +86,7 @@ jobs:
           earthly_version: ${{ inputs.earthly_version }}
           earthly_runner_secret: ${{ secrets.earthly_runner_secret }}
       - name: Build docs
-        uses: input-output-hk/catalyst-ci/actions/run@v3.2.25
+        uses: input-output-hk/catalyst-ci/actions/run@v3.2.25-lucio-do-not-delete
         id: build
         with:
           earthfile: ${{ inputs.earthfile }}
