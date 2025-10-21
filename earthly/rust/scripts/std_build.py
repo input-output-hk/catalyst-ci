@@ -12,7 +12,6 @@ import rich
 from python import exec_manager
 from python.utils import fix_quoted_earthly_args
 
-
 # This script is run inside the `build` stage.
 # This is set up so that ALL build steps are run and it will fail if any fail.
 # This improves visibility into all issues that need to be corrected for `build`
@@ -231,14 +230,7 @@ def readelf(results: exec_manager.Results, bin_file: str) -> None:
     )
 
 
-def strip(results: exec_manager.Results, bin_file: str) -> None:
-    """Strip."""
-    results.add(
-        exec_manager.cli_run(f"strip -v target/release/{bin_file}", name=f"strip for '{bin_file}'", verbose=True),
-    )
-
-
-def main() -> None:  # noqa: C901, PLR0915
+def main() -> None:  # noqa: C901
     """Rust Standard Build."""
     # Force color output in CI
     rich.reconfigure(color_system="256")
