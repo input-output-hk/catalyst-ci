@@ -12,6 +12,7 @@ import rich
 from python import exec_manager
 from python.utils import fix_quoted_earthly_args
 
+
 # This script is run inside the `build` stage.
 # This is set up so that ALL build steps are run and it will fail if any fail.
 # This improves visibility into all issues that need to be corrected for `build`
@@ -306,11 +307,6 @@ def main() -> None:  # noqa: C901, PLR0915
         default="",
         help="The list of binaries `cargo-modules` docs to build and make a smoke tests on them.",
     )
-    parser.add_argument(
-        "--strip",
-        action="store_true",
-        help="Flag to strip binary artifacts.",
-    )
     args = parser.parse_args()
 
     libs = filter(lambda lib: lib.strip() and len(lib.strip()) > 0, args.libs.split(","))
@@ -377,8 +373,6 @@ def main() -> None:  # noqa: C901, PLR0915
         help_check(results, bin_name, verbose=args.verbose)
         ldd(results, bin_name)
         readelf(results, bin_name)
-        if args.strip:
-            strip(results, bin_name)
 
     results.print()
     if not results.ok():
