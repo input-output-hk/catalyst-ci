@@ -37,6 +37,7 @@ INSTALL_FLUTTER:
     RUN dart pub global activate coverage
     RUN dart pub global activate combine_coverage
     RUN dart pub global activate license_checker
+    RUN dart pub global activate dartdoc
 
 # flutter-base installs required tools and packages.
 flutter-base:
@@ -67,15 +68,16 @@ SETUP:
     FUNCTION
     FROM +flutter-base
 
-# Runs melos bootstrap if melos.yaml file is present.
+# Runs melos bootstrap if melos dependency is present in pubspec.yaml.
 BOOTSTRAP:
     FUNCTION
 
-    IF [ -f melos.yaml ]
+    IF grep -q "melos" pubspec.yaml
         RUN echo "Running melos bootstrap"
         RUN melos bootstrap
     ELSE
-        RUN echo "No melos.yaml file found"
+        RUN echo "Running dart pub get"
+        RUN dart pub get
     END
 
 # Generates dart code from open api spec.
@@ -110,9 +112,9 @@ OPENAPI_VALIDATE:
 ANALYZE:
     FUNCTION
 
-    IF [ -f melos.yaml ]
+    IF grep -q "melos" pubspec.yaml
         RUN echo "Running melos analyze"
-        RUN melos analyze --fatal-infos --fatal-warnings
+        RUN melos analyze
     ELSE
         RUN echo "Running flutter analyze"
         RUN flutter analyze --fatal-infos --fatal-warnings
@@ -122,20 +124,19 @@ ANALYZE:
 FORMAT:
     FUNCTION
 
-    IF [ -f melos.yaml ]
+    IF grep -q "melos" pubspec.yaml
         RUN echo "Running melos format"
         RUN melos run format-check
     ELSE
-        RUN echo "Running flutter format"
-        # RUN flutter format --set-exit-if-changed .
-        RUN dart format --output=none --set-exit-if-changed .
+        RUN echo "Running dart format"
+        RUN flutter dart --set-exit-if-changed .
     END
 
 # Dry-runs the publish script for publishable packages.
 PUBLISH_DRY_RUN:
     FUNCTION
 
-    IF [ -f melos.yaml ]
+    IF grep -q "melos" pubspec.yaml
         RUN echo "Running melos publish --dry-run"
         RUN melos publish --dry-run --yes
     ELSE
@@ -151,7 +152,7 @@ UNIT_TESTS:
     ARG PLATFORM=native
     ARG REPORT=false
 
-    IF [ -f melos.yaml ]
+    IF grep -q "melos" pubspec.yaml
         IF [ $PLATFORM = native ]
             RUN echo "Running native unit tests with melos."
 

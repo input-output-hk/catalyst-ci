@@ -230,14 +230,7 @@ def readelf(results: exec_manager.Results, bin_file: str) -> None:
     )
 
 
-def strip(results: exec_manager.Results, bin_file: str) -> None:
-    """Strip."""
-    results.add(
-        exec_manager.cli_run(f"strip -v target/release/{bin_file}", name=f"strip for '{bin_file}'", verbose=True),
-    )
-
-
-def main() -> None:  # noqa: C901, PLR0915
+def main() -> None:  # noqa: C901
     """Rust Standard Build."""
     # Force color output in CI
     rich.reconfigure(color_system="256")
@@ -372,7 +365,6 @@ def main() -> None:  # noqa: C901, PLR0915
         help_check(results, bin_name, verbose=args.verbose)
         ldd(results, bin_name)
         readelf(results, bin_name)
-        strip(results, bin_name)
 
     results.print()
     if not results.ok():

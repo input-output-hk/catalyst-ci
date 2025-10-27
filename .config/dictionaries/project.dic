@@ -14,6 +14,7 @@ colordiff
 cowsay
 cuelang
 cytopia
+dartdoc
 depgraph
 devenv
 dind
@@ -55,6 +56,7 @@ gopls
 gosec
 graphviz
 idents
+iohk
 ipynb
 javascripts
 JDBC
