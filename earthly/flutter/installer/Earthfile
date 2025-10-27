@@ -2,12 +2,15 @@ VERSION 0.8
 
 # cspell: words Rxxxx
 
-# DO NOT USE `main` branch.
-# When updating the artifacts, update them in `main` and then create a sequentially numbered branch from it called `Rxxxx`
-# Then replace that Release version number in the path below.
-# This ensures that the tools are properly cached, and will also be re-installed when the upstream artifact is updated.
-# If a branch is no longer used by CI, delete it.
-ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw/R0002/web-browsers"
+# An AWS S3 bucket is used to store browser and driver packages. 
+# Packages are updated automatically once a week. 
+# You can download the version of packages you need using the pipeline https://github.com/input-output-hk/catalyst-storage/actions/workflows/download-browsers.yml.
+# There are some limitation in pipeline:
+# - for firefox you need to exatly specify version (e.g. 115.15.0esr-1)
+# - latest geckodriver will be downloaded together with firefox
+# Not all version can be installed due to library dependencies.
+# Starting from this version, INSTALL_CHROME_LINUX64, INSTALL_FIREFOX_LINUX64, INSTALL_EDGE_LINUX64, INSTALL_CHROMIUM require specifying the browser version.
+ARG --global BASE_URL = "https://iog-catalyst-storage.s3.eu-central-1.amazonaws.com"
 
 #TODO(minikin): https://github.com/input-output-hk/catalyst-storage/issues/1
 
@@ -18,6 +21,7 @@ ARG --global BASE_URL = "https://github.com/input-output-hk/catalyst-storage/raw
 INSTALL_CHROME_LINUX64:
     FUNCTION
 
+    ARG version
     ARG TARGETARCH
     LET BLUE='\033[0;34m'
 
@@ -26,51 +30,26 @@ INSTALL_CHROME_LINUX64:
     # You must provide it as ARG, e.g., `ARG TARGETARCH` in your function to use it.
     # Read more about it here: https://docs.earthly.dev/docs/earthfile/builtin-args#platform-related-args
     IF [ "$TARGETARCH" = "amd64" ]
-        # RUN printf "${BLUE} Installing Google Chrome..." \
-        #     && curl -sSL -o /opt/chrome.zip "${BASE_URL}/chrome/chrome_amd64.zip" \
-        #     && unzip /opt/chrome.zip -d /opt/chrome \
-        #     && dpkg -i /opt/chrome/chrome_amd64/google-chrome-stable_current_amd64.deb || true \
-        #     && dpkg -i /opt/chrome/chrome_amd64/*.deb || true \
-        #     && echo "Check and fix missing dependencies..." \
-        #     && apt-get update --fix-missing \
-	    # && apt-get install -f -y \
-        #     && rm -rf /opt/chrome.zip /opt/chrome
-        # RUN google-chrome --version
-        # DO +PATCH_CHROME --BIN_TO_PATCH="google-chrome"
-
-        # RUN printf "${BLUE} Installing Chromedriver..." \
-        #     && mkdir -p /opt/chromedriver \
-        #     && curl -L "${BASE_URL}/chrome/chromedriver-linux64.zip" \
-        #     -o /opt/chromedriver/chromedriver.zip \
-        #     && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
-        # RUN chromedriver --version
-
         RUN printf "${BLUE} Installing Google Chrome..." \
-            && curl -sSL -o /opt/chrome.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb \
-            && dpkg -i /opt/chrome.deb || true \
-            && echo "Check and fix missing dependencies..." \
-            && apt-get update --fix-missing \
-	        && apt-get install -f -y \
-            && rm -rf /opt/chrome.deb
+            && curl -sSL -o /opt/chrome.zip "${BASE_URL}/chrome/${version}/chrome_amd64.zip" \
+            && unzip /opt/chrome.zip -d /opt/chrome \
+            && gdebi -n /opt/chrome/chrome_amd64.deb \
+            && rm -rf /opt/chrome*
         RUN google-chrome --version
         DO +PATCH_CHROME --BIN_TO_PATCH="google-chrome"
 
         RUN printf "${BLUE} Installing Chromedriver..." \
-            && mkdir -p /opt/chromedriver \
-            && CHROME_VERSION=$(google-chrome --version | cut -d' ' -f3) \
-            && curl -L "https://storage.googleapis.com/chrome-for-testing-public/${CHROME_VERSION}/linux64/chromedriver-linux64.zip" \
-            -o /opt/chromedriver/chromedriver.zip \
-            && unzip -j /opt/chromedriver/chromedriver.zip -d /usr/local/bin/
+            && curl -sSL -o /opt/chromedriver.zip "${BASE_URL}/chrome/${version}/chromedriver-linux64.zip" \
+            && unzip -j /opt/chromedriver.zip -d /usr/local/bin/ \
+            && rm -rf /opt/chromedriver.zip
         RUN chromedriver --version
 
     ELSE
-        # DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium.zip"
-        RUN apt-get update --fix-missing \
-	        && apt-get install -y chromium chromium-driver
+        DO +INSTALL_CHROMIUM --version=$version --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chromium/${version}/chromium_${TARGETARCH}.zip"
         RUN chromium --version
         DO +PATCH_CHROME --BIN_TO_PATCH="chromium"
 
-        # DO +INSTALL_CHROMIUM --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}/chrome/chromium-driver.zip"
+        DO +INSTALL_CHROMIUM --version=$version --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}/chromium/${version}/chromium-driver-${TARGETARCH}.zip"
         RUN chromedriver --version
     END
 
@@ -80,6 +59,7 @@ INSTALL_CHROME_LINUX64:
 INSTALL_FIREFOX_LINUX64:
     FUNCTION
 
+    ARG version
     ARG TARGETARCH
     LET PLATFORM = ""
     LET BLUE = '\033[0;34m'
@@ -88,25 +68,22 @@ INSTALL_FIREFOX_LINUX64:
 
     IF [ "$TARGETARCH" = "amd64" ]
         SET PLATFORM = "linux64"
-        # LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_amd64.deb"
+        LET FIREFOX_URL = "${BASE_URL}/firefox/${version}/firefox_amd64.zip"
+        LET GECKODRIVER_URL = "${BASE_URL}/firefox/${version}/geckodriver-v0.36.0-linux64.tar.gz"
     ELSE
         SET PLATFORM = "linux-aarch64"
-        # LET FIREFOX_URL = "${BASE_URL}/firefox/firefox-esr_115.15.0esr-1~deb12u1_arm64.deb"
+        LET FIREFOX_URL = "${BASE_URL}/firefox/${version}/firefox_arm64.zip"
+        LET GECKODRIVER_URL = "${BASE_URL}/firefox/${version}/geckodriver-v0.36.0-linux-aarch64.tar.gz"
     END
 
-    # RUN curl -L ${FIREFOX_URL} -o /tmp/firefox.deb \
-    #     && apt-get update --fix-missing \
-    #     && apt-get --fix-broken install -y /tmp/firefox.deb \
-    #     && rm /tmp/firefox.deb
-    RUN apt-get update --fix-missing \
-        && apt-get --fix-broken install -y firefox-esr
-
+    RUN curl -sSL -o /tmp/firefox.zip ${FIREFOX_URL} \
+        && unzip /tmp/firefox.zip -d /tmp \
+        && gdebi -n /tmp/firefox*.deb \
+        && rm -f /tmp/firefox.deb
     RUN firefox --version
 
-    # https://github.com/mozilla/geckodriver/releases
     RUN printf "${BLUE} Installing Geckodriver..."
     RUN mkdir -p /opt/geckodriver
-    LET GECKODRIVER_URL = "${BASE_URL}/firefox/geckodriver-v0.35.0-${PLATFORM}.tar.gz"
     RUN curl -sL ${GECKODRIVER_URL} | tar -xz -C /opt/geckodriver/
     RUN ln -s /opt/geckodriver/geckodriver /usr/bin/geckodriver
     RUN geckodriver --version
@@ -117,52 +94,49 @@ INSTALL_FIREFOX_LINUX64:
 INSTALL_EDGE_LINUX64:
     FUNCTION
 
+    ARG version
     ARG TARGETARCH
     LET BLUE ='\033[0;34m'
 
     IF [ "$TARGETARCH" = "amd64" ]
-        ARG --required edge_version
-        ARG --required edge_package_release
+        RUN printf "${BLUE} Installing Edge..." \
+            && curl -sSL -o /opt/edge.zip "${BASE_URL}/edge/${version}/edge_amd64.zip" \
+            && unzip /opt/edge.zip -d /opt/edge \
+            && gdebi -n /opt/edge/edge_amd64.deb \
+            && rm -rf /opt/edge*
+        RUN microsoft-edge --version
 
-        RUN printf "${BLUE} Installing Edge..."
-        RUN curl -LO https://packages.microsoft.com/repos/edge/pool/main/m/microsoft-edge-stable/microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
-        RUN apt-get update --fix-missing \
-	    && apt-get --fix-broken install -y ./microsoft-edge-stable_${edge_version}-${edge_package_release}_amd64.deb
-        RUN microsoft-edge-stable --version
-
-        # https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver
-        RUN printf "${BLUE} Installing Edgedriver..."
-        RUN mkdir -p /opt/edgedriver
-        RUN curl -L https://msedgedriver.microsoft.com/{$edge_version}/edgedriver_linux64.zip \
-            -o /opt/edgedriver/edgedriver.zip
-        RUN unzip /opt/edgedriver/edgedriver.zip -d /usr/local/bin/
+        RUN printf "${BLUE} Installing Edgedriver..." \
+            && curl -sSL -o /opt/edgedriver.zip "${BASE_URL}/edge/${version}/edgedriver_linux64.zip" \
+            && unzip -j /opt/edgedriver.zip -d /usr/local/bin/ \
+            && rm -rf /opt/edgedriver.zip
         RUN msedgedriver --version
     END
 
 # Installs the Chromium or Chromium driver.
-# INSTALL_CHROMIUM:
-#     FUNCTION
+INSTALL_CHROMIUM:
+    FUNCTION
 
-#     ARG --required PACKAGE_TYPE
-#     ARG --required DOWNLOAD_URL
-#     LET BLUE='\033[0;34m'
+    ARG version
+    ARG --required PACKAGE_TYPE
+    ARG --required DOWNLOAD_URL
+    LET BLUE='\033[0;34m'
 
-#     RUN printf "${BLUE} Installing the latest ${PACKAGE_TYPE} version...\n" \
-#         && echo "Downloading ${PACKAGE_TYPE} and dependencies from: ${DOWNLOAD_URL}" \
-#         && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
-#         && echo "Downloaded file information:" \
-#         && ls -lh /opt/${PACKAGE_TYPE}.zip \
-#         && echo "Unzipping ${PACKAGE_TYPE} packages..." \
-#         && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
-#         && echo "Contents of /opt/${PACKAGE_TYPE} after unzipping:" \
-#         && ls -lh /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE} \
-#         && echo "Installing ${PACKAGE_TYPE} and dependencies..." \
-#         && dpkg -i /opt/${PACKAGE_TYPE}/${PACKAGE_TYPE}/*.deb || true \
-#         && echo "Checking for missing dependencies..." \
-#         && echo "Cleaning up..." \
-#         && rm /opt/${PACKAGE_TYPE}.zip \
-#         && rm -r /opt/${PACKAGE_TYPE} \
-#         && echo "${PACKAGE_TYPE} installation completed."
+    IF [ "$PACKAGE_TYPE" = "chromium" ]
+        RUN printf "${BLUE} Installing ${PACKAGE_TYPE} version: ${version}..." \
+            && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
+            && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
+            && gdebi -n /opt/${PACKAGE_TYPE}/lib*.deb \
+            && gdebi -n /opt/${PACKAGE_TYPE}/chromium-common*.deb \
+            && gdebi -n /opt/${PACKAGE_TYPE}/chromium_*.deb \
+            && rm -rf /opt/${PACKAGE_TYPE}*
+    ELSE
+        RUN printf "${BLUE} Installing ${PACKAGE_TYPE} version: ${version}..." \
+            && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
+            && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
+            && gdebi -n /opt/${PACKAGE_TYPE}/*.deb \
+            && rm -rf /opt/${PACKAGE_TYPE}.zip
+    END
 
 PATCH_CHROME:
     FUNCTION
