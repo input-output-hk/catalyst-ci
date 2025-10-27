@@ -6,7 +6,7 @@ VERSION 0.8
 # Packages are updated automatically once a week. 
 # You can download the version of packages you need using the pipeline https://github.com/input-output-hk/catalyst-storage/actions/workflows/download-browsers.yml.
 # There are some limitation in pipeline:
-# - for firefox you need to exatly specify version (e.g. 115.15.0esr-1)
+# - for firefox you need to specify full version name with "esr" key word (e.g. 115.15.0esr-1)
 # - latest geckodriver will be downloaded together with firefox
 # Not all version can be installed due to library dependencies.
 # Starting from this version, INSTALL_CHROME_LINUX64, INSTALL_FIREFOX_LINUX64, INSTALL_EDGE_LINUX64, INSTALL_CHROMIUM require specifying the browser version.

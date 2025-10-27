@@ -24,7 +24,6 @@ markdown-check-fix:
 
 # Make sure the project dictionary is properly sorted.
 clean-spelling-list:
-    # FROM ${REGISTRY}/debian:stable-slim
     FROM debian+clean
     DO cspell-ci+CLEAN
 
@@ -34,8 +33,6 @@ check-spelling:
 
 # check-bash - test all bash files lint properly according to shellcheck.
 check-bash:
-    # FROM ${REGISTRY}/alpine:3.20.3
-
     DO bash-ci+SHELLCHECK --src=.
 
 # Internal: Reference to our repo root documentation used by docs builder.
