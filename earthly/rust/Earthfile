@@ -124,7 +124,6 @@ COPY_TOOL:
     ARG bin = $tool
     COPY rust-tools+tool-$tool/$bin $CARGO_HOME/bin/$bin
 
-
 # rust-base-plus-tools : Add all tools we use for rust builds to the base builder image.
 #                        Not called directly, used by other targets.
 rust-base-plus-tools:

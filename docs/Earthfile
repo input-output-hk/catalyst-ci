@@ -23,9 +23,7 @@ src:
 # Build the docs here.
 docs:
     FROM +src
-
     DO docs-ci+BUILD
-
 
 # Make a docker image that can serve the docs for development purposes.
 # This target is only for local developer use.

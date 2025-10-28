@@ -31,4 +31,3 @@ SHELLCHECK:
     COPY --dir $src /src
 
     RUN ./check-all.sh /src
-

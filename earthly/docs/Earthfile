@@ -52,7 +52,6 @@ deps:
     # Set working directory
     WORKDIR /docs
 
-
 # Documentation files used across all documentation builds.
 common:
     FROM scratch
@@ -90,7 +89,6 @@ SRC:
 
     # Any files which replace the standard files are copied here
     COPY --if-exists --dir includes macros overrides .
-
 
 # Build the docs - We always do this in a `docs` target.
 # The only target that needs customizing is the `src` target.
@@ -133,7 +131,7 @@ PACKAGE:
     # These steps are done outside the FUNCTION.
 
     # Copy the static pages into the container like this...
-    #COPY $docs /usr/share/nginx/html
+    # COPY $docs /usr/share/nginx/html
 
     # And then save the image
     # SAVE IMAGE image_name

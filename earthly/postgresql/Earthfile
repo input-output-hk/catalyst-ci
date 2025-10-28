@@ -154,12 +154,10 @@ integration-test:
 
     WORKDIR /test
 
-
 INTEGRATION_TEST_SETUP:
     FUNCTION
 
     FROM +integration-test
-
 
 # Build PostgreSQL image.
 # REQUIREMENTS:
