@@ -21,7 +21,7 @@ ARG --global BASE_URL = "https://iog-catalyst-storage.s3.eu-central-1.amazonaws.
 INSTALL_CHROME_LINUX64:
     FUNCTION
 
-    ARG version
+    ARG --required version
     ARG TARGETARCH
     LET BLUE='\033[0;34m'
 
@@ -53,13 +53,13 @@ INSTALL_CHROME_LINUX64:
         RUN chromedriver --version
     END
 
-# Install Firefox and Geckodriver from hardcoded GitHub-hosted locations.
+# Install Firefox and Geckodriver from AWS S3 bucket.
 # Geckodriver supported versions:
 # https://firefox-source-docs.mozilla.org/testing/geckodriver/Support.html
 INSTALL_FIREFOX_LINUX64:
     FUNCTION
 
-    ARG version
+    ARG --required version
     ARG TARGETARCH
     LET PLATFORM = ""
     LET BLUE = '\033[0;34m'
@@ -88,13 +88,11 @@ INSTALL_FIREFOX_LINUX64:
     RUN ln -s /opt/geckodriver/geckodriver /usr/bin/geckodriver
     RUN geckodriver --version
 
-# TODO(minikin): https://github.com/input-output-hk/catalyst-ci/issues/308
-# Install Edge and EdgeDriver.
 # There is no Edge version build for linux/arm64, installing only for amd64.
 INSTALL_EDGE_LINUX64:
     FUNCTION
 
-    ARG version
+    ARG --required version
     ARG TARGETARCH
     LET BLUE ='\033[0;34m'
 
@@ -114,10 +112,11 @@ INSTALL_EDGE_LINUX64:
     END
 
 # Installs the Chromium or Chromium driver.
+# Both amd64 and arm64 are supported.
 INSTALL_CHROMIUM:
     FUNCTION
 
-    ARG version
+    ARG --required version
     ARG --required PACKAGE_TYPE
     ARG --required DOWNLOAD_URL
     LET BLUE='\033[0;34m'
