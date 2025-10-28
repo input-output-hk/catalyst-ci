@@ -102,10 +102,6 @@ DOCS:
 
     FROM +postgres-base
 
-    # RUN apt-get update && apt-get install -y \
-    #     graphviz \
-    #     wget
-
     DO graphviz+INSTALL
 
     # Use the cached java installation from the java Earthfile

@@ -1,6 +1,5 @@
 VERSION 0.8
 
-# ARG --global IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/python:3.13-slim-bookworm"
 ARG --global IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/python:3.13-slim-trixie"
 
 deps:
