@@ -18,7 +18,7 @@ IMPORT ../graphviz AS graphviz
 # cspell: words findutils fileset pkgconfig wasip
 
 # rust-base : Base Rustup build container.
-#   Not called directly, used by other targets.
+#             Not called directly, used by other targets.
 rust-base:
     ARG TARGETPLATFORM
     ARG TARGETOS
@@ -126,7 +126,7 @@ COPY_TOOL:
 
 
 # rust-base-plus-tools : Add all tools we use for rust builds to the base builder image.
-#   Not called directly, used by other targets.
+#                        Not called directly, used by other targets.
 rust-base-plus-tools:
     FROM +rust-base
 
@@ -212,8 +212,7 @@ EXECUTE:
     DO rust+SET_CACHE_MOUNTS_ENV
 
     IF [ "$EARTHLY_KEEP_FINGERPRINTS" = "false" ]
-
-       DO +REMOVE_SOURCE_FINGERPRINTS
+        DO +REMOVE_SOURCE_FINGERPRINTS
     END
 
     # target/debug should not be present, so purge it just in case.
@@ -234,8 +233,7 @@ EXECUTE:
         cargo sweep -r -t $EARTHLY_SWEEP_DAYS; \
         cargo sweep -r -i; \
         $EARTHLY_FUNCTIONS_HOME/copy-output.sh "$output";
-    RUN $EARTHLY_FUNCTIONS_HOME/rename-output.sh        
-        
+    RUN $EARTHLY_FUNCTIONS_HOME/rename-output.sh
 
     # We always want to save these (if requested) even if the command fails.
     IF [ "$junit" != "" ]
@@ -316,7 +314,7 @@ SETUP:
     ARG EARTHLY_TARGET_PROJECT_NO_TAG #https://docs.earthly.dev/docs/earthfile/builtin-args
     ARG TARGETARCH
     ARG TARGETOS
-	  ARG TARGETVARIANT    
+	ARG TARGETVARIANT
     ARG CACHE_VERSION="00001" # Bumping this causes the old cache to be dropped.
     ARG cache_prefix="${EARTHLY_TARGET_PROJECT_NO_TAG}#${TARGETOS}#${TARGETARCH}${TARGETVARIANT}#earthly-cargo-cache#${CACHE_VERSION}"
 
@@ -338,7 +336,7 @@ SYNC_STD_CFG:
     SAVE ARTIFACT /stdcfgs/rustfmt.toml AS LOCAL rustfmt.toml
     SAVE ARTIFACT /stdcfgs/rust-toolchain.toml AS LOCAL rust-toolchain.toml
 
-# FINGERPRINT_SRC  : Generates a fingerprint of the source.
+# FINGERPRINT_SRC: Generates a fingerprint of the source.
 FINGERPRINT_SRC:
     FUNCTION
 
@@ -356,10 +354,10 @@ REMOVE_SOURCE_FINGERPRINTS:
     DO rust+CHECK_INITED
     COPY rust+get-tomljson/tomljson /tmp/tomljson
     COPY rust+get-jq/jq /tmp/jq
-    RUN  if [ ! -n "$EARTHLY_RUST_TARGET_CACHE" ]; then \
-      echo "+SET_CACHE_MOUNTS_ENV has not been called yet in this build environment" ; \
-      exit 1; \
-    fi;
+    RUN if [ ! -n "$EARTHLY_RUST_TARGET_CACHE" ]; then \
+            echo "+SET_CACHE_MOUNTS_ENV has not been called yet in this build environment" ; \
+            exit 1; \
+        fi;
     RUN --mount=$EARTHLY_RUST_TARGET_CACHE \
         set -e;\
         source_libs=$(find . -name Cargo.toml -exec bash -c '/tmp/tomljson {} | /tmp/jq -r .package.name; printf "\n"' \;) ; \
@@ -406,7 +404,7 @@ INSTALL_RUST:
         && rustc --version \
         && rm -rf /var/lib/apt/lists/*
 
-      # Make sure we have cargo.
+    # Make sure we have cargo.
     RUN rustup component add cargo
 
     # Make sure we have the clippy linter.
@@ -464,4 +462,3 @@ INSTALL_TOOLS:
     DO +COPY_TOOL --tool="wasm-pack"
     # TODO(dt-iohk): reenable when we're no longer using forked flutter_rust_bridge
     # DO +COPY_TOOL --tool="flutter-rust-bridge-codegen" --bin="flutter_rust_bridge_codegen"
-    

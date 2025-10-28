@@ -51,7 +51,7 @@ CHECK:
     # See: https://github.com/DavidAnson/markdownlint-cli2
     # We use a special container which includes all rule extensions to markdownlint
     # Notably, we rely on the `max-one-sentence-per-line` rule which helps keep
-    # diffs of markdown files small and legible.  This rule is only currently
+    # diffs of markdown files small and legible. This rule is only currently
     # in the `next` branch of `markdownlint`.
     # Container is built by:
     #   https://github.com/DavidAnson/markdownlint-cli2/blob/next/docker/Dockerfile-rules

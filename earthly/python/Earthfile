@@ -99,4 +99,3 @@ LINT_PYTHON:
 
     RUN ruff format --check && \
         ruff check --output-format=github .
-

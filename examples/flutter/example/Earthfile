@@ -8,25 +8,21 @@ IMPORT ../../../earthly/flutter_rust_bridge AS flutter_rust_bridge
 # Set up the CI environment for Flutter app.
 builder:
     DO flutter-ci+SETUP
-
     COPY --dir . .
 
 # Run flutter analyze over melos analyze.
 analyze:
     FROM +builder
-
     DO flutter-ci+ANALYZE
 
 # Run dart format over melos format.
 format:
     FROM +builder
-
     DO flutter-ci+FORMAT
 
 # unit-tests - Run Flutter unit tests.
 unit-tests:
     FROM +builder
-
     DO flutter-ci+UNIT_TESTS
 
 # Build the Flutter app for the web.

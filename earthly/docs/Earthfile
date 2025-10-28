@@ -27,7 +27,7 @@ deps:
         liblcms2-dev \
         libopenjp2-7-dev \
         tk-dev \
-        tcl-dev  \
+        tcl-dev \
         make
     DO debian+INSTALL --packages=$PACKAGES
 
@@ -92,7 +92,7 @@ SRC:
     COPY --if-exists --dir includes macros overrides .
 
 
-# Build the docs - We always do this in a `docs` target.  
+# Build the docs - We always do this in a `docs` target.
 # The only target that needs customizing is the `src` target.
 BUILD:
     FUNCTION
@@ -137,4 +137,3 @@ PACKAGE:
 
     # And then save the image
     # SAVE IMAGE image_name
-    

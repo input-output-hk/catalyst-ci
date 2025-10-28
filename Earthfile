@@ -65,4 +65,4 @@ edit-docs:
 # are linted equally.
 # Its also fast.
 check-python:
-    DO python-ci+LINT_PYTHON    
+    DO python-ci+LINT_PYTHON
