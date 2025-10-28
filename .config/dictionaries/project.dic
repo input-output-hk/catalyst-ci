@@ -38,6 +38,7 @@ fontawesome
 fontconfig
 fontname
 forcelabels
+gdebi
 Geckodriver
 genpkey
 giga
@@ -154,4 +155,3 @@ xerrors
 xvfb
 zstd
 zstdcat
-gdebi

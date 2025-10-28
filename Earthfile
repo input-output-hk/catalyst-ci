@@ -24,7 +24,7 @@ markdown-check-fix:
 
 # Make sure the project dictionary is properly sorted.
 clean-spelling-list:
-    FROM debian+clean
+    FROM debian+debian-clean
     DO cspell-ci+CLEAN
 
 # check-spelling Check spelling in this repo inside a container.
