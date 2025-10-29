@@ -137,6 +137,39 @@ INSTALL_CHROMIUM:
             && rm -rf /opt/${PACKAGE_TYPE}.zip
     END
 
+# based on https://github.com/GoogleChromeLabs/chrome-for-testing/issues/55#issuecomment-2369600641
+INSTALL_CHROME_FOR_TESTING:
+    FUNCTION
+
+    ARG --required version
+    ARG TARGETARCH
+    LET BLUE ='\033[0;34m'
+
+    IF [ "$TARGETARCH" = "amd64" ]
+        RUN printf "${BLUE} Installing Chrome-for-testing..." \
+            && curl -sSL -o /opt/chrome.zip "${BASE_URL}/chrome-for-testing/${version}/chrome-linux64.zip" \
+            && unzip /opt/chrome.zip -d /opt/chrome \
+            && mv /opt/chrome/chrome-linux64/* /opt/chrome \
+            && rm -rf /opt/chrome/chrome-linux64 \
+            && while read pkg; do apt-get satisfy -y --no-install-recommends "${pkg}"; done < /opt/chrome/deb.deps \
+            && ln -s /opt/chrome/chrome /usr/local/bin/google-chrome \
+            && rm -f /opt/chrome.zip
+        RUN google-chrome --version
+
+        RUN printf "${BLUE} Installing Chromedriver..." \
+            && curl -sSL -o /opt/chromedriver.zip "${BASE_URL}/chrome-for-testing/${version}/chromedriver-linux64.zip" \
+            && unzip -j /opt/chromedriver.zip -d /usr/local/bin/ \
+            && rm -rf /opt/chromedriver.zip
+        RUN chromedriver --version
+    ELSE
+        DO +INSTALL_CHROMIUM --version=$version --PACKAGE_TYPE="chromium" --DOWNLOAD_URL="${BASE_URL}/chromium/${version}/chromium_${TARGETARCH}.zip"
+        RUN chromium --version
+        DO +PATCH_CHROME --BIN_TO_PATCH="chromium"
+
+        DO +INSTALL_CHROMIUM --version=$version --PACKAGE_TYPE="chromium-driver" --DOWNLOAD_URL="${BASE_URL}/chromium/${version}/chromium-driver-${TARGETARCH}.zip"
+        RUN chromedriver --version
+    END
+
 PATCH_CHROME:
     FUNCTION
     ARG --required BIN_TO_PATCH
