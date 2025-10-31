@@ -255,6 +255,7 @@ BUILD_WEB:
     RUN flutter clean
     RUN flutter pub get
     RUN flutter build web $BUILD_MODE \
+        --wasm \
         --pwa-strategy=none \
         --target $TARGET \
         --build-name=$BUILD_NAME \
