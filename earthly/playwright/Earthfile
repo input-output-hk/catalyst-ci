@@ -7,7 +7,7 @@ SETUP:
     FROM mcr.microsoft.com/playwright:v1.48.0-noble
     WORKDIR $workdir
 
-    RUN apt-get update --fix-missing && apt-get install -y apt-utils curl unzip
+    RUN apt-get update --fix-missing && apt-get install -y apt-utils unzip
 
     DO flutter-installer+INSTALL_CHROME_LINUX64
 

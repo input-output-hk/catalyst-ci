@@ -1,0 +1,20 @@
+VERSION 0.8
+
+IMPORT ../debian AS debian
+
+ARG --global UV_IMAGE="harbor.shared-services.projectcatalyst.io/ghcr/astral-sh/uv:python3.13-trixie-slim"
+
+INSTALL:
+    FUNCTION
+
+    COPY +uv-bin/uv /usr/local/bin/uv
+
+uv-bin:
+    FROM $UV_IMAGE
+    SAVE ARTIFACT /usr/local/bin/uv
+
+check-uv:
+    FROM debian+common
+    DO +INSTALL
+
+    RUN uv --version

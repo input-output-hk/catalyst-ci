@@ -1,5 +1,6 @@
 VERSION 0.8
 
+ARG --global IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/davidanson/markdownlint-cli2-rules:v0.14.0"
 # cspell: words markdownlint
 
 MDLINT_LOCALLY:
@@ -35,7 +36,7 @@ MDLINT_LOCALLY:
     RUN docker run \
         --rm \
         -v $src:/workdir \
-        davidanson/markdownlint-cli2-rules:v0.14.0 \
+        $IMAGE \
         "**/*.md" \
         --config $cfg_file \
         $fix
@@ -50,7 +51,7 @@ CHECK:
     # See: https://github.com/DavidAnson/markdownlint-cli2
     # We use a special container which includes all rule extensions to markdownlint
     # Notably, we rely on the `max-one-sentence-per-line` rule which helps keep
-    # diffs of markdown files small and legible.  This rule is only currently
+    # diffs of markdown files small and legible. This rule is only currently
     # in the `next` branch of `markdownlint`.
     # Container is built by:
     #   https://github.com/DavidAnson/markdownlint-cli2/blob/next/docker/Dockerfile-rules
@@ -60,9 +61,8 @@ CHECK:
 
     # Unlikely this ever needs to be changed.
     ARG cfg_file=.markdownlint-cli2.jsonc
-    ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub"
 
-    FROM ${REGISTRY}/davidanson/markdownlint-cli2-rules:v0.14.0 
+    FROM $IMAGE
 
     # Status line for what we are about to do.
     RUN echo Linting Markdown Recursively from: $src

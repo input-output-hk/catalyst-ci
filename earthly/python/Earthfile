@@ -6,7 +6,7 @@ IMPORT ../../ AS cat-ci
 IMPORT ../debian AS debian
 IMPORT ../cue AS cue
 IMPORT ../graphviz AS graphviz
-
+IMPORT ../uv AS uv
 
 # Define a constant name for the container and its version.
 ARG --global PYTHON_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/python"
@@ -18,15 +18,12 @@ python-base:
 
     # Install necessary packages
     LET PACKAGES= \
-        bash \
         curl \
         libffi-dev \
-        gcc \
         musl-dev \
         zlib1g-dev \
         libjpeg-dev \
-        git \
-        jq
+        git
     DO debian+INSTALL --packages=$PACKAGES
 
     # Install CUE
@@ -50,14 +47,14 @@ python-base:
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
 
-    # Install UV through the recommended installer.
-    RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+    # Install UV through Earthfile.
     ENV PATH=$HOME/.local/bin:$PATH
+    DO uv+INSTALL
 
     # Install ruff for linting.
-    RUN pip3 install ruff
-    RUN pip3 install rich
-    RUN pip3 install third-party-imports
+    RUN uv tool install ruff
+    RUN uv pip install rich --system
+    RUN uv pip install third-party-imports --system
 
     # Universal build scripts we will always need and are not target dependent.
     COPY --dir scripts /scripts
@@ -71,7 +68,7 @@ BUILDER:
     ARG opts
 
     # Copy our dependencies.
-    COPY pyproject.toml poetry.lock Readme.md .
+    COPY --if-exists pyproject.toml poetry.lock Readme.md README.md . 
 
     # Install it all with poetry
     RUN poetry install $opts
@@ -91,11 +88,8 @@ LINT_PYTHON:
     # Where we want to run the `lint` from. Use `.` to check the whole repo.
     ARG src=.
 
-    FROM ${PYTHON_IMAGE}:3.13
+    FROM +python-base
     WORKDIR /work
-
-    # Install ruff
-    RUN pip install ruff
 
     COPY $src .
     COPY cat-ci+repo-config/repo/ruff.toml ruff.toml.std
@@ -104,4 +98,3 @@ LINT_PYTHON:
 
     RUN ruff format --check && \
         ruff check --output-format=github .
-

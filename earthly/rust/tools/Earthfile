@@ -40,8 +40,6 @@ CARGO_BINSTALL:
     END
     SAVE ARTIFACT $CARGO_HOME/bin/"$executable"
 
-
-
 # Note, TOOLS do not benefit from the CARGO caching, and pollute it, so build without it.
 tool-cargo-nextest:
     DO +CARGO_BINSTALL --package=cargo-nextest --version=0.9.78

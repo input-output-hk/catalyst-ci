@@ -1,7 +1,9 @@
 VERSION 0.8
 
-ARG REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
-FROM ${REGISTRY}/golang:1.22.4-alpine3.20
+IMPORT ../../earthly/debian AS debian
+
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+FROM ${REGISTRY}/golang:1.24.5-bookworm
 
 IMPORT ../../earthly/go AS go-ci
 
@@ -17,7 +19,7 @@ deps:
     WORKDIR /work
     CACHE --persist --sharing shared /go
 
-    RUN apk add --no-cache gcc musl-dev
+    RUN apt-get update && apt-get install -y musl-dev
     DO go-ci+DEPS
 
 src:
@@ -51,7 +53,7 @@ github:
     SAVE ARTIFACT bin/fetcher fetcher
 
 docker:
-    FROM debian:bookworm-slim
+    FROM debian+debian-clean
     WORKDIR /workspace
 
     ARG container="jorm-fetcher"
