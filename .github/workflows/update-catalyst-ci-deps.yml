@@ -6,15 +6,16 @@ on:
   workflow_dispatch:
     inputs:
       notify_type:
-        description: ""
+        description: "Notification type: Issue or PR"
         type: choice
         options:
           - "pr"
           - "issue"
         default: "pr"
       repos:
-        description: ""
+        description: "Comma separated list of repositories"
         type: string
+        default: ""
 
 permissions:
   contents: write

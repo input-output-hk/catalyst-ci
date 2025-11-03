@@ -4,11 +4,11 @@ on:
   workflow_call:
     inputs:
       notify_type:
-        description: ""
+        description: "Notification type: Issue or PR"
         type: string
         default: "pr"
       repos:
-        description: ""
+        description: "Comma separated list of repositories"
         type: string
         default: ""
 
