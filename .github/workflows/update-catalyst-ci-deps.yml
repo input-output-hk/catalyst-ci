@@ -26,6 +26,6 @@ jobs:
   update_ci_deps:
     uses: ./.github/workflows/update-catalyst-deps.yml
     with:
-        notify_type: ${{ inputs.notify_type }}
+        notify_type: ${{ github.event_name == 'workflow_dispatch' && inputs.notify_type || 'pr' }}
         repos: ${{ inputs.repos != '' && inputs.repos ||'input-output-hk/catalyst-voices, input-output-hk/hermes, input-output-hk/catalyst-libs, input-output-hk/catalyst-reviews, input-output-hk/catalyst-som, input-output-hk/catalyst-execution, input-output-hk/norns' }}
     secrets: inherit
