@@ -239,6 +239,7 @@ BUILD_WEB:
     ARG UPLOAD_DEBUG_SYMBOLS=false
     ARG SENTRY_ORG
     ARG SENTRY_PROJECT
+    ARG WASM=false
 
     WORKDIR $WORKDIR
 
@@ -252,10 +253,13 @@ BUILD_WEB:
         SET ADDITIONAL_BUILD_ARGS = "$ADDITIONAL_BUILD_ARGS --source-maps"
     END
 
+    IF [ $WASM = true ]
+        SET ADDITIONAL_BUILD_ARGS = "$ADDITIONAL_BUILD_ARGS --wasm"
+    END
+
     RUN flutter clean
     RUN flutter pub get
     RUN flutter build web $BUILD_MODE \
-        --wasm \
         --pwa-strategy=none \
         --target $TARGET \
         --build-name=$BUILD_NAME \
