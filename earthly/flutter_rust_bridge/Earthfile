@@ -4,26 +4,15 @@ VERSION 0.8
 
 IMPORT ../flutter AS flutter-ci
 IMPORT ../rust AS rust-ci
+IMPORT ../debian AS debian
 
 # This will be refactored in the future
 # TODO(bkioshn): https://github.com/input-output-hk/catalyst-ci/issues/322
 # builder: Setup necessary tools for `flutter_rust_bridge`
 builder:
-    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/debian:stable-slim
+    FROM debian+common
 
     WORKDIR /work
-
-    RUN apt-get update \
-        && apt-get install -y \
-        apt-utils \
-        wget \
-        tar \
-        xz-utils \
-        git \
-        build-essential \
-        curl \
-        unzip \
-        clang
 
     DO flutter-ci+INSTALL_FLUTTER
     DO rust-ci+INSTALL_RUST

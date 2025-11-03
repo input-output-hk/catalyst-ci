@@ -3,6 +3,7 @@ VERSION 0.8
 # cspell: words noninteractive
 
 IMPORT ./installer AS installer
+IMPORT ../debian AS debian
 
 ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
 
@@ -40,7 +41,7 @@ INSTALL_FLUTTER:
 
 # flutter-base installs required tools and packages.
 flutter-base:
-    FROM ${REGISTRY}/debian:bookworm-20250203-slim
+    FROM debian+common
 
     ENV DEBIAN_FRONTEND=noninteractive
 
@@ -48,19 +49,6 @@ flutter-base:
     # sqlite3 and libsqlite3-dev are required for running db tests in CI
     RUN apt-get update --fix-missing && \
             apt-get install -y \
-            apt-utils \
-            git \
-            curl \
-            gzip \
-            unzip \
-            bzip2 \
-            bash \
-            jq \
-            gpg \
-            lcov \
-            tar \
-            wget \
-            xz-utils \
             sqlite3 \
             libsqlite3-dev
 
@@ -68,14 +56,12 @@ flutter-base:
 
     WORKDIR frontend
 
-    DO installer+INSTALL_CHROME_LINUX64
-    DO installer+INSTALL_FIREFOX_LINUX64
+    # DO installer+INSTALL_CHROME_LINUX64 --version=141.0.7390.122
+    DO installer+INSTALL_CHROME_FOR_TESTING --version=141.0.7390.122
+    DO installer+INSTALL_FIREFOX_LINUX64 --version=115.15.0esr-1
+    DO installer+INSTALL_EDGE_LINUX64 --version=125.0.2535.51
 
-    ARG edge_version = 125.0.2535.51
-    ARG edge_package_release = 1
-    DO installer+INSTALL_EDGE_LINUX64 --edge_version=$edge_version --edge_package_release=$edge_package_release
-
-# test-flutter-base : installs required tools and packages for flutter development.
+# test-flutter-base: installs required tools and packages for flutter development.
 test-flutter-base:
     BUILD +flutter-base
 
@@ -158,7 +144,6 @@ PUBLISH_DRY_RUN:
         RUN echo "Running dart pub publish --dry-run"
         RUN dart pub publish --dry-run
     END
-
 
 # Runs unit tests.
 UNIT_TESTS:

@@ -5,75 +5,27 @@ on:
     types: [published, edited]
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: "Run in dry-run mode (no PRs created)"
-        type: boolean
-        default: false
+      notify_type:
+        description: "Notification type: Issue or PR"
+        type: choice
+        options:
+          - "pr"
+          - "issue"
+        default: "pr"
+      repos:
+        description: "Comma separated list of repositories"
+        type: string
+        default: ""
 
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 jobs:
-  notify-dependents:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Get release info
-        id: release_info
-        run: |
-          if [ "${{ github.event_name }}" = "release" ]; then
-            echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-            echo "release_url=${{ github.event.release.html_url }}" >> $GITHUB_OUTPUT
-            echo "release_notes=${{ github.event.release.body }}" >> $GITHUB_OUTPUT
-          else
-            # For manual dispatch, use latest release
-            LATEST_TAG=$(git describe --tags --abbrev=0)
-            echo "tag_name=$LATEST_TAG" >> $GITHUB_OUTPUT
-            echo "release_url=https://github.com/${{ github.repository }}/releases/latest" >> $GITHUB_OUTPUT
-            echo "release_notes=Manual dispatch" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create PRs for dependent repositories
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          DRY_RUN: ${{ inputs.dry_run }}
-          RELEASE_TAG: ${{ steps.release_info.outputs.tag_name }}
-          RELEASE_URL: ${{ steps.release_info.outputs.release_url }}
-          RELEASE_NOTES: ${{ steps.release_info.outputs.release_notes }}
-        run: |
-          REPOS=(
-            "input-output-hk/catalyst-voices"
-            "input-output-hk/hermes"
-            "input-output-hk/catalyst-libs"
-            "input-output-hk/catalyst-reviews"
-            "input-output-hk/catalyst-som"
-            "input-output-hk/catalyst-execution"
-            "input-output-hk/norns"
-          )
-
-          for repo in "${REPOS[@]}"; do
-            repo=$(echo "$repo" | tr -d ' ')
-            if [ -n "$repo" ]; then
-              echo "Processing $repo"
-
-              if [ "$DRY_RUN" = "true" ]; then
-                echo "[DRY RUN] Would create PR for $repo"
-              else
-                branch_name="chore/update-catalyst-ci-to-$(echo $RELEASE_TAG | tr -d 'v')"
-
-                default_branch=$(gh api repos/$repo --jq '.default_branch')
-                base_sha=$(gh api repos/$repo/branches/$default_branch --jq '.commit.sha')
-                gh api repos/$repo/git/refs -f ref="refs/heads/$branch_name" -f sha="$base_sha"
-                gh pr create \
-                  --repo "$repo" \
-                  --title "Update catalyst-ci to $RELEASE_TAG" \
-                  --body "Update catalyst-ci to $RELEASE_TAG. Release: $RELEASE_URL" \
-                  --head "$branch_name" \
-                  --base "$default_branch"
-
-                echo "Created PR for $repo"
-              fi
-
-              sleep 2
-            fi
-          done
+  update_ci_deps:
+    uses: ./.github/workflows/update-catalyst-deps.yml
+    with:
+        notify_type: ${{ github.event_name == 'workflow_dispatch' && inputs.notify_type || 'pr' }}
+        repos: ${{ inputs.repos != '' && inputs.repos ||'input-output-hk/catalyst-voices, input-output-hk/hermes, input-output-hk/catalyst-libs, input-output-hk/catalyst-reviews, input-output-hk/catalyst-som, input-output-hk/catalyst-execution, input-output-hk/norns' }}
+    secrets: inherit

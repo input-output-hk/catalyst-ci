@@ -1,7 +1,7 @@
 VERSION 0.8
 
 # Define a constant name for the container and its version.
-ARG --global DEBIAN_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/debian:13.0-slim"
+ARG --global DEBIAN_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/debian:stable-slim"
 
 # Optimally install packages for debian
 INSTALL:
@@ -23,10 +23,10 @@ INSTALL:
 debian-clean:
     FROM $DEBIAN_IMAGE
 
-
 # The current version of our base Debian Container.
 # Normally you want this because it has all the common tools
 # one would expect inside CI.
+# gdebi-core is used to more easily manage dependency conflicts.
 common:
     FROM +debian-clean
 
@@ -35,16 +35,15 @@ common:
         apt-utils \
         git \
         curl \
-        gzip \
         unzip \
         bzip2 \
-        bash \
         jq \
         gpg \
         lcov \
-        tar \
         wget \
-        xz-utils
+        build-essential \
+        xz-utils \
+        gdebi-core
     DO +INSTALL --packages=$PACKAGES
 
 # Checks our debian container is basically usable, and nothing more.

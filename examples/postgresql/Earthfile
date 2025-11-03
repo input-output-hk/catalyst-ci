@@ -7,12 +7,12 @@ IMPORT ../../ AS cat-ci
 # cspell: words psql
 
 # Internal: builder is our Event db builder target. Prepares all necessary artifacts.
-#   CI target : dependency
+# CI target : dependency
 builder:
     DO postgresql-ci+BUILDER
 
 # check if the sql files are properly formatted and pass lint quality checks.
-#   CI target : true
+# CI target : true
 check:
     FROM postgresql-ci+sqlfluff-base
 
@@ -23,8 +23,8 @@ check:
     # Now you can run the script without the file not found error
     DO postgresql-ci+CHECK
 
-# format all SQL files in the current project.  Local developers tool.
-#   CI target : false
+# format all SQL files in the current project. Local developers tool.
+# CI target : false
 format:
     LOCALLY
 
@@ -32,7 +32,7 @@ format:
 
 
 # build an event db docker image.
-#   CI target : true
+# CI target : true
 build:
     FROM +builder
 
@@ -75,7 +75,7 @@ INTEGRATION_TEST_RUN:
 
 
 # Internal: Test Scenario 1
-#   CI target : true
+# CI target : true
 # Steps:
 #   * Container runs PostgreSQL server
 #   * drops and initialise db
@@ -85,7 +85,7 @@ test-1:
     DO +INTEGRATION_TEST_RUN --seed_data="data" --test_script=./tests/test1.sh
 
 # Internal: Test Scenario 2
-#   CI target : dependency
+# CI target : dependency
 # Steps:
 #   * Container runs PostgreSQL server
 #   * drops and initialise db
@@ -95,7 +95,7 @@ test-2:
     DO +INTEGRATION_TEST_RUN --migrations=false --seed_data= --test_script=./tests/test2.sh
 
 # Internal: Test Scenario 3
-#   CI target : dependency
+# CI target : dependency
 # Steps:
 #   * Container runs PostgreSQL server
 #   * drops and initialise db

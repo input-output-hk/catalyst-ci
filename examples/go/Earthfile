@@ -4,16 +4,18 @@ VERSION 0.8
 
 IMPORT ../../earthly/go AS go-ci
 
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
+
 # The structure of this Earthfile is derived from the style guide:
 # https://input-output-hk.github.io/catalyst-ci/style/#adhere-to-a-consistent-structure
 
 deps:
     # This target is used to install external Go dependencies.
-    FROM golang:1.22.4-alpine3.20
+    FROM ${REGISTRY}/golang:1.24.5-bookworm
     WORKDIR /work
 
     # Any build dependencies should also be captured in this target.
-    RUN apk add --no-cache gcc musl-dev
+    RUN apt-get update && apt-get install -y musl-dev
 
     # This FUNCTION automatically copies the go.mod and go.sum files and runs
     # `go mod download` to install the dependencies.
