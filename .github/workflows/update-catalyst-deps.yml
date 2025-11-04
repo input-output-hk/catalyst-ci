@@ -86,6 +86,7 @@ jobs:
               --body "Update $REPO_NAME to $RELEASE_TAG. Release: $RELEASE_URL" \
               --head "$branch_name" \
               --base "$default_branch"
+              --draft
 
             echo "PR created for ${{ matrix.repo }}"
           else
