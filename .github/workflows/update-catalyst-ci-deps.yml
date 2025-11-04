@@ -17,11 +17,6 @@ on:
         type: string
         default: ""
 
-permissions:
-  contents: write
-  pull-requests: write
-  issues: write
-
 jobs:
   update_ci_deps:
     uses: ./.github/workflows/update-catalyst-deps.yml
