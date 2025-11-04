@@ -25,7 +25,7 @@ jobs:
       tag_name: ${{ steps.release_info.outputs.tag_name }}
       release_url: ${{ steps.release_info.outputs.release_url }}
     env:
-        GITHUB_TOKEN: ${{ secrets.CATALYST_PROJECT_PAT }}
+        GITHUB_TOKEN: ${{ secrets.PROJECTS_PAT }}
     steps:
       - name: Get release info
         id: release_info
@@ -47,7 +47,7 @@ jobs:
       matrix: 
         repo: ${{ fromJSON(needs.notify-dependents.outputs.matrix) }}
     env:
-        GITHUB_TOKEN: ${{ secrets.CATALYST_PROJECT_PAT }}
+        GITHUB_TOKEN: ${{ secrets.PROJECTS_PAT }}
     steps:
       - uses: actions/checkout@v4
         with:
