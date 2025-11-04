@@ -12,6 +12,10 @@ on:
         type: string
         default: ""
 
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
 
 jobs:
   notify-dependents:
