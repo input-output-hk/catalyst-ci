@@ -75,12 +75,12 @@ jobs:
               "s|(IMPORT[[:space:]]+$UPDATED_REPO/(earthly/)?[^:]+:)v[0-9]+\.[0-9]+\.[0-9]+|\1$RELEASE_TAG|" {} +
 
             git add .
-            git commit -m "chrore($REPO_NAME): Update $REPO_NAME to $RELEASE_TAG"
+            git commit -m "chore($REPO_NAME): Update $REPO_NAME to $RELEASE_TAG"
             git push origin "$branch_name"
 
             gh pr create \
               --repo "${{ matrix.repo }}" \
-              --title "chrore($REPO_NAME): Update $REPO_NAME to $RELEASE_TAG" \
+              --title "chore($REPO_NAME): Update $REPO_NAME to $RELEASE_TAG" \
               --body "Update $REPO_NAME to $RELEASE_TAG. Release: $RELEASE_URL" \
               --head "$branch_name" \
               --base "$default_branch"
