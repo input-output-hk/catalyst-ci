@@ -2,9 +2,9 @@ VERSION 0.8
 
 # Base image for Java used in other targets to avoid improve caching
 java-base:
-    FROM harbor.shared-services.projectcatalyst.io/dockerhub/library/openjdk:21-jdk-slim
+    FROM harbor.shared-services.projectcatalyst.io/dockerhub/amazoncorretto:21-al2023-jdk
 
-    SAVE ARTIFACT /usr/local/openjdk-21 /java
+    SAVE ARTIFACT /usr/lib/jvm/java-21-amazon-corretto.x86_64 /java
 
 COPY_DEPS:
     FUNCTION
