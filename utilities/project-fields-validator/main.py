@@ -478,7 +478,7 @@ def clean_env_var(var: str) -> str:
     return var.strip().strip("\"'")
 
 
-def main() -> None:  # noqa: C901, PLR0915
+def main() -> None:  # noqa: C901, PLR0915, PLR0912
     """Project Field Validator."""
     try:
         env_vars = {
@@ -523,6 +523,7 @@ def main() -> None:  # noqa: C901, PLR0915
             pr_details = validator.get_pr_details(org_name, repo_name, pr_number)
             author = pr_details["author"]["login"]
             assignees = [node["login"] for node in pr_details["assignees"]["nodes"]]
+            body = pr_details["body"]
 
             if not assignees:
                 print(f"\nAssigning PR to author @{author}")
@@ -552,6 +553,12 @@ def main() -> None:  # noqa: C901, PLR0915
             validator.print_validation_results(validation_errors)
 
             if validation_errors:
+                sys.exit(1)
+
+            if body.startswith(
+                "# Description\r\n\r\nThanks for contributing to the project!\r\nPlease fill out this template"
+            ):
+                print("❌ Please edit the pull request description.")
                 sys.exit(1)
 
         except GitHubAPIError as e:
