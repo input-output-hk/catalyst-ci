@@ -12,6 +12,8 @@ IMPORT ../debian AS debian
 builder:
     FROM debian+common
 
+    DO debian+INSTALL --packages=clang
+
     WORKDIR /work
 
     DO flutter-ci+INSTALL_FLUTTER
