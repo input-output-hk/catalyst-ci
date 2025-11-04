@@ -13,7 +13,7 @@ on:
         default: ""
 
 env:
-  GH_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
 
 jobs:
   notify-dependents:
@@ -57,7 +57,7 @@ jobs:
           UPDATED_REPO="github.com/${{ github.repository }}"
           REPO_NAME=$(echo ${{ github.repository }} | cut -d/ -f2)
 
-          git config --global user.name "github-actions[bot]"
+          git config --global user.name "${GITHUB_ACTOR}"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
           if [ "${{ inputs.notify_type }}" == "pr" ]; then
