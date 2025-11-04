@@ -74,11 +74,13 @@ jobs:
             find . -type f -name "Earthfile" -exec sed -i -E \
               "s|(IMPORT[[:space:]]+$UPDATED_REPO/(earthly/)?[^:]+:)v[0-9]+\.[0-9]+\.[0-9]+|\1$RELEASE_TAG|" {} +
 
-            gh auth status
-
             git add .
             git commit -m "Update $REPO_NAME to $RELEASE_TAG"
             git push origin "$branch_name"
+
+            echo "${{ secrets.CI_BOT_TOKEN }}" > token.txt
+
+            gh auth login --with-token < token.txt
 
             gh pr create \
               --repo "${{ matrix.repo }}" \
@@ -86,7 +88,6 @@ jobs:
               --body "Update $REPO_NAME to $RELEASE_TAG. Release: $RELEASE_URL" \
               --head "$branch_name" \
               --base "$default_branch"
-              --draft
 
             echo "PR created for ${{ matrix.repo }}"
           else
