@@ -57,8 +57,8 @@ jobs:
           UPDATED_REPO="github.com/${{ github.repository }}"
           REPO_NAME=$(echo ${{ github.repository }} | cut -d/ -f2)
 
-          git config --global user.name "${GITHUB_ACTOR}"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name catalyst-cibot
+          git config --global user.email "catalyst-cibot@projectcatalyst.io"
 
           if [ "${{ inputs.notify_type }}" == "pr" ]; then
             echo "Create PR in ${{ matrix.repo }}"
