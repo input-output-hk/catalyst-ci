@@ -12,8 +12,6 @@ on:
         type: string
         default: ""
 
-env:
-  GITHUB_TOKEN: ${{ secrets.PROJECTS_PAT }}
 
 jobs:
   notify-dependents:
@@ -22,6 +20,8 @@ jobs:
       matrix: ${{ steps.matrix.outputs.matrix }}
       tag_name: ${{ steps.release_info.outputs.tag_name }}
       release_url: ${{ steps.release_info.outputs.release_url }}
+    env:
+        GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
     steps:
       - name: Get release info
         id: release_info
@@ -42,6 +42,8 @@ jobs:
     strategy:
       matrix: 
         repo: ${{ fromJSON(needs.notify-dependents.outputs.matrix) }}
+    env:
+        GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
     steps:
       - uses: actions/checkout@v4
         with:
