@@ -69,12 +69,18 @@ jobs:
             echo "Create PR in ${{ matrix.repo }}"
             branch_name="chore/update-$REPO_NAME-to-$RELEASE_TAG"
             default_branch=$(gh api repos/${{ matrix.repo }} --jq '.default_branch')
-            git checkout -b $branch_name
+            git switch "$branch_name" || git switch --create "$branch_name"
 
             find . -type f -name "Earthfile" -exec sed -i -E \
               "s|(IMPORT[[:space:]]+$UPDATED_REPO/(earthly/)?[^:]+:)v[0-9]+\.[0-9]+\.[0-9]+|\1$RELEASE_TAG|" {} +
 
             git add .
+
+            if [[ $(git diff --staged) == "" ]]; then
+                echo "No changes, everything up to date"
+                exit 0
+            fi
+
             git commit -m "chore($REPO_NAME): Update $REPO_NAME to $RELEASE_TAG"
             git push origin "$branch_name"
 
