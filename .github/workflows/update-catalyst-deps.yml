@@ -13,7 +13,7 @@ on:
         default: ""
 
 env:
-  GITHUB_TOKEN: ${{ secrets.CI_BOT_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.PROJECTS_PAT }}
 
 jobs:
   notify-dependents:
