@@ -1,5 +1,7 @@
 VERSION 0.8
 
+# cspell: words amazoncorretto corretto
+
 # Base image for Java used in other targets to avoid improve caching
 java-base:
     FROM harbor.shared-services.projectcatalyst.io/dockerhub/amazoncorretto:21-al2023-jdk
