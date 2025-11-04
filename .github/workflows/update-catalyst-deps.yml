@@ -75,6 +75,8 @@ jobs:
             git commit -m "Update $REPO_NAME to $RELEASE_TAG"
             git push origin "$branch_name"
 
+            gh auth status
+
             gh pr create \
               --repo "${{ matrix.repo }}" \
               --title "Update $REPO_NAME to $RELEASE_TAG" \
