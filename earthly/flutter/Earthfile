@@ -71,11 +71,6 @@ test-flutter-base:
 
 SETUP:
     FUNCTION
-
-    ARG CHROME_VERSION
-    ARG FIREFOX_VERSION
-    ARG EDGE_VERSION
-
     FROM +flutter-base
 
 # Runs melos bootstrap if melos dependency is present in pubspec.yaml.
