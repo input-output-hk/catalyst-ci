@@ -264,6 +264,7 @@ class ProjectFieldsValidator:
                   login
                 }
               }
+              body
             }
           }
         }
