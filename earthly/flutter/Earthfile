@@ -41,6 +41,7 @@ INSTALL_FLUTTER:
 
 # flutter-base installs required tools and packages.
 flutter-base:
+    ARG CHROME_FOR_TESTING=true
     ARG CHROME_VERSION=141.0.7390.122
     ARG FIREFOX_VERSION=115.15.0esr-1
     ARG EDGE_VERSION=125.0.2535.51
@@ -60,8 +61,12 @@ flutter-base:
 
     WORKDIR frontend
 
-    # DO installer+INSTALL_CHROME_LINUX64 --version=141.0.7390.122
-    DO installer+INSTALL_CHROME_FOR_TESTING --version=$CHROME_VERSION
+    IF [ $CHROME_FOR_TESTING = true ]
+        DO installer+INSTALL_CHROME_FOR_TESTING --version=$CHROME_VERSION
+    ELSE
+        DO installer+INSTALL_CHROME_LINUX64 --version=$CHROME_VERSION
+    END
+    
     DO installer+INSTALL_FIREFOX_LINUX64 --version=$FIREFOX_VERSION
     DO installer+INSTALL_EDGE_LINUX64 --version=$EDGE_VERSION
 
