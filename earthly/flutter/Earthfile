@@ -41,8 +41,8 @@ INSTALL_FLUTTER:
 
 # flutter-base installs required tools and packages.
 flutter-base:
-    ARG CHROME_FOR_TESTING=true
-    ARG CHROME_VERSION=141.0.7390.122
+    ARG CHROME_FOR_TESTING=false
+    ARG CHROME_VERSION=132.0.6834.83
     ARG FIREFOX_VERSION=115.15.0esr-1
     ARG EDGE_VERSION=125.0.2535.51
 
