@@ -1,5 +1,6 @@
 //! Simple benchmark example
-use criterion::{black_box, criterion_group, criterion_main, Criterion};
+
+use criterion::{Criterion, black_box, criterion_group, criterion_main};
 
 /// fibonacci calculates the nth fibonacci number
 fn fibonacci(n: u64) -> u64 {
