@@ -2,7 +2,7 @@ VERSION 0.8
 
 IMPORT ../debian AS debian
 
-ARG --global UV_IMAGE="harbor.shared-services.projectcatalyst.io/ghcr/astral-sh/uv:python3.13-trixie-slim"
+ARG --global UV_IMAGE="harbor.shared-services.projectcatalyst.io/ghcr/astral-sh/uv:python3.14-trixie-slim"
 
 ARG --global UV_VERSION=0.9.7
 ARG --global UV_URL="https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-installer.sh"
