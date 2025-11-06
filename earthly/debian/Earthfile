@@ -49,8 +49,9 @@ common:
     DO +INSTALL --packages=$PACKAGES
 
     # Make and add to path all the common places executables can be installed.
-    RUN mkdir -p /usr/local/bin
-    ENV PATH="/usr/local/bin/:${PATH}"
+    RUN mkdir -p /usr/local/bin \
+        && mkdir -p "/${HOME}/.local/bin/"
+    ENV PATH="/usr/local/bin/:/${HOME}/.local/bin/:${PATH}"
 
 # Checks our debian container is basically usable, and nothing more.
 check-debian:
