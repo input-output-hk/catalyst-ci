@@ -23,6 +23,7 @@ python-base:
         musl-dev \
         zlib1g-dev \
         libjpeg-dev \
+        jq \
         git
     DO debian+INSTALL --packages=$PACKAGES
 
