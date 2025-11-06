@@ -24,15 +24,21 @@ builder:
 CODE_GENERATOR_WEB:
     FUNCTION
     ARG --required WASM_MODULE_NAME
+    ARG RELEASE_MODE=false
+
+    LET ADDITIONAL_BUILD_ARGS = ""
+
+    IF [ $RELEASE_MODE = true ]
+        SET ADDITIONAL_BUILD_ARGS = "$ADDITIONAL_BUILD_ARGS --release"
+    END
 
     # TODO(dt-iohk): revert to official version when changes from the fork are merged into the official version
     GIT CLONE --branch feat/wasm-bindgen-configurable-module https://github.com/input-output-hk/catalyst_flutter_rust_bridge.git /usr/local/flutter_rust_bridge
     RUN cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- generate
-    RUN cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- build-web --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME"
+    RUN cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- build-web --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME" $ADDITIONAL_BUILD_ARGS
 
     # RUN flutter_rust_bridge_codegen generate
-    # TODO(damian-molinski) add --release flag to the command below to optimize for performance
-    # RUN flutter_rust_bridge_codegen build-web --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME"
+    # RUN flutter_rust_bridge_codegen build-web --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME" $ADDITIONAL_BUILD_ARGS
 
     RUN mkdir -p assets/js && cp -rf ./web/pkg/* assets/js/
      # Don't want this gitignore file.
