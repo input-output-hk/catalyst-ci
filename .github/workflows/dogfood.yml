@@ -8,6 +8,7 @@ on:
     types:
       - synchronize
       - ready_for_review
+      - opened
 
 permissions:
   id-token: write
