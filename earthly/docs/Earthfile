@@ -7,7 +7,7 @@ IMPORT ../../utilities/scripts AS scripts
 # cspell: words libfreetype liblcms libopenjp etag
 
 deps:
-    FROM python-ci+python-base
+    FROM python-ci+python-base-deprecated
     # Derived from official mkdocs-material docker container.
     # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile
     # Due to docs being constructed not only from Doc source but Build artifacts,
