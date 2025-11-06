@@ -38,7 +38,7 @@ deps:
     RUN curl -fsSL https://d2lang.com/install.sh | sh -s --
 
     # Install poetry and our python dependencies.
-    DO python-ci+BUILDER --opts=--no-root
+    DO python-ci+BUILDER_WITH_POETRY --opts=--no-root
 
     # Copy our run scripts
     COPY --dir scripts/* /scripts/
