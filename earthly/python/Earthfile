@@ -19,7 +19,7 @@ ARG --global PYTHON_URL=https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z
 
 # cspell: words libjpeg ruff
 
-python-base:
+python-base-old:
     FROM ${PYTHON_IMAGE}:3.13-slim-trixie
 
     # Install necessary packages
@@ -68,7 +68,8 @@ python-base:
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
 
-BUILDER:
+# Deprecated Builder with Poetry.
+BUILDER_WITH_POETRY:
     FUNCTION
 
     ARG opts
@@ -235,7 +236,23 @@ INSTALL:
     DO scripts+ADD_PYTHON_SCRIPTS
 
 
-python-base2:
+python-base:
     FROM debian+common
 
     DO +INSTALL
+
+# Poetry use is deprecated in favor of using UV but we keep this because not everything is migrated to UV.
+python-base-deprecated:
+    FROM +python-base
+
+    # Poetry Installation directory.
+    # Gives poetry and our poetry project a reliable location.
+    WORKDIR /poetry
+    ENV POETRY_HOME=/poetry
+    ENV PATH=$POETRY_HOME/bin:$PATH
+
+    # Install Poetry using the recommended installer.
+    RUN curl -sSL https://install.python-poetry.org | python3 - --version 2.0.0
+
+    # Adjust Poetry's configuration to prevent connection pool warnings.
+    RUN poetry config installer.max-workers 10
