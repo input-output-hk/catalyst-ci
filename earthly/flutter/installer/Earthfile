@@ -125,7 +125,9 @@ INSTALL_CHROMIUM:
         RUN printf "${BLUE} Installing ${PACKAGE_TYPE} version: ${version}..." \
             && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
             && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
-            && gdebi -n /opt/${PACKAGE_TYPE}/lib*.deb \
+            && gdebi -n /opt/${PACKAGE_TYPE}/libx*.deb \
+            && gdebi -n /opt/${PACKAGE_TYPE}/libf*.deb \
+            && gdebi -n /opt/${PACKAGE_TYPE}/libo*.deb \
             && gdebi -n /opt/${PACKAGE_TYPE}/chromium-common*.deb \
             && gdebi -n /opt/${PACKAGE_TYPE}/chromium_*.deb \
             && rm -rf /opt/${PACKAGE_TYPE}*
