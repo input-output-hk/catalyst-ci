@@ -4,10 +4,21 @@ IMPORT ../debian AS debian
 
 ARG --global UV_IMAGE="harbor.shared-services.projectcatalyst.io/ghcr/astral-sh/uv:python3.13-trixie-slim"
 
+ARG --global UV_VERSION=0.9.7
+ARG --global UV_URL="https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-installer.sh"
+
 INSTALL:
     FUNCTION
 
     COPY +uv-bin/uv /usr/local/bin/uv
+    RUN uv --version
+
+# Install Binary version tagged the UV recommended way.
+INSTALL_BIN:
+    FUNCTION
+
+    RUN curl --proto '=https' --tlsv1.2 -LsSf "${UV_URL}" | UV_INSTALL_DIR="/usr/local/bin" sh \
+        && uv --version
 
 uv-bin:
     FROM $UV_IMAGE
