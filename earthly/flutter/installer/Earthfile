@@ -1,6 +1,7 @@
 VERSION 0.8
 
-# cspell: words Rxxxx
+# cspell: words Rxxxx 
+# cspell: ignoreRegExp lib[f-x]
 
 # An AWS S3 bucket is used to store browser and driver packages. 
 # Packages are updated automatically once a week. 
