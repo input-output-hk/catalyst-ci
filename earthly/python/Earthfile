@@ -16,58 +16,6 @@ ARG --global PYTHON_VERSION=3.14.0
 ARG --global PYTHON_SHA256=2299dae542d395ce3883aca00d3c910307cd68e0b2f7336098c8e7b7eee9f3e9
 ARG --global PYTHON_URL=https://www.python.org/ftp/python/${PYTHON_VERSION%%[a-z]*}/Python-$PYTHON_VERSION.tar.xz
 
-
-# cspell: words libjpeg ruff
-
-python-base-old:
-    FROM ${PYTHON_IMAGE}:3.13-slim-trixie
-
-    # Install necessary packages
-    LET PACKAGES= \
-        curl \
-        libffi-dev \
-        musl-dev \
-        zlib1g-dev \
-        libjpeg-dev \
-        git
-    DO debian+INSTALL --packages=$PACKAGES
-
-    # Install CUE
-    DO cue+INSTALL
-
-    # Install Graphviz
-    DO graphviz+INSTALL
-
-    # Poetry Installation directory.
-    # Gives poetry and our poetry project a reliable location.
-    WORKDIR /poetry
-    ENV POETRY_HOME=/poetry
-    ENV PATH=$POETRY_HOME/bin:$PATH
-
-    # Stop python code running in the container saving pointless .pyc files.
-    ENV PYTHONDONTWRITEBYTECODE=1
-
-    # Install Poetry using the recommended installer.
-    RUN curl -sSL https://install.python-poetry.org | python3 - --version 2.0.0
-
-    # Adjust Poetry's configuration to prevent connection pool warnings.
-    RUN poetry config installer.max-workers 10
-
-    # Install UV through Earthfile.
-    ENV PATH=$HOME/.local/bin:$PATH
-    DO uv+INSTALL
-
-    # Install ruff for linting.
-    RUN uv tool install ruff
-    RUN uv pip install rich --system
-    RUN uv pip install third-party-imports --system
-
-    # Universal build scripts we will always need and are not target dependent.
-    COPY --dir scripts /scripts
-    # Copy our common scripts so we can use them inside the container.
-    DO scripts+ADD_BASH_SCRIPTS
-    DO scripts+ADD_PYTHON_SCRIPTS
-
 # Deprecated Builder with Poetry.
 BUILDER_WITH_POETRY:
     FUNCTION
