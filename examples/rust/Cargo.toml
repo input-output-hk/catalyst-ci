@@ -1,5 +1,5 @@
 [workspace]
-resolver = "2"
+resolver = "3"
 members = [
     "crates/foo",
     "crates/bar",
@@ -8,7 +8,7 @@ members = [
 [workspace.package]
 version = "0.0.1"
 license = "MIT OR Apache-2.0"
-edition = "2021"
+edition = "2024"
 
 [workspace.lints.rust]
 warnings = "deny"
