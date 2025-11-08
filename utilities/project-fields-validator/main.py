@@ -9,13 +9,11 @@ import traceback
 import urllib.error
 import urllib.parse
 import urllib.request
+from collections.abc import Iterable
 from dataclasses import dataclass
+from email.message import Message
 from enum import Enum
-from typing import TYPE_CHECKING, Any, NamedTuple
-
-if TYPE_CHECKING:
-    from collections.abc import Iterable
-    from email.message import Message
+from typing import Any, NamedTuple
 
 logger = logging.getLogger(__name__)
 

@@ -5,15 +5,12 @@
 # cspell: words dbreadytimeout setupdbsql dbrefinerytoml dbmigrations
 # cspell: words dbseeddatasrc pwfile pgctl rtype initdb isready
 
+import argparse
 import os
 import tempfile
 import threading
 import time
 from pathlib import Path
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    import argparse
 
 from python import exec_manager
 
