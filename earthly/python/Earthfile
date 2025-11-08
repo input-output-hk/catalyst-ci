@@ -173,7 +173,7 @@ INSTALL:
     DO uv+INSTALL_BIN
 
     # Install ruff for linting.
-    RUN uv tool install ruff
+    RUN uv tool install ruff==0.14.4
     RUN uv pip install rich --system
     RUN uv pip install third-party-imports --system
 

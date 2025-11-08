@@ -17,7 +17,7 @@ asyncclick = "^8.1.8"
 loguru = "^0.7.3"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.14.3"
+ruff = "^0.14.4"
 ipython = "^9.1.0"
 
 [tool.ruff]

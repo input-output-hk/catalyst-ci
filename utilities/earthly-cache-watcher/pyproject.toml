@@ -13,7 +13,7 @@ watchdog = "^6.0.0"
 python-dotenv = "^1.1.0"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.14.3"
+ruff = "^0.14.4"
 
 [tool.ruff]
 line-length = 79

@@ -9,6 +9,9 @@ readme = "Readme.md"
 python = "^3.14"
 mkdocs-material = { version = "9.6.23", extras = ["recommended","git","imaging"] }
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.14.4"
+
 ### MkDocs Plugins we add.
 
 # https://github.com/byrnereese/mkdocs-minify-plugin

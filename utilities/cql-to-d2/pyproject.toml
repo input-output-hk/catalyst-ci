@@ -11,7 +11,7 @@ readme = "README.md"
 python = "^3.14"
 
 [tool.poetry.group.dev.dependencies]
-ruff = "^0.14.3"
+ruff = "^0.14.4"
 
 [tool.ruff]
 line-length = 79

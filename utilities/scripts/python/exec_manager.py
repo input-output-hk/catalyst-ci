@@ -6,13 +6,15 @@ import multiprocessing
 import subprocess
 import textwrap
 import time
-import types
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any, Self
 
 from rich import print  # noqa: A004
 from rich.table import Table
 from rich.text import Text
+
+if TYPE_CHECKING:
+    import types
 
 
 def status_for_rc(rc: int) -> str:
@@ -294,7 +296,7 @@ class ParallelRunner:
         self.processes = []
         self.start_time = time.perf_counter()
 
-    def __enter__(self) -> "ParallelRunner":
+    def __enter__(self) -> Self:
         """Enter."""
         return self
 
