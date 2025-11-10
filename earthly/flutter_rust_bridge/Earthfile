@@ -37,12 +37,14 @@ CODE_GENERATOR_WEB:
     RUN cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- generate
     RUN cargo run --manifest-path /usr/local/flutter_rust_bridge/frb_codegen/Cargo.toml -- build-web \
         --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME" \
+        # https://github.com/fzyzcjy/flutter_rust_bridge/issues/2914
         --wasm-pack-rustflags "-Ctarget-feature=+atomics -Clink-args=--shared-memory -Clink-args=--max-memory=1073741824 -Clink-args=--import-memory -Clink-args=--export=__wasm_init_tls -Clink-args=--export=__tls_size -Clink-args=--export=__tls_align -Clink-args=--export=__tls_base" \
         $ADDITIONAL_BUILD_ARGS
 
     # RUN flutter_rust_bridge_codegen generate
     # RUN flutter_rust_bridge_codegen build-web \
     #    --wasm-bindgen-args="--no-modules-global=$WASM_MODULE_NAME" \
+    # https://github.com/fzyzcjy/flutter_rust_bridge/issues/2914
     #    --wasm-pack-rustflags "-Ctarget-feature=+atomics -Clink-args=--shared-memory -Clink-args=--max-memory=1073741824 -Clink-args=--import-memory -Clink-args=--export=__wasm_init_tls -Clink-args=--export=__tls_size -Clink-args=--export=__tls_align -Clink-args=--export=__tls_base" \
     #    $ADDITIONAL_BUILD_ARGS \
 
