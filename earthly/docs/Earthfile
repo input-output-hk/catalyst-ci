@@ -7,7 +7,7 @@ IMPORT ../../utilities/scripts AS scripts
 # cspell: words libfreetype liblcms libopenjp etag
 
 deps:
-    FROM python-ci+python-base
+    FROM python-ci+python-base-deprecated
     # Derived from official mkdocs-material docker container.
     # https://github.com/squidfunk/mkdocs-material/blob/master/Dockerfile
     # Due to docs being constructed not only from Doc source but Build artifacts,
@@ -38,7 +38,7 @@ deps:
     RUN curl -fsSL https://d2lang.com/install.sh | sh -s --
 
     # Install poetry and our python dependencies.
-    DO python-ci+BUILDER --opts=--no-root
+    DO python-ci+BUILDER_WITH_POETRY --opts=--no-root
 
     # Copy our run scripts
     COPY --dir scripts/* /scripts/

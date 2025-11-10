@@ -3,13 +3,15 @@ VERSION 0.8
 IMPORT ../debian AS debian
 
 # Define a constant name for the container and its version.
-ARG --global CUE_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/cuelang/cue:0.14.1"
+ARG --global CUE_VERSION=0.14.2
+ARG --global CUE_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/cuelang/cue:${CUE_VERSION}"
 
 
 INSTALL:
     FUNCTION
 
     COPY +cue-bin/cue /usr/bin/cue
+    RUN cue version
 
 # Get cue binary
 cue-bin:

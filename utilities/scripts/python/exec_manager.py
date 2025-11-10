@@ -8,7 +8,7 @@ import textwrap
 import time
 import types
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Self
 
 from rich import print  # noqa: A004
 from rich.table import Table
@@ -294,7 +294,7 @@ class ParallelRunner:
         self.processes = []
         self.start_time = time.perf_counter()
 
-    def __enter__(self) -> "ParallelRunner":
+    def __enter__(self) -> Self:
         """Enter."""
         return self
 
