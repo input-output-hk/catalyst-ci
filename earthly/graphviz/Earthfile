@@ -35,4 +35,5 @@ INSTALL:
         && make install > /dev/null 2>&1 \
         && cd ../.. \
         && rm -rf build \
+        && dot --version \
         && echo "Graphviz built and installed OK"
