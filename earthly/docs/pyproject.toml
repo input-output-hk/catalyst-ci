@@ -6,8 +6,11 @@ authors = ["Joshua Gilman", "Steven Johnson"]
 readme = "Readme.md"
 
 [tool.poetry.dependencies]
-python = "^3.13"
-mkdocs-material = { version = "9.6.16", extras = ["recommended","git","imaging"] }
+python = "^3.14"
+mkdocs-material = { version = "9.6.23", extras = ["recommended","git","imaging"] }
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.14.4"
 
 ### MkDocs Plugins we add.
 
@@ -18,7 +21,7 @@ mkdocs-minify-plugin = "^0.8.0"
 mkdocs-redirects = "^1.2.2"
 
 # https://github.com/Blueswen/mkdocs-glightbox
-mkdocs-glightbox = "^0.4.0"
+mkdocs-glightbox = "^0.5.2"
 
 # Kroki is disabled because it requires an external service
 # https://github.com/AVATEAM-IT-SYSTEMHAUS/mkdocs-kroki-plugin/tree/main
@@ -31,7 +34,7 @@ mkdocs-glightbox = "^0.4.0"
 mkdocs-multirepo-plugin = "^0.8.3"
 
 # https://mkdocs-macros-plugin.readthedocs.io/en/latest/
-mkdocs-macros-plugin = "^1.3.7"
+mkdocs-macros-plugin = "^1.4.1"
 
 # https://github.com/timmeinerzhagen/mkdocs-meta-manager
 mkdocs-meta-manager = "^1.1.0"

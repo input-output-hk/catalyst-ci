@@ -5,7 +5,7 @@ IMPORT ../../earthly/python AS python-ci
 # Assuming the detailed setup from the second snippet is defined in relevant Earthly targets.
 
 builder:
-    FROM python-ci+python-base
+    FROM python-ci+python-base-deprecated
 
     COPY --dir poetry.lock pyproject.toml Readme.md src .
 

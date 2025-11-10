@@ -1,7 +1,9 @@
 VERSION 0.8
 
 # Define a constant name for the container and its version.
-ARG --global DEBIAN_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/debian:stable-slim"
+# Note: Always use true debian version numbers not code names.
+ARG --global DEBIAN_VERSION=13.1-slim
+ARG --global DEBIAN_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/debian:${DEBIAN_VERSION}"
 
 # Optimally install packages for debian
 INSTALL:
@@ -45,6 +47,11 @@ common:
         xz-utils \
         gdebi-core
     DO +INSTALL --packages=$PACKAGES
+
+    # Make and add to path all the common places executables can be installed.
+    RUN mkdir -p /usr/local/bin \
+        && mkdir -p "/${HOME}/.local/bin/"
+    ENV PATH="/usr/local/bin/:/${HOME}/.local/bin/:${PATH}"
 
 # Checks our debian container is basically usable, and nothing more.
 check-debian:
