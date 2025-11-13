@@ -52,6 +52,14 @@ jobs:
           repository: ${{ matrix.repo }}
           token: ${{ secrets.CI_BOT_TOKEN }}
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.CI_BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.CI_BOT_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Create PR or Issue for dependent repository
         env:
           RELEASE_TAG: ${{ needs.notify-dependents.outputs.tag_name }}
@@ -81,7 +89,7 @@ jobs:
                 exit 0
             fi
 
-            git commit -m "chore($REPO_NAME): Update $REPO_NAME to $RELEASE_TAG"
+            git commit -S -m "chore($REPO_NAME): Update $REPO_NAME to $RELEASE_TAG"
             git push origin "$branch_name"
 
             gh pr create \
