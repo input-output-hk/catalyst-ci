@@ -62,25 +62,31 @@ jobs:
           token: ${{ secrets.CI_BOT_TOKEN }}
 
       - name: Import GPG key
+        id: import-gpg
         uses: crazy-max/ghaction-import-gpg@v6
         with:
           gpg_private_key: ${{ secrets.CI_BOT_GPG_PRIVATE_KEY }}
           passphrase: ${{ secrets.CI_BOT_GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+          git_config_global: true
 
       - name: Create PR or Issue for dependent repository
         env:
           RELEASE_TAG: ${{ needs.notify-dependents.outputs.tag_name }}
           RELEASE_URL: ${{ needs.notify-dependents.outputs.release_url }}
+          GIT_AUTHOR_NAME: ${{ steps.import-gpg.outputs.name }}
+          GIT_AUTHOR_EMAIL: ${{ steps.import-gpg.outputs.email }}
+          GIT_COMMITTER_NAME: ${{ steps.import-gpg.outputs.name }}
+          GIT_COMMITTER_EMAIL: ${{ steps.import-gpg.outputs.email }}
         run: |
           set -e
 
           UPDATED_REPO="github.com/${{ github.repository }}"
           REPO_NAME=$(echo ${{ github.repository }} | cut -d/ -f2)
 
-          git config --global user.name catalyst-cibot
-          git config --global user.email "catalyst-cibot@projectcatalyst.io"
+          # git config --global user.name catalyst-cibot
+          # git config --global user.email "catalyst-cibot@projectcatalyst.io"
 
           if [ "${{ inputs.notify_type }}" == "pr" ]; then
             echo "Create PR in ${{ matrix.repo }}"
