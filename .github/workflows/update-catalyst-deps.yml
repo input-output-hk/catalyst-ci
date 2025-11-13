@@ -35,7 +35,7 @@ jobs:
       - name: Get release info
         id: release_info
         run: |
-          if [ "${{ inputs.test }}" != "" ]; then
+          if [ "${{ inputs.test }}" == "" ]; then
             echo "tag_name=$(gh release list -R ${{ github.repository }} --json name,isLatest --jq '.[] | select(.isLatest)|.name')" >> $GITHUB_OUTPUT
             echo "release_url=$(gh release view -R ${{ github.repository }} $tag_name --json url | jq -r .[])" >> $GITHUB_OUTPUT
           else
