@@ -16,6 +16,10 @@ on:
         description: "Comma separated list of repositories"
         type: string
         default: ""
+      test:
+        description: ""
+        type: string
+        default: ""
 
 jobs:
   update_ci_deps:

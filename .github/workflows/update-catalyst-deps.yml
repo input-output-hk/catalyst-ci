@@ -11,6 +11,10 @@ on:
         description: "Comma separated list of repositories"
         type: string
         default: ""
+      test:
+        description: ""
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -31,8 +35,13 @@ jobs:
       - name: Get release info
         id: release_info
         run: |
-          echo "tag_name=$(gh release list -R ${{ github.repository }} --json name,isLatest --jq '.[] | select(.isLatest)|.name')" >> $GITHUB_OUTPUT
-          echo "release_url=$(gh release view -R ${{ github.repository }} $tag_name --json url | jq -r .[])" >> $GITHUB_OUTPUT
+          if [ "${{ inputs.test }}" != "" ]; then
+            echo "tag_name=$(gh release list -R ${{ github.repository }} --json name,isLatest --jq '.[] | select(.isLatest)|.name')" >> $GITHUB_OUTPUT
+            echo "release_url=$(gh release view -R ${{ github.repository }} $tag_name --json url | jq -r .[])" >> $GITHUB_OUTPUT
+          else
+            echo "tag_name=${{ inputs.test }}" >> $GITHUB_OUTPUT
+            echo "release_url=${{ inputs.test }}" >> $GITHUB_OUTPUT
+          fi
 
       - name: Generate repos matrix
         id: matrix
