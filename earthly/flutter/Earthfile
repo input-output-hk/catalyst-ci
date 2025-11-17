@@ -12,7 +12,7 @@ ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/libra
 INSTALL_FLUTTER:
     FUNCTION
     ARG version=3.38.1
-    ARG TARGETARCH
+    ARG TARGETARCH=amd64
 
     # Install Flutter
     IF [ "$TARGETARCH" = "amd64" ]
@@ -61,7 +61,7 @@ flutter-base:
             gzip \
             zstd
 
-    DO +INSTALL_FLUTTER --TARGETARCH=amd64
+    DO +INSTALL_FLUTTER
 
     WORKDIR frontend
 
