@@ -290,3 +290,44 @@ BUILD_WEB:
     ELSE
         SAVE ARTIFACT web /web
     END
+
+COMPRESS_WEB_FILES:
+    FUNCTION
+    ARG WORKDIR=web
+    ARG BROTLI_LEVEL=11
+    ARG ZSTD_LEVEL=19
+    ARG GZIP_LEVEL=9
+
+    # Install compression tools
+    RUN apt-get update && \
+        apt-get install -y \
+            brotli \
+            gzip \
+            zstd
+
+    # Compress all compressible text files
+    RUN cd $WORKDIR && \
+        compress_files() { \
+            find . -type f \( \
+                -name "*.js" -o \
+                -name "*.css" -o \
+                -name "*.html" -o \
+                -name "*.json" -o \
+                -name "*.svg" -o \
+                -name "*.wasm" -o \
+                -name "*.txt" -o \
+                -name "*.xml" -o \
+                -name "*.md" -o \
+                -name "*.frag" -o \
+                -name "*.vert" -o \
+                -name "*.glsl" -o \
+                -name "*.ttf" -o \
+                -name "*.otf" -o \
+                -name "NOTICES" -o \
+                -name "LICENSE*" -o \
+                -name "README*" \
+            \) "$@"; \
+        } && \
+        compress_files -exec brotli -k -q 11 {} \; && \
+        compress_files -exec zstd -k -19 {} \; && \
+        compress_files -exec gzip -k9 {} \;
