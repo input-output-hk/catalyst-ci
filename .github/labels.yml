@@ -213,3 +213,7 @@
 - name: no-track
   color: "000000"
   description: Used to skip tracking in Swarmia analytics, etc.
+
+- name: needs user documentation
+  color: "f61992"
+  description: Issue requires updates to user-facing documentation.
