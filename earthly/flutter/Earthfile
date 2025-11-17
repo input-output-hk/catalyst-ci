@@ -61,7 +61,7 @@ flutter-base:
             gzip \
             zstd
 
-    DO +INSTALL_FLUTTER
+    DO +INSTALL_FLUTTER --TARGETARCH=amd64
 
     WORKDIR frontend
 
