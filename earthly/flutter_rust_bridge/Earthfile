@@ -53,9 +53,11 @@ CODE_GENERATOR_WEB:
         PREFIX=$(grep default_external_library_loader_web_prefix flutter_rust_bridge.yaml | sed 's/.*: *//' | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'); \
         VERSION_FOLDER=$(echo "$PREFIX" | sed 's:/$::' | xargs basename); \
         echo "Detected version folder: $VERSION_FOLDER"; \
+        rm -rf assets/js/*; \
         mkdir -p "assets/js/$VERSION_FOLDER" && cp -rf ./web/pkg/* "assets/js/$VERSION_FOLDER/"; \
     else \
         echo "flutter_rust_bridge.yaml not found, using default assets/js"; \
+        rm -rf assets/js/*; \
         mkdir -p assets/js && cp -rf ./web/pkg/* assets/js/; \
     fi
      # Don't want this gitignore file.
