@@ -11,7 +11,7 @@ ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/libra
 # Install flutter.
 INSTALL_FLUTTER:
     FUNCTION
-    ARG version=3.35.1
+    ARG version=3.38.1
     ARG TARGETARCH
 
     # Install Flutter
