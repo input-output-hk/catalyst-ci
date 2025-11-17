@@ -12,17 +12,19 @@ ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/libra
 INSTALL_FLUTTER:
     FUNCTION
     ARG version=3.38.1
-    ARG TARGETARCH=amd64
+    ARG TARGETARCH
 
     # Install Flutter
-    IF [ "$TARGETARCH" = "amd64" ]
-        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
-            | tar -xJ -C /usr/local
-    ELSE IF [ "$TARGETARCH" = "arm64" ]
-        GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local/flutter
-    ELSE
-        RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
-    END
+    RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
+        | tar -xJ -C /usr/local
+#    IF [ "$TARGETARCH" = "amd64" ]
+#        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
+#            | tar -xJ -C /usr/local
+#    ELSE IF [ "$TARGETARCH" = "arm64" ]
+#        GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local/flutter
+#    ELSE
+#        RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
+#    END
 
     RUN git config --global --add safe.directory /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
