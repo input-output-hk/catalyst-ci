@@ -52,10 +52,14 @@ flutter-base:
 
     # Update and install as same command so if either fails, the whole step fails and is not cached.
     # sqlite3 and libsqlite3-dev are required for running db tests in CI
+    # brotli, gzip, zstd are required for web compression
     RUN apt-get update --fix-missing && \
             apt-get install -y \
             sqlite3 \
-            libsqlite3-dev
+            libsqlite3-dev \
+            brotli \
+            gzip \
+            zstd
 
     DO +INSTALL_FLUTTER
 
@@ -298,14 +302,6 @@ COMPRESS_WEB_FILES:
     ARG ZSTD_LEVEL=19
     ARG GZIP_LEVEL=9
 
-    # Install compression tools
-    RUN apt-get update && \
-        apt-get install -y \
-            brotli \
-            gzip \
-            zstd
-
-    # Compress all compressible text files
     RUN cd $WORKDIR && \
         compress_files() { \
             find . -type f \( \
