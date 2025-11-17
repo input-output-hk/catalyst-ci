@@ -38,6 +38,8 @@ INSTALL_FLUTTER:
     RUN dart pub global activate combine_coverage
     RUN dart pub global activate license_checker
     RUN dart pub global activate dartdoc
+    # Required for vector_graphics_compiler
+    RUN flutter precache --web --linux
 
 # flutter-base installs required tools and packages.
 flutter-base:
@@ -62,8 +64,6 @@ flutter-base:
             zstd
 
     DO +INSTALL_FLUTTER
-
-    RUN flutter precache --web --linux
 
     WORKDIR frontend
 
