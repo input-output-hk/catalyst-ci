@@ -15,16 +15,14 @@ INSTALL_FLUTTER:
     ARG TARGETARCH
 
     # Install Flutter
-    RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
-        | tar -xJ -C /usr/local
-#    IF [ "$TARGETARCH" = "amd64" ]
-#        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
-#            | tar -xJ -C /usr/local
-#    ELSE IF [ "$TARGETARCH" = "arm64" ]
-#        GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local/flutter
-#    ELSE
-#        RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
-#    END
+    IF [ "$TARGETARCH" = "amd64" ]
+        RUN wget -qO - https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_$version-stable.tar.xz \
+            | tar -xJ -C /usr/local
+    ELSE IF [ "$TARGETARCH" = "arm64" ]
+        GIT CLONE --branch $version https://github.com/flutter/flutter.git /usr/local/flutter
+    ELSE
+        RUN echo >&2 "unsupported architecture: ${TARGETARCH}"; exit 1
+    END
 
     RUN git config --global --add safe.directory /usr/local/flutter
     ENV PATH="/usr/local/flutter/bin:/usr/local/flutter/bin/cache/dart-sdk/bin:$HOME/.pub-cache/bin:${PATH}"
@@ -274,8 +272,6 @@ BUILD_WEB:
 
     RUN flutter clean
     RUN flutter pub get
-    # Required for vector_graphics_compiler
-    RUN flutter precache --web --linux
     RUN flutter build web $BUILD_MODE \
         --pwa-strategy=none \
         --target $TARGET \
