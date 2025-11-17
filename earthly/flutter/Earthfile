@@ -63,6 +63,8 @@ flutter-base:
 
     DO +INSTALL_FLUTTER
 
+    RUN flutter precache --web --linux
+
     WORKDIR frontend
 
     IF [ $CHROME_FOR_TESTING = true ]
