@@ -1,5 +1,7 @@
 VERSION 0.8
 
+ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
+
 # CHECK: Check spelling in all files that are not explicitly excluded.
 CHECK:
     # Spell checking all docs and code is done with cspell
@@ -11,14 +13,12 @@ CHECK:
 
     # Unlikely to need to change this.
     ARG cfg_file=cspell.json
-    ARG REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
 
-    FROM ${REGISTRY}/streetsidesoftware/cspell:8.13.3
+    FROM ${REGISTRY}/streetsidesoftware/cspell:9.3.2
     WORKDIR /work
 
-    COPY $src .
-
-    RUN cspell-cli --quiet lint . --dot
+    RUN --mount=type=bind,source=$src,target=/work,readonly \
+        cspell-cli --quiet lint . --dot
 
 # CLEAN: Cleanup the project dictionary.
 CLEAN:
