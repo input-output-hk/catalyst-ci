@@ -306,6 +306,7 @@ COMPRESS_WEB_FILES:
         compress_files() { \
             find . -type f \( \
                 -name "*.js" -o \
+                -name "*.mjs" -o \
                 -name "*.css" -o \
                 -name "*.html" -o \
                 -name "*.json" -o \
