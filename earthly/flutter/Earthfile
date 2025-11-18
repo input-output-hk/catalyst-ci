@@ -325,6 +325,6 @@ COMPRESS_WEB_FILES:
                 -name "README*" \
             \) "$@"; \
         } && \
-        compress_files -exec brotli -k -q 11 {} \; && \
-        compress_files -exec zstd -k -19 {} \; && \
-        compress_files -exec gzip -k9 {} \;
+        compress_files -exec brotli -k -q $BROTLI_LEVE {} \; && \
+        compress_files -exec zstd -k -$ZSTD_LEVEL {} \; && \
+        compress_files -exec gzip -k$GZIP_LEVEL {} \;
