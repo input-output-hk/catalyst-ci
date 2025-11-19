@@ -1,0 +1,33 @@
+VERSION 0.8
+
+IMPORT ../debian AS debian
+IMPORT ../python AS python-ci
+IMPORT ../flutter AS flutter-ci
+IMPORT ../rust AS rust-ci
+IMPORT ../go AS go-ci
+
+
+builder:    
+    ARG TARGETARCH
+
+    ARG GO_VERSION=1.25.4
+
+    # python-base is already based on debian 13.1
+    FROM python-ci+python-base
+
+    ENV DEBIAN_FRONTEND=noninteractive
+    ENV PATH=/usr/local/go/bin:$PATH
+
+    WORKDIR /work
+
+    DO flutter-ci+SETUP
+    DO rust-ci+INSTALL_RUST
+    DO rust-ci+INSTALL_TOOLS
+
+    # install go
+    RUN rm -f /tmp/go* \
+        && wget -q -P /tmp https://go.dev/dl/go$GO_VERSION.linux-$TARGETARCH.tar.gz \
+        && tar -C /usr/local -xzf /tmp/go$GO_VERSION.linux-$TARGETARCH.tar.gz \
+        && rm -f /tmp/go$GO_VERSION.linux-$TARGETARCH.tar.gz
+
+    SAVE IMAGE cat-ci-builder:latest
