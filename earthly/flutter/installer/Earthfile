@@ -1,7 +1,6 @@
 VERSION 0.8
 
 # cspell: words Rxxxx 
-# cspell: ignoreRegExp lib[f-x]
 
 # An AWS S3 bucket is used to store browser and driver packages. 
 # Packages are updated automatically once a week. 
@@ -79,8 +78,9 @@ INSTALL_FIREFOX_LINUX64:
 
     RUN curl -sSL -o /tmp/firefox.zip ${FIREFOX_URL} \
         && unzip /tmp/firefox.zip -d /tmp \
-        && gdebi -n /tmp/firefox*.deb \
-        && rm -f /tmp/firefox.deb
+        && FAILED_PACKAGES=""; for p in /tmp/*.deb; do gdebi -n "$p" || FAILED_PACKAGES="$FAILED_PACKAGES $p"; done; \
+        if [ -n "$FAILED_PACKAGES" ]; then for p in $FAILED_PACKAGES; do gdebi -n "$p" || echo "Installation failed"; done; fi \
+        && rm -f /tmp/*
     RUN firefox --version
 
     RUN printf "${BLUE} Installing Geckodriver..."
@@ -126,11 +126,8 @@ INSTALL_CHROMIUM:
         RUN printf "${BLUE} Installing ${PACKAGE_TYPE} version: ${version}..." \
             && curl -sSL -o /opt/${PACKAGE_TYPE}.zip ${DOWNLOAD_URL} \
             && unzip /opt/${PACKAGE_TYPE}.zip -d /opt/${PACKAGE_TYPE} \
-            && gdebi -n /opt/${PACKAGE_TYPE}/libx*.deb \
-            && gdebi -n /opt/${PACKAGE_TYPE}/libf*.deb \
-            && gdebi -n /opt/${PACKAGE_TYPE}/libo*.deb \
-            && gdebi -n /opt/${PACKAGE_TYPE}/chromium-common*.deb \
-            && gdebi -n /opt/${PACKAGE_TYPE}/chromium_*.deb \
+            && FAILED_PACKAGES=""; for p in /opt/${PACKAGE_TYPE}/*.deb; do gdebi -n "$p" || FAILED_PACKAGES="$FAILED_PACKAGES $p"; done; \
+            if [ -n "$FAILED_PACKAGES" ]; then for p in $FAILED_PACKAGES; do gdebi -n "$p" || echo "Installation failed"; done; fi \
             && rm -rf /opt/${PACKAGE_TYPE}*
     ELSE
         RUN printf "${BLUE} Installing ${PACKAGE_TYPE} version: ${version}..." \
