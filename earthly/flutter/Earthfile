@@ -52,10 +52,14 @@ flutter-base:
 
     # Update and install as same command so if either fails, the whole step fails and is not cached.
     # sqlite3 and libsqlite3-dev are required for running db tests in CI
+    # brotli, gzip, zstd are required for web compression
     RUN apt-get update --fix-missing && \
             apt-get install -y \
             sqlite3 \
-            libsqlite3-dev
+            libsqlite3-dev \
+            brotli \
+            gzip \
+            zstd
 
     DO +INSTALL_FLUTTER
 
@@ -290,3 +294,37 @@ BUILD_WEB:
     ELSE
         SAVE ARTIFACT web /web
     END
+
+COMPRESS_WEB_FILES:
+    FUNCTION
+    ARG WORKDIR=web
+    ARG BROTLI_LEVEL=11
+    ARG ZSTD_LEVEL=19
+    ARG GZIP_LEVEL=9
+
+    RUN cd $WORKDIR && \
+        compress_files() { \
+            find . -type f \( \
+                -name "*.js" -o \
+                -name "*.mjs" -o \
+                -name "*.css" -o \
+                -name "*.html" -o \
+                -name "*.json" -o \
+                -name "*.svg" -o \
+                -name "*.wasm" -o \
+                -name "*.txt" -o \
+                -name "*.xml" -o \
+                -name "*.md" -o \
+                -name "*.frag" -o \
+                -name "*.vert" -o \
+                -name "*.glsl" -o \
+                -name "*.ttf" -o \
+                -name "*.otf" -o \
+                -name "NOTICES" -o \
+                -name "LICENSE*" -o \
+                -name "README*" \
+            \) "$@"; \
+        } && \
+        compress_files -exec brotli -k -q $BROTLI_LEVEL {} \; && \
+        compress_files -exec zstd -k -$ZSTD_LEVEL {} \; && \
+        compress_files -exec gzip -k$GZIP_LEVEL {} \;
