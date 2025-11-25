@@ -1,0 +1,83 @@
+# cspell: words U03MLNG4ZV3, U03GRSQNR6K, U08ME989AKX, U039LK3BLBW, argjson
+
+name: 📞 QA Slack Notification Service
+
+on:
+  workflow_call:
+    inputs:
+      failed_repo:
+        description: 'The owner/repo where the failure occurred.'
+        type: string
+        required: true
+      failed_run_id:
+        description: 'The run ID of the failed workflow.'
+        type: string
+        required: true
+    secrets:
+      slack_webhook:
+        required: true
+      token:
+        required: false
+        description: 'PAT token required for repository access.'
+
+env:
+    TEAM_MEMBERS: '["U03MLNG4ZV3", "U03GRSQNR6K", "U08ME989AKX", "U039LK3BLBW"]'
+    TEAM_SIZE: 4
+
+jobs:
+   notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine Engineer to be notified
+        id: determine_engineer
+        run: |
+          # Get the current day of the week (1=Monday, 7=Sunday)
+          # We use +%u because it's 1-indexed (Mon=1)
+          CURRENT_DAY_OF_WEEK=$(date +%u)
+
+          # Calculate the rotation index (0, 1, 2, 3, 0, 1, 2, 3...)
+          # 1. Start with the current day (Mon=1, Tue=2...)
+          # 2. Subtract 1 to make it 0-indexed (Mon=0, Tue=1...)
+          # 3. Apply the modulo operator using TEAM_SIZE (4)
+          # This ensures the result is always 0, 1, 2, or 3.
+          ROTATION_INDEX=$(( (CURRENT_DAY_OF_WEEK - 1) % ${{ env.TEAM_SIZE }} ))
+
+          echo "Current Day Index (Mon=1): $CURRENT_DAY_OF_WEEK"
+          echo "Rotation Index (0-3): $ROTATION_INDEX"
+
+          TEAM_ARRAY='${{ env.TEAM_MEMBERS }}'
+          SLACK_ID_TO_MENTION=$(echo $TEAM_ARRAY | jq -r --argjson index "$ROTATION_INDEX" '.[$index]')
+          echo "slack_id=$SLACK_ID_TO_MENTION" >> $GITHUB_OUTPUT
+
+      - name: Send Slack Alert
+        uses: slackapi/slack-github-action@v2.1.1
+        with:
+          payload: |
+            {
+              "text": "😭 Test Failure in ${{ inputs.failed_repo }} 😭",
+              "attachments": [
+                {
+                  "color": "danger",
+                  "blocks": [
+                    {
+                      "type": "section",
+                      "text": {
+                        "type": "mrkdwn",
+                        "text": "*Action Required:* <@${{ steps.determine_engineer.outputs.slack_id }}> please review the logs and leave a comment below this message."
+                      }
+                    },
+                    {
+                      "type": "context",
+                      "elements": [
+                        {
+                          "type": "mrkdwn",
+                          "text": "View Failed Logs: www.github.com/${{ inputs.failed_repo }}/actions/runs/${{ inputs.failed_run_id }}"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          webhook: ${{ secrets.slack_webhook }}
+          webhook-type: webhook-trigger
