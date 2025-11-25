@@ -83,7 +83,7 @@ GO_WASM_TOOL:
 
     # Install tinygo
     LET path = "https://github.com/tinygo-org/tinygo/releases/download/v${tinygo_version}/tinygo_${tinygo_version}_${TARGETARCH}.deb"
-    RUN wget $path && dpkg -i tinygo_${tinygo_version}_${TARGETARCH}.deb
+    RUN wget $path && dpkg -i tinygo_${tinygo_version}_${TARGETARCH}.deb && rm -f tinygo_${tinygo_version}_${TARGETARCH}.deb
 
 # Install go tools needed for go WASM binding
 go-wasm-builder:

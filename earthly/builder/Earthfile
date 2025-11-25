@@ -1,28 +1,55 @@
 VERSION 0.8
 
+# cspell: words tinygo
+
 IMPORT ../debian AS debian
 IMPORT ../python AS python-ci
 IMPORT ../flutter AS flutter-ci
+IMPORT ../flutter/installer AS installer
 IMPORT ../rust AS rust-ci
 IMPORT ../go AS go-ci
+IMPORT ../graphviz AS graphviz
 
 
 builder:    
     ARG TARGETARCH
 
-    ARG GO_VERSION=1.25.4
+    ARG GO_VERSION=1.24.5
 
-    # python-base is already based on debian 13.1
-    FROM python-ci+python-base
+    ARG CHROME_FOR_TESTING=false
+    ARG CHROME_VERSION=132.0.6834.83
+    ARG FIREFOX_VERSION=115.15.0esr-1
+    ARG EDGE_VERSION=125.0.2535.51
+
+    FROM debian+common
+
+    ENV GOPATH=/go
 
     ENV DEBIAN_FRONTEND=noninteractive
-    ENV PATH=/usr/local/go/bin:$PATH
+    ENV PATH=/go/bin:/usr/local/go/bin:$PATH
 
-    WORKDIR /work
-
-    DO flutter-ci+SETUP
+    DO python-ci+INSTALL
+    DO flutter-ci+INSTALL_FLUTTER
     DO rust-ci+INSTALL_RUST
     DO rust-ci+INSTALL_TOOLS
+
+    RUN apt-get update --fix-missing && \
+            apt-get install -y \
+            sqlite3 \
+            libsqlite3-dev \
+            brotli \
+            gzip \
+            zstd \
+            clang
+
+    IF [ $CHROME_FOR_TESTING = true ]
+        DO installer+INSTALL_CHROME_FOR_TESTING --version=$CHROME_VERSION
+    ELSE
+        DO installer+INSTALL_CHROME_LINUX64 --version=$CHROME_VERSION
+    END
+    
+    DO installer+INSTALL_FIREFOX_LINUX64 --version=$FIREFOX_VERSION
+    DO installer+INSTALL_EDGE_LINUX64 --version=$EDGE_VERSION
 
     # install go
     RUN rm -f /tmp/go* \
@@ -30,4 +57,13 @@ builder:
         && tar -C /usr/local -xzf /tmp/go$GO_VERSION.linux-$TARGETARCH.tar.gz \
         && rm -f /tmp/go$GO_VERSION.linux-$TARGETARCH.tar.gz
 
-    SAVE IMAGE cat-ci-builder:latest
+    DO go-ci+GO_WASM_TOOL
+
+    RUN cargo install wkg --version 0.11.0
+
+    RUN go version
+    RUN wkg --version
+    RUN tinygo version
+    RUN wit-bindgen-go --version
+
+    # SAVE IMAGE cat-ci-builder:latest
