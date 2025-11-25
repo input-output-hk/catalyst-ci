@@ -16,9 +16,6 @@ on:
     secrets:
       slack_webhook:
         required: true
-      token:
-        required: false
-        description: 'PAT token required for repository access.'
 
 env:
     TEAM_MEMBERS: '["U03MLNG4ZV3", "U03GRSQNR6K", "U08ME989AKX", "U039LK3BLBW"]'
