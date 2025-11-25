@@ -1,26 +1,28 @@
 name: Update Catalyst CI Deps
 
 on:
-  release:
-    types: [published, edited]
   workflow_dispatch:
-    inputs:
-      notify_type:
-        description: "Notification type: Issue or PR"
-        type: choice
-        options:
-          - "pr"
-          - "issue"
-        default: "pr"
-      repos:
-        description: "Comma separated list of repositories"
-        type: string
-        default: ""
 
 jobs:
-  update_ci_deps:
-    uses: ./.github/workflows/update-catalyst-deps.yml
-    with:
-        notify_type: ${{ github.event_name == 'workflow_dispatch' && inputs.notify_type || 'pr' }}
-        repos: ${{ inputs.repos != '' && inputs.repos || 'input-output-hk/catalyst-voices, input-output-hk/hermes, input-output-hk/catalyst-libs, input-output-hk/catalyst-reviews, input-output-hk/catalyst-som, input-output-hk/catalyst-execution, input-output-hk/norns, input-output-hk/catalyst-qa' }}
-    secrets: inherit
+  build-builder:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "eu-central-1"
+          role-to-assume: "arn:aws:iam::332405224602:role/ci"
+
+      - name: Get secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            HARBOR_ADMIN_PASSWORD,shared-services/harbor/admin-password
+      
+      - name: Login to Harbor
+        uses: docker/login-action@v3
+        with:
+          username: admin
+          password: ${{ env.HARBOR_ADMIN_PASSWORD }}
