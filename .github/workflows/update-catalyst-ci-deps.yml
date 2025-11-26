@@ -24,10 +24,11 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
           secret-ids: |
-            HARBOR_ADMIN_PASSWORD,shared-services/harbor/admin-password
+            ,global/harbor/projects/catalyst-ci
+          parse-json-secrets: true
       
       - name: Login to Harbor
         uses: docker/login-action@v3
         with:
-          username: admin
-          password: ${{ env.HARBOR_ADMIN_PASSWORD }}
+          username: ${{ env.USERNAME }}
+          password: ${{ env.PASSWORD }}
