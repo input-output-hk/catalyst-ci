@@ -45,7 +45,7 @@ jobs:
         shell: bash
         run: |
           echo "==== Earthly Setup ====="
-          
+
           echo "sat=true" >> GITHUB_OUTPUT
           echo "version=0.8.15" >> $GITHUB_OUTPUT
 
@@ -69,3 +69,13 @@ jobs:
         run: |
           rm -rf "$HOME/.earthly"
           forge configure-satellite -vvv --ci
+
+      - name: Run
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
+        with:
+          command: run
+          args: ./earthly/builder+builder
+          local: false
+          verbosity: info
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
