@@ -26,7 +26,10 @@ jobs:
           secret-ids: |
             ,global/harbor/projects/catalyst-ci-robot
           parse-json-secrets: true
-      
+
+      - name: debug
+        run: |
+          echo "${{ env.USERNAME }}" | grep -o .
       - name: Login to Harbor
         uses: docker/login-action@v3
         with:
