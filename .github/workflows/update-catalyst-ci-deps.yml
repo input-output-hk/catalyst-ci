@@ -24,7 +24,7 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
           secret-ids: |
-            ,global/harbor/projects/catalyst-ci
+            ,global/harbor/projects/catalyst-ci-robot
           parse-json-secrets: true
       
       - name: Login to Harbor
