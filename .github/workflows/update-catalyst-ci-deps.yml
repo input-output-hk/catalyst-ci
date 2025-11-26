@@ -27,12 +27,13 @@ jobs:
             ,global/harbor/projects/catalyst-ci-robot
           parse-json-secrets: true
 
-      - name: debug
-        run: |
-          echo "${{ env.USERNAME }}" | grep -o .
+      # - name: debug
+      #   run: |
+      #     echo "${{ env.USERNAME }}" | grep -o .
       - name: Login to Harbor
         uses: docker/login-action@v3
         with:
           registry: harbor.shared-services.projectcatalyst.io
-          username: "robot$catalyst-ci+catalyst-ci-robot"
-          password: ${{ env.PASSWORD }}
+          # username: "robot$catalyst-ci+catalyst-ci-robot"
+          username: "${{ env.USERNAME }}"
+          password: "${{ env.PASSWORD }}"
