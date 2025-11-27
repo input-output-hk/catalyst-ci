@@ -13,6 +13,9 @@ IMPORT ../graphviz AS graphviz
 
 builder:    
     ARG TARGETARCH
+    
+    ARG --required IMAGE_NAME
+    ARG --required TAG
 
     ARG GO_VERSION=1.24.5
 
@@ -66,4 +69,4 @@ builder:
     RUN tinygo version
     RUN wit-bindgen-go --version
 
-    SAVE IMAGE cat-ci-builder:latest
+    SAVE IMAGE $IMAGE_NAME:$TAG
