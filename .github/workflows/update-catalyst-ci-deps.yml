@@ -76,6 +76,6 @@ jobs:
           command: run
           args: ./earthly/builder+builder
           local: false
-          verbosity: info
+          verbosity: debug
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
