@@ -6,6 +6,8 @@ on:
 
 env:
   earthly_version: "0.8.15"
+  forge_version: "0.21.0"
+
 permissions:
   id-token: write
   contents: read
@@ -17,10 +19,9 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install Forge
-        uses: input-output-hk/catalyst-forge/actions/install@master
+        uses: input-output-hk/catalyst-forge/actions/install@ci/v1.9.0
         with:
-          enable_caching: "true"
-          version: 0.21.0
+          version: ${{ env.forge_version }}
 
       - name: Login to AWS
         uses: aws-actions/configure-aws-credentials@v4
@@ -41,6 +42,7 @@ jobs:
           registry: harbor.shared-services.projectcatalyst.io
           username: "${{ env.HARBOR_USERNAME }}"
           password: "${{ env.HARBOR_PASSWORD }}"
+
       - name: Cache Earthly binary
         id: cache-binary
         uses: actions/cache@v4
@@ -79,10 +81,15 @@ jobs:
           version: "latest"
 
       - name: Run
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.9.0
         with:
           command: run
           args: ./earthly/builder+builder
           local: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Push to Harbor
+        run: |
+          docker tag cat-ci-builder:latest harbor.shared-services.projectcatalyst.io/catalyst-ci/cat-ci-builder:latest
+          docker push harbor.shared-services.projectcatalyst.io/catalyst-ci/cat-ci-builder:latest

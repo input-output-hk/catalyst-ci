@@ -66,4 +66,4 @@ builder:
     RUN tinygo version
     RUN wit-bindgen-go --version
 
-    # SAVE IMAGE cat-ci-builder:latest
+    SAVE IMAGE cat-ci-builder:latest
