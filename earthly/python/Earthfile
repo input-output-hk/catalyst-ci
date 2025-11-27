@@ -178,7 +178,8 @@ INSTALL:
     RUN uv pip install third-party-imports --system
 
     # Universal build scripts we will always need and are not target dependent.
-    COPY --dir scripts /scripts
+    # COPY --dir scripts /scripts
+    DO +ADD_PYTHON_SCRIPTS
     # Copy our common scripts so we can use them inside the container.
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
@@ -204,3 +205,15 @@ python-base-deprecated:
 
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
+
+python-scripts:
+    FROM scratch
+
+    COPY --dir scripts /
+
+    SAVE ARTIFACT /scripts /scripts
+
+ADD_PYTHON_SCRIPTS:
+    FUNCTION
+
+    COPY --dir +python-scripts/scripts /scripts
