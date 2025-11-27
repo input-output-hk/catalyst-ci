@@ -32,7 +32,7 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
           secret-ids: |
-            harbor,global/harbor/projects/catalyst-ci-robot
+            HARBOR,global/harbor/projects/catalyst-ci-robot
           parse-json-secrets: true
 
       - name: Login to Harbor
@@ -66,7 +66,7 @@ jobs:
         uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
           secret-ids: |
-            tailscale,global/ci/tailscale
+            TAILSCALE,global/ci/tailscale
           parse-json-secrets: true
 
       - name: Install and configure Tailscale
