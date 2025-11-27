@@ -70,12 +70,27 @@ jobs:
           rm -rf "$HOME/.earthly"
           forge configure-satellite -vvv --ci
 
-      - name: Run
-        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
+      - name: Get tailscale secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
         with:
-          command: run
-          args: ./earthly/builder+builder
-          local: false
-          verbosity: debug
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          secret-ids: |
+            ,global/ci/tailscale
+          parse-json-secrets: true
+      - name: Install and configure Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: "${{ env.CLIENT_ID }}"
+          oauth-secret: "${{ env.CLIENT_SECRET }}"
+          tags: "tag:cat-github"
+          use-cache: "true"
+          version: "latest"
+
+      # - name: Run
+      #   uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
+      #   with:
+      #     command: run
+      #     args: ./earthly/builder+builder
+      #     local: false
+      #     verbosity: debug
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
