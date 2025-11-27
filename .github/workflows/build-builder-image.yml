@@ -4,8 +4,93 @@ on:
   workflow_dispatch:
 
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  build:
+  build-builder:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Build builder image"
+      - uses: actions/checkout@v4
+
+      - name: Install Forge
+        uses: input-output-hk/catalyst-forge/actions/install@master
+        with:
+          enable_caching: "true"
+          version: 0.21.0
+
+      - name: Login to AWS
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: "eu-central-1"
+          role-to-assume: "arn:aws:iam::332405224602:role/ci"
+
+      - name: Get Harbor secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,global/harbor/projects/catalyst-ci-robot
+          parse-json-secrets: true
+
+      - name: Login to Harbor
+        uses: docker/login-action@v3
+        with:
+          registry: harbor.shared-services.projectcatalyst.io
+          username: "${{ env.USERNAME }}"
+          password: "${{ env.PASSWORD }}"
+
+      - name: Get Earthly provider configuration
+        id: earthly
+        shell: bash
+        run: |
+          echo "==== Earthly Setup ====="
+
+          echo "sat=true" >> GITHUB_OUTPUT
+          echo "version=0.8.15" >> $GITHUB_OUTPUT
+
+      - name: Cache Earthly binary
+        id: cache-binary
+        uses: actions/cache@v4
+        with:
+          path: /usr/local/bin/earthly
+          key: ${{ runner.os }}-${{ steps.earthly.outputs.version }}
+
+      - name: Install Earthly
+        shell: bash
+        run: |
+          wget -q https://github.com/earthly/earthly/releases/download/v${{ steps.earthly.outputs.version}}/earthly-linux-amd64 -O /usr/local/bin/earthly
+
+          chmod +x /usr/local/bin/earthly
+          /usr/local/bin/earthly bootstrap
+
+      - name: Configure Earthly satellite credentials
+        shell: bash
+        run: |
+          rm -rf "$HOME/.earthly"
+          forge configure-satellite -vvv --ci
+
+      - name: Get tailscale secrets
+        uses: aws-actions/aws-secretsmanager-get-secrets@v2
+        with:
+          secret-ids: |
+            ,global/ci/tailscale
+          parse-json-secrets: true
+      - name: Install and configure Tailscale
+        uses: tailscale/github-action@v3
+        with:
+          oauth-client-id: "${{ env.CLIENT_ID }}"
+          oauth-secret: "${{ env.CLIENT_SECRET }}"
+          tags: "tag:cat-github"
+          use-cache: "true"
+          version: "latest"
+
+      - name: Run
+        uses: input-output-hk/catalyst-forge/actions/run@ci/v1.8.1
+        with:
+          command: run
+          args: ./earthly/builder+builder
+          local: false
+          verbosity: debug
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
