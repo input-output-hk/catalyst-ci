@@ -92,16 +92,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@0.33.1
-        with:
-          image-ref: "${{ env.image_name }}:${{ env.tag }}"
-          format: 'table'
-          exit-code: '0'
-          ignore-unfixed: true
-          vuln-type: 'os,library'
-          severity: 'CRITICAL,HIGH,MEDIUM'
-
       - name: Push to Harbor
         run: |
           docker tag ${{ env.image_name }}:${{ env.tag }} ${{ env.registry }}/catalyst-ci/${{ env.image_name }}:${{ env.tag }}
