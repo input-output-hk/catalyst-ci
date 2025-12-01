@@ -2,6 +2,8 @@ name: Build builder image
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 10 * * MON" #UTC time
 
 
 env:
