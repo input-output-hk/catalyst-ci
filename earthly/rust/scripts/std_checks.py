@@ -81,12 +81,12 @@ def main() -> None:
     results.add(vendor_files_check.toml_diff_check("/stdcfgs/deny.toml", "deny.toml"))
 
     # Check if the rust src is properly formatted.
-    res = exec_manager.cli_run("cargo +nightly fmtchk ", name="Rust Code Format Check")
+    res = exec_manager.cli_run("cargo +nightly-2026-01-07 fmtchk ", name="Rust Code Format Check")
     results.add(res)
     if not res.ok():
         print(
             "[yellow]You can locally fix format errors by running:"
-            " [/yellow] \n [red bold]cargo +nightly fmtfix [/red bold]",
+            " [/yellow] \n [red bold]cargo +nightly-2026-01-07 fmtfix [/red bold]",
         )
 
     # Check if we have unused dependencies declared in our Cargo.toml files.
