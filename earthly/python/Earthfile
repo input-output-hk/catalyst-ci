@@ -54,7 +54,6 @@ LINT_PYTHON:
     RUN ruff format --check && \
         ruff check --output-format=github .
 
-
 # Install Python into the Debian base container.
 # Adapted from: https://github.com/docker-library/python/blob/a83345bce8e75b407f283511dc3128b2062d8c1e/3.14/slim-trixie/Dockerfile
 INSTALL:
@@ -178,11 +177,11 @@ INSTALL:
     RUN uv pip install third-party-imports --system
 
     # Universal build scripts we will always need and are not target dependent.
-    COPY --dir scripts /scripts
+    # COPY --dir scripts /scripts
+    DO +ADD_PYTHON_SCRIPTS
     # Copy our common scripts so we can use them inside the container.
     DO scripts+ADD_BASH_SCRIPTS
     DO scripts+ADD_PYTHON_SCRIPTS
-
 
 python-base:
     FROM debian+common
@@ -204,3 +203,15 @@ python-base-deprecated:
 
     # Adjust Poetry's configuration to prevent connection pool warnings.
     RUN poetry config installer.max-workers 10
+
+python-scripts:
+    FROM scratch
+
+    COPY --dir scripts /
+
+    SAVE ARTIFACT /scripts /scripts
+
+ADD_PYTHON_SCRIPTS:
+    FUNCTION
+
+    COPY --dir +python-scripts/scripts /scripts
