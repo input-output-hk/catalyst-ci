@@ -86,7 +86,8 @@ rust-base:
     RUN rustup component add llvm-tools-preview
 
     # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
+    # The --no-cache attribute is used for debug purposes for this build issue: https://github.com/input-output-hk/hermes/actions/runs/20656802732/job/59661907225?pr=748
+    RUN --no-cache rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
 
     # Ensure we have all the necessary targets
     RUN rustup target add wasm32-unknown-unknown
