@@ -99,7 +99,7 @@ def cargo_doc(*, verbose: bool = False) -> exec_manager.Result:
     # Add RUSTDOCFLAGS to the inherited environment so we can build an index page with nightly.
     env = os.environ
     env["RUSTDOCFLAGS"] = "-Z unstable-options --enable-index-page"
-    return exec_manager.cli_run("cargo +nightly docs", name="Documentation build", verbose=verbose)
+    return exec_manager.cli_run("cargo +nightly-2026-01-07 docs", name="Documentation build", verbose=verbose)
 
 
 def cargo_depgraph(runner: exec_manager.ParallelRunner, *, verbose: bool = False) -> None:

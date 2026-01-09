@@ -85,8 +85,9 @@ rust-base:
     # Needed to generate code coverage.
     RUN rustup component add llvm-tools-preview
 
-    # Install a nightly toolchain which matches.
-    RUN rustup toolchain install nightly --component miri --component rust-src --component rustfmt --component clippy --component cargo
+    # Install a specific nightly toolchain which is known to work.
+    # The version should be updated on regular basis.
+    RUN rustup toolchain install nightly-2026-01-07 --component miri --component rust-src --component rustfmt --component clippy --component cargo
 
     # Ensure we have all the necessary targets
     RUN rustup target add wasm32-unknown-unknown
