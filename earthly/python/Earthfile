@@ -77,7 +77,8 @@ INSTALL:
 		libzstd-dev \
 		make \
 		tk-dev \
-		uuid-dev
+		uuid-dev \
+        curl
 
     DO debian+INSTALL --packages=$PACKAGES
 
