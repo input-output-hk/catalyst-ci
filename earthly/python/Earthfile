@@ -78,6 +78,7 @@ INSTALL:
 		make \
 		tk-dev \
 		uuid-dev \
+        git \
         curl
 
     DO debian+INSTALL --packages=$PACKAGES
