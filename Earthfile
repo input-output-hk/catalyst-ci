@@ -7,8 +7,6 @@ IMPORT ./earthly/spectral AS spectral-ci
 IMPORT ./earthly/python AS python-ci
 IMPORT ./earthly/debian AS debian
 
-ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
-
 # cspell: words livedocs sitedocs
 
 

@@ -9,7 +9,7 @@ IMPORT ../graphviz AS graphviz
 IMPORT ../uv AS uv
 
 # Define a constant name for the container and its version.
-ARG --global PYTHON_IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/library/python"
+ARG --global PYTHON_IMAGE="python"
 
 # Define a constant name for the container and its version.
 ARG --global PYTHON_VERSION=3.14.0

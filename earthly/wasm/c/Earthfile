@@ -8,8 +8,7 @@ IMPORT ../../../utilities/scripts AS scripts
 wasm-c-base:
     # This image comes from: 
     # https://github.com/WebAssembly/wasi-sdk/pkgs/container/wasi-sdk
-    ARG REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
-    FROM ${REGISTRY}/webassembly/wasi-sdk:sha-400dd95
+    FROM ghcr.io/webassembly/wasi-sdk:sha-400dd95
     WORKDIR /root
 
     RUN apt-get update && apt-get install -y \
