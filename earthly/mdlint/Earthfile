@@ -1,6 +1,6 @@
 VERSION 0.8
 
-ARG --global IMAGE="harbor.shared-services.projectcatalyst.io/dockerhub/davidanson/markdownlint-cli2-rules:v0.14.0"
+ARG --global IMAGE="davidanson/markdownlint-cli2-rules:v0.14.0"
 # cspell: words markdownlint
 
 MDLINT_LOCALLY:

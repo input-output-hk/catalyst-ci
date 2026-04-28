@@ -2,8 +2,7 @@ VERSION 0.8
 
 IMPORT ../../earthly/debian AS debian
 
-ARG --global REGISTRY="harbor.shared-services.projectcatalyst.io/dockerhub/library"
-FROM ${REGISTRY}/golang:1.24.5-bookworm
+FROM golang:1.24.5-bookworm
 
 IMPORT ../../earthly/go AS go-ci
 

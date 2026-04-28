@@ -11,9 +11,8 @@ CHECK:
 
     # Unlikely to need to change this.
     ARG cfg_file=cspell.json
-    ARG REGISTRY="harbor.shared-services.projectcatalyst.io/ghcr"
 
-    FROM ${REGISTRY}/streetsidesoftware/cspell:8.13.3
+    FROM ghcr.io/streetsidesoftware/cspell:8.13.3
     WORKDIR /work
 
     COPY $src .
